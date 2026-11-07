@@ -1,0 +1,42 @@
+name: Foundation checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NODE_ENV: test
+      LOG_LEVEL: silent
+      DATABASE_URL: postgresql://relayforge_api:relayforge_api_local@127.0.0.1:55433/relayforge_test
+      WORKER_DATABASE_URL: postgresql://relayforge_worker:relayforge_worker_local@127.0.0.1:55433/relayforge_test
+      MIGRATION_DATABASE_URL: postgresql://relayforge_admin:relayforge_admin_local@127.0.0.1:55433/relayforge_test
+      REDIS_URL: redis://127.0.0.1:56380/0
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run db:generate
+      - run: npm audit --omit=dev --audit-level=moderate
+      - run: npm run check
+      - run: docker compose -f compose.test.yaml up -d --wait
+      - run: npm run db:migrate
+      - run: npm run test:integration
+      - run: docker build --target runtime -t relayforge:ci .
+      - name: Show service logs after failure
+        if: failure()
+        run: docker compose -f compose.test.yaml logs --no-color
+      - name: Stop test services
+        if: always()
+        run: docker compose -f compose.test.yaml down

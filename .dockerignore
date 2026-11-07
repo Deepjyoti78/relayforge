@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+.cache
+.env
+.env.*
+.git
+tests
+docs
+*.log

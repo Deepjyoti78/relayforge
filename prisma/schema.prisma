@@ -1,0 +1,20 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Operational infrastructure only; tenant domain tables follow in the next milestone.
+model WorkerHeartbeat {
+  instanceId String   @id @map("instance_id") @db.Uuid
+  startedAt  DateTime @default(now()) @map("started_at") @db.Timestamptz(3)
+  lastSeenAt DateTime @default(now()) @map("last_seen_at") @db.Timestamptz(3)
+  version    String   @db.VarChar(64)
+
+  @@index([lastSeenAt])
+  @@map("worker_heartbeats")
+}

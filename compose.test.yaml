@@ -1,0 +1,30 @@
+name: relayforge-test
+
+services:
+  postgres:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_USER: relayforge_admin
+      POSTGRES_PASSWORD: relayforge_admin_local
+      POSTGRES_DB: relayforge_test
+    ports:
+      - "127.0.0.1:55433:5432"
+    volumes:
+      - ./infra/postgres/001-roles.sql:/docker-entrypoint-initdb.d/001-roles.sql:ro
+    tmpfs: [/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U relayforge_admin -d relayforge_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7.4-bookworm
+    command: [redis-server, --maxmemory, 64mb, --maxmemory-policy, noeviction]
+    ports:
+      - "127.0.0.1:56380:6379"
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 2s
+      timeout: 3s
+      retries: 30

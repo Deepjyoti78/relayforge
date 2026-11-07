@@ -1,0 +1,94 @@
+name: relayforge
+
+services:
+  postgres:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_USER: relayforge_admin
+      POSTGRES_PASSWORD: relayforge_admin_local
+      POSTGRES_DB: relayforge
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infra/postgres/001-roles.sql:/docker-entrypoint-initdb.d/001-roles.sql:ro
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U relayforge_admin -d relayforge"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.4-bookworm
+    command: [redis-server, --appendonly, "yes", --appendfsync, everysec, --maxmemory, 128mb, --maxmemory-policy, noeviction]
+    ports:
+      - "127.0.0.1:56379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  migrate:
+    profiles: [app]
+    build: { context: ., target: tooling }
+    command: [npm, run, db:migrate]
+    environment:
+      MIGRATION_DATABASE_URL: postgresql://relayforge_admin:relayforge_admin_local@postgres:5432/relayforge
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: "no"
+
+  api:
+    profiles: [app]
+    build: { context: ., target: runtime }
+    init: true
+    command: [node, dist/api/main.js]
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "3100"
+      DATABASE_URL: postgresql://relayforge_api:relayforge_api_local@postgres:5432/relayforge
+      LOG_LEVEL: info
+    ports:
+      - "127.0.0.1:3100:3100"
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3100/health/ready').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    stop_grace_period: 20s
+    restart: unless-stopped
+
+  worker:
+    profiles: [app]
+    build: { context: ., target: runtime }
+    init: true
+    command: [node, dist/worker/main.js]
+    environment:
+      NODE_ENV: production
+      WORKER_DATABASE_URL: postgresql://relayforge_worker:relayforge_worker_local@postgres:5432/relayforge
+      REDIS_URL: redis://redis:6379/0
+      LOG_LEVEL: info
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: [CMD, node, dist/worker/healthcheck.js]
+      interval: 20s
+      timeout: 8s
+      retries: 3
+      start_period: 15s
+    stop_grace_period: 20s
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  redis-data:
