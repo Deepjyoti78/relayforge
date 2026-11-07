@@ -1,6 +1,8 @@
 import type {
   ApiKeyMetadata,
   CreatedApiKeyResponse,
+  CreatedEndpointResponse,
+  EndpointMetadata,
   MembershipRole,
   OrganizationDetails,
   OrganizationMember,
@@ -184,4 +186,50 @@ export async function revokeApiKey(orgId: string, keyId: string): Promise<ApiKey
     throw new Error(error.message || 'Failed to revoke API key');
   }
   return res.json() as Promise<ApiKeyMetadata>;
+}
+
+// Milestone 3 Phase 2 & 3 — Endpoints
+
+export async function fetchEndpoints(orgId: string): Promise<EndpointMetadata[]> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/endpoints`);
+  if (!res.ok) throw new Error('Failed to fetch endpoints');
+  return res.json() as Promise<EndpointMetadata[]>;
+}
+
+export async function createEndpoint(
+  orgId: string,
+  name: string,
+  slug?: string,
+): Promise<CreatedEndpointResponse> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/endpoints`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, slug: slug || undefined }),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: 'Failed to create endpoint' })) as { message?: string };
+    throw new Error(error.message || 'Failed to create endpoint');
+  }
+  return res.json() as Promise<CreatedEndpointResponse>;
+}
+
+export async function deleteEndpoint(orgId: string, endpointId: string): Promise<void> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/endpoints/${endpointId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: 'Failed to delete endpoint' })) as { message?: string };
+    throw new Error(error.message || 'Failed to delete endpoint');
+  }
+}
+
+export async function rotateEndpointSecret(orgId: string, endpointId: string): Promise<CreatedEndpointResponse> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/endpoints/${endpointId}/rotate-secret`, {
+    method: 'POST',
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: 'Failed to rotate secret' })) as { message?: string };
+    throw new Error(error.message || 'Failed to rotate secret');
+  }
+  return res.json() as Promise<CreatedEndpointResponse>;
 }

@@ -3,7 +3,9 @@ import { ApiKeyModule } from '../modules/api-keys/api-key.module';
 import { AuthModule } from '../modules/auth/auth.module';
 import { ConfigurationModule } from '../modules/config/config.module';
 import { DatabaseModule } from '../modules/database/database.module';
+import { EndpointModule } from '../modules/endpoints/endpoint.module';
 import { HealthController } from '../modules/health/health.controller';
+import { IngestionModule } from '../modules/ingestion/ingestion.module';
 import { ObservabilityModule } from '../modules/observability/observability.module';
 import { OrganizationModule } from '../modules/organizations/organization.module';
 
@@ -15,6 +17,8 @@ import { OrganizationModule } from '../modules/organizations/organization.module
     AuthModule,
     OrganizationModule,
     ApiKeyModule,
+    EndpointModule,
+    IngestionModule,
   ],
   controllers: [HealthController],
 })

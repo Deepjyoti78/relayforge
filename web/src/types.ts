@@ -56,3 +56,19 @@ export interface CreatedApiKeyResponse {
   apiKey: string;
   record: ApiKeyMetadata;
 }
+
+export interface EndpointMetadata {
+  id: string;
+  organizationId: string;
+  name: string;
+  slug: string;
+  secretPreview: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatedEndpointResponse {
+  endpoint: EndpointMetadata;
+  signingSecret: string;
+}

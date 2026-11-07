@@ -1,6 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { createApiKey, fetchApiKeys, revokeApiKey } from '../api.ts';
-import type { ApiKeyMetadata, MembershipRole, OrganizationDetails, OrganizationMember } from '../types.ts';
+import {
+  createApiKey,
+  createEndpoint,
+  deleteEndpoint,
+  fetchApiKeys,
+  fetchEndpoints,
+  revokeApiKey,
+  rotateEndpointSecret,
+} from '../api.ts';
+import type {
+  ApiKeyMetadata,
+  EndpointMetadata,
+  MembershipRole,
+  OrganizationDetails,
+  OrganizationMember,
+} from '../types.ts';
 
 interface OrgManagementProps {
   organization: OrganizationDetails;
@@ -44,7 +58,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
   // Action feedback
   const [actionError, setActionError] = useState<string | null>(null);
 
-  // API Keys State (Milestone 3)
+  // API Keys State (Milestone 3 Phase 1)
   const [apiKeys, setApiKeys] = useState<ApiKeyMetadata[]>([]);
   const [keysLoading, setKeysLoading] = useState(false);
   const [showAddKeyModal, setShowAddKeyModal] = useState(false);
@@ -54,14 +68,28 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
   const [keyActionError, setKeyActionError] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState(false);
 
+  // Endpoints State (Milestone 3 Phase 2 & 3)
+  const [endpoints, setEndpoints] = useState<EndpointMetadata[]>([]);
+  const [endpointsLoading, setEndpointsLoading] = useState(false);
+  const [showAddEndpointModal, setShowAddEndpointModal] = useState(false);
+  const [newEndpointName, setNewEndpointName] = useState('');
+  const [newEndpointSlug, setNewEndpointSlug] = useState('');
+  const [createdRawSecret, setCreatedRawSecret] = useState<string | null>(null);
+  const [endpointActionError, setEndpointActionError] = useState<string | null>(null);
+  const [copiedSecret, setCopiedSecret] = useState(false);
+  const [copiedUrlId, setCopiedUrlId] = useState<string | null>(null);
+
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     setOrgName(organization.name);
     setCreatedRawKey(null);
+    setCreatedRawSecret(null);
     setKeyActionError(null);
+    setEndpointActionError(null);
     void loadApiKeys();
+    void loadEndpoints();
   }, [organization.id]);
 
   const loadApiKeys = async () => {
@@ -73,6 +101,18 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       // Ignore if user lacks permissions
     } finally {
       setKeysLoading(false);
+    }
+  };
+
+  const loadEndpoints = async () => {
+    setEndpointsLoading(true);
+    try {
+      const data = await fetchEndpoints(organization.id);
+      setEndpoints(data);
+    } catch {
+      // Ignore if user lacks permissions
+    } finally {
+      setEndpointsLoading(false);
     }
   };
 
@@ -104,11 +144,61 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
     }
   };
 
-  const handleCopyKey = () => {
-    if (!createdRawKey) return;
-    void navigator.clipboard.writeText(createdRawKey);
-    setCopiedKey(true);
-    setTimeout(() => setCopiedKey(false), 2500);
+  const handleCreateEndpoint = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newEndpointName.trim()) return;
+    setEndpointActionError(null);
+    try {
+      const res = await createEndpoint(organization.id, newEndpointName.trim(), newEndpointSlug.trim() || undefined);
+      setCreatedRawSecret(res.signingSecret);
+      setEndpoints((prev) => [res.endpoint, ...prev]);
+      setNewEndpointName('');
+      setNewEndpointSlug('');
+      setShowAddEndpointModal(false);
+    } catch (err: unknown) {
+      setEndpointActionError(err instanceof Error ? err.message : 'Failed to create endpoint');
+    }
+  };
+
+  const handleRotateSecret = async (endpointId: string) => {
+    if (!window.confirm('Rotate webhook signing secret? Previous signatures will no longer be accepted.')) {
+      return;
+    }
+    setEndpointActionError(null);
+    try {
+      const res = await rotateEndpointSecret(organization.id, endpointId);
+      setCreatedRawSecret(res.signingSecret);
+      setEndpoints((prev) => prev.map((ep) => (ep.id === endpointId ? res.endpoint : ep)));
+    } catch (err: unknown) {
+      setEndpointActionError(err instanceof Error ? err.message : 'Failed to rotate secret');
+    }
+  };
+
+  const handleDeleteEndpoint = async (endpointId: string) => {
+    if (!window.confirm('Are you sure you want to delete this endpoint? Inbound webhooks sent to it will be rejected.')) {
+      return;
+    }
+    setEndpointActionError(null);
+    try {
+      await deleteEndpoint(organization.id, endpointId);
+      setEndpoints((prev) => prev.filter((ep) => ep.id !== endpointId));
+    } catch (err: unknown) {
+      setEndpointActionError(err instanceof Error ? err.message : 'Failed to delete endpoint');
+    }
+  };
+
+  const handleCopyText = (text: string, isSecret = false, urlId?: string) => {
+    navigator.clipboard.writeText(text);
+    if (isSecret) {
+      setCopiedSecret(true);
+      setTimeout(() => setCopiedSecret(false), 2000);
+    } else if (urlId) {
+      setCopiedUrlId(urlId);
+      setTimeout(() => setCopiedUrlId(null), 2000);
+    } else {
+      setCopiedKey(true);
+      setTimeout(() => setCopiedKey(false), 2000);
+    }
   };
 
   const handleRename = async (e: React.FormEvent) => {
@@ -122,19 +212,17 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       await onUpdateOrgName(orgName.trim());
       setIsRenaming(false);
     } catch (err: unknown) {
-      setRenameError(err instanceof Error ? err.message : 'Failed to update name');
+      setRenameError(err instanceof Error ? err.message : 'Failed to update organization name');
     }
   };
 
-  const handleAddMember = async (e: React.FormEvent) => {
+  const handleAddMemberSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!memberInput.trim()) return;
     setAddError(null);
     setAddLoading(true);
     try {
-      const identifier = inputType === 'email'
-        ? { email: memberInput.trim() }
-        : { username: memberInput.trim() };
+      const identifier = inputType === 'email' ? { email: memberInput.trim() } : { username: memberInput.trim() };
       await onAddMember(identifier, memberRole);
       setMemberInput('');
       setShowAddMemberModal(false);
@@ -183,6 +271,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
     );
   });
 
+  const filteredEndpoints = endpoints.filter((ep) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      ep.name.toLowerCase().includes(q) ||
+      ep.slug.toLowerCase().includes(q) ||
+      ep.id.toLowerCase().includes(q)
+    );
+  });
+
   return (
     <div style={{ flex: 1, padding: '36px 40px', overflowY: 'auto' }}>
       {/* Eyebrow and Page Title */}
@@ -196,7 +293,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             textTransform: 'uppercase',
             marginBottom: '6px',
           }}>
-            RELAYFORGE TENANT & ACCESS MANAGEMENT
+            RELAYFORGE TENANT & INGESTION CONSOLE
           </div>
 
           {isRenaming ? (
@@ -248,20 +345,26 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             </form>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <h1 style={{ fontSize: '26px', fontWeight: 800, margin: 0, color: '#0f172a', letterSpacing: '-0.03em' }}>
+              <h1 style={{
+                fontSize: '26px',
+                fontWeight: 800,
+                color: '#0f172a',
+                margin: 0,
+                letterSpacing: '-0.02em',
+              }}>
                 {organization.name}
               </h1>
               {isOwner && (
                 <button
                   onClick={() => setIsRenaming(true)}
                   style={{
-                    backgroundColor: '#ffffff',
+                    backgroundColor: 'transparent',
                     border: '1px solid #e2e8f0',
                     color: '#64748b',
-                    borderRadius: '6px',
-                    padding: '3px 9px',
                     fontSize: '11px',
                     fontWeight: 600,
+                    borderRadius: '6px',
+                    padding: '3px 8px',
                     cursor: 'pointer',
                   }}
                 >
@@ -270,41 +373,24 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               )}
             </div>
           )}
-          {renameError && <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>{renameError}</div>}
 
-          <p style={{ margin: '6px 0 0', fontSize: '13px', color: '#64748b' }}>
-            Manage registered members, programmatic API keys, webhook endpoints, and row-level tenant security.
+          <p style={{
+            fontSize: '13px',
+            color: '#64748b',
+            margin: '6px 0 0 0',
+          }}>
+            Manage members, high-throughput webhook ingestion endpoints, and AES-256-GCM signing secrets.
           </p>
+          {renameError && (
+            <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '6px' }}>
+              {renameError}
+            </div>
+          )}
         </div>
 
-        {/* Top Right Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <button
-            onClick={() => alert(`Exporting ${organization.name} directory as CSV...`)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '9px 16px',
-              backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
-              borderRadius: '8px',
-              color: '#0f172a',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Export CSV
-          </button>
-
-          {isOwner && (
+        {/* Top Action Buttons */}
+        <div style={{ display: 'flex', gap: '10px' }}>
+          {isOwner && activeTab === 'members' && (
             <button
               onClick={() => setShowAddMemberModal(true)}
               style={{
@@ -326,7 +412,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             </button>
           )}
 
-          {canManageKeys && (
+          {canManageKeys && activeTab === 'api-keys' && (
             <button
               onClick={() => setShowAddKeyModal(true)}
               style={{
@@ -347,10 +433,32 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               + Generate Key
             </button>
           )}
+
+          {canManageKeys && activeTab === 'endpoints' && (
+            <button
+              onClick={() => setShowAddEndpointModal(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '9px 18px',
+                backgroundColor: '#0f172a',
+                border: '1px solid #0f172a',
+                borderRadius: '8px',
+                color: '#ffffff',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                boxShadow: '0 1px 3px rgba(15, 23, 42, 0.1)',
+              }}
+            >
+              + New Endpoint
+            </button>
+          )}
         </div>
       </div>
 
-      {/* STATS CARDS ROW (4 CARDS) */}
+      {/* STATS CARDS ROW (4 CARDS MATCHING SORA DESIGN) */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
@@ -436,7 +544,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             </svg>
           </div>
           <div style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', lineHeight: '1.2' }}>
-            Ready
+            {endpoints.length}
           </div>
           <div style={{ marginTop: '8px', fontSize: '11px', color: '#64748b' }}>
             AES-256-GCM signed
@@ -554,7 +662,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             backgroundColor: activeTab === 'endpoints' ? 'rgba(255,255,255,0.2)' : '#f1f5f9',
             color: activeTab === 'endpoints' ? '#ffffff' : '#64748b',
           }}>
-            0
+            {endpoints.length}
           </span>
         </button>
 
@@ -575,11 +683,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             transition: 'all 0.15s ease',
           }}
         >
-          <span>Organization Settings</span>
+          <span>Settings</span>
         </button>
       </div>
 
-      {/* SEARCH AND FILTER BAR (MATCHING SORA LIBRARY STYLE) */}
+      {/* SEARCH BAR */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -604,7 +712,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           </svg>
           <input
             type="text"
-            placeholder={activeTab === 'api-keys' ? "Search API key by name, prefix, or scope..." : "Search member by name, contact email, role..."}
+            placeholder={
+              activeTab === 'api-keys'
+                ? 'Search API key by name, prefix, or scope...'
+                : activeTab === 'endpoints'
+                ? 'Search endpoint by name, slug, or ID...'
+                : 'Search member by name, contact email, role...'
+            }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -617,45 +731,22 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             }}
           />
         </div>
-
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          backgroundColor: '#ffffff',
-          border: '1px solid #e2e8f0',
-          borderRadius: '10px',
-          padding: '9px 14px',
-          fontSize: '13px',
-          fontWeight: 500,
-          color: '#0f172a',
-          cursor: 'pointer',
-        }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-          </svg>
-          <span>All Statuses</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </div>
       </div>
 
-      {/* FEEDBACK BANNERS */}
+      {/* FEEDBACK BANNER: CREATED RAW API KEY */}
       {createdRawKey && (
         <div style={{
           backgroundColor: '#ffffff',
           border: '1px solid #10b981',
           borderRadius: '12px',
           padding: '20px 24px',
-          marginBottom: '24px',
-          boxShadow: '0 4px 12px rgba(16, 185, 129, 0.08)',
+          marginBottom: '20px',
+          boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.08)',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '18px' }}>🔑</span>
-            <strong style={{ fontSize: '15px', color: '#065f46' }}>API Key Generated Successfully</strong>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#059669', fontWeight: 700, fontSize: '14px', marginBottom: '6px' }}>
+            <span>🔑 API Key Generated Successfully</span>
           </div>
-          <p style={{ margin: '0 0 14px', fontSize: '13px', color: '#047857' }}>
+          <p style={{ fontSize: '13px', color: '#475569', margin: '0 0 14px' }}>
             Make sure to copy your API key now. For your security, this key is SHA-256 hashed and will never be shown again.
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -665,31 +756,108 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               value={createdRawKey}
               style={{
                 flex: 1,
-                backgroundColor: '#f0fdf4',
-                border: '1px solid #86efac',
-                borderRadius: '8px',
-                padding: '10px 14px',
-                color: '#15803d',
                 fontFamily: 'monospace',
                 fontSize: '13px',
-                fontWeight: 600,
+                padding: '10px 14px',
+                backgroundColor: '#f8fafc',
+                border: '1px solid #cbd5e1',
+                borderRadius: '8px',
+                color: '#0f172a',
               }}
             />
             <button
-              type="button"
-              onClick={handleCopyKey}
+              onClick={() => handleCopyText(createdRawKey)}
               style={{
-                backgroundColor: '#0f172a',
+                padding: '10px 18px',
+                backgroundColor: copiedKey ? '#059669' : '#0f172a',
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: '8px',
-                padding: '10px 20px',
-                fontSize: '13px',
                 fontWeight: 600,
+                fontSize: '13px',
                 cursor: 'pointer',
               }}
             >
               {copiedKey ? '✓ Copied' : 'Copy Key'}
+            </button>
+            <button
+              onClick={() => setCreatedRawKey(null)}
+              style={{
+                padding: '10px 14px',
+                backgroundColor: 'transparent',
+                color: '#64748b',
+                border: '1px solid #cbd5e1',
+                borderRadius: '8px',
+                fontSize: '13px',
+                cursor: 'pointer',
+              }}
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* FEEDBACK BANNER: CREATED RAW SIGNING SECRET (PHASE 2 & 3) */}
+      {createdRawSecret && (
+        <div style={{
+          backgroundColor: '#ffffff',
+          border: '1px solid #0f172a',
+          borderRadius: '12px',
+          padding: '20px 24px',
+          marginBottom: '20px',
+          boxShadow: '0 4px 6px -1px rgba(15, 23, 42, 0.08)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', fontWeight: 700, fontSize: '14px', marginBottom: '6px' }}>
+            <span>🔒 Webhook Signing Secret Generated (AES-256-GCM)</span>
+          </div>
+          <p style={{ fontSize: '13px', color: '#475569', margin: '0 0 14px' }}>
+            Make sure to copy your webhook signing secret now. It is encrypted in the database using envelope encryption and cannot be shown again.
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <input
+              type="text"
+              readOnly
+              value={createdRawSecret}
+              style={{
+                flex: 1,
+                fontFamily: 'monospace',
+                fontSize: '13px',
+                padding: '10px 14px',
+                backgroundColor: '#f8fafc',
+                border: '1px solid #cbd5e1',
+                borderRadius: '8px',
+                color: '#0f172a',
+              }}
+            />
+            <button
+              onClick={() => handleCopyText(createdRawSecret, true)}
+              style={{
+                padding: '10px 18px',
+                backgroundColor: copiedSecret ? '#059669' : '#0f172a',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '8px',
+                fontWeight: 600,
+                fontSize: '13px',
+                cursor: 'pointer',
+              }}
+            >
+              {copiedSecret ? '✓ Copied' : 'Copy Secret'}
+            </button>
+            <button
+              onClick={() => setCreatedRawSecret(null)}
+              style={{
+                padding: '10px 14px',
+                backgroundColor: 'transparent',
+                color: '#64748b',
+                border: '1px solid #cbd5e1',
+                borderRadius: '8px',
+                fontSize: '13px',
+                cursor: 'pointer',
+              }}
+            >
+              Dismiss
             </button>
           </div>
         </div>
@@ -700,16 +868,30 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           backgroundColor: '#fef2f2',
           border: '1px solid #fecaca',
           color: '#b91c1c',
-          borderRadius: '10px',
           padding: '12px 16px',
-          marginBottom: '20px',
+          borderRadius: '8px',
           fontSize: '13px',
+          marginBottom: '20px',
         }}>
           {actionError}
         </div>
       )}
 
-      {/* TABLE CARD */}
+      {endpointActionError && (
+        <div style={{
+          backgroundColor: '#fef2f2',
+          border: '1px solid #fecaca',
+          color: '#b91c1c',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          fontSize: '13px',
+          marginBottom: '20px',
+        }}>
+          {endpointActionError}
+        </div>
+      )}
+
+      {/* TABLE CONTAINER */}
       <div style={{
         backgroundColor: '#ffffff',
         border: '1px solid #e2e8f0',
@@ -732,185 +914,166 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               }}>
                 <th style={{ padding: '14px 20px' }}>Member ID</th>
                 <th style={{ padding: '14px 20px' }}>Member Name & Contact</th>
-                <th style={{ padding: '14px 20px' }}>Membership Role</th>
-                <th style={{ padding: '14px 20px' }}>Active Tenant</th>
-                <th style={{ padding: '14px 20px' }}>Joined Date</th>
+                <th style={{ padding: '14px 20px' }}>Role</th>
+                <th style={{ padding: '14px 20px' }}>Enrolled Date</th>
                 <th style={{ padding: '14px 20px' }}>Status</th>
                 <th style={{ padding: '14px 20px', textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredMembers.map((m, idx) => {
-                const isSelf = m.userId === currentUserId;
-                const memberIdDisplay = `MEM-${m.id.slice(0, 5).toUpperCase()}`;
-                const initials = (m.user.displayName || 'U').split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
-                return (
-                  <tr
-                    key={m.id}
-                    style={{
-                      borderBottom: idx === filteredMembers.length - 1 ? 'none' : '1px solid #f1f5f9',
-                      fontSize: '13px',
-                      color: '#0f172a',
-                    }}
-                  >
-                    <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#64748b' }}>
-                      {memberIdDisplay}
-                    </td>
+              {filteredMembers.length === 0 ? (
+                <tr>
+                  <td colSpan={6} style={{ padding: '40px 20px', textAlign: 'center', color: '#94a3b8' }}>
+                    No members match your search criteria.
+                  </td>
+                </tr>
+              ) : (
+                filteredMembers.map((m, idx) => {
+                  const isCurrent = m.userId === currentUserId;
+                  const memberIdDisplay = `MEM-${m.userId.slice(0, 5).toUpperCase()}`;
 
-                    <td style={{ padding: '14px 20px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        {m.user.avatarUrl ? (
-                          <img
-                            src={m.user.avatarUrl}
-                            alt=""
-                            style={{ width: '32px', height: '32px', borderRadius: '50%' }}
-                          />
-                        ) : (
-                          <div style={{
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: '50%',
-                            backgroundColor: '#0f172a',
-                            color: '#ffffff',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '11px',
-                            fontWeight: 700,
-                          }}>
-                            {initials}
-                          </div>
-                        )}
-                        <div>
-                          <div style={{ fontWeight: 600, color: '#0f172a' }}>
-                            {m.user.displayName || 'Unnamed User'} {isSelf && <span style={{ color: '#2563eb', fontWeight: 500 }}>(You)</span>}
-                          </div>
-                          <div style={{ fontSize: '12px', color: '#64748b' }}>
-                            {m.user.email || '—'}
+                  return (
+                    <tr
+                      key={m.id}
+                      style={{
+                        borderBottom: idx === filteredMembers.length - 1 ? 'none' : '1px solid #f1f5f9',
+                        fontSize: '13px',
+                        color: '#0f172a',
+                      }}
+                    >
+                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#64748b' }}>
+                        {memberIdDisplay}
+                      </td>
+
+                      <td style={{ padding: '14px 20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          {m.user.avatarUrl ? (
+                            <img
+                              src={m.user.avatarUrl}
+                              alt=""
+                              style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }}
+                            />
+                          ) : (
+                            <div style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '50%',
+                              backgroundColor: '#0f172a',
+                              color: '#ffffff',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '11px',
+                              fontWeight: 700,
+                            }}>
+                              {(m.user.displayName || m.user.email || 'U').slice(0, 2).toUpperCase()}
+                            </div>
+                          )}
+                          <div>
+                            <div style={{ fontWeight: 600, color: '#0f172a' }}>
+                              {m.user.displayName || 'Unnamed Developer'} {isCurrent && <span style={{ color: '#64748b', fontWeight: 400 }}>(You)</span>}
+                            </div>
+                            <div style={{ fontSize: '12px', color: '#64748b' }}>
+                              {m.user.email || 'No public email'}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    <td style={{ padding: '14px 20px' }}>
-                      {isOwner && !isSelf ? (
-                        <select
-                          value={m.role}
-                          onChange={(e) => void handleRoleChange(m.id, e.target.value as MembershipRole)}
-                          style={{
-                            backgroundColor: '#ffffff',
-                            border: '1px solid #cbd5e1',
-                            borderRadius: '6px',
-                            padding: '4px 8px',
-                            fontSize: '12px',
-                            fontWeight: 600,
-                            color: '#0f172a',
-                          }}
-                        >
-                          <option value="VIEWER">VIEWER</option>
-                          <option value="DEVELOPER">DEVELOPER</option>
-                          <option value="OWNER">OWNER</option>
-                        </select>
-                      ) : (
+                      <td style={{ padding: '14px 20px' }}>
                         <span style={{
                           display: 'inline-block',
-                          padding: '3px 8px',
+                          padding: '3px 10px',
                           borderRadius: '6px',
                           fontSize: '11px',
-                          fontWeight: 700,
-                          backgroundColor: m.role === 'OWNER' ? '#f1f5f9' : '#f8fafc',
+                          fontWeight: 600,
+                          backgroundColor: m.role === 'OWNER' ? '#f8fafc' : '#ffffff',
                           color: '#0f172a',
                           border: '1px solid #e2e8f0',
                         }}>
                           {m.role}
                         </span>
-                      )}
-                    </td>
+                      </td>
 
-                    <td style={{ padding: '14px 20px', color: '#64748b' }}>
-                      {organization.name}
-                    </td>
+                      <td style={{ padding: '14px 20px', color: '#64748b', fontSize: '12px' }}>
+                        {new Date(m.joinedAt).toLocaleDateString()}
+                      </td>
 
-                    <td style={{ padding: '14px 20px', color: '#64748b', fontSize: '12px' }}>
-                      {new Date(m.joinedAt).toLocaleDateString()}
-                    </td>
+                      <td style={{ padding: '14px 20px' }}>
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          padding: '2px 8px',
+                          borderRadius: '999px',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          backgroundColor: '#ecfdf5',
+                          color: '#059669',
+                        }}>
+                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#10b981' }}></span>
+                          Active
+                        </span>
+                      </td>
 
-                    <td style={{ padding: '14px 20px' }}>
-                      <span style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                        padding: '2px 8px',
-                        borderRadius: '999px',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        backgroundColor: '#ecfdf5',
-                        color: '#059669',
-                      }}>
-                        <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#10b981' }}></span>
-                        Active
-                      </span>
-                    </td>
-
-                    <td style={{ padding: '14px 20px', textAlign: 'right' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
-                        <button
-                          title="View details"
-                          style={{
-                            backgroundColor: 'transparent',
-                            border: '1px solid #e2e8f0',
-                            borderRadius: '6px',
-                            padding: '6px',
-                            color: '#64748b',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                          </svg>
-                        </button>
-
-                        {isOwner && !isSelf && (
-                          <button
-                            title="Remove member"
-                            onClick={() => void handleRemove(m.id)}
-                            style={{
-                              backgroundColor: 'transparent',
-                              border: '1px solid #fee2e2',
-                              borderRadius: '6px',
-                              padding: '6px',
-                              color: '#ef4444',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <polyline points="3 6 5 6 21 6"></polyline>
-                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            </svg>
-                          </button>
-                        )}
-                        {isSelf && (
-                          <button
-                            onClick={() => void handleRemove(m.id)}
-                            style={{
-                              backgroundColor: 'transparent',
-                              border: '1px solid #cbd5e1',
-                              color: '#64748b',
-                              borderRadius: '6px',
-                              padding: '4px 10px',
-                              fontSize: '11px',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            Leave
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                      <td style={{ padding: '14px 20px', textAlign: 'right' }}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                          {isOwner && !isCurrent ? (
+                            <>
+                              <select
+                                value={m.role}
+                                onChange={(e) => void handleRoleChange(m.id, e.target.value as MembershipRole)}
+                                style={{
+                                  backgroundColor: '#ffffff',
+                                  border: '1px solid #cbd5e1',
+                                  borderRadius: '6px',
+                                  padding: '4px 8px',
+                                  fontSize: '11px',
+                                  color: '#0f172a',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                <option value="OWNER">OWNER</option>
+                                <option value="DEVELOPER">DEVELOPER</option>
+                                <option value="VIEWER">VIEWER</option>
+                              </select>
+                              <button
+                                onClick={() => void handleRemove(m.id)}
+                                style={{
+                                  backgroundColor: '#ffffff',
+                                  border: '1px solid #fee2e2',
+                                  color: '#ef4444',
+                                  borderRadius: '6px',
+                                  padding: '4px 10px',
+                                  fontSize: '11px',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                Remove
+                              </button>
+                            </>
+                          ) : isCurrent && !isOwner && (
+                            <button
+                              onClick={() => void handleRemove(m.id)}
+                              style={{
+                                backgroundColor: '#ffffff',
+                                border: '1px solid #cbd5e1',
+                                color: '#64748b',
+                                borderRadius: '6px',
+                                padding: '4px 10px',
+                                fontSize: '11px',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Leave
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         )}
@@ -1046,8 +1209,171 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           </table>
         )}
 
-        {/* ENDPOINTS / OTHER TABS VIEW */}
-        {(activeTab === 'endpoints' || activeTab === 'dashboard' || activeTab === 'settings') && (
+        {/* ENDPOINTS VIEW (MILESTONE 3 PHASE 2 & 3) */}
+        {activeTab === 'endpoints' && (
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr style={{
+                borderBottom: '1px solid #f1f5f9',
+                color: '#64748b',
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                backgroundColor: '#fafafa',
+              }}>
+                <th style={{ padding: '14px 20px' }}>Endpoint ID</th>
+                <th style={{ padding: '14px 20px' }}>Name & Slug</th>
+                <th style={{ padding: '14px 20px' }}>Ingestion URL</th>
+                <th style={{ padding: '14px 20px' }}>Signing Secret</th>
+                <th style={{ padding: '14px 20px' }}>Created</th>
+                <th style={{ padding: '14px 20px' }}>Status</th>
+                <th style={{ padding: '14px 20px', textAlign: 'right' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {endpointsLoading ? (
+                <tr>
+                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#94a3b8' }}>
+                    Loading ingestion endpoints...
+                  </td>
+                </tr>
+              ) : filteredEndpoints.length === 0 ? (
+                <tr>
+                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#94a3b8' }}>
+                    No ingestion endpoints created yet. Click "+ New Endpoint" to begin accepting webhooks.
+                  </td>
+                </tr>
+              ) : (
+                filteredEndpoints.map((ep, idx) => {
+                  const ingestUrl = `http://127.0.0.1:3100/v1/ingest/${ep.id}`;
+                  const isCopied = copiedUrlId === ep.id;
+                  const epIdDisplay = `EP-${ep.id.slice(0, 5).toUpperCase()}`;
+
+                  return (
+                    <tr
+                      key={ep.id}
+                      style={{
+                        borderBottom: idx === filteredEndpoints.length - 1 ? 'none' : '1px solid #f1f5f9',
+                        fontSize: '13px',
+                        color: '#0f172a',
+                      }}
+                    >
+                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#64748b' }}>
+                        {epIdDisplay}
+                      </td>
+
+                      <td style={{ padding: '14px 20px' }}>
+                        <div style={{ fontWeight: 600 }}>{ep.name}</div>
+                        <div style={{ fontSize: '11px', color: '#64748b', fontFamily: 'monospace' }}>/{ep.slug}</div>
+                      </td>
+
+                      <td style={{ padding: '14px 20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <code style={{
+                            fontSize: '11px',
+                            backgroundColor: '#f1f5f9',
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            color: '#0f172a',
+                          }}>
+                            {`/v1/ingest/${ep.id.slice(0, 8)}...`}
+                          </code>
+                          <button
+                            onClick={() => handleCopyText(ingestUrl, false, ep.id)}
+                            style={{
+                              backgroundColor: 'transparent',
+                              border: 'none',
+                              color: isCopied ? '#059669' : '#64748b',
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              padding: '2px 6px',
+                            }}
+                          >
+                            {isCopied ? '✓ Copied' : 'Copy'}
+                          </button>
+                        </div>
+                      </td>
+
+                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#0f172a' }}>
+                        <code>{ep.secretPreview}...</code>
+                      </td>
+
+                      <td style={{ padding: '14px 20px', color: '#64748b', fontSize: '12px' }}>
+                        {new Date(ep.createdAt).toLocaleDateString()}
+                      </td>
+
+                      <td style={{ padding: '14px 20px' }}>
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          padding: '2px 8px',
+                          borderRadius: '999px',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          backgroundColor: ep.isActive ? '#ecfdf5' : '#fef2f2',
+                          color: ep.isActive ? '#059669' : '#b91c1c',
+                        }}>
+                          <span style={{
+                            width: '5px',
+                            height: '5px',
+                            borderRadius: '50%',
+                            backgroundColor: ep.isActive ? '#10b981' : '#ef4444',
+                          }}></span>
+                          {ep.isActive ? 'ACTIVE' : 'INACTIVE'}
+                        </span>
+                      </td>
+
+                      <td style={{ padding: '14px 20px', textAlign: 'right' }}>
+                        {canManageKeys && (
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                            <button
+                              title="Rotate signing secret"
+                              onClick={() => void handleRotateSecret(ep.id)}
+                              style={{
+                                backgroundColor: 'transparent',
+                                border: '1px solid #cbd5e1',
+                                color: '#0f172a',
+                                borderRadius: '6px',
+                                padding: '4px 10px',
+                                fontSize: '11px',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Rotate
+                            </button>
+                            <button
+                              title="Delete endpoint"
+                              onClick={() => void handleDeleteEndpoint(ep.id)}
+                              style={{
+                                backgroundColor: 'transparent',
+                                border: '1px solid #fee2e2',
+                                color: '#ef4444',
+                                borderRadius: '6px',
+                                padding: '4px 10px',
+                                fontSize: '11px',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        )}
+
+        {/* SETTINGS / DASHBOARD VIEW */}
+        {(activeTab === 'dashboard' || activeTab === 'settings') && (
           <div style={{ padding: '60px 20px', textAlign: 'center', color: '#64748b' }}>
             <div style={{
               width: '44px',
@@ -1061,17 +1387,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               color: '#0f172a',
             }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
               </svg>
             </div>
             <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 8px', color: '#0f172a' }}>
-              {activeTab === 'endpoints' ? 'Milestone 3 — Ingestion Endpoints' : 'Settings & Telemetry'}
+              Organization Settings & Architecture
             </h3>
             <p style={{ fontSize: '13px', margin: 0, color: '#64748b' }}>
-              {activeTab === 'endpoints'
-                ? 'Webhook ingestion endpoints with AES-256-GCM envelope signing secrets and outbox dispatch are in progress.'
-                : 'Manage organization preferences, database connection parameters, and webhook retention rules.'}
+              PostgreSQL Row-Level Security isolation is active. Slug: <code>{organization.slug}</code>
             </p>
           </div>
         )}
@@ -1105,19 +1429,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               Register Organization Member
             </h3>
             <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 20px' }}>
-              Invite a user by email or GitHub username and grant tenant access.
+              Invite a collaborator to access organization resources and pipelines.
             </p>
 
-            <form onSubmit={handleAddMember}>
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
-                  Identifier Type
-                </label>
+            <form onSubmit={handleAddMemberSubmit}>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
                 <select
                   value={inputType}
                   onChange={(e) => setInputType(e.target.value as 'email' | 'username')}
                   style={{
-                    width: '100%',
                     padding: '8px 12px',
                     border: '1px solid #cbd5e1',
                     borderRadius: '8px',
@@ -1129,12 +1449,6 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   <option value="email">User Email</option>
                   <option value="username">GitHub Username</option>
                 </select>
-              </div>
-
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
-                  {inputType === 'email' ? 'Email Address' : 'GitHub Username'}
-                </label>
                 <input
                   type={inputType === 'email' ? 'email' : 'text'}
                   placeholder={inputType === 'email' ? 'developer@example.com' : 'octocat'}
@@ -1142,7 +1456,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onChange={(e) => setMemberInput(e.target.value)}
                   autoFocus
                   style={{
-                    width: '100%',
+                    flex: 1,
                     padding: '8px 12px',
                     border: '1px solid #cbd5e1',
                     borderRadius: '8px',
@@ -1155,7 +1469,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
-                  Role & Permissions
+                  Assigned Role
                 </label>
                 <select
                   value={memberRole}
@@ -1170,9 +1484,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     color: '#0f172a',
                   }}
                 >
-                  <option value="VIEWER">VIEWER — Read-only permitted resources</option>
-                  <option value="DEVELOPER">DEVELOPER — Endpoints, API keys & workflows</option>
-                  <option value="OWNER">OWNER — Full administrative access</option>
+                  <option value="VIEWER">VIEWER (Read-only)</option>
+                  <option value="DEVELOPER">DEVELOPER (Create Keys & Endpoints)</option>
+                  <option value="OWNER">OWNER (Full Admin)</option>
                 </select>
               </div>
 
@@ -1249,7 +1563,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               Create Organization API Key
             </h3>
             <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 20px' }}>
-              Generate a secure SHA-256 hashed API key to authenticate incoming webhooks.
+              Generate a secure SHA-256 hashed API key to authenticate programmatic requests.
             </p>
 
             <form onSubmit={handleCreateApiKey}>
@@ -1334,6 +1648,128 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   }}
                 >
                   Generate Key
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ADD ENDPOINT (MILESTONE 3 PHASE 2) */}
+      {showAddEndpointModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.4)',
+          backdropFilter: 'blur(2px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 50,
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '16px',
+            border: '1px solid #e2e8f0',
+            width: '100%',
+            maxWidth: '460px',
+            padding: '28px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+          }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#0f172a' }}>
+              Create Ingestion Endpoint
+            </h3>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 20px' }}>
+              Register a dedicated webhook ingestion endpoint. A unique AES-256-GCM signing secret will be generated.
+            </p>
+
+            <form onSubmit={handleCreateEndpoint}>
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
+                  Endpoint Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Stripe Webhooks, GitHub Events"
+                  value={newEndpointName}
+                  onChange={(e) => setNewEndpointName(e.target.value)}
+                  autoFocus
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    backgroundColor: '#ffffff',
+                    color: '#0f172a',
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
+                  Slug (Optional URL identifier)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. stripe-production"
+                  value={newEndpointSlug}
+                  onChange={(e) => setNewEndpointSlug(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    backgroundColor: '#ffffff',
+                    color: '#0f172a',
+                  }}
+                />
+                <span style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px', display: 'block' }}>
+                  Leave empty to automatically generate a unique slug.
+                </span>
+              </div>
+
+              {endpointActionError && (
+                <div style={{ color: '#ef4444', fontSize: '12px', marginBottom: '16px' }}>
+                  {endpointActionError}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAddEndpointModal(false)}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '8px',
+                    color: '#64748b',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: '8px 18px',
+                    backgroundColor: '#0f172a',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#ffffff',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Create Endpoint
                 </button>
               </div>
             </form>

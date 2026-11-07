@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
 export type ProcessRole = 'api' | 'worker';
@@ -34,6 +35,7 @@ const baseSchema = z.object({
   GITHUB_CALLBACK_URL: z.string().url().default('http://127.0.0.1:3100/auth/github/callback'),
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
   SESSION_COOKIE_NAME: z.string().default('rf_session'),
+  ENCRYPTION_KEY: z.string().default('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'),
 });
 
 export class ConfigurationError extends Error {
@@ -72,6 +74,7 @@ export function parseEnvironment(role: ProcessRole, input: NodeJS.ProcessEnv) {
     githubCallbackUrl: values.GITHUB_CALLBACK_URL,
     frontendUrl: values.FRONTEND_URL,
     sessionCookieName: values.SESSION_COOKIE_NAME,
+    encryptionKey: createHash('sha256').update(values.ENCRYPTION_KEY).digest(),
   });
 }
 
