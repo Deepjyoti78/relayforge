@@ -53,7 +53,10 @@ async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Promise<R
 export async function fetchMe(): Promise<UserProfile | null> {
   const res = await apiFetch('/v1/me');
   if (res.status === 401) return null;
-  if (!res.ok) throw new Error('Failed to fetch user profile');
+  const contentType = res.headers.get('content-type');
+  if (!res.ok || !contentType?.includes('application/json')) {
+    return null;
+  }
   return res.json() as Promise<UserProfile>;
 }
 
