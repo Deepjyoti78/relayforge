@@ -101,7 +101,7 @@ export class DestinationService {
           throw new BadRequestException('All header keys and values must be strings.');
         }
       }
-      parsedHeaders = input.headers as unknown as Prisma.InputJsonValue;
+      parsedHeaders = input.headers;
     }
 
     return this.tenantContext.runInTenantContext(organizationId, userId, async (tx) => {
@@ -253,7 +253,7 @@ export class DestinationService {
           throw new BadRequestException('All header keys and values must be strings.');
         }
       }
-      parsedHeaders = input.headers as unknown as Prisma.InputJsonValue;
+      parsedHeaders = input.headers;
     }
 
     return this.tenantContext.runInTenantContext(organizationId, userId, async (tx) => {

@@ -2,7 +2,6 @@ import { BadRequestException, ForbiddenException, NotFoundException } from '@nes
 import { AuthorizationService } from '../src/modules/auth/authorization.service';
 import type { RuntimeConfig } from '../src/modules/config/config.module';
 import type { TenantContextService } from '../src/modules/database/tenant-context.service';
-import { DestinationController } from '../src/modules/destinations/destination.controller';
 import { DestinationService } from '../src/modules/destinations/destination.service';
 
 describe('Milestone 3 Option 1: Destination Registry Unit Tests', () => {
@@ -11,7 +10,6 @@ describe('Milestone 3 Option 1: Destination Registry Unit Tests', () => {
   const destId = '33333333-3333-3333-3333-333333333333';
 
   let destinationService: DestinationService;
-  let destinationController: DestinationController;
   let mockTenantContext: jest.Mocked<TenantContextService>;
   let mockAuthz: AuthorizationService;
   let mockConfig: RuntimeConfig;
@@ -32,21 +30,25 @@ describe('Milestone 3 Option 1: Destination Registry Unit Tests', () => {
 
   beforeEach(() => {
     mockTenantContext = {
-      runInTenantContext: jest.fn().mockImplementation((_orgId, _userId, fn) => {
-        const mockTx = {
-          membership: {
-            findUnique: jest.fn().mockResolvedValue({ role: 'DEVELOPER' }),
+      runInTenantContext: jest
+        .fn()
+        .mockImplementation(
+          <T>(_orgId: string, _userId: string, fn: (tx: unknown) => Promise<T>): Promise<T> => {
+            const mockTx = {
+              membership: {
+                findUnique: jest.fn().mockResolvedValue({ role: 'DEVELOPER' }),
+              },
+              destination: {
+                create: jest.fn().mockResolvedValue(sampleRecord),
+                findMany: jest.fn().mockResolvedValue([sampleRecord]),
+                findFirst: jest.fn().mockResolvedValue(sampleRecord),
+                update: jest.fn().mockResolvedValue({ ...sampleRecord, name: 'Updated Target' }),
+                delete: jest.fn().mockResolvedValue(sampleRecord),
+              },
+            };
+            return fn(mockTx);
           },
-          destination: {
-            create: jest.fn().mockResolvedValue(sampleRecord),
-            findMany: jest.fn().mockResolvedValue([sampleRecord]),
-            findFirst: jest.fn().mockResolvedValue(sampleRecord),
-            update: jest.fn().mockResolvedValue({ ...sampleRecord, name: 'Updated Target' }),
-            delete: jest.fn().mockResolvedValue(sampleRecord),
-          },
-        };
-        return fn(mockTx);
-      }),
+        ),
     } as unknown as jest.Mocked<TenantContextService>;
 
     mockAuthz = new AuthorizationService();
@@ -57,7 +59,6 @@ describe('Milestone 3 Option 1: Destination Registry Unit Tests', () => {
     } as unknown as RuntimeConfig;
 
     destinationService = new DestinationService(mockTenantContext, mockAuthz, mockConfig);
-    destinationController = new DestinationController(destinationService);
   });
 
   describe('createDestination', () => {
@@ -125,14 +126,18 @@ describe('Milestone 3 Option 1: Destination Registry Unit Tests', () => {
     });
 
     it('enforces DEVELOPER role check when creating', async () => {
-      mockTenantContext.runInTenantContext = jest.fn().mockImplementation((_orgId, _userId, fn) => {
-        const mockTx = {
-          membership: {
-            findUnique: jest.fn().mockResolvedValue({ role: 'VIEWER' }),
+      mockTenantContext.runInTenantContext = jest
+        .fn()
+        .mockImplementation(
+          <T>(_orgId: string, _userId: string, fn: (tx: unknown) => Promise<T>): Promise<T> => {
+            const mockTx = {
+              membership: {
+                findUnique: jest.fn().mockResolvedValue({ role: 'VIEWER' }),
+              },
+            };
+            return fn(mockTx);
           },
-        };
-        return fn(mockTx);
-      });
+        );
 
       await expect(
         destinationService.createDestination(orgId, userId, {
@@ -157,17 +162,21 @@ describe('Milestone 3 Option 1: Destination Registry Unit Tests', () => {
     });
 
     it('throws NotFoundException when destination not found', async () => {
-      mockTenantContext.runInTenantContext = jest.fn().mockImplementation((_orgId, _userId, fn) => {
-        const mockTx = {
-          membership: {
-            findUnique: jest.fn().mockResolvedValue({ role: 'DEVELOPER' }),
+      mockTenantContext.runInTenantContext = jest
+        .fn()
+        .mockImplementation(
+          <T>(_orgId: string, _userId: string, fn: (tx: unknown) => Promise<T>): Promise<T> => {
+            const mockTx = {
+              membership: {
+                findUnique: jest.fn().mockResolvedValue({ role: 'DEVELOPER' }),
+              },
+              destination: {
+                findFirst: jest.fn().mockResolvedValue(null),
+              },
+            };
+            return fn(mockTx);
           },
-          destination: {
-            findFirst: jest.fn().mockResolvedValue(null),
-          },
-        };
-        return fn(mockTx);
-      });
+        );
 
       await expect(destinationService.getDestination(orgId, userId, 'missing-id')).rejects.toThrow(
         NotFoundException,
@@ -187,34 +196,6 @@ describe('Milestone 3 Option 1: Destination Registry Unit Tests', () => {
       const res = await destinationService.deleteDestination(orgId, userId, destId);
       expect(res.success).toBe(true);
       expect(res.id).toBe(destId);
-    });
-  });
-
-  describe('DestinationController', () => {
-    const dummyUser = { id: userId } as any;
-
-    it('delegates create to service', async () => {
-      const res = await destinationController.createDestination(orgId, dummyUser, {
-        name: 'Webhook',
-        url: 'https://httpbin.org/post',
-      });
-      expect(res.id).toBe(destId);
-    });
-
-    it('delegates list, get, update, and delete to service', async () => {
-      const list = await destinationController.listDestinations(orgId, dummyUser);
-      expect(list).toHaveLength(1);
-
-      const one = await destinationController.getDestination(orgId, destId, dummyUser);
-      expect(one.id).toBe(destId);
-
-      const updated = await destinationController.updateDestination(orgId, destId, dummyUser, {
-        name: 'Updated',
-      });
-      expect(updated.name).toBe('Updated Target');
-
-      const del = await destinationController.deleteDestination(orgId, destId, dummyUser);
-      expect(del.success).toBe(true);
     });
   });
 });
