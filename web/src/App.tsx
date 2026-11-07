@@ -7,6 +7,7 @@ import {
   fetchMe,
   logout,
   removeMember,
+  setSessionToken,
   updateMemberRole,
   updateOrganization,
 } from './api.ts';
@@ -39,6 +40,21 @@ export const App: React.FC = () => {
   };
 
   useEffect(() => {
+    // Check if returned from OAuth redirect with ?token=...
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlToken = params.get('token');
+      if (urlToken) {
+        setSessionToken(urlToken);
+        params.delete('token');
+        const remainingQuery = params.toString();
+        const cleanUrl = window.location.pathname + (remainingQuery ? `?${remainingQuery}` : '') + window.location.hash;
+        window.history.replaceState({}, '', cleanUrl);
+      }
+    } catch {
+      // Ignore URL parsing errors
+    }
+
     void loadUser();
   }, []);
 

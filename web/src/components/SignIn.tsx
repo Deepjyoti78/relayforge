@@ -1,6 +1,8 @@
 import React from 'react';
 
 export const SignIn: React.FC = () => {
+  const startUrl = `/auth/github/start?redirect_uri=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : '')}`;
+
   return (
     <div style={{
       display: 'flex',
@@ -43,7 +45,7 @@ export const SignIn: React.FC = () => {
         </p>
 
         <a
-          href="/auth/github/start"
+          href={startUrl}
           style={{
             display: 'inline-flex',
             alignItems: 'center',

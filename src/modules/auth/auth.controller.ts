@@ -14,6 +14,7 @@ import { parseCookies, serializeCookie } from '../../common/cookies';
 import type { User } from '../../generated/prisma/client';
 import { RuntimeConfig } from '../config/config.module';
 import { DatabaseService } from '../database/database.service';
+import { TenantContextService } from '../database/tenant-context.service';
 import { AuthGuard } from './auth.guard';
 import type { AuthenticatedRequest } from './auth.guard';
 import { CurrentUser } from './current-user.decorator';
@@ -26,6 +27,7 @@ export class AuthController {
     private readonly gitHubOAuth: GitHubOAuthService,
     private readonly sessionService: SessionService,
     private readonly database: DatabaseService,
+    private readonly tenantContext: TenantContextService,
     private readonly config: RuntimeConfig,
   ) {}
 
@@ -56,7 +58,18 @@ export class AuthController {
     });
 
     res.setHeader('Set-Cookie', cookieHeader);
-    res.redirect(302, redirectUri);
+
+    // Pass token in redirect URL to support seamless multi-origin local dev (localhost <-> 127.0.0.1)
+    let destination = redirectUri;
+    try {
+      const redirectUrl = new URL(redirectUri);
+      redirectUrl.searchParams.set('token', token);
+      destination = redirectUrl.toString();
+    } catch {
+      destination = redirectUri;
+    }
+
+    res.redirect(302, destination);
   }
 
   @Post('v1/auth/logout')
@@ -86,15 +99,17 @@ export class AuthController {
   @Get('v1/me')
   @UseGuards(AuthGuard)
   async me(@CurrentUser() user: User) {
-    // Retrieve memberships for this user
-    const memberships = await this.database.client.membership.findMany({
-      where: { userId: user.id },
-      include: {
-        organization: {
-          select: { id: true, name: true, slug: true, createdAt: true },
+    // Retrieve memberships for this user within user context so RLS permits access
+    const memberships = await this.tenantContext.runInUserContext(user.id, async (tx) => {
+      return tx.membership.findMany({
+        where: { userId: user.id },
+        include: {
+          organization: {
+            select: { id: true, name: true, slug: true, createdAt: true },
+          },
         },
-      },
-      orderBy: { createdAt: 'asc' },
+        orderBy: { createdAt: 'asc' },
+      });
     });
 
     return {
