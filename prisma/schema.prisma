@@ -41,6 +41,7 @@ model User {
   sessions             Session[]
   memberships          Membership[]
   createdOrganizations Organization[]     @relation("OrganizationCreator")
+  createdApiKeys       ApiKey[]           @relation("ApiKeyCreator")
 
   @@map("users")
 }
@@ -99,6 +100,7 @@ model Organization {
 
   creator     User?        @relation("OrganizationCreator", fields: [createdBy], references: [id], onDelete: SetNull)
   memberships Membership[]
+  apiKeys     ApiKey[]
 
   @@map("organizations")
 }
@@ -118,4 +120,28 @@ model Membership {
   @@index([userId])
   @@index([organizationId, role])
   @@map("memberships")
+}
+
+// Milestone 3 — API Keys and Ingestion
+
+model ApiKey {
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @map("org_id") @db.Uuid
+  name           String    @db.VarChar(128)
+  keyPrefix      String    @map("key_prefix") @db.VarChar(16)
+  keyHash        String    @unique @map("key_hash") @db.VarChar(64)
+  scopes         String[]  @default(["ingest"]) @map("scopes")
+  createdBy      String?   @map("created_by") @db.Uuid
+  lastUsedAt     DateTime? @map("last_used_at") @db.Timestamptz(3)
+  expiresAt      DateTime? @map("expires_at") @db.Timestamptz(3)
+  revokedAt      DateTime? @map("revoked_at") @db.Timestamptz(3)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User?        @relation("ApiKeyCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([organizationId, revokedAt])
+  @@map("api_keys")
 }

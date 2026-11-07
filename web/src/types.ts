@@ -38,3 +38,21 @@ export interface OrganizationMember {
     avatarUrl: string | null;
   };
 }
+
+export interface ApiKeyMetadata {
+  id: string;
+  organizationId: string;
+  name: string;
+  keyPrefix: string;
+  scopes: string[];
+  createdBy: string | null;
+  lastUsedAt: string | null;
+  expiresAt: string | null;
+  revokedAt: string | null;
+  createdAt: string;
+}
+
+export interface CreatedApiKeyResponse {
+  apiKey: string;
+  record: ApiKeyMetadata;
+}

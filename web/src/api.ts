@@ -1,4 +1,11 @@
-import type { MembershipRole, OrganizationDetails, OrganizationMember, UserProfile } from './types.ts';
+import type {
+  ApiKeyMetadata,
+  CreatedApiKeyResponse,
+  MembershipRole,
+  OrganizationDetails,
+  OrganizationMember,
+  UserProfile,
+} from './types.ts';
 
 const TOKEN_KEY = 'rf_session_token';
 
@@ -138,4 +145,40 @@ export async function removeMember(orgId: string, memberId: string): Promise<voi
     const error = await res.json().catch(() => ({ message: 'Failed to remove member' })) as { message?: string };
     throw new Error(error.message || 'Failed to remove member');
   }
+}
+
+// Milestone 3 — API Keys
+
+export async function fetchApiKeys(orgId: string): Promise<ApiKeyMetadata[]> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/api-keys`);
+  if (!res.ok) throw new Error('Failed to fetch API keys');
+  return res.json() as Promise<ApiKeyMetadata[]>;
+}
+
+export async function createApiKey(
+  orgId: string,
+  name: string,
+  scopes: string[] = ['ingest'],
+): Promise<CreatedApiKeyResponse> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/api-keys`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, scopes }),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: 'Failed to create API key' })) as { message?: string };
+    throw new Error(error.message || 'Failed to create API key');
+  }
+  return res.json() as Promise<CreatedApiKeyResponse>;
+}
+
+export async function revokeApiKey(orgId: string, keyId: string): Promise<ApiKeyMetadata> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/api-keys/${keyId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: 'Failed to revoke API key' })) as { message?: string };
+    throw new Error(error.message || 'Failed to revoke API key');
+  }
+  return res.json() as Promise<ApiKeyMetadata>;
 }

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ApiKeyModule } from '../modules/api-keys/api-key.module';
 import { AuthModule } from '../modules/auth/auth.module';
 import { ConfigurationModule } from '../modules/config/config.module';
 import { DatabaseModule } from '../modules/database/database.module';
@@ -13,6 +14,7 @@ import { OrganizationModule } from '../modules/organizations/organization.module
     DatabaseModule,
     AuthModule,
     OrganizationModule,
+    ApiKeyModule,
   ],
   controllers: [HealthController],
 })
