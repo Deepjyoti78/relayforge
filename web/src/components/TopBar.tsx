@@ -5,12 +5,14 @@ interface TopBarProps {
   user: UserProfile;
   organization: OrganizationDetails | null;
   activeTab: string;
+  onOpenMobileMenu?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
   user,
   organization,
   activeTab,
+  onOpenMobileMenu,
 }) => {
   const getTabLabel = () => {
     switch (activeTab) {
@@ -39,43 +41,69 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <header style={{
-      height: '60px',
-      backgroundColor: '#232327',
-      borderBottom: '1px solid #3E3E45',
+      height: '64px',
+      backgroundColor: '#0E0E10',
+      borderBottom: '1px solid #232327',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: '0 28px',
+      padding: '0 24px',
       position: 'sticky',
       top: 0,
       zIndex: 20,
     }}>
-      {/* Breadcrumbs */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#9A9AA6' }}>
-        <span>Organizations</span>
-        <span style={{ color: '#63636E' }}>›</span>
-        <span style={{ fontWeight: 600, color: '#F2F2F5' }}>
-          {organization ? organization.name : 'Select Org'}
-        </span>
-        <span style={{ color: '#63636E' }}>›</span>
-        <span style={{ color: '#C9C9D2' }}>
-          {getTabLabel()}
-        </span>
-      </div>
+      {/* Left: Mobile Toggle + Breadcrumbs */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
+        {/* Mobile Hamburger Button */}
+        <button
+          onClick={onOpenMobileMenu}
+          className="rf-mobile-menu-btn"
+          aria-label="Open Navigation Menu"
+          style={{
+            backgroundColor: '#232327',
+            border: '1px solid #3E3E45',
+            borderRadius: '8px',
+            color: '#F2F2F5',
+            padding: '7px 9px',
+            cursor: 'pointer',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
 
-      {/* Right Tools */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-        {/* Search bar */}
+        {/* Breadcrumbs */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          backgroundColor: '#0E0E10',
-          border: '1px solid #3E3E45',
-          borderRadius: '8px',
-          padding: '6px 12px',
-          width: '260px',
+          fontSize: '13px',
+          color: '#9A9AA6',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
         }}>
+          <span style={{ color: '#9A9AA6' }}>Organizations</span>
+          <span style={{ color: '#63636E' }}>›</span>
+          <span style={{ fontWeight: 600, color: '#F2F2F5' }}>
+            {organization ? organization.name : 'Select Org'}
+          </span>
+          <span style={{ color: '#63636E' }}>›</span>
+          <span style={{ color: '#C9C9D2' }}>
+            {getTabLabel()}
+          </span>
+        </div>
+      </div>
+
+      {/* Right Tools */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+        {/* Search bar */}
+        <div className="rf-topbar-search">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#63636E" strokeWidth="2.5">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -110,10 +138,10 @@ export const TopBar: React.FC<TopBarProps> = ({
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
-          padding: '6px 12px',
-          borderRadius: '8px',
-          border: '1px solid #3E3E45',
-          backgroundColor: '#0E0E10',
+          padding: '6px 14px',
+          borderRadius: '999px',
+          border: '1px solid #2C2C32',
+          backgroundColor: '#16161A',
           fontSize: '12px',
           color: '#C9C9D2',
           fontWeight: 500,
@@ -124,7 +152,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             borderRadius: '50%',
             backgroundColor: '#10b981',
           }}></span>
-          <span>RLS Active</span>
+          <span className="rf-topbar-pill-text">RLS Active</span>
         </div>
 
         {/* Public docs button */}
@@ -136,10 +164,10 @@ export const TopBar: React.FC<TopBarProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            padding: '6px 12px',
-            borderRadius: '8px',
-            border: '1px solid #3E3E45',
-            backgroundColor: 'transparent',
+            padding: '6px 14px',
+            borderRadius: '999px',
+            border: '1px solid #2C2C32',
+            backgroundColor: '#16161A',
             fontSize: '12px',
             color: '#9A9AA6',
             textDecoration: 'none',
@@ -148,11 +176,11 @@ export const TopBar: React.FC<TopBarProps> = ({
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = '#F2F2F5';
-            e.currentTarget.style.backgroundColor = '#2C2C31';
+            e.currentTarget.style.borderColor = '#3E3E45';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.color = '#9A9AA6';
-            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.borderColor = '#2C2C32';
           }}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -160,28 +188,22 @@ export const TopBar: React.FC<TopBarProps> = ({
             <polyline points="15 3 21 3 21 9"></polyline>
             <line x1="10" y1="14" x2="21" y2="3"></line>
           </svg>
-          <span>Docs</span>
+          <span className="rf-topbar-pill-text">Docs</span>
         </a>
 
-        {/* User avatar badge */}
+        {/* User avatar */}
         {user.avatarUrl ? (
           <img
             src={user.avatarUrl}
             alt=""
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              objectFit: 'cover',
-              border: '1px solid #3E3E45',
-            }}
+            style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #3E3E45' }}
           />
         ) : (
           <div style={{
-            width: '32px',
-            height: '32px',
+            width: '30px',
+            height: '30px',
             borderRadius: '50%',
-            backgroundColor: '#0E0E10',
+            backgroundColor: '#232327',
             border: '1px solid #3E3E45',
             color: '#F2F2F5',
             display: 'flex',

@@ -24,6 +24,7 @@ export const App: React.FC = () => {
   const [activeOrg, setActiveOrg] = useState<OrganizationDetails | null>(null);
   const [members, setMembers] = useState<OrganizationMember[]>([]);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'settings'>('members');
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const loadUser = async () => {
     try {
@@ -165,25 +166,51 @@ export const App: React.FC = () => {
       minHeight: '100vh',
       backgroundColor: '#0E0E10',
       color: '#F2F2F5',
+      position: 'relative',
     }}>
-      {/* Sidebar Navigation */}
-      <Sidebar
-        user={user}
-        organizations={user.organizations}
-        selectedOrgId={selectedOrgId}
-        activeTab={activeTab}
-        onSelectOrg={setSelectedOrgId}
-        onCreateOrg={handleCreateOrg}
-        onTabChange={setActiveTab}
-        onLogout={handleLogout}
-      />
+      {/* Desktop Sidebar Navigation */}
+      <div className="rf-sidebar-desktop">
+        <Sidebar
+          user={user}
+          organizations={user.organizations}
+          selectedOrgId={selectedOrgId}
+          activeTab={activeTab}
+          onSelectOrg={setSelectedOrgId}
+          onCreateOrg={handleCreateOrg}
+          onTabChange={setActiveTab}
+          onLogout={handleLogout}
+        />
+      </div>
+
+      {/* Mobile Drawer Overlay */}
+      {mobileSidebarOpen && (
+        <>
+          <div
+            className="rf-sidebar-mobile-backdrop"
+            onClick={() => setMobileSidebarOpen(false)}
+          />
+          <Sidebar
+            user={user}
+            organizations={user.organizations}
+            selectedOrgId={selectedOrgId}
+            activeTab={activeTab}
+            onSelectOrg={setSelectedOrgId}
+            onCreateOrg={handleCreateOrg}
+            onTabChange={setActiveTab}
+            onLogout={handleLogout}
+            isMobile={true}
+            onCloseMobile={() => setMobileSidebarOpen(false)}
+          />
+        </>
+      )}
 
       {/* Main Layout Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', minWidth: 0 }}>
         <TopBar
           user={user}
           organization={activeOrg}
           activeTab={activeTab}
+          onOpenMobileMenu={() => setMobileSidebarOpen(true)}
         />
 
         <main style={{ flex: 1, display: 'flex', overflowY: 'auto', backgroundColor: '#0E0E10' }}>

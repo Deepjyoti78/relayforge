@@ -81,6 +81,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeMenuMemberId, setActiveMenuMemberId] = useState<string | null>(null);
 
   useEffect(() => {
     setOrgName(organization.name);
@@ -281,9 +282,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
   });
 
   return (
-    <div style={{ flex: 1, padding: '36px 40px', overflowY: 'auto', backgroundColor: '#0E0E10', color: '#F2F2F5' }}>
+    <div className="rf-main-content">
       {/* Eyebrow and Page Title */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+      <div className="rf-header-row">
         <div>
           <div style={{
             fontSize: '11px',
@@ -307,19 +308,19 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   fontWeight: 700,
                   backgroundColor: '#0E0E10',
                   border: '1px solid #3E3E45',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   color: '#F2F2F5',
-                  padding: '4px 10px',
+                  padding: '4px 12px',
                 }}
               />
               <button
                 type="submit"
                 style={{
-                  padding: '6px 14px',
+                  padding: '7px 16px',
                   backgroundColor: '#F2F2F5',
                   color: '#0E0E10',
                   border: 'none',
-                  borderRadius: '6px',
+                  borderRadius: '999px',
                   cursor: 'pointer',
                   fontWeight: 700,
                   fontSize: '13px',
@@ -331,11 +332,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 type="button"
                 onClick={() => { setOrgName(organization.name); setIsRenaming(false); }}
                 style={{
-                  padding: '6px 12px',
+                  padding: '7px 14px',
                   backgroundColor: 'transparent',
                   color: '#9A9AA6',
                   border: '1px solid #3E3E45',
-                  borderRadius: '6px',
+                  borderRadius: '999px',
                   cursor: 'pointer',
                   fontSize: '13px',
                 }}
@@ -363,8 +364,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     color: '#C9C9D2',
                     fontSize: '11px',
                     fontWeight: 600,
-                    borderRadius: '6px',
-                    padding: '3px 8px',
+                    borderRadius: '999px',
+                    padding: '3px 10px',
                     cursor: 'pointer',
                   }}
                 >
@@ -389,7 +390,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         </div>
 
         {/* Top Action Buttons */}
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div className="rf-header-btn-wrap" style={{ display: 'flex', gap: '10px' }}>
           {isOwner && activeTab === 'members' && (
             <button
               onClick={() => setShowAddMemberModal(true)}
@@ -397,15 +398,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '9px 18px',
+                padding: '10px 22px',
                 backgroundColor: '#F2F2F5',
-                border: '1px solid #F2F2F5',
-                borderRadius: '8px',
+                border: 'none',
+                borderRadius: '999px',
                 color: '#0E0E10',
                 fontSize: '13px',
                 fontWeight: 700,
                 cursor: 'pointer',
-                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.25)',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
               }}
             >
               + Register Member
@@ -419,15 +420,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '9px 18px',
+                padding: '10px 22px',
                 backgroundColor: '#F2F2F5',
-                border: '1px solid #F2F2F5',
-                borderRadius: '8px',
+                border: 'none',
+                borderRadius: '999px',
                 color: '#0E0E10',
                 fontSize: '13px',
                 fontWeight: 700,
                 cursor: 'pointer',
-                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.25)',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
               }}
             >
               + Generate Key
@@ -441,15 +442,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '9px 18px',
+                padding: '10px 22px',
                 backgroundColor: '#F2F2F5',
-                border: '1px solid #F2F2F5',
-                borderRadius: '8px',
+                border: 'none',
+                borderRadius: '999px',
                 color: '#0E0E10',
                 fontSize: '13px',
                 fontWeight: 700,
                 cursor: 'pointer',
-                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.25)',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
               }}
             >
               + New Endpoint
@@ -458,128 +459,124 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         </div>
       </div>
 
-      {/* STATS CARDS ROW (4 CARDS MATCHING SORA DESIGN PALETTE) */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: '16px',
-        marginBottom: '28px',
-      }}>
-        {/* Card 1: Members */}
+      {/* STATS CARDS ROW (EXACT DESIGN MATCHING 7a30a006.jpg) */}
+      <div className="rf-stats-grid">
+        {/* Card 1: Members (Light Surface) */}
         <div style={{
-          backgroundColor: '#232327',
-          border: '1px solid #3E3E45',
-          borderRadius: '12px',
-          padding: '18px 20px',
+          backgroundColor: '#F2F2F5',
+          border: '1px solid rgba(255, 255, 255, 0.9)',
+          borderRadius: '20px',
+          padding: '22px 24px',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-              Total Members
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#0E0E10', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              TOTAL MEMBERS
             </span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A9AA6" strokeWidth="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E0E10" strokeWidth="2.2">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 800, color: '#F2F2F5', lineHeight: '1.2' }}>
+          <div style={{ fontSize: '32px', fontWeight: 800, color: '#0E0E10', lineHeight: '1.2' }}>
             {members.length}
           </div>
-          <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{
               fontSize: '11px',
-              fontWeight: 600,
-              backgroundColor: '#1E2D22',
-              color: '#4ade80',
-              padding: '2px 6px',
-              borderRadius: '4px',
-              border: '1px solid #2B4232',
+              fontWeight: 700,
+              backgroundColor: '#0E0E10',
+              color: '#F2F2F5',
+              padding: '2px 8px',
+              borderRadius: '999px',
             }}>
               +{members.length} active
             </span>
-            <span style={{ fontSize: '11px', color: '#63636E' }}>Enrolled</span>
+            <span style={{ fontSize: '11px', color: '#63636E', fontWeight: 500 }}>Enrolled</span>
           </div>
         </div>
 
-        {/* Card 2: Active API Keys */}
+        {/* Card 2: Active API Keys (Light Surface) */}
         <div style={{
-          backgroundColor: '#232327',
-          border: '1px solid #3E3E45',
-          borderRadius: '12px',
-          padding: '18px 20px',
+          backgroundColor: '#F2F2F5',
+          border: '1px solid rgba(255, 255, 255, 0.9)',
+          borderRadius: '20px',
+          padding: '22px 24px',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-              Active API Keys
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#0E0E10', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              ACTIVE API KEYS
             </span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A9AA6" strokeWidth="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E0E10" strokeWidth="2.2">
               <path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5-3 3 1.5 1.5L9 14l-5 5H2v-2l5-5 1.5 1.5 3-3-1.5-1.5 3.5-3.5 1.5 1.5L21 2z"></path>
             </svg>
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 800, color: '#F2F2F5', lineHeight: '1.2' }}>
+          <div style={{ fontSize: '32px', fontWeight: 800, color: '#0E0E10', lineHeight: '1.2' }}>
             {activeKeyCount}
           </div>
-          <div style={{ marginTop: '8px', fontSize: '11px', color: '#9A9AA6' }}>
+          <div style={{ marginTop: '10px', fontSize: '11px', color: '#63636E', fontWeight: 500 }}>
             SHA-256 hashed live keys
           </div>
         </div>
 
-        {/* Card 3: Ingestion Endpoints */}
+        {/* Card 3: Ingestion Endpoints (Dark Surface) */}
         <div style={{
           backgroundColor: '#232327',
           border: '1px solid #3E3E45',
-          borderRadius: '12px',
-          padding: '18px 20px',
+          borderRadius: '20px',
+          padding: '22px 24px',
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-              Endpoints (M3)
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              ENDPOINTS (M3)
             </span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A9AA6" strokeWidth="2">
               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
             </svg>
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 800, color: '#F2F2F5', lineHeight: '1.2' }}>
+          <div style={{ fontSize: '32px', fontWeight: 800, color: '#F2F2F5', lineHeight: '1.2' }}>
             {endpoints.length}
           </div>
-          <div style={{ marginTop: '8px', fontSize: '11px', color: '#9A9AA6' }}>
+          <div style={{ marginTop: '10px', fontSize: '11px', color: '#9A9AA6', fontWeight: 500 }}>
             AES-256-GCM signed
           </div>
         </div>
 
-        {/* Card 4: Tenant RLS Policy */}
+        {/* Card 4: Tenant Isolation (Dark Surface) */}
         <div style={{
           backgroundColor: '#232327',
           border: '1px solid #3E3E45',
-          borderRadius: '12px',
-          padding: '18px 20px',
+          borderRadius: '20px',
+          padding: '22px 24px',
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-              Tenant Isolation
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              TENANT ISOLATION
             </span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A9AA6" strokeWidth="2">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
             </svg>
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 800, color: '#F2F2F5', lineHeight: '1.2' }}>
+          <div style={{ fontSize: '26px', fontWeight: 800, color: '#F2F2F5', lineHeight: '1.2' }}>
             Enforced
           </div>
-          <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#4ade80' }}></span>
-            <span style={{ fontSize: '11px', color: '#4ade80', fontWeight: 600 }}>PostgreSQL RLS Active</span>
+          <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981' }}></span>
+            <span style={{ fontSize: '11px', color: '#9A9AA6', fontWeight: 500 }}>• PostgreSQL RLS Active</span>
           </div>
         </div>
       </div>
 
-      {/* FILTER PILLS ROW (PALETTE MATCHING) */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', alignItems: 'center' }}>
+      {/* FILTER PILLS ROW (ROUNDED PILLS) */}
+      <div className="rf-filter-pills">
         <button
           onClick={() => onTabChange('members')}
           style={{
-            padding: '7px 16px',
+            padding: '7px 18px',
             borderRadius: '999px',
             fontSize: '13px',
             fontWeight: 600,
@@ -589,17 +586,19 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             border: activeTab === 'members' ? '1px solid #F2F2F5' : '1px solid #3E3E45',
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
+            gap: '8px',
             transition: 'all 0.15s ease',
+            whiteSpace: 'nowrap',
           }}
         >
           <span>All Members</span>
           <span style={{
             fontSize: '11px',
-            padding: '1px 6px',
+            padding: '1px 7px',
             borderRadius: '999px',
-            backgroundColor: activeTab === 'members' ? 'rgba(14, 14, 16, 0.15)' : '#3E3E45',
-            color: activeTab === 'members' ? '#0E0E10' : '#F2F2F5',
+            backgroundColor: activeTab === 'members' ? '#0E0E10' : '#3E3E45',
+            color: '#F2F2F5',
+            fontWeight: 700,
           }}>
             {members.length}
           </span>
@@ -608,7 +607,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         <button
           onClick={() => onTabChange('api-keys')}
           style={{
-            padding: '7px 16px',
+            padding: '7px 18px',
             borderRadius: '999px',
             fontSize: '13px',
             fontWeight: 600,
@@ -618,17 +617,19 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             border: activeTab === 'api-keys' ? '1px solid #F2F2F5' : '1px solid #3E3E45',
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
+            gap: '8px',
             transition: 'all 0.15s ease',
+            whiteSpace: 'nowrap',
           }}
         >
           <span>API Keys</span>
           <span style={{
             fontSize: '11px',
-            padding: '1px 6px',
+            padding: '1px 7px',
             borderRadius: '999px',
-            backgroundColor: activeTab === 'api-keys' ? 'rgba(14, 14, 16, 0.15)' : '#3E3E45',
-            color: activeTab === 'api-keys' ? '#0E0E10' : '#F2F2F5',
+            backgroundColor: activeTab === 'api-keys' ? '#0E0E10' : '#3E3E45',
+            color: '#F2F2F5',
+            fontWeight: 700,
           }}>
             {apiKeys.length}
           </span>
@@ -637,7 +638,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         <button
           onClick={() => onTabChange('endpoints')}
           style={{
-            padding: '7px 16px',
+            padding: '7px 18px',
             borderRadius: '999px',
             fontSize: '13px',
             fontWeight: 600,
@@ -647,17 +648,19 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             border: activeTab === 'endpoints' ? '1px solid #F2F2F5' : '1px solid #3E3E45',
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
+            gap: '8px',
             transition: 'all 0.15s ease',
+            whiteSpace: 'nowrap',
           }}
         >
           <span>Endpoints</span>
           <span style={{
             fontSize: '11px',
-            padding: '1px 6px',
+            padding: '1px 7px',
             borderRadius: '999px',
-            backgroundColor: activeTab === 'endpoints' ? 'rgba(14, 14, 16, 0.15)' : '#3E3E45',
-            color: activeTab === 'endpoints' ? '#0E0E10' : '#F2F2F5',
+            backgroundColor: activeTab === 'endpoints' ? '#0E0E10' : '#3E3E45',
+            color: '#F2F2F5',
+            fontWeight: 700,
           }}>
             {endpoints.length}
           </span>
@@ -666,7 +669,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         <button
           onClick={() => onTabChange('settings')}
           style={{
-            padding: '7px 16px',
+            padding: '7px 18px',
             borderRadius: '999px',
             fontSize: '13px',
             fontWeight: 600,
@@ -678,31 +681,33 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             alignItems: 'center',
             gap: '6px',
             transition: 'all 0.15s ease',
+            whiteSpace: 'nowrap',
           }}
         >
           <span>Settings</span>
         </button>
       </div>
 
-      {/* SEARCH BAR */}
+      {/* SEARCH BAR (ROUNDED PILL MATCHING 7a30a006.jpg) */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         gap: '16px',
-        marginBottom: '16px',
+        marginBottom: '20px',
       }}>
         <div style={{
           flex: 1,
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
+          gap: '12px',
           backgroundColor: '#232327',
           border: '1px solid #3E3E45',
-          borderRadius: '10px',
-          padding: '10px 14px',
+          borderRadius: '999px',
+          padding: '12px 22px',
+          boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.2)',
         }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#63636E" strokeWidth="2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#63636E" strokeWidth="2.2">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
@@ -888,37 +893,32 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       )}
 
       {/* TABLE CONTAINER */}
-      <div style={{
-        backgroundColor: '#232327',
-        border: '1px solid #3E3E45',
-        borderRadius: '12px',
-        overflow: 'hidden',
-      }}>
+      <div className="rf-table-responsive">
         {/* MEMBERS VIEW */}
         {activeTab === 'members' && (
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '680px' }}>
             <thead>
               <tr style={{
                 borderBottom: '1px solid #3E3E45',
                 color: '#9A9AA6',
                 fontSize: '11px',
                 fontWeight: 700,
-                letterSpacing: '0.05em',
+                letterSpacing: '0.06em',
                 textTransform: 'uppercase',
                 backgroundColor: '#1E1E22',
               }}>
-                <th style={{ padding: '14px 20px' }}>Member ID</th>
-                <th style={{ padding: '14px 20px' }}>Member Name & Contact</th>
-                <th style={{ padding: '14px 20px' }}>Role</th>
-                <th style={{ padding: '14px 20px' }}>Enrolled Date</th>
-                <th style={{ padding: '14px 20px' }}>Status</th>
-                <th style={{ padding: '14px 20px', textAlign: 'right' }}>Actions</th>
+                <th style={{ padding: '16px 22px' }}>Member ID</th>
+                <th style={{ padding: '16px 22px' }}>Member Name & Contact</th>
+                <th style={{ padding: '16px 22px' }}>Role</th>
+                <th style={{ padding: '16px 22px' }}>Enrolled Date</th>
+                <th style={{ padding: '16px 22px' }}>Status</th>
+                <th style={{ padding: '16px 22px', textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredMembers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ padding: '40px 20px', textAlign: 'center', color: '#63636E' }}>
+                  <td colSpan={6} style={{ padding: '48px 20px', textAlign: 'center', color: '#63636E' }}>
                     No members match your search criteria.
                   </td>
                 </tr>
@@ -926,6 +926,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 filteredMembers.map((m, idx) => {
                   const isCurrent = m.userId === currentUserId;
                   const memberIdDisplay = `MEM-${m.userId.slice(0, 5).toUpperCase()}`;
+                  const isMenuOpen = activeMenuMemberId === m.id;
 
                   return (
                     <tr
@@ -936,22 +937,22 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                         color: '#F2F2F5',
                       }}
                     >
-                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#9A9AA6' }}>
+                      <td style={{ padding: '16px 22px', fontFamily: 'monospace', fontSize: '12px', color: '#9A9AA6' }}>
                         {memberIdDisplay}
                       </td>
 
-                      <td style={{ padding: '14px 20px' }}>
+                      <td style={{ padding: '16px 22px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           {m.user.avatarUrl ? (
                             <img
                               src={m.user.avatarUrl}
                               alt=""
-                              style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #3E3E45' }}
+                              style={{ width: '34px', height: '34px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #3E3E45' }}
                             />
                           ) : (
                             <div style={{
-                              width: '32px',
-                              height: '32px',
+                              width: '34px',
+                              height: '34px',
                               borderRadius: '50%',
                               backgroundColor: '#0E0E10',
                               border: '1px solid #3E3E45',
@@ -976,94 +977,168 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                         </div>
                       </td>
 
-                      <td style={{ padding: '14px 20px' }}>
+                      <td style={{ padding: '16px 22px' }}>
                         <span style={{
                           display: 'inline-block',
-                          padding: '3px 10px',
-                          borderRadius: '6px',
+                          padding: '4px 14px',
+                          borderRadius: '999px',
                           fontSize: '11px',
-                          fontWeight: 600,
-                          backgroundColor: '#0E0E10',
+                          fontWeight: 700,
+                          backgroundColor: '#35353C',
                           color: '#F2F2F5',
-                          border: '1px solid #3E3E45',
+                          letterSpacing: '0.04em',
                         }}>
                           {m.role}
                         </span>
                       </td>
 
-                      <td style={{ padding: '14px 20px', color: '#9A9AA6', fontSize: '12px' }}>
+                      <td style={{ padding: '16px 22px', color: '#9A9AA6', fontSize: '12px' }}>
                         {new Date(m.joinedAt).toLocaleDateString()}
                       </td>
 
-                      <td style={{ padding: '14px 20px' }}>
+                      <td style={{ padding: '16px 22px' }}>
                         <span style={{
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '5px',
-                          padding: '2px 8px',
+                          gap: '6px',
+                          padding: '4px 12px',
                           borderRadius: '999px',
                           fontSize: '11px',
                           fontWeight: 600,
-                          backgroundColor: '#1E2D22',
-                          color: '#4ade80',
-                          border: '1px solid #2B4232',
+                          backgroundColor: '#16161A',
+                          color: '#F2F2F5',
+                          border: '1px solid #33333A',
                         }}>
-                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#4ade80' }}></span>
+                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#10b981' }}></span>
                           Active
                         </span>
                       </td>
 
-                      <td style={{ padding: '14px 20px', textAlign: 'right' }}>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                          {isOwner && !isCurrent ? (
-                            <>
-                              <select
-                                value={m.role}
-                                onChange={(e) => void handleRoleChange(m.id, e.target.value as MembershipRole)}
-                                style={{
-                                  backgroundColor: '#0E0E10',
-                                  border: '1px solid #3E3E45',
-                                  borderRadius: '6px',
-                                  padding: '4px 8px',
-                                  fontSize: '11px',
-                                  color: '#F2F2F5',
-                                  cursor: 'pointer',
-                                }}
-                              >
-                                <option value="OWNER">OWNER</option>
-                                <option value="DEVELOPER">DEVELOPER</option>
-                                <option value="VIEWER">VIEWER</option>
-                              </select>
-                              <button
-                                onClick={() => void handleRemove(m.id)}
-                                style={{
-                                  backgroundColor: 'transparent',
-                                  border: '1px solid #4A2828',
-                                  color: '#f87171',
-                                  borderRadius: '6px',
-                                  padding: '4px 10px',
-                                  fontSize: '11px',
-                                  cursor: 'pointer',
-                                }}
-                              >
-                                Remove
-                              </button>
-                            </>
-                          ) : isCurrent && !isOwner && (
-                            <button
-                              onClick={() => void handleRemove(m.id)}
-                              style={{
-                                backgroundColor: 'transparent',
-                                border: '1px solid #3E3E45',
-                                color: '#9A9AA6',
-                                borderRadius: '6px',
-                                padding: '4px 10px',
-                                fontSize: '11px',
-                                cursor: 'pointer',
-                              }}
-                            >
-                              Leave
-                            </button>
+                      <td style={{ padding: '16px 22px', textAlign: 'right', position: 'relative' }}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                          <button
+                            title="Member Actions"
+                            onClick={() => setActiveMenuMemberId(isMenuOpen ? null : m.id)}
+                            style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '50%',
+                              backgroundColor: isMenuOpen ? '#3E3E45' : 'transparent',
+                              border: '1px solid transparent',
+                              color: '#C9C9D2',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#3E3E45';
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isMenuOpen) e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                              <circle cx="12" cy="12" r="2"></circle>
+                              <circle cx="6" cy="12" r="2"></circle>
+                              <circle cx="18" cy="12" r="2"></circle>
+                            </svg>
+                          </button>
+
+                          {/* Action Popover Menu */}
+                          {isMenuOpen && (
+                            <div style={{
+                              position: 'absolute',
+                              right: '22px',
+                              top: '52px',
+                              backgroundColor: '#1E1E22',
+                              border: '1px solid #3E3E45',
+                              borderRadius: '12px',
+                              padding: '8px',
+                              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.5)',
+                              zIndex: 30,
+                              minWidth: '180px',
+                              textAlign: 'left',
+                            }}>
+                              {isOwner && !isCurrent ? (
+                                <>
+                                  <div style={{ fontSize: '11px', color: '#9A9AA6', padding: '4px 8px', fontWeight: 600 }}>
+                                    Change Role:
+                                  </div>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '6px' }}>
+                                    {(['OWNER', 'DEVELOPER', 'VIEWER'] as MembershipRole[]).map((r) => (
+                                      <button
+                                        key={r}
+                                        onClick={() => {
+                                          void handleRoleChange(m.id, r);
+                                          setActiveMenuMemberId(null);
+                                        }}
+                                        style={{
+                                          padding: '6px 8px',
+                                          borderRadius: '6px',
+                                          fontSize: '12px',
+                                          backgroundColor: m.role === r ? '#2A2A30' : 'transparent',
+                                          color: '#F2F2F5',
+                                          border: 'none',
+                                          cursor: 'pointer',
+                                          textAlign: 'left',
+                                          fontWeight: m.role === r ? 700 : 500,
+                                        }}
+                                      >
+                                        {r} {m.role === r ? '✓' : ''}
+                                      </button>
+                                    ))}
+                                  </div>
+                                  <div style={{ height: '1px', backgroundColor: '#3E3E45', margin: '4px 0' }} />
+                                  <button
+                                    onClick={() => {
+                                      void handleRemove(m.id);
+                                      setActiveMenuMemberId(null);
+                                    }}
+                                    style={{
+                                      width: '100%',
+                                      padding: '6px 8px',
+                                      borderRadius: '6px',
+                                      fontSize: '12px',
+                                      backgroundColor: 'transparent',
+                                      color: '#f87171',
+                                      border: 'none',
+                                      cursor: 'pointer',
+                                      textAlign: 'left',
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    Remove Member
+                                  </button>
+                                </>
+                              ) : isCurrent && !isOwner ? (
+                                <button
+                                  onClick={() => {
+                                    void handleRemove(m.id);
+                                    setActiveMenuMemberId(null);
+                                  }}
+                                  style={{
+                                    width: '100%',
+                                    padding: '6px 8px',
+                                    borderRadius: '6px',
+                                    fontSize: '12px',
+                                    backgroundColor: 'transparent',
+                                    color: '#f87171',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    textAlign: 'left',
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  Leave Organization
+                                </button>
+                              ) : (
+                                <div style={{ fontSize: '12px', color: '#9A9AA6', padding: '6px 8px' }}>
+                                  No actions available for Organization Owner.
+                                </div>
+                              )}
+                            </div>
                           )}
                         </div>
                       </td>
@@ -1077,7 +1152,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
         {/* API KEYS VIEW */}
         {activeTab === 'api-keys' && (
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '720px' }}>
             <thead>
               <tr style={{
                 borderBottom: '1px solid #3E3E45',
@@ -1209,24 +1284,24 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
         {/* ENDPOINTS VIEW (MILESTONE 3 PHASE 2 & 3) */}
         {activeTab === 'endpoints' && (
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '780px' }}>
             <thead>
               <tr style={{
                 borderBottom: '1px solid #3E3E45',
                 color: '#9A9AA6',
                 fontSize: '11px',
                 fontWeight: 700,
-                letterSpacing: '0.05em',
+                letterSpacing: '0.06em',
                 textTransform: 'uppercase',
                 backgroundColor: '#1E1E22',
               }}>
-                <th style={{ padding: '14px 20px' }}>Endpoint ID</th>
-                <th style={{ padding: '14px 20px' }}>Name & Slug</th>
-                <th style={{ padding: '14px 20px' }}>Ingestion URL</th>
-                <th style={{ padding: '14px 20px' }}>Signing Secret</th>
-                <th style={{ padding: '14px 20px' }}>Created</th>
-                <th style={{ padding: '14px 20px' }}>Status</th>
-                <th style={{ padding: '14px 20px', textAlign: 'right' }}>Actions</th>
+                <th style={{ padding: '16px 22px' }}>Endpoint ID</th>
+                <th style={{ padding: '16px 22px' }}>Name & Slug</th>
+                <th style={{ padding: '16px 22px' }}>Ingestion URL</th>
+                <th style={{ padding: '16px 22px' }}>Signing Secret</th>
+                <th style={{ padding: '16px 22px' }}>Created</th>
+                <th style={{ padding: '16px 22px' }}>Status</th>
+                <th style={{ padding: '16px 22px', textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -1416,15 +1491,16 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 50,
+          padding: '16px',
         }}>
           <div style={{
-            backgroundColor: '#232327',
-            borderRadius: '16px',
+            backgroundColor: '#1E1E22',
+            borderRadius: '20px',
             border: '1px solid #3E3E45',
             width: '100%',
             maxWidth: '460px',
             padding: '28px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)',
+            boxShadow: '0 20px 30px rgba(0, 0, 0, 0.6)',
           }}>
             <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#F2F2F5' }}>
               Register Organization Member
@@ -1434,14 +1510,14 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             </p>
 
             <form onSubmit={handleAddMemberSubmit}>
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
                 <select
                   value={inputType}
                   onChange={(e) => setInputType(e.target.value as 'email' | 'username')}
                   style={{
-                    padding: '8px 12px',
+                    padding: '9px 12px',
                     border: '1px solid #3E3E45',
-                    borderRadius: '8px',
+                    borderRadius: '10px',
                     fontSize: '13px',
                     backgroundColor: '#0E0E10',
                     color: '#F2F2F5',
@@ -1458,9 +1534,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   autoFocus
                   style={{
                     flex: 1,
-                    padding: '8px 12px',
+                    minWidth: '180px',
+                    padding: '9px 14px',
                     border: '1px solid #3E3E45',
-                    borderRadius: '8px',
+                    borderRadius: '10px',
                     fontSize: '13px',
                     backgroundColor: '#0E0E10',
                     color: '#F2F2F5',
@@ -1477,9 +1554,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onChange={(e) => setMemberRole(e.target.value as MembershipRole)}
                   style={{
                     width: '100%',
-                    padding: '8px 12px',
+                    padding: '9px 14px',
                     border: '1px solid #3E3E45',
-                    borderRadius: '8px',
+                    borderRadius: '10px',
                     fontSize: '13px',
                     backgroundColor: '#0E0E10',
                     color: '#F2F2F5',
@@ -1502,10 +1579,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   type="button"
                   onClick={() => setShowAddMemberModal(false)}
                   style={{
-                    padding: '8px 16px',
+                    padding: '9px 18px',
                     backgroundColor: 'transparent',
                     border: '1px solid #3E3E45',
-                    borderRadius: '8px',
+                    borderRadius: '999px',
                     color: '#9A9AA6',
                     fontSize: '13px',
                     fontWeight: 600,
@@ -1518,10 +1595,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   type="submit"
                   disabled={addLoading}
                   style={{
-                    padding: '8px 18px',
+                    padding: '9px 22px',
                     backgroundColor: '#F2F2F5',
                     border: 'none',
-                    borderRadius: '8px',
+                    borderRadius: '999px',
                     color: '#0E0E10',
                     fontSize: '13px',
                     fontWeight: 700,
@@ -1550,15 +1627,16 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 50,
+          padding: '16px',
         }}>
           <div style={{
-            backgroundColor: '#232327',
-            borderRadius: '16px',
+            backgroundColor: '#1E1E22',
+            borderRadius: '20px',
             border: '1px solid #3E3E45',
             width: '100%',
             maxWidth: '460px',
             padding: '28px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)',
+            boxShadow: '0 20px 30px rgba(0, 0, 0, 0.6)',
           }}>
             <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#F2F2F5' }}>
               Create Organization API Key
@@ -1580,9 +1658,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   autoFocus
                   style={{
                     width: '100%',
-                    padding: '8px 12px',
+                    padding: '9px 14px',
                     border: '1px solid #3E3E45',
-                    borderRadius: '8px',
+                    borderRadius: '10px',
                     fontSize: '13px',
                     backgroundColor: '#0E0E10',
                     color: '#F2F2F5',
@@ -1599,9 +1677,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onChange={(e) => setNewKeyScopes([e.target.value])}
                   style={{
                     width: '100%',
-                    padding: '8px 12px',
+                    padding: '9px 14px',
                     border: '1px solid #3E3E45',
-                    borderRadius: '8px',
+                    borderRadius: '10px',
                     fontSize: '13px',
                     backgroundColor: '#0E0E10',
                     color: '#F2F2F5',
@@ -1623,10 +1701,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   type="button"
                   onClick={() => setShowAddKeyModal(false)}
                   style={{
-                    padding: '8px 16px',
+                    padding: '9px 18px',
                     backgroundColor: 'transparent',
                     border: '1px solid #3E3E45',
-                    borderRadius: '8px',
+                    borderRadius: '999px',
                     color: '#9A9AA6',
                     fontSize: '13px',
                     fontWeight: 600,
@@ -1638,10 +1716,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 <button
                   type="submit"
                   style={{
-                    padding: '8px 18px',
+                    padding: '9px 22px',
                     backgroundColor: '#F2F2F5',
                     border: 'none',
-                    borderRadius: '8px',
+                    borderRadius: '999px',
                     color: '#0E0E10',
                     fontSize: '13px',
                     fontWeight: 700,
@@ -1670,15 +1748,16 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 50,
+          padding: '16px',
         }}>
           <div style={{
-            backgroundColor: '#232327',
-            borderRadius: '16px',
+            backgroundColor: '#1E1E22',
+            borderRadius: '20px',
             border: '1px solid #3E3E45',
             width: '100%',
             maxWidth: '460px',
             padding: '28px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)',
+            boxShadow: '0 20px 30px rgba(0, 0, 0, 0.6)',
           }}>
             <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#F2F2F5' }}>
               Create Ingestion Endpoint
@@ -1700,9 +1779,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   autoFocus
                   style={{
                     width: '100%',
-                    padding: '8px 12px',
+                    padding: '9px 14px',
                     border: '1px solid #3E3E45',
-                    borderRadius: '8px',
+                    borderRadius: '10px',
                     fontSize: '13px',
                     backgroundColor: '#0E0E10',
                     color: '#F2F2F5',
@@ -1721,9 +1800,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onChange={(e) => setNewEndpointSlug(e.target.value)}
                   style={{
                     width: '100%',
-                    padding: '8px 12px',
+                    padding: '9px 14px',
                     border: '1px solid #3E3E45',
-                    borderRadius: '8px',
+                    borderRadius: '10px',
                     fontSize: '13px',
                     backgroundColor: '#0E0E10',
                     color: '#F2F2F5',
@@ -1745,10 +1824,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   type="button"
                   onClick={() => setShowAddEndpointModal(false)}
                   style={{
-                    padding: '8px 16px',
+                    padding: '9px 18px',
                     backgroundColor: 'transparent',
                     border: '1px solid #3E3E45',
-                    borderRadius: '8px',
+                    borderRadius: '999px',
                     color: '#9A9AA6',
                     fontSize: '13px',
                     fontWeight: 600,
@@ -1760,10 +1839,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 <button
                   type="submit"
                   style={{
-                    padding: '8px 18px',
+                    padding: '9px 22px',
                     backgroundColor: '#F2F2F5',
                     border: 'none',
-                    borderRadius: '8px',
+                    borderRadius: '999px',
                     color: '#0E0E10',
                     fontSize: '13px',
                     fontWeight: 700,

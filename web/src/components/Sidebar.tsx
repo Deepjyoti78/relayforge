@@ -10,6 +10,8 @@ interface SidebarProps {
   onCreateOrg: (name: string, slug?: string) => Promise<void>;
   onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'settings') => void;
   onLogout: () => void;
+  isMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -21,6 +23,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCreateOrg,
   onTabChange,
   onLogout,
+  isMobile = false,
+  onCloseMobile,
 }) => {
   const [isCreatingOrg, setIsCreatingOrg] = useState(false);
   const [newOrgName, setNewOrgName] = useState('');
@@ -45,6 +49,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
+  const handleTabClick = (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'settings') => {
+    onTabChange(tab);
+    if (isMobile && onCloseMobile) {
+      onCloseMobile();
+    }
+  };
+
+  const handleOrgClick = (orgId: string) => {
+    onSelectOrg(orgId);
+    if (isMobile && onCloseMobile) {
+      onCloseMobile();
+    }
+  };
+
   const getInitials = (name?: string | null, email?: string | null) => {
     if (name) {
       return name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
@@ -52,40 +70,48 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (email) {
       return email.slice(0, 2).toUpperCase();
     }
-    return 'U';
+    return 'RF';
   };
 
-  return (
+  const sidebarContent = (
     <aside style={{
-      width: '260px',
-      backgroundColor: '#232327',
-      borderRight: '1px solid #3E3E45',
+      width: isMobile ? '280px' : '260px',
+      backgroundColor: '#0E0E10',
+      borderRight: '1px solid #232327',
       display: 'flex',
       flexDirection: 'column',
       height: '100vh',
       flexShrink: 0,
+      position: isMobile ? 'fixed' : 'relative',
+      top: 0,
+      left: 0,
+      bottom: 0,
+      zIndex: isMobile ? 100 : 1,
+      boxShadow: isMobile ? '0 0 35px rgba(0, 0, 0, 0.7)' : 'none',
+      transition: 'transform 0.25s ease-in-out',
     }}>
       {/* Brand Header */}
       <div style={{
-        padding: '20px 20px 16px',
-        borderBottom: '1px solid #3E3E45',
+        padding: '22px 20px 18px',
+        borderBottom: '1px solid #232327',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
-            width: '34px',
-            height: '34px',
-            borderRadius: '8px',
+            width: '36px',
+            height: '36px',
+            borderRadius: '10px',
             border: '1px solid #3E3E45',
             backgroundColor: '#0E0E10',
             color: '#F2F2F5',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
           }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
             </svg>
           </div>
@@ -98,10 +124,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
         </div>
+
+        {isMobile && (
+          <button
+            onClick={onCloseMobile}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#9A9AA6',
+              fontSize: '18px',
+              cursor: 'pointer',
+              padding: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {/* Navigation Sections */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 12px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '18px 12px' }}>
         {/* Section: MAIN MENU */}
         <div style={{ marginBottom: '24px' }}>
           <div style={{
@@ -110,42 +155,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
             letterSpacing: '0.08em',
             color: '#63636E',
             textTransform: 'uppercase',
-            padding: '0 8px 8px',
+            padding: '0 10px 10px',
           }}>
             MAIN MENU
           </div>
 
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {/* Overview / Dashboard */}
             <button
-              onClick={() => onTabChange('dashboard')}
+              onClick={() => handleTabClick('dashboard')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '12px',
                 width: '100%',
-                padding: '9px 12px',
-                borderRadius: '8px',
+                padding: '9px 14px',
+                borderRadius: '999px',
                 fontSize: '13px',
                 fontWeight: activeTab === 'dashboard' ? 700 : 500,
-                backgroundColor: activeTab === 'dashboard' ? '#0E0E10' : 'transparent',
-                color: activeTab === 'dashboard' ? '#F2F2F5' : '#9A9AA6',
-                border: activeTab === 'dashboard' ? '1px solid #3E3E45' : '1px solid transparent',
+                backgroundColor: activeTab === 'dashboard' ? '#F2F2F5' : 'transparent',
+                color: activeTab === 'dashboard' ? '#0E0E10' : '#9A9AA6',
+                border: 'none',
                 cursor: 'pointer',
                 textAlign: 'left',
                 transition: 'all 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                if (activeTab !== 'dashboard') {
-                  e.currentTarget.style.backgroundColor = '#2A2A30';
-                  e.currentTarget.style.color = '#F2F2F5';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (activeTab !== 'dashboard') {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#9A9AA6';
-                }
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -159,34 +192,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {/* Members Directory */}
             <button
-              onClick={() => onTabChange('members')}
+              onClick={() => handleTabClick('members')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '12px',
                 width: '100%',
-                padding: '9px 12px',
-                borderRadius: '8px',
+                padding: '9px 14px',
+                borderRadius: '999px',
                 fontSize: '13px',
                 fontWeight: activeTab === 'members' ? 700 : 500,
-                backgroundColor: activeTab === 'members' ? '#0E0E10' : 'transparent',
-                color: activeTab === 'members' ? '#F2F2F5' : '#9A9AA6',
-                border: activeTab === 'members' ? '1px solid #3E3E45' : '1px solid transparent',
+                backgroundColor: activeTab === 'members' ? '#F2F2F5' : 'transparent',
+                color: activeTab === 'members' ? '#0E0E10' : '#9A9AA6',
+                border: 'none',
                 cursor: 'pointer',
                 textAlign: 'left',
                 transition: 'all 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                if (activeTab !== 'members') {
-                  e.currentTarget.style.backgroundColor = '#2A2A30';
-                  e.currentTarget.style.color = '#F2F2F5';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (activeTab !== 'members') {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#9A9AA6';
-                }
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -200,37 +221,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {/* API Keys */}
             <button
-              onClick={() => onTabChange('api-keys')}
+              onClick={() => handleTabClick('api-keys')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 width: '100%',
-                padding: '9px 12px',
-                borderRadius: '8px',
+                padding: '9px 14px',
+                borderRadius: '999px',
                 fontSize: '13px',
                 fontWeight: activeTab === 'api-keys' ? 700 : 500,
-                backgroundColor: activeTab === 'api-keys' ? '#0E0E10' : 'transparent',
-                color: activeTab === 'api-keys' ? '#F2F2F5' : '#9A9AA6',
-                border: activeTab === 'api-keys' ? '1px solid #3E3E45' : '1px solid transparent',
+                backgroundColor: activeTab === 'api-keys' ? '#F2F2F5' : 'transparent',
+                color: activeTab === 'api-keys' ? '#0E0E10' : '#9A9AA6',
+                border: 'none',
                 cursor: 'pointer',
                 textAlign: 'left',
                 transition: 'all 0.15s ease',
               }}
-              onMouseEnter={(e) => {
-                if (activeTab !== 'api-keys') {
-                  e.currentTarget.style.backgroundColor = '#2A2A30';
-                  e.currentTarget.style.color = '#F2F2F5';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (activeTab !== 'api-keys') {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#9A9AA6';
-                }
-              }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5-3 3 1.5 1.5L9 14l-5 5H2v-2l5-5 1.5 1.5 3-3-1.5-1.5 3.5-3.5 1.5 1.5L21 2z"></path>
                 </svg>
@@ -239,10 +248,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span style={{
                 fontSize: '10px',
                 fontWeight: 700,
-                backgroundColor: '#3E3E45',
-                color: '#F2F2F5',
-                padding: '2px 6px',
-                borderRadius: '4px',
+                backgroundColor: activeTab === 'api-keys' ? '#232327' : '#232327',
+                color: activeTab === 'api-keys' ? '#F2F2F5' : '#9A9AA6',
+                padding: '2px 7px',
+                borderRadius: '999px',
+                border: '1px solid #3E3E45',
               }}>
                 M3
               </span>
@@ -250,34 +260,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {/* Ingestion Endpoints */}
             <button
-              onClick={() => onTabChange('endpoints')}
+              onClick={() => handleTabClick('endpoints')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '12px',
                 width: '100%',
-                padding: '9px 12px',
-                borderRadius: '8px',
+                padding: '9px 14px',
+                borderRadius: '999px',
                 fontSize: '13px',
                 fontWeight: activeTab === 'endpoints' ? 700 : 500,
-                backgroundColor: activeTab === 'endpoints' ? '#0E0E10' : 'transparent',
-                color: activeTab === 'endpoints' ? '#F2F2F5' : '#9A9AA6',
-                border: activeTab === 'endpoints' ? '1px solid #3E3E45' : '1px solid transparent',
+                backgroundColor: activeTab === 'endpoints' ? '#F2F2F5' : 'transparent',
+                color: activeTab === 'endpoints' ? '#0E0E10' : '#9A9AA6',
+                border: 'none',
                 cursor: 'pointer',
                 textAlign: 'left',
                 transition: 'all 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                if (activeTab !== 'endpoints') {
-                  e.currentTarget.style.backgroundColor = '#2A2A30';
-                  e.currentTarget.style.color = '#F2F2F5';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (activeTab !== 'endpoints') {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#9A9AA6';
-                }
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -295,7 +293,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: '0 8px 8px',
+            padding: '0 10px 10px',
           }}>
             <span style={{
               fontSize: '11px',
@@ -309,13 +307,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={() => setIsCreatingOrg((prev) => !prev)}
               style={{
-                backgroundColor: '#3E3E45',
-                border: 'none',
+                backgroundColor: '#232327',
+                border: '1px solid #3E3E45',
                 color: '#F2F2F5',
                 fontSize: '11px',
                 fontWeight: 600,
-                borderRadius: '4px',
-                padding: '2px 7px',
+                borderRadius: '999px',
+                padding: '2px 8px',
                 cursor: 'pointer',
               }}
             >
@@ -326,11 +324,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Quick Create Organization Form */}
           {isCreatingOrg && (
             <form onSubmit={handleCreateSubmit} style={{
-              padding: '10px',
+              padding: '12px',
               backgroundColor: '#1E1E22',
-              borderRadius: '8px',
+              borderRadius: '12px',
               border: '1px solid #3E3E45',
-              marginBottom: '8px',
+              marginBottom: '10px',
             }}>
               <input
                 type="text"
@@ -340,7 +338,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 autoFocus
                 style={{
                   width: '100%',
-                  padding: '6px 8px',
+                  padding: '7px 10px',
                   borderRadius: '6px',
                   border: '1px solid #3E3E45',
                   backgroundColor: '#0E0E10',
@@ -356,7 +354,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onChange={(e) => setNewOrgSlug(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '6px 8px',
+                  padding: '7px 10px',
                   borderRadius: '6px',
                   border: '1px solid #3E3E45',
                   backgroundColor: '#0E0E10',
@@ -375,12 +373,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   type="button"
                   onClick={() => setIsCreatingOrg(false)}
                   style={{
-                    padding: '4px 8px',
+                    padding: '4px 10px',
                     fontSize: '11px',
                     backgroundColor: 'transparent',
                     border: '1px solid #3E3E45',
                     color: '#9A9AA6',
-                    borderRadius: '4px',
+                    borderRadius: '6px',
                     cursor: 'pointer',
                   }}
                 >
@@ -390,13 +388,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   type="submit"
                   disabled={createLoading}
                   style={{
-                    padding: '4px 10px',
+                    padding: '4px 12px',
                     fontSize: '11px',
                     backgroundColor: '#F2F2F5',
                     color: '#0E0E10',
-                    fontWeight: 600,
+                    fontWeight: 700,
                     border: 'none',
-                    borderRadius: '4px',
+                    borderRadius: '6px',
                     cursor: 'pointer',
                   }}
                 >
@@ -407,9 +405,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
 
           {/* Organization list */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             {organizations.length === 0 ? (
-              <div style={{ padding: '8px', fontSize: '12px', color: '#63636E' }}>
+              <div style={{ padding: '8px 10px', fontSize: '12px', color: '#63636E' }}>
                 No organizations yet.
               </div>
             ) : (
@@ -418,38 +416,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 return (
                   <button
                     key={org.id}
-                    onClick={() => onSelectOrg(org.id)}
+                    onClick={() => handleOrgClick(org.id)}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       width: '100%',
-                      padding: '8px 12px',
-                      borderRadius: '8px',
+                      padding: '10px 14px',
+                      borderRadius: '14px',
                       fontSize: '13px',
-                      fontWeight: isSelected ? 700 : 500,
-                      backgroundColor: isSelected ? '#0E0E10' : 'transparent',
-                      color: isSelected ? '#F2F2F5' : '#C9C9D2',
-                      border: isSelected ? '1px solid #3E3E45' : '1px solid transparent',
+                      backgroundColor: isSelected ? '#17171B' : 'transparent',
+                      color: '#F2F2F5',
+                      border: isSelected ? '1px solid #2B2B32' : '1px solid transparent',
                       cursor: 'pointer',
                       textAlign: 'left',
                       transition: 'all 0.15s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isSelected) {
-                        e.currentTarget.style.backgroundColor = '#2A2A30';
-                        e.currentTarget.style.color = '#F2F2F5';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isSelected) {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = '#C9C9D2';
-                      }
+                      boxShadow: isSelected ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
                     }}
                   >
                     <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      <div>{org.name}</div>
+                      <div style={{ fontWeight: 700, color: '#F2F2F5' }}>{org.name}</div>
                       <div style={{ fontSize: '11px', color: '#63636E', fontWeight: 400 }}>
                         /{org.slug}
                       </div>
@@ -457,11 +443,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span style={{
                       fontSize: '10px',
                       fontWeight: 700,
-                      backgroundColor: '#3E3E45',
-                      color: '#F2F2F5',
-                      padding: '2px 5px',
-                      borderRadius: '4px',
-                      marginLeft: '6px',
+                      backgroundColor: '#232327',
+                      color: '#C9C9D2',
+                      padding: '2px 7px',
+                      borderRadius: '999px',
+                      border: '1px solid #3E3E45',
+                      marginLeft: '8px',
                     }}>
                       {org.role}
                     </span>
@@ -480,41 +467,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
             letterSpacing: '0.08em',
             color: '#63636E',
             textTransform: 'uppercase',
-            padding: '0 8px 8px',
+            padding: '0 10px 10px',
           }}>
             ADMINISTRATION
           </div>
 
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <button
-              onClick={() => onTabChange('settings')}
+              onClick={() => handleTabClick('settings')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '12px',
                 width: '100%',
-                padding: '9px 12px',
-                borderRadius: '8px',
+                padding: '9px 14px',
+                borderRadius: '999px',
                 fontSize: '13px',
                 fontWeight: activeTab === 'settings' ? 700 : 500,
-                backgroundColor: activeTab === 'settings' ? '#0E0E10' : 'transparent',
-                color: activeTab === 'settings' ? '#F2F2F5' : '#9A9AA6',
-                border: activeTab === 'settings' ? '1px solid #3E3E45' : '1px solid transparent',
+                backgroundColor: activeTab === 'settings' ? '#F2F2F5' : 'transparent',
+                color: activeTab === 'settings' ? '#0E0E10' : '#9A9AA6',
+                border: 'none',
                 cursor: 'pointer',
                 textAlign: 'left',
                 transition: 'all 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                if (activeTab !== 'settings') {
-                  e.currentTarget.style.backgroundColor = '#2A2A30';
-                  e.currentTarget.style.color = '#F2F2F5';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (activeTab !== 'settings') {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#9A9AA6';
-                }
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -530,11 +505,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* User Footer Profile & Logout */}
       <div style={{
         padding: '14px 16px',
-        borderTop: '1px solid #3E3E45',
+        borderTop: '1px solid #232327',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#1E1E22',
+        backgroundColor: '#0E0E10',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden' }}>
           {user.avatarUrl ? (
@@ -548,7 +523,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              backgroundColor: '#0E0E10',
+              backgroundColor: '#232327',
               border: '1px solid #3E3E45',
               color: '#F2F2F5',
               display: 'flex',
@@ -578,17 +553,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
             border: 'none',
             color: '#9A9AA6',
             cursor: 'pointer',
-            padding: '4px',
+            padding: '6px',
             borderRadius: '6px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#F2F2F5';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = '#9A9AA6';
           }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -600,4 +569,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
     </aside>
   );
+
+  return sidebarContent;
 };
