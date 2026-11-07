@@ -72,3 +72,17 @@ export interface CreatedEndpointResponse {
   endpoint: EndpointMetadata;
   signingSecret: string;
 }
+
+export interface DestinationMetadata {
+  id: string;
+  organizationId: string;
+  name: string;
+  url: string;
+  httpMethod: string;
+  headers: Record<string, string> | null;
+  rateLimitPerSecond: number;
+  timeoutMs: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}

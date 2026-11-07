@@ -36,6 +36,10 @@ const baseSchema = z.object({
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
   SESSION_COOKIE_NAME: z.string().default('rf_session'),
   ENCRYPTION_KEY: z.string().default('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'),
+  ALLOW_PRIVATE_DESTINATIONS: z.preprocess(
+    (val) => val === 'true' || val === true || val === '1' || val === 1,
+    z.boolean().default(false),
+  ),
 });
 
 export class ConfigurationError extends Error {
@@ -75,6 +79,7 @@ export function parseEnvironment(role: ProcessRole, input: NodeJS.ProcessEnv) {
     frontendUrl: values.FRONTEND_URL,
     sessionCookieName: values.SESSION_COOKIE_NAME,
     encryptionKey: createHash('sha256').update(values.ENCRYPTION_KEY).digest(),
+    allowPrivateDestinations: Boolean(values.ALLOW_PRIVATE_DESTINATIONS),
   });
 }
 

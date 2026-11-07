@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import {
   createApiKey,
+  createDestination,
   createEndpoint,
+  deleteDestination,
   deleteEndpoint,
   fetchApiKeys,
+  fetchDestinations,
   fetchEndpoints,
   revokeApiKey,
   rotateEndpointSecret,
+  updateDestination,
 } from '../api.ts';
 import type {
   ApiKeyMetadata,
+  DestinationMetadata,
   EndpointMetadata,
   MembershipRole,
   OrganizationDetails,
@@ -20,8 +25,8 @@ interface OrgManagementProps {
   organization: OrganizationDetails;
   members: OrganizationMember[];
   currentUserId: string;
-  activeTab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'settings';
-  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'settings') => void;
+  activeTab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'settings';
+  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'settings') => void;
   onUpdateOrgName: (name: string) => Promise<void>;
   onAddMember: (identifier: { email?: string; username?: string }, role: MembershipRole) => Promise<void>;
   onUpdateRole: (memberId: string, role: MembershipRole) => Promise<void>;
@@ -79,6 +84,17 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
   const [copiedSecret, setCopiedSecret] = useState(false);
   const [copiedUrlId, setCopiedUrlId] = useState<string | null>(null);
 
+  // Destinations State (Milestone 3 Option 1)
+  const [destinations, setDestinations] = useState<DestinationMetadata[]>([]);
+  const [destinationsLoading, setDestinationsLoading] = useState(false);
+  const [showAddDestinationModal, setShowAddDestinationModal] = useState(false);
+  const [newDestinationName, setNewDestinationName] = useState('');
+  const [newDestinationUrl, setNewDestinationUrl] = useState('');
+  const [newDestinationMethod, setNewDestinationMethod] = useState('POST');
+  const [newDestinationRateLimit, setNewDestinationRateLimit] = useState(50);
+  const [newDestinationTimeout, setNewDestinationTimeout] = useState(10000);
+  const [destinationActionError, setDestinationActionError] = useState<string | null>(null);
+
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState('');
   const [activeMenuMemberId, setActiveMenuMemberId] = useState<string | null>(null);
@@ -89,9 +105,23 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
     setCreatedRawSecret(null);
     setKeyActionError(null);
     setEndpointActionError(null);
+    setDestinationActionError(null);
     void loadApiKeys();
     void loadEndpoints();
+    void loadDestinations();
   }, [organization.id]);
+
+  const loadDestinations = async () => {
+    setDestinationsLoading(true);
+    try {
+      const data = await fetchDestinations(organization.id);
+      setDestinations(data);
+    } catch {
+      // Ignore if user lacks permissions
+    } finally {
+      setDestinationsLoading(false);
+    }
+  };
 
   const loadApiKeys = async () => {
     setKeysLoading(true);
@@ -188,6 +218,50 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
     }
   };
 
+  const handleCreateDestination = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newDestinationName.trim() || !newDestinationUrl.trim()) return;
+    setDestinationActionError(null);
+    try {
+      const created = await createDestination(organization.id, newDestinationName.trim(), newDestinationUrl.trim(), {
+        httpMethod: newDestinationMethod,
+        rateLimitPerSecond: Number(newDestinationRateLimit),
+        timeoutMs: Number(newDestinationTimeout),
+      });
+      setDestinations((prev) => [created, ...prev]);
+      setNewDestinationName('');
+      setNewDestinationUrl('');
+      setShowAddDestinationModal(false);
+    } catch (err: unknown) {
+      setDestinationActionError(err instanceof Error ? err.message : 'Failed to create destination');
+    }
+  };
+
+  const handleDeleteDestination = async (destinationId: string) => {
+    if (!window.confirm('Are you sure you want to delete this destination target? Webhooks will no longer be forwarded to it.')) {
+      return;
+    }
+    setDestinationActionError(null);
+    try {
+      await deleteDestination(organization.id, destinationId);
+      setDestinations((prev) => prev.filter((d) => d.id !== destinationId));
+    } catch (err: unknown) {
+      setDestinationActionError(err instanceof Error ? err.message : 'Failed to delete destination');
+    }
+  };
+
+  const handleToggleDestinationStatus = async (destination: DestinationMetadata) => {
+    setDestinationActionError(null);
+    try {
+      const updated = await updateDestination(organization.id, destination.id, {
+        isActive: !destination.isActive,
+      });
+      setDestinations((prev) => prev.map((d) => (d.id === destination.id ? updated : d)));
+    } catch (err: unknown) {
+      setDestinationActionError(err instanceof Error ? err.message : 'Failed to update destination');
+    }
+  };
+
   const handleCopyText = (text: string, isSecret = false, urlId?: string) => {
     navigator.clipboard.writeText(text);
     if (isSecret) {
@@ -278,6 +352,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       ep.name.toLowerCase().includes(q) ||
       ep.slug.toLowerCase().includes(q) ||
       ep.id.toLowerCase().includes(q)
+    );
+  });
+
+  const filteredDestinations = destinations.filter((d) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      d.name.toLowerCase().includes(q) ||
+      d.url.toLowerCase().includes(q) ||
+      d.httpMethod.toLowerCase().includes(q)
     );
   });
 
@@ -667,6 +750,37 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         </button>
 
         <button
+          onClick={() => onTabChange('destinations')}
+          style={{
+            padding: '7px 18px',
+            borderRadius: '999px',
+            fontSize: '13px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            backgroundColor: activeTab === 'destinations' ? '#F2F2F5' : '#232327',
+            color: activeTab === 'destinations' ? '#0E0E10' : '#C9C9D2',
+            border: activeTab === 'destinations' ? '1px solid #F2F2F5' : '1px solid #3E3E45',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'all 0.15s ease',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <span>Destinations</span>
+          <span style={{
+            fontSize: '11px',
+            padding: '1px 7px',
+            borderRadius: '999px',
+            backgroundColor: activeTab === 'destinations' ? '#0E0E10' : '#3E3E45',
+            color: '#F2F2F5',
+            fontWeight: 700,
+          }}>
+            {destinations.length}
+          </span>
+        </button>
+
+        <button
           onClick={() => onTabChange('settings')}
           style={{
             padding: '7px 18px',
@@ -718,6 +832,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 ? 'Search API key by name, prefix, or scope...'
                 : activeTab === 'endpoints'
                 ? 'Search endpoint by name, slug, or ID...'
+                : activeTab === 'destinations'
+                ? 'Search destination by name, URL, or method...'
                 : 'Search member by name, contact email, role...'
             }
             value={searchQuery}
@@ -889,6 +1005,20 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           marginBottom: '20px',
         }}>
           {endpointActionError}
+        </div>
+      )}
+
+      {destinationActionError && (
+        <div style={{
+          backgroundColor: '#2A1C1C',
+          border: '1px solid #552B2B',
+          color: '#f87171',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          fontSize: '13px',
+          marginBottom: '20px',
+        }}>
+          {destinationActionError}
         </div>
       )}
 
@@ -1447,6 +1577,175 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           </table>
         )}
 
+        {/* DESTINATIONS VIEW (MILESTONE 3 OPTION 1: SSRF PROTECTED) */}
+        {activeTab === 'destinations' && (
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '780px' }}>
+            <thead>
+              <tr style={{
+                borderBottom: '1px solid #3E3E45',
+                color: '#9A9AA6',
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                backgroundColor: '#1E1E22',
+              }}>
+                <th style={{ padding: '16px 22px' }}>Destination ID</th>
+                <th style={{ padding: '16px 22px' }}>Name & Method</th>
+                <th style={{ padding: '16px 22px' }}>Target URL (SSRF Protected)</th>
+                <th style={{ padding: '16px 22px' }}>Rate Limit & Timeout</th>
+                <th style={{ padding: '16px 22px' }}>Created</th>
+                <th style={{ padding: '16px 22px' }}>Status</th>
+                <th style={{ padding: '16px 22px', textAlign: 'right' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {destinationsLoading ? (
+                <tr>
+                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#63636E' }}>
+                    Loading destination targets...
+                  </td>
+                </tr>
+              ) : filteredDestinations.length === 0 ? (
+                <tr>
+                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#63636E' }}>
+                    No destination targets registered yet. Click "+ New Destination" to configure webhook forward targets.
+                  </td>
+                </tr>
+              ) : (
+                filteredDestinations.map((d, idx) => {
+                  const destIdDisplay = `DEST-${d.id.slice(0, 5).toUpperCase()}`;
+
+                  return (
+                    <tr
+                      key={d.id}
+                      style={{
+                        borderBottom: idx === filteredDestinations.length - 1 ? 'none' : '1px solid #2C2C32',
+                        fontSize: '13px',
+                        color: '#F2F2F5',
+                      }}
+                    >
+                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#9A9AA6' }}>
+                        {destIdDisplay}
+                      </td>
+
+                      <td style={{ padding: '14px 20px' }}>
+                        <div style={{ fontWeight: 600 }}>{d.name}</div>
+                        <div style={{ marginTop: '3px' }}>
+                          <span style={{
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            fontFamily: 'monospace',
+                            backgroundColor: '#0E0E10',
+                            border: '1px solid #3E3E45',
+                            color: '#F2F2F5',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                          }}>
+                            {d.httpMethod}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td style={{ padding: '14px 20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <code style={{
+                            fontSize: '12px',
+                            backgroundColor: '#0E0E10',
+                            border: '1px solid #3E3E45',
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            color: '#F2F2F5',
+                            maxWidth: '320px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            display: 'inline-block',
+                          }}>
+                            {d.url}
+                          </code>
+                          <span style={{
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            padding: '2px 6px',
+                            borderRadius: '999px',
+                            backgroundColor: '#1E2D22',
+                            color: '#4ade80',
+                            border: '1px solid #2B4232',
+                            whiteSpace: 'nowrap',
+                          }}>
+                            ✓ SSRF Safe
+                          </span>
+                        </div>
+                      </td>
+
+                      <td style={{ padding: '14px 20px', color: '#C9C9D2', fontSize: '12px' }}>
+                        <div>{d.rateLimitPerSecond} req/sec</div>
+                        <div style={{ fontSize: '11px', color: '#9A9AA6' }}>{d.timeoutMs}ms timeout</div>
+                      </td>
+
+                      <td style={{ padding: '14px 20px', color: '#9A9AA6', fontSize: '12px' }}>
+                        {new Date(d.createdAt).toLocaleDateString()}
+                      </td>
+
+                      <td style={{ padding: '14px 20px' }}>
+                        <button
+                          onClick={() => canManageKeys && void handleToggleDestinationStatus(d)}
+                          disabled={!canManageKeys}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            padding: '2px 8px',
+                            borderRadius: '999px',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            backgroundColor: d.isActive ? '#1E2D22' : '#2A1C1C',
+                            color: d.isActive ? '#4ade80' : '#f87171',
+                            border: d.isActive ? '1px solid #2B4232' : '1px solid #442A2A',
+                            cursor: canManageKeys ? 'pointer' : 'default',
+                          }}
+                        >
+                          <span style={{
+                            width: '5px',
+                            height: '5px',
+                            borderRadius: '50%',
+                            backgroundColor: d.isActive ? '#4ade80' : '#f87171',
+                          }}></span>
+                          {d.isActive ? 'ACTIVE' : 'PAUSED'}
+                        </button>
+                      </td>
+
+                      <td style={{ padding: '14px 20px', textAlign: 'right' }}>
+                        {canManageKeys && (
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                            <button
+                              title="Delete destination"
+                              onClick={() => void handleDeleteDestination(d.id)}
+                              style={{
+                                backgroundColor: 'transparent',
+                                border: '1px solid #4A2828',
+                                color: '#f87171',
+                                borderRadius: '6px',
+                                padding: '4px 10px',
+                                fontSize: '11px',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        )}
+
         {/* SETTINGS / DASHBOARD VIEW */}
         {(activeTab === 'dashboard' || activeTab === 'settings') && (
           <div style={{ padding: '60px 20px', textAlign: 'center', color: '#9A9AA6' }}>
@@ -1850,6 +2149,199 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   }}
                 >
                   Create Endpoint
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ADD DESTINATION (MILESTONE 3 OPTION 1) */}
+      {showAddDestinationModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(14, 14, 16, 0.75)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 50,
+          padding: '16px',
+        }}>
+          <div style={{
+            backgroundColor: '#1E1E22',
+            borderRadius: '20px',
+            border: '1px solid #3E3E45',
+            width: '100%',
+            maxWidth: '500px',
+            padding: '28px',
+            boxShadow: '0 20px 30px rgba(0, 0, 0, 0.6)',
+          }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#F2F2F5' }}>
+              Register Destination Target
+            </h3>
+            <p style={{ fontSize: '13px', color: '#9A9AA6', margin: '0 0 20px' }}>
+              Register a webhook delivery destination. Targets are protected against SSRF attacks (private IPs, loopback, and cloud metadata are strictly blocked).
+            </p>
+
+            <form onSubmit={handleCreateDestination}>
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#9A9AA6', marginBottom: '6px' }}>
+                  Destination Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Primary Customer Webhook, Analytics Ingest"
+                  value={newDestinationName}
+                  onChange={(e) => setNewDestinationName(e.target.value)}
+                  autoFocus
+                  style={{
+                    width: '100%',
+                    padding: '9px 14px',
+                    border: '1px solid #3E3E45',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    backgroundColor: '#0E0E10',
+                    color: '#F2F2F5',
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#9A9AA6', marginBottom: '6px' }}>
+                  Target Webhook URL (SSRF Protected)
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://api.example.com/webhooks"
+                  value={newDestinationUrl}
+                  onChange={(e) => setNewDestinationUrl(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '9px 14px',
+                    border: '1px solid #3E3E45',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    backgroundColor: '#0E0E10',
+                    color: '#F2F2F5',
+                  }}
+                />
+                <span style={{ fontSize: '11px', color: '#63636E', marginTop: '4px', display: 'block' }}>
+                  Only public HTTP/HTTPS URLs allowed. RFC 1918 private subnets and 169.254.169.254 metadata are rejected.
+                </span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '20px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#9A9AA6', marginBottom: '6px' }}>
+                    HTTP Method
+                  </label>
+                  <select
+                    value={newDestinationMethod}
+                    onChange={(e) => setNewDestinationMethod(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '9px 10px',
+                      border: '1px solid #3E3E45',
+                      borderRadius: '10px',
+                      fontSize: '13px',
+                      backgroundColor: '#0E0E10',
+                      color: '#F2F2F5',
+                    }}
+                  >
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="PATCH">PATCH</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#9A9AA6', marginBottom: '6px' }}>
+                    Rate Limit (req/s)
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={5000}
+                    value={newDestinationRateLimit}
+                    onChange={(e) => setNewDestinationRateLimit(Number(e.target.value))}
+                    style={{
+                      width: '100%',
+                      padding: '9px 10px',
+                      border: '1px solid #3E3E45',
+                      borderRadius: '10px',
+                      fontSize: '13px',
+                      backgroundColor: '#0E0E10',
+                      color: '#F2F2F5',
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#9A9AA6', marginBottom: '6px' }}>
+                    Timeout (ms)
+                  </label>
+                  <input
+                    type="number"
+                    min={500}
+                    max={60000}
+                    step={500}
+                    value={newDestinationTimeout}
+                    onChange={(e) => setNewDestinationTimeout(Number(e.target.value))}
+                    style={{
+                      width: '100%',
+                      padding: '9px 10px',
+                      border: '1px solid #3E3E45',
+                      borderRadius: '10px',
+                      fontSize: '13px',
+                      backgroundColor: '#0E0E10',
+                      color: '#F2F2F5',
+                    }}
+                  />
+                </div>
+              </div>
+
+              {destinationActionError && (
+                <div style={{ color: '#f87171', fontSize: '12px', marginBottom: '16px' }}>
+                  {destinationActionError}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAddDestinationModal(false)}
+                  style={{
+                    padding: '9px 18px',
+                    backgroundColor: 'transparent',
+                    border: '1px solid #3E3E45',
+                    borderRadius: '999px',
+                    color: '#9A9AA6',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: '9px 22px',
+                    backgroundColor: '#F2F2F5',
+                    border: 'none',
+                    borderRadius: '999px',
+                    color: '#0E0E10',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Save Destination
                 </button>
               </div>
             </form>

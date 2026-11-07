@@ -8,7 +8,7 @@ interface SidebarProps {
   activeTab: string;
   onSelectOrg: (orgId: string) => void;
   onCreateOrg: (name: string, slug?: string) => Promise<void>;
-  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'settings') => void;
+  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'settings') => void;
   onLogout: () => void;
   isMobile?: boolean;
   onCloseMobile?: () => void;
@@ -49,7 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const handleTabClick = (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'settings') => {
+  const handleTabClick = (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'settings') => {
     onTabChange(tab);
     if (isMobile && onCloseMobile) {
       onCloseMobile();
@@ -283,6 +283,49 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
               </svg>
               <span>Ingestion Endpoints</span>
+            </button>
+
+            {/* Destinations & SSRF Registry (Milestone 3 Option 1) */}
+            <button
+              onClick={() => handleTabClick('destinations')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+                padding: '9px 14px',
+                borderRadius: '999px',
+                fontSize: '13px',
+                fontWeight: activeTab === 'destinations' ? 700 : 500,
+                backgroundColor: activeTab === 'destinations' ? '#F2F2F5' : 'transparent',
+                color: activeTab === 'destinations' ? '#0E0E10' : '#9A9AA6',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="22" y1="12" x2="18" y2="12"></line>
+                  <line x1="6" y1="12" x2="2" y2="12"></line>
+                  <line x1="12" y1="6" x2="12" y2="2"></line>
+                  <line x1="12" y1="22" x2="12" y2="18"></line>
+                </svg>
+                <span>Destinations</span>
+              </div>
+              <span style={{
+                fontSize: '10px',
+                fontWeight: 700,
+                backgroundColor: activeTab === 'destinations' ? '#232327' : '#232327',
+                color: activeTab === 'destinations' ? '#F2F2F5' : '#9A9AA6',
+                padding: '2px 7px',
+                borderRadius: '999px',
+                border: '1px solid #3E3E45',
+              }}>
+                M3
+              </span>
             </button>
           </nav>
         </div>

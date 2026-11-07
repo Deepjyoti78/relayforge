@@ -22,6 +22,8 @@ export const TopBar: React.FC<TopBarProps> = ({
         return 'API Keys & Secrets';
       case 'endpoints':
         return 'Ingestion Endpoints';
+      case 'destinations':
+        return 'Destinations & SSRF Registry';
       case 'settings':
         return 'Settings';
       default:

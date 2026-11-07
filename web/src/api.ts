@@ -2,6 +2,7 @@ import type {
   ApiKeyMetadata,
   CreatedApiKeyResponse,
   CreatedEndpointResponse,
+  DestinationMetadata,
   EndpointMetadata,
   MembershipRole,
   OrganizationDetails,
@@ -211,6 +212,64 @@ export async function createEndpoint(
     throw new Error(error.message || 'Failed to create endpoint');
   }
   return res.json() as Promise<CreatedEndpointResponse>;
+}
+
+// Milestone 3 Option 1 — Destinations & SSRF Registry
+
+export async function fetchDestinations(orgId: string): Promise<DestinationMetadata[]> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/destinations`);
+  if (!res.ok) throw new Error('Failed to fetch destinations');
+  return res.json() as Promise<DestinationMetadata[]>;
+}
+
+export async function createDestination(
+  orgId: string,
+  name: string,
+  url: string,
+  options?: {
+    httpMethod?: string;
+    rateLimitPerSecond?: number;
+    timeoutMs?: number;
+    headers?: Record<string, string>;
+  },
+): Promise<DestinationMetadata> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/destinations`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, url, ...options }),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: 'Failed to create destination' })) as { message?: string };
+    throw new Error(error.message || 'Failed to create destination');
+  }
+  return res.json() as Promise<DestinationMetadata>;
+}
+
+export async function updateDestination(
+  orgId: string,
+  destinationId: string,
+  update: Partial<DestinationMetadata>,
+): Promise<DestinationMetadata> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/destinations/${destinationId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(update),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: 'Failed to update destination' })) as { message?: string };
+    throw new Error(error.message || 'Failed to update destination');
+  }
+  return res.json() as Promise<DestinationMetadata>;
+}
+
+export async function deleteDestination(orgId: string, destinationId: string): Promise<void> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/destinations/${destinationId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: 'Failed to delete destination' })) as { message?: string };
+    throw new Error(error.message || 'Failed to delete destination');
+  }
 }
 
 export async function deleteEndpoint(orgId: string, endpointId: string): Promise<void> {
