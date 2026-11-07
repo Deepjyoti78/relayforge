@@ -99,64 +99,58 @@ export const App: React.FC = () => {
 
   const handleUpdateOrgName = async (name: string) => {
     if (!selectedOrgId) return;
-    const updated = await updateOrganization(selectedOrgId, name);
-    setActiveOrg(updated);
-    await loadUser();
+    await updateOrganization(selectedOrgId, name);
+    await Promise.all([loadUser(), loadActiveOrg(selectedOrgId)]);
   };
 
-  const handleAddMember = async (identifier: { email?: string; username?: string }, role: MembershipRole) => {
+  const handleAddMember = async (
+    identifier: { email?: string; username?: string },
+    role: MembershipRole,
+  ) => {
     if (!selectedOrgId) return;
     await addMember(selectedOrgId, identifier, role);
-    const updatedMembers = await fetchMembers(selectedOrgId);
-    setMembers(updatedMembers);
+    await loadActiveOrg(selectedOrgId);
   };
 
   const handleUpdateRole = async (memberId: string, role: MembershipRole) => {
     if (!selectedOrgId) return;
     await updateMemberRole(selectedOrgId, memberId, role);
-    const updatedMembers = await fetchMembers(selectedOrgId);
-    setMembers(updatedMembers);
+    await loadActiveOrg(selectedOrgId);
   };
 
   const handleRemoveMember = async (memberId: string) => {
     if (!selectedOrgId) return;
     await removeMember(selectedOrgId, memberId);
-    await loadUser();
-    if (selectedOrgId) {
-      const updatedMembers = await fetchMembers(selectedOrgId);
-      setMembers(updatedMembers);
-    }
+    await Promise.all([loadUser(), loadActiveOrg(selectedOrgId)]);
   };
 
   if (loading) {
     return (
       <div style={{
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
-        backgroundColor: '#f8fafc',
-        color: '#64748b',
+        backgroundColor: '#0E0E10',
+        color: '#9A9AA6',
         fontSize: '14px',
-        fontWeight: 600,
+        fontWeight: 500,
         gap: '12px',
       }}>
         <div style={{
-          width: '32px',
-          height: '32px',
-          borderRadius: '8px',
-          backgroundColor: '#0f172a',
-          color: '#ffffff',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-          </svg>
-        </div>
+          width: '18px',
+          height: '18px',
+          border: '2px solid #3E3E45',
+          borderTopColor: '#F2F2F5',
+          borderRadius: '50%',
+          animation: 'spin 0.8s linear infinite',
+        }}></div>
         <span>Initializing RelayForge Console...</span>
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }
@@ -166,8 +160,13 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', backgroundColor: '#f8fafc' }}>
-      {/* Monochromatic Left Sidebar */}
+    <div style={{
+      display: 'flex',
+      minHeight: '100vh',
+      backgroundColor: '#0E0E10',
+      color: '#F2F2F5',
+    }}>
+      {/* Sidebar Navigation */}
       <Sidebar
         user={user}
         organizations={user.organizations}
@@ -185,10 +184,9 @@ export const App: React.FC = () => {
           user={user}
           organization={activeOrg}
           activeTab={activeTab}
-          onLogout={handleLogout}
         />
 
-        <main style={{ flex: 1, display: 'flex', overflowY: 'auto' }}>
+        <main style={{ flex: 1, display: 'flex', overflowY: 'auto', backgroundColor: '#0E0E10' }}>
           {activeOrg ? (
             <OrgManagement
               organization={activeOrg}
@@ -208,21 +206,22 @@ export const App: React.FC = () => {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#64748b',
+              color: '#9A9AA6',
               padding: '40px',
               textAlign: 'center',
+              backgroundColor: '#0E0E10',
             }}>
               <div style={{
                 width: '48px',
                 height: '48px',
                 borderRadius: '12px',
-                backgroundColor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                backgroundColor: '#232327',
+                border: '1px solid #3E3E45',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: '16px',
-                color: '#0f172a',
+                color: '#F2F2F5',
               }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -231,10 +230,10 @@ export const App: React.FC = () => {
                   <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
               </div>
-              <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#0f172a' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#F2F2F5' }}>
                 No Organization Selected
               </h2>
-              <p style={{ fontSize: '13px', margin: 0, maxWidth: '360px', color: '#64748b' }}>
+              <p style={{ fontSize: '13px', margin: 0, maxWidth: '360px', color: '#9A9AA6' }}>
                 Create or select an organization from the sidebar to manage identity, roles, and API keys.
               </p>
             </div>

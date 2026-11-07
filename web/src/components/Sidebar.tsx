@@ -58,8 +58,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside style={{
       width: '260px',
-      backgroundColor: '#ffffff',
-      borderRight: '1px solid #e2e8f0',
+      backgroundColor: '#232327',
+      borderRight: '1px solid #3E3E45',
       display: 'flex',
       flexDirection: 'column',
       height: '100vh',
@@ -68,7 +68,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Brand Header */}
       <div style={{
         padding: '20px 20px 16px',
-        borderBottom: '1px solid #f1f5f9',
+        borderBottom: '1px solid #3E3E45',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -78,9 +78,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             width: '34px',
             height: '34px',
             borderRadius: '8px',
-            border: '1px solid #0f172a',
-            backgroundColor: '#0f172a',
-            color: '#ffffff',
+            border: '1px solid #3E3E45',
+            backgroundColor: '#0E0E10',
+            color: '#F2F2F5',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -90,49 +90,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </svg>
           </div>
           <div>
-            <div style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', lineHeight: '1.2' }}>
+            <div style={{ fontSize: '14px', fontWeight: 800, color: '#F2F2F5', letterSpacing: '-0.02em', lineHeight: '1.2' }}>
               RELAYFORGE
             </div>
-            <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 500 }}>
+            <div style={{ fontSize: '11px', color: '#9A9AA6', fontWeight: 500 }}>
               Management Console
             </div>
           </div>
         </div>
-
-        <button
-          title="Sidebar Collapse"
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: '#94a3b8',
-            cursor: 'pointer',
-            padding: '4px',
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-        </button>
       </div>
 
-      {/* Nav Content */}
+      {/* Navigation Sections */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px 12px' }}>
-        {/* MAIN MENU */}
+        {/* Section: MAIN MENU */}
         <div style={{ marginBottom: '24px' }}>
           <div style={{
             fontSize: '11px',
             fontWeight: 700,
-            letterSpacing: '0.06em',
-            color: '#94a3b8',
+            letterSpacing: '0.08em',
+            color: '#63636E',
             textTransform: 'uppercase',
-            padding: '0 8px',
-            marginBottom: '6px',
+            padding: '0 8px 8px',
           }}>
-            Main Menu
+            MAIN MENU
           </div>
 
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            {/* Dashboard */}
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+            {/* Overview / Dashboard */}
             <button
               onClick={() => onTabChange('dashboard')}
               style={{
@@ -140,16 +124,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 alignItems: 'center',
                 gap: '10px',
                 width: '100%',
-                padding: '8px 10px',
+                padding: '9px 12px',
                 borderRadius: '8px',
                 fontSize: '13px',
-                fontWeight: activeTab === 'dashboard' ? 600 : 500,
-                color: activeTab === 'dashboard' ? '#0f172a' : '#475569',
-                backgroundColor: activeTab === 'dashboard' ? '#f8fafc' : 'transparent',
-                border: activeTab === 'dashboard' ? '1px solid #e2e8f0' : '1px solid transparent',
+                fontWeight: activeTab === 'dashboard' ? 700 : 500,
+                backgroundColor: activeTab === 'dashboard' ? '#0E0E10' : 'transparent',
+                color: activeTab === 'dashboard' ? '#F2F2F5' : '#9A9AA6',
+                border: activeTab === 'dashboard' ? '1px solid #3E3E45' : '1px solid transparent',
                 cursor: 'pointer',
                 textAlign: 'left',
                 transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (activeTab !== 'dashboard') {
+                  e.currentTarget.style.backgroundColor = '#2A2A30';
+                  e.currentTarget.style.color = '#F2F2F5';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== 'dashboard') {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#9A9AA6';
+                }
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -158,10 +154,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <rect x="14" y="14" width="7" height="7"></rect>
                 <rect x="3" y="14" width="7" height="7"></rect>
               </svg>
-              <span>Dashboard</span>
+              <span>Overview</span>
             </button>
 
-            {/* Members */}
+            {/* Members Directory */}
             <button
               onClick={() => onTabChange('members')}
               style={{
@@ -169,16 +165,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 alignItems: 'center',
                 gap: '10px',
                 width: '100%',
-                padding: '8px 10px',
+                padding: '9px 12px',
                 borderRadius: '8px',
                 fontSize: '13px',
-                fontWeight: activeTab === 'members' ? 600 : 500,
-                color: activeTab === 'members' ? '#0f172a' : '#475569',
-                backgroundColor: activeTab === 'members' ? '#f8fafc' : 'transparent',
-                border: activeTab === 'members' ? '1px solid #e2e8f0' : '1px solid transparent',
+                fontWeight: activeTab === 'members' ? 700 : 500,
+                backgroundColor: activeTab === 'members' ? '#0E0E10' : 'transparent',
+                color: activeTab === 'members' ? '#F2F2F5' : '#9A9AA6',
+                border: activeTab === 'members' ? '1px solid #3E3E45' : '1px solid transparent',
                 cursor: 'pointer',
                 textAlign: 'left',
                 transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (activeTab !== 'members') {
+                  e.currentTarget.style.backgroundColor = '#2A2A30';
+                  e.currentTarget.style.color = '#F2F2F5';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== 'members') {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#9A9AA6';
+                }
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -187,7 +195,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                 <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
               </svg>
-              <span>Members</span>
+              <span>Members Directory</span>
             </button>
 
             {/* API Keys */}
@@ -198,16 +206,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 width: '100%',
-                padding: '8px 10px',
+                padding: '9px 12px',
                 borderRadius: '8px',
                 fontSize: '13px',
-                fontWeight: activeTab === 'api-keys' ? 600 : 500,
-                color: activeTab === 'api-keys' ? '#0f172a' : '#475569',
-                backgroundColor: activeTab === 'api-keys' ? '#f8fafc' : 'transparent',
-                border: activeTab === 'api-keys' ? '1px solid #e2e8f0' : '1px solid transparent',
+                fontWeight: activeTab === 'api-keys' ? 700 : 500,
+                backgroundColor: activeTab === 'api-keys' ? '#0E0E10' : 'transparent',
+                color: activeTab === 'api-keys' ? '#F2F2F5' : '#9A9AA6',
+                border: activeTab === 'api-keys' ? '1px solid #3E3E45' : '1px solid transparent',
                 cursor: 'pointer',
                 textAlign: 'left',
                 transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (activeTab !== 'api-keys') {
+                  e.currentTarget.style.backgroundColor = '#2A2A30';
+                  e.currentTarget.style.color = '#F2F2F5';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== 'api-keys') {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#9A9AA6';
+                }
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -219,16 +239,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span style={{
                 fontSize: '10px',
                 fontWeight: 700,
-                padding: '1px 5px',
-                backgroundColor: '#0f172a',
-                color: '#ffffff',
+                backgroundColor: '#3E3E45',
+                color: '#F2F2F5',
+                padding: '2px 6px',
                 borderRadius: '4px',
               }}>
                 M3
               </span>
             </button>
 
-            {/* Endpoints */}
+            {/* Ingestion Endpoints */}
             <button
               onClick={() => onTabChange('endpoints')}
               style={{
@@ -236,55 +256,66 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 alignItems: 'center',
                 gap: '10px',
                 width: '100%',
-                padding: '8px 10px',
+                padding: '9px 12px',
                 borderRadius: '8px',
                 fontSize: '13px',
-                fontWeight: activeTab === 'endpoints' ? 600 : 500,
-                color: activeTab === 'endpoints' ? '#0f172a' : '#475569',
-                backgroundColor: activeTab === 'endpoints' ? '#f8fafc' : 'transparent',
-                border: activeTab === 'endpoints' ? '1px solid #e2e8f0' : '1px solid transparent',
+                fontWeight: activeTab === 'endpoints' ? 700 : 500,
+                backgroundColor: activeTab === 'endpoints' ? '#0E0E10' : 'transparent',
+                color: activeTab === 'endpoints' ? '#F2F2F5' : '#9A9AA6',
+                border: activeTab === 'endpoints' ? '1px solid #3E3E45' : '1px solid transparent',
                 cursor: 'pointer',
                 textAlign: 'left',
                 transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (activeTab !== 'endpoints') {
+                  e.currentTarget.style.backgroundColor = '#2A2A30';
+                  e.currentTarget.style.color = '#F2F2F5';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== 'endpoints') {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#9A9AA6';
+                }
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
               </svg>
-              <span>Endpoints</span>
+              <span>Ingestion Endpoints</span>
             </button>
           </nav>
         </div>
 
-        {/* ORGANIZATIONS (TENANCY) */}
+        {/* Section: ORGANIZATIONS */}
         <div style={{ marginBottom: '24px' }}>
           <div style={{
             display: 'flex',
-            alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '0 8px',
-            marginBottom: '8px',
+            alignItems: 'center',
+            padding: '0 8px 8px',
           }}>
             <span style={{
               fontSize: '11px',
               fontWeight: 700,
-              letterSpacing: '0.06em',
-              color: '#94a3b8',
+              letterSpacing: '0.08em',
+              color: '#63636E',
               textTransform: 'uppercase',
             }}>
-              Organizations
+              ORGANIZATIONS
             </span>
             <button
-              onClick={() => setIsCreatingOrg(!isCreatingOrg)}
+              onClick={() => setIsCreatingOrg((prev) => !prev)}
               style={{
+                backgroundColor: '#3E3E45',
+                border: 'none',
+                color: '#F2F2F5',
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#0f172a',
-                backgroundColor: '#f1f5f9',
-                border: '1px solid #e2e8f0',
                 borderRadius: '4px',
-                padding: '1px 6px',
+                padding: '2px 7px',
                 cursor: 'pointer',
               }}
             >
@@ -292,155 +323,169 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
 
-          {/* Inline Create Form */}
+          {/* Quick Create Organization Form */}
           {isCreatingOrg && (
             <form onSubmit={handleCreateSubmit} style={{
-              backgroundColor: '#f8fafc',
-              border: '1px solid #e2e8f0',
+              padding: '10px',
+              backgroundColor: '#1E1E22',
               borderRadius: '8px',
-              padding: '12px',
-              marginBottom: '10px',
+              border: '1px solid #3E3E45',
+              marginBottom: '8px',
             }}>
               <input
                 type="text"
-                placeholder="Org Name"
+                placeholder="Organization Name"
                 value={newOrgName}
                 onChange={(e) => setNewOrgName(e.target.value)}
                 autoFocus
                 style={{
                   width: '100%',
                   padding: '6px 8px',
+                  borderRadius: '6px',
+                  border: '1px solid #3E3E45',
+                  backgroundColor: '#0E0E10',
+                  color: '#F2F2F5',
                   fontSize: '12px',
-                  border: '1px solid #cbd5e1',
-                  borderRadius: '4px',
-                  backgroundColor: '#ffffff',
-                  marginBottom: '8px',
-                  outline: 'none',
+                  marginBottom: '6px',
                 }}
               />
               <input
                 type="text"
-                placeholder="slug (optional)"
+                placeholder="Slug (optional)"
                 value={newOrgSlug}
                 onChange={(e) => setNewOrgSlug(e.target.value)}
                 style={{
                   width: '100%',
                   padding: '6px 8px',
-                  fontSize: '11px',
-                  border: '1px solid #cbd5e1',
-                  borderRadius: '4px',
-                  backgroundColor: '#ffffff',
+                  borderRadius: '6px',
+                  border: '1px solid #3E3E45',
+                  backgroundColor: '#0E0E10',
+                  color: '#F2F2F5',
+                  fontSize: '12px',
                   marginBottom: '8px',
-                  outline: 'none',
                 }}
               />
               {createError && (
-                <div style={{ color: '#ef4444', fontSize: '11px', marginBottom: '8px' }}>
+                <div style={{ color: '#f87171', fontSize: '11px', marginBottom: '6px' }}>
                   {createError}
                 </div>
               )}
-              <div style={{ display: 'flex', gap: '6px' }}>
-                <button
-                  type="submit"
-                  disabled={createLoading}
-                  style={{
-                    flex: 1,
-                    backgroundColor: '#0f172a',
-                    color: '#ffffff',
-                    border: 'none',
-                    borderRadius: '4px',
-                    padding: '5px',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {createLoading ? '...' : 'Create'}
-                </button>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
                 <button
                   type="button"
                   onClick={() => setIsCreatingOrg(false)}
                   style={{
-                    backgroundColor: '#ffffff',
-                    color: '#64748b',
-                    border: '1px solid #cbd5e1',
-                    borderRadius: '4px',
-                    padding: '5px 8px',
+                    padding: '4px 8px',
                     fontSize: '11px',
+                    backgroundColor: 'transparent',
+                    border: '1px solid #3E3E45',
+                    color: '#9A9AA6',
+                    borderRadius: '4px',
                     cursor: 'pointer',
                   }}
                 >
                   Cancel
                 </button>
+                <button
+                  type="submit"
+                  disabled={createLoading}
+                  style={{
+                    padding: '4px 10px',
+                    fontSize: '11px',
+                    backgroundColor: '#F2F2F5',
+                    color: '#0E0E10',
+                    fontWeight: 600,
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {createLoading ? '...' : 'Create'}
+                </button>
               </div>
             </form>
           )}
 
-          {/* Org List */}
+          {/* Organization list */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-            {organizations.map((org) => {
-              const isSelected = org.id === selectedOrgId;
-              return (
-                <button
-                  key={org.id}
-                  onClick={() => onSelectOrg(org.id)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                    padding: '7px 10px',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                    fontWeight: isSelected ? 600 : 500,
-                    color: isSelected ? '#0f172a' : '#475569',
-                    backgroundColor: isSelected ? '#f1f5f9' : 'transparent',
-                    border: isSelected ? '1px solid #cbd5e1' : '1px solid transparent',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
-                    <div style={{
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      backgroundColor: isSelected ? '#0f172a' : '#cbd5e1',
-                    }}></div>
-                    <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {org.name}
+            {organizations.length === 0 ? (
+              <div style={{ padding: '8px', fontSize: '12px', color: '#63636E' }}>
+                No organizations yet.
+              </div>
+            ) : (
+              organizations.map((org) => {
+                const isSelected = org.id === selectedOrgId;
+                return (
+                  <button
+                    key={org.id}
+                    onClick={() => onSelectOrg(org.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      width: '100%',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      fontWeight: isSelected ? 700 : 500,
+                      backgroundColor: isSelected ? '#0E0E10' : 'transparent',
+                      color: isSelected ? '#F2F2F5' : '#C9C9D2',
+                      border: isSelected ? '1px solid #3E3E45' : '1px solid transparent',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'all 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.backgroundColor = '#2A2A30';
+                        e.currentTarget.style.color = '#F2F2F5';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.color = '#C9C9D2';
+                      }
+                    }}
+                  >
+                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <div>{org.name}</div>
+                      <div style={{ fontSize: '11px', color: '#63636E', fontWeight: 400 }}>
+                        /{org.slug}
+                      </div>
+                    </div>
+                    <span style={{
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      backgroundColor: '#3E3E45',
+                      color: '#F2F2F5',
+                      padding: '2px 5px',
+                      borderRadius: '4px',
+                      marginLeft: '6px',
+                    }}>
+                      {org.role}
                     </span>
-                  </div>
-                  <span style={{
-                    fontSize: '10px',
-                    padding: '1px 5px',
-                    borderRadius: '4px',
-                    backgroundColor: isSelected ? '#0f172a' : '#f1f5f9',
-                    color: isSelected ? '#ffffff' : '#64748b',
-                    fontWeight: 600,
-                  }}>
-                    {org.role}
-                  </span>
-                </button>
-              );
-            })}
+                  </button>
+                );
+              })
+            )}
           </div>
         </div>
 
-        {/* ADMINISTRATION */}
+        {/* Section: ADMINISTRATION */}
         <div>
           <div style={{
             fontSize: '11px',
             fontWeight: 700,
-            letterSpacing: '0.06em',
-            color: '#94a3b8',
+            letterSpacing: '0.08em',
+            color: '#63636E',
             textTransform: 'uppercase',
-            padding: '0 8px',
-            marginBottom: '6px',
+            padding: '0 8px 8px',
           }}>
-            Administration
+            ADMINISTRATION
           </div>
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
             <button
               onClick={() => onTabChange('settings')}
               style={{
@@ -448,15 +493,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 alignItems: 'center',
                 gap: '10px',
                 width: '100%',
-                padding: '8px 10px',
+                padding: '9px 12px',
                 borderRadius: '8px',
                 fontSize: '13px',
-                fontWeight: activeTab === 'settings' ? 600 : 500,
-                color: activeTab === 'settings' ? '#0f172a' : '#475569',
-                backgroundColor: activeTab === 'settings' ? '#f8fafc' : 'transparent',
-                border: activeTab === 'settings' ? '1px solid #e2e8f0' : '1px solid transparent',
+                fontWeight: activeTab === 'settings' ? 700 : 500,
+                backgroundColor: activeTab === 'settings' ? '#0E0E10' : 'transparent',
+                color: activeTab === 'settings' ? '#F2F2F5' : '#9A9AA6',
+                border: activeTab === 'settings' ? '1px solid #3E3E45' : '1px solid transparent',
                 cursor: 'pointer',
                 textAlign: 'left',
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (activeTab !== 'settings') {
+                  e.currentTarget.style.backgroundColor = '#2A2A30';
+                  e.currentTarget.style.color = '#F2F2F5';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== 'settings') {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#9A9AA6';
+                }
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -469,45 +527,45 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Footer Profile */}
+      {/* User Footer Profile & Logout */}
       <div style={{
         padding: '14px 16px',
-        borderTop: '1px solid #f1f5f9',
+        borderTop: '1px solid #3E3E45',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#1E1E22',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden' }}>
           {user.avatarUrl ? (
             <img
               src={user.avatarUrl}
               alt=""
-              style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0 }}
+              style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #3E3E45' }}
             />
           ) : (
             <div style={{
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              backgroundColor: '#0f172a',
-              color: '#ffffff',
+              backgroundColor: '#0E0E10',
+              border: '1px solid #3E3E45',
+              color: '#F2F2F5',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '11px',
               fontWeight: 700,
-              flexShrink: 0,
             }}>
               {getInitials(user.displayName, user.email)}
             </div>
           )}
-          <div style={{ overflow: 'hidden' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#F2F2F5', lineHeight: '1.2' }}>
               {user.displayName || 'Developer'}
             </div>
-            <div style={{ fontSize: '11px', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {user.email || 'Admin'}
+            <div style={{ fontSize: '11px', color: '#9A9AA6', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {user.email || 'developer@relayforge'}
             </div>
           </div>
         </div>
@@ -518,10 +576,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
           style={{
             backgroundColor: 'transparent',
             border: 'none',
-            color: '#94a3b8',
+            color: '#9A9AA6',
             cursor: 'pointer',
             padding: '4px',
-            borderRadius: '4px',
+            borderRadius: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#F2F2F5';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#9A9AA6';
           }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
