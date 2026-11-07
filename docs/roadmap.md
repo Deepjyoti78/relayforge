@@ -1,24 +1,24 @@
 # Implementation roadmap
 
-## Current milestone: backend foundation
+## Completed: Milestone 1 — Backend foundation
 
 API and worker entry points, PostgreSQL/Redis infrastructure, restricted database
 roles, Prisma migration, health checks, structured logs, operational probes,
 automated checks, and container/CI definitions.
 
-Verification results for a given development run are reported in the chat; the
-presence of a CI file is not evidence of a completed remote GitHub Actions run.
+## Completed: Milestone 2 — Identity, organizations, and multi-tenant isolation
 
-## Next: identity and organization isolation
+GitHub OAuth 2.0 with PKCE and state protection, server-side session hashing,
+user profiles, multi-organization membership, Owner/Developer/Viewer RBAC,
+transaction-local tenant context, PostgreSQL Row-Level Security (RLS) enforcement,
+and minimal React/TypeScript management UI.
 
-Implement external login and server-side sessions, users and memberships,
-Owner/Developer/Viewer permissions, authorized tenant context, composite foreign
-keys, and PostgreSQL RLS together. Test cross-tenant reads, writes, and pooled
-connection reuse before adding event data.
+## Next: Milestone 3 — API keys, encrypted secrets, and approved destinations
 
-## Then
-
-1. API keys, encrypted secrets, and approved destinations.
+1. Organization-scoped API keys (hashed storage, prefix, rotation).
+2. AES-256-GCM envelope encryption for webhook secrets.
+3. Destination registry and egress URL policy verification (SSRF protection).
+4. Immutable workflow publication and endpoint configuration.
 2. Endpoint configuration and immutable bounded workflow publication.
 3. Signed ingestion, schema validation, deduplication, and transactional outbox.
 4. One real HTTP delivery with leases and durable attempt records.

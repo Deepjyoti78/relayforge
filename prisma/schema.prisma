@@ -8,7 +8,7 @@ datasource db {
   provider = "postgresql"
 }
 
-// Operational infrastructure only; tenant domain tables follow in the next milestone.
+// Operational infrastructure from Milestone 1.
 model WorkerHeartbeat {
   instanceId String   @id @map("instance_id") @db.Uuid
   startedAt  DateTime @default(now()) @map("started_at") @db.Timestamptz(3)
@@ -17,4 +17,105 @@ model WorkerHeartbeat {
 
   @@index([lastSeenAt])
   @@map("worker_heartbeats")
+}
+
+// Milestone 2 — Identity, Organizations, and Tenancy
+
+enum MembershipRole {
+  OWNER
+  DEVELOPER
+  VIEWER
+
+  @@map("membership_role")
+}
+
+model User {
+  id          String   @id @default(uuid()) @db.Uuid
+  email       String?  @db.VarChar(255)
+  displayName String?  @map("display_name") @db.VarChar(255)
+  avatarUrl   String?  @map("avatar_url") @db.VarChar(1024)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  externalIdentities   ExternalIdentity[]
+  sessions             Session[]
+  memberships          Membership[]
+  createdOrganizations Organization[]     @relation("OrganizationCreator")
+
+  @@map("users")
+}
+
+model ExternalIdentity {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  provider         String   @db.VarChar(32)
+  providerUserId   String   @map("provider_user_id") @db.VarChar(255)
+  providerUsername String?  @map("provider_username") @db.VarChar(255)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+  @@map("external_identities")
+}
+
+model Session {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  tokenHash    String    @unique @map("token_hash") @db.VarChar(64)
+  expiresAt    DateTime  @map("expires_at") @db.Timestamptz(3)
+  revokedAt    DateTime? @map("revoked_at") @db.Timestamptz(3)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastActiveAt DateTime  @default(now()) @map("last_active_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model OAuthState {
+  id           String   @id @default(uuid()) @db.Uuid
+  state        String   @unique @db.VarChar(128)
+  codeVerifier String   @map("code_verifier") @db.VarChar(128)
+  redirectUri  String?  @map("redirect_uri") @db.VarChar(512)
+  expiresAt    DateTime @map("expires_at") @db.Timestamptz(3)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([expiresAt])
+  @@map("oauth_states")
+}
+
+model Organization {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(128)
+  slug      String   @unique @db.VarChar(128)
+  createdBy String?  @map("created_by") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  creator     User?        @relation("OrganizationCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  memberships Membership[]
+
+  @@map("organizations")
+}
+
+model Membership {
+  id             String         @id @default(uuid()) @db.Uuid
+  organizationId String         @map("org_id") @db.Uuid
+  userId         String         @map("user_id") @db.Uuid
+  role           MembershipRole
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@index([organizationId, role])
+  @@map("memberships")
 }

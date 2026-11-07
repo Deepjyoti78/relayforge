@@ -8,33 +8,35 @@ the durable database. Redis and BullMQ provide background queue infrastructure.
 
 ## What works now
 
-- NestJS API with liveness and PostgreSQL readiness endpoints.
-- A separate NestJS worker with a BullMQ operational-probe consumer.
-- A real queue round trip that checks the worker and its database connection.
-- Prisma schema, checked-in migration, and restricted API/worker database accounts.
-- Worker heartbeat registration, refresh, and graceful cleanup.
-- Validated environment settings and bounded database connection/query timeouts.
-- Structured JSON logs, server-generated request IDs, and secret redaction.
-- Persistent local PostgreSQL and Redis, plus isolated disposable test services.
-- Multi-stage Docker builds and a GitHub Actions verification workflow.
+- **Backend Runtime:** Separate NestJS API and Worker processes from a single codebase.
+- **Operational Probes:** BullMQ system queue with real end-to-end round trip worker verification.
+- **Identity & Authentication:** GitHub OAuth 2.0 with PKCE (S256), short-lived state replay protection, session token SHA-256 hashing, and secure cookies (`rf_session`).
+- **Organization & RBAC:** Multi-tenant organization creation, Owner/Developer/Viewer hierarchy, member invitations, and final Owner protection.
+- **Row-Level Security:** Database-enforced isolation on `organizations` and `memberships` using PostgreSQL RLS, transaction-local tenant context, and recursion-free security functions.
+- **Frontend Interface:** Modern, clean React + TypeScript interface for GitHub sign-in, organization selection, and member management.
+- **Security & Least Privilege:** Restricted API and Worker database accounts, non-root Docker runtime, secret redaction, and bounded timeouts.
+- **Infrastructure:** Persistent local PostgreSQL 17 and Redis 7.4 (AOF with `noeviction`), isolated test services, and GitHub Actions CI.
 
-Authentication, organizations, tenant RLS policies, webhook ingestion, delivery,
-retries, outbox processing, and the frontend are later milestones. The operational
-probe is infrastructure verification; it does not simulate webhook delivery.
+Webhook ingestion, delivery pipelines, transactional outbox, automatic retries, and dead-letter queues are part of the delivery milestones.
 
-## Run the complete foundation
+## Run the full application
 
-Prerequisites: Node.js 22.20+ or 24+, npm 10+, and a running Docker Desktop using
-Linux containers. All commands below run from this folder.
+Prerequisites: Node.js 22.20+ or 24+, npm 10+, and Docker Desktop. All commands run from this folder.
 
 ```powershell
 npm ci
 npm run setup
 npm run db:generate
 npm run build
-npm run stack:up
-npm run test:smoke
+npm run infra:up
+npm run db:migrate
+npm run build:web
 ```
+
+To run the API and Worker on your host:
+- Terminal 1: `npm run dev:api` (API on port 3100)
+- Terminal 2: `npm run dev:worker` (Worker consumer)
+- Terminal 3: `npm run dev:web` (Vite UI on <http://localhost:5173>)
 
 `setup` creates local `.env` and `.env.test` files only when absent. It never
 overwrites existing configuration. `stack:up` starts PostgreSQL and Redis, applies

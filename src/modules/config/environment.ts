@@ -29,6 +29,11 @@ const baseSchema = z.object({
   WORKER_CONCURRENCY: z.coerce.number().int().min(1).max(32).default(2),
   WORKER_HEARTBEAT_MS: z.coerce.number().int().min(1000).max(60000).default(10000),
   QUEUE_PREFIX: z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/).default('relayforge'),
+  GITHUB_CLIENT_ID: z.string().default('gh_placeholder_client_id'),
+  GITHUB_CLIENT_SECRET: z.string().default('gh_placeholder_client_secret'),
+  GITHUB_CALLBACK_URL: z.string().url().default('http://127.0.0.1:3100/auth/github/callback'),
+  FRONTEND_URL: z.string().url().default('http://localhost:5173'),
+  SESSION_COOKIE_NAME: z.string().default('rf_session'),
 });
 
 export class ConfigurationError extends Error {
@@ -62,6 +67,11 @@ export function parseEnvironment(role: ProcessRole, input: NodeJS.ProcessEnv) {
     workerConcurrency: values.WORKER_CONCURRENCY,
     workerHeartbeatMs: values.WORKER_HEARTBEAT_MS,
     queuePrefix: values.QUEUE_PREFIX,
+    githubClientId: values.GITHUB_CLIENT_ID,
+    githubClientSecret: values.GITHUB_CLIENT_SECRET,
+    githubCallbackUrl: values.GITHUB_CALLBACK_URL,
+    frontendUrl: values.FRONTEND_URL,
+    sessionCookieName: values.SESSION_COOKIE_NAME,
   });
 }
 
