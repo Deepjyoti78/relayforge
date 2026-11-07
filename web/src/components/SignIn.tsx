@@ -9,39 +9,54 @@ export const SignIn: React.FC = () => {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      minHeight: '80vh',
+      minHeight: '100vh',
+      backgroundColor: '#f8fafc',
       padding: '24px',
     }}>
       <div style={{
-        backgroundColor: '#161e2e',
-        border: '1px solid #283548',
-        borderRadius: '12px',
-        padding: '36px',
+        backgroundColor: '#ffffff',
+        border: '1px solid #e2e8f0',
+        borderRadius: '16px',
+        padding: '44px 36px',
         maxWidth: '420px',
         width: '100%',
-        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.4)',
+        boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03)',
         textAlign: 'center',
       }}>
         <div style={{
-          width: '56px',
-          height: '56px',
+          width: '52px',
+          height: '52px',
           borderRadius: '12px',
-          backgroundColor: '#3b82f6',
+          backgroundColor: '#0f172a',
+          color: '#ffffff',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           margin: '0 auto 20px',
+          boxShadow: '0 4px 12px rgba(15, 23, 42, 0.15)',
         }}>
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
           </svg>
         </div>
 
-        <h1 style={{ fontSize: '22px', fontWeight: 700, margin: '0 0 8px', color: '#f8fafc' }}>
-          Welcome to RelayForge
+        <div style={{
+          display: 'inline-block',
+          fontSize: '11px',
+          fontWeight: 700,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          color: '#64748b',
+          marginBottom: '8px',
+        }}>
+          RELAYFORGE DEVELOPER CONSOLE
+        </div>
+
+        <h1 style={{ fontSize: '24px', fontWeight: 700, margin: '0 0 10px', color: '#0f172a', letterSpacing: '-0.02em' }}>
+          Welcome back
         </h1>
-        <p style={{ fontSize: '14px', color: '#94a3b8', margin: '0 0 28px' }}>
-          Developer-focused reliable webhook delivery and workflow orchestration
+        <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 32px', lineHeight: '1.5' }}>
+          Sign in to manage your organizations, secure API keys, and event-driven webhook workflows.
         </p>
 
         <a
@@ -50,18 +65,25 @@ export const SignIn: React.FC = () => {
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '10px',
+            gap: '12px',
             width: '100%',
-            backgroundColor: '#24292f',
+            backgroundColor: '#0f172a',
             color: '#ffffff',
             textDecoration: 'none',
-            padding: '12px 20px',
-            borderRadius: '8px',
-            fontSize: '15px',
+            padding: '13px 20px',
+            borderRadius: '10px',
+            fontSize: '14px',
             fontWeight: 600,
-            border: '1px solid #475569',
+            border: '1px solid #0f172a',
             cursor: 'pointer',
-            transition: 'background-color 0.2s',
+            transition: 'all 0.15s ease',
+            boxShadow: '0 2px 4px rgba(15, 23, 42, 0.1)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#1e293b';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#0f172a';
           }}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -69,6 +91,14 @@ export const SignIn: React.FC = () => {
           </svg>
           Continue with GitHub
         </a>
+
+        <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'center', gap: '16px', fontSize: '12px', color: '#94a3b8' }}>
+          <span>PostgreSQL RLS</span>
+          <span>•</span>
+          <span>PKCE OAuth 2.0</span>
+          <span>•</span>
+          <span>Milestone 3</span>
+        </div>
       </div>
     </div>
   );
