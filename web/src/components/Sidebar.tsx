@@ -8,7 +8,7 @@ interface SidebarProps {
   activeTab: string;
   onSelectOrg: (orgId: string) => void;
   onCreateOrg: (name: string, slug?: string) => Promise<void>;
-  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'settings') => void;
+  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'settings') => void;
   onLogout: () => void;
   isMobile?: boolean;
   onCloseMobile?: () => void;
@@ -49,7 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const handleTabClick = (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'settings') => {
+  const handleTabClick = (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'settings') => {
     onTabChange(tab);
     if (isMobile && onCloseMobile) {
       onCloseMobile();
@@ -320,6 +320,45 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 fontWeight: 700,
                 backgroundColor: activeTab === 'destinations' ? '#232327' : '#232327',
                 color: activeTab === 'destinations' ? '#F2F2F5' : '#9A9AA6',
+                padding: '2px 7px',
+                borderRadius: '999px',
+                border: '1px solid #3E3E45',
+              }}>
+                M3
+              </span>
+            </button>
+
+            {/* Deliveries & Outbox Pipeline (Milestone 3 Option 2) */}
+            <button
+              onClick={() => handleTabClick('deliveries')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+                padding: '9px 14px',
+                borderRadius: '999px',
+                fontSize: '13px',
+                fontWeight: activeTab === 'deliveries' ? 700 : 500,
+                backgroundColor: activeTab === 'deliveries' ? '#F2F2F5' : 'transparent',
+                color: activeTab === 'deliveries' ? '#0E0E10' : '#9A9AA6',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+                <span>Delivery History</span>
+              </div>
+              <span style={{
+                fontSize: '10px',
+                fontWeight: 700,
+                backgroundColor: activeTab === 'deliveries' ? '#232327' : '#232327',
+                color: activeTab === 'deliveries' ? '#F2F2F5' : '#9A9AA6',
                 padding: '2px 7px',
                 borderRadius: '999px',
                 border: '1px solid #3E3E45',

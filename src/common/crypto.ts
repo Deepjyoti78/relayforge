@@ -155,3 +155,16 @@ export function verifyWebhookSignature(
     return false;
   }
 }
+
+/**
+ * Signs outbound webhook payload using HMAC-SHA256 and timestamp.
+ * Returns standard header value: t=<timestamp>,v1=<signature>
+ */
+export function signWebhookPayload(
+  payload: string,
+  secret: string,
+  timestamp = Math.floor(Date.now() / 1000),
+): string {
+  const signature = computeHmacSignature(`${timestamp}.${payload}`, secret);
+  return `t=${timestamp},v1=${signature}`;
+}

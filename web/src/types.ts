@@ -86,3 +86,22 @@ export interface DestinationMetadata {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface DeliveryAttemptMetadata {
+  id: string;
+  organizationId: string;
+  eventId: string;
+  destinationId: string;
+  outboxMessageId: string | null;
+  attemptNumber: number;
+  status: 'SUCCESS' | 'FAILED';
+  statusCode: number | null;
+  latencyMs: number;
+  requestUrl: string;
+  requestMethod: string;
+  requestHeaders: Record<string, string>;
+  responseHeaders: Record<string, string> | null;
+  responseBodyPreview: string | null;
+  errorDescription: string | null;
+  createdAt: string;
+}

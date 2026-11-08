@@ -23,7 +23,7 @@ export const App: React.FC = () => {
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
   const [activeOrg, setActiveOrg] = useState<OrganizationDetails | null>(null);
   const [members, setMembers] = useState<OrganizationMember[]>([]);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'settings'>('members');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'settings'>('members');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const loadUser = async () => {

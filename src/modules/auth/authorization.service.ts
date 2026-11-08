@@ -50,4 +50,8 @@ export class AuthorizationService {
       throw new ForbiddenException('Only organization owners can manage memberships');
     }
   }
+
+  canManageDestinations(memberRole: MembershipRole): boolean {
+    return this.hasRole(memberRole, 'DEVELOPER');
+  }
 }

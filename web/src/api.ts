@@ -2,6 +2,7 @@ import type {
   ApiKeyMetadata,
   CreatedApiKeyResponse,
   CreatedEndpointResponse,
+  DeliveryAttemptMetadata,
   DestinationMetadata,
   EndpointMetadata,
   MembershipRole,
@@ -291,4 +292,34 @@ export async function rotateEndpointSecret(orgId: string, endpointId: string): P
     throw new Error(error.message || 'Failed to rotate secret');
   }
   return res.json() as Promise<CreatedEndpointResponse>;
+}
+
+// Milestone 3 Option 2 — Delivery Pipeline & Real-Time Attempts
+
+export async function fetchDeliveries(
+  orgId: string,
+  filters?: { destinationId?: string; eventId?: string; status?: 'SUCCESS' | 'FAILED' },
+): Promise<DeliveryAttemptMetadata[]> {
+  const query = new URLSearchParams();
+  if (filters?.destinationId) query.set('destinationId', filters.destinationId);
+  if (filters?.eventId) query.set('eventId', filters.eventId);
+  if (filters?.status) query.set('status', filters.status);
+  const qs = query.toString();
+  const res = await apiFetch(`/v1/organizations/${orgId}/deliveries${qs ? `?${qs}` : ''}`);
+  if (!res.ok) throw new Error('Failed to fetch delivery attempts');
+  return res.json() as Promise<DeliveryAttemptMetadata[]>;
+}
+
+export async function testDestinationPing(
+  orgId: string,
+  destinationId: string,
+): Promise<DeliveryAttemptMetadata> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/destinations/${destinationId}/test`, {
+    method: 'POST',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Failed to test destination' })) as { message?: string };
+    throw new Error(err.message || 'Failed to test destination');
+  }
+  return res.json() as Promise<DeliveryAttemptMetadata>;
 }

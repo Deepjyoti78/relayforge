@@ -6,14 +6,17 @@ import {
   deleteDestination,
   deleteEndpoint,
   fetchApiKeys,
+  fetchDeliveries,
   fetchDestinations,
   fetchEndpoints,
   revokeApiKey,
   rotateEndpointSecret,
+  testDestinationPing,
   updateDestination,
 } from '../api.ts';
 import type {
   ApiKeyMetadata,
+  DeliveryAttemptMetadata,
   DestinationMetadata,
   EndpointMetadata,
   MembershipRole,
@@ -25,8 +28,8 @@ interface OrgManagementProps {
   organization: OrganizationDetails;
   members: OrganizationMember[];
   currentUserId: string;
-  activeTab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'settings';
-  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'settings') => void;
+  activeTab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'settings';
+  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'settings') => void;
   onUpdateOrgName: (name: string) => Promise<void>;
   onAddMember: (identifier: { email?: string; username?: string }, role: MembershipRole) => Promise<void>;
   onUpdateRole: (memberId: string, role: MembershipRole) => Promise<void>;
@@ -95,6 +98,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
   const [newDestinationTimeout, setNewDestinationTimeout] = useState(10000);
   const [destinationActionError, setDestinationActionError] = useState<string | null>(null);
 
+  // Deliveries State (Milestone 3 Option 2)
+  const [deliveries, setDeliveries] = useState<DeliveryAttemptMetadata[]>([]);
+  const [deliveriesLoading, setDeliveriesLoading] = useState(false);
+  const [pingLoadingId, setPingLoadingId] = useState<string | null>(null);
+  const [pingResult, setPingResult] = useState<{ id: string; status: 'SUCCESS' | 'FAILED'; text: string } | null>(null);
+  const [selectedAttemptForModal, setSelectedAttemptForModal] = useState<DeliveryAttemptMetadata | null>(null);
+
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState('');
   const [activeMenuMemberId, setActiveMenuMemberId] = useState<string | null>(null);
@@ -106,10 +116,48 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
     setKeyActionError(null);
     setEndpointActionError(null);
     setDestinationActionError(null);
+    setPingResult(null);
     void loadApiKeys();
     void loadEndpoints();
     void loadDestinations();
+    void loadDeliveries();
   }, [organization.id]);
+
+  const loadDeliveries = async () => {
+    setDeliveriesLoading(true);
+    try {
+      const data = await fetchDeliveries(organization.id);
+      setDeliveries(data);
+    } catch {
+      // Ignore if user lacks permissions
+    } finally {
+      setDeliveriesLoading(false);
+    }
+  };
+
+  const handleTestDestinationPing = async (destId: string) => {
+    setPingLoadingId(destId);
+    setPingResult(null);
+    try {
+      const attempt = await testDestinationPing(organization.id, destId);
+      setDeliveries((prev) => [attempt, ...prev]);
+      setPingResult({
+        id: destId,
+        status: attempt.status,
+        text: attempt.status === 'SUCCESS'
+          ? `✓ 200 OK (${attempt.latencyMs}ms)`
+          : `✗ ${attempt.errorDescription || `HTTP ${attempt.statusCode}`}`,
+      });
+    } catch (err: unknown) {
+      setPingResult({
+        id: destId,
+        status: 'FAILED',
+        text: err instanceof Error ? err.message : 'Ping test failed',
+      });
+    } finally {
+      setPingLoadingId(null);
+    }
+  };
 
   const loadDestinations = async () => {
     setDestinationsLoading(true);
@@ -361,6 +409,17 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       d.name.toLowerCase().includes(q) ||
       d.url.toLowerCase().includes(q) ||
       d.httpMethod.toLowerCase().includes(q)
+    );
+  });
+
+  const filteredDeliveries = deliveries.filter((att) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      att.id.toLowerCase().includes(q) ||
+      att.requestUrl.toLowerCase().includes(q) ||
+      att.status.toLowerCase().includes(q) ||
+      (att.statusCode !== null && String(att.statusCode).includes(q)) ||
+      (att.errorDescription !== null && att.errorDescription.toLowerCase().includes(q))
     );
   });
 
@@ -781,6 +840,37 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         </button>
 
         <button
+          onClick={() => onTabChange('deliveries')}
+          style={{
+            padding: '7px 18px',
+            borderRadius: '999px',
+            fontSize: '13px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            backgroundColor: activeTab === 'deliveries' ? '#F2F2F5' : '#232327',
+            color: activeTab === 'deliveries' ? '#0E0E10' : '#C9C9D2',
+            border: activeTab === 'deliveries' ? '1px solid #F2F2F5' : '1px solid #3E3E45',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'all 0.15s ease',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <span>Deliveries</span>
+          <span style={{
+            fontSize: '11px',
+            padding: '1px 7px',
+            borderRadius: '999px',
+            backgroundColor: activeTab === 'deliveries' ? '#0E0E10' : '#3E3E45',
+            color: '#F2F2F5',
+            fontWeight: 700,
+          }}>
+            {deliveries.length}
+          </span>
+        </button>
+
+        <button
           onClick={() => onTabChange('settings')}
           style={{
             padding: '7px 18px',
@@ -834,6 +924,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 ? 'Search endpoint by name, slug, or ID...'
                 : activeTab === 'destinations'
                 ? 'Search destination by name, URL, or method...'
+                : activeTab === 'deliveries'
+                ? 'Search deliveries by ID, URL, status code, or error...'
                 : 'Search member by name, contact email, role...'
             }
             value={searchQuery}
@@ -1718,7 +1810,34 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
                       <td style={{ padding: '14px 20px', textAlign: 'right' }}>
                         {canManageKeys && (
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px' }}>
+                            {pingResult?.id === d.id && (
+                              <span style={{
+                                fontSize: '11px',
+                                fontWeight: 600,
+                                color: pingResult.status === 'SUCCESS' ? '#4ade80' : '#f87171',
+                                whiteSpace: 'nowrap',
+                              }}>
+                                {pingResult.text}
+                              </span>
+                            )}
+                            <button
+                              title="Send test webhook delivery to destination"
+                              disabled={pingLoadingId === d.id}
+                              onClick={() => void handleTestDestinationPing(d.id)}
+                              style={{
+                                backgroundColor: '#232327',
+                                border: '1px solid #3E3E45',
+                                color: pingLoadingId === d.id ? '#9A9AA6' : '#F2F2F5',
+                                borderRadius: '6px',
+                                padding: '4px 10px',
+                                fontSize: '11px',
+                                fontWeight: 600,
+                                cursor: pingLoadingId === d.id ? 'default' : 'pointer',
+                              }}
+                            >
+                              {pingLoadingId === d.id ? 'Pinging...' : '⚡ Ping'}
+                            </button>
                             <button
                               title="Delete destination"
                               onClick={() => void handleDeleteDestination(d.id)}
@@ -1737,6 +1856,162 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                             </button>
                           </div>
                         )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        )}
+
+        {/* DELIVERIES & ATTEMPTS VIEW (MILESTONE 3 OPTION 2) */}
+        {activeTab === 'deliveries' && (
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '820px' }}>
+            <thead>
+              <tr style={{
+                borderBottom: '1px solid #3E3E45',
+                color: '#9A9AA6',
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                backgroundColor: '#1E1E22',
+              }}>
+                <th style={{ padding: '16px 22px' }}>Attempt ID</th>
+                <th style={{ padding: '16px 22px' }}>Status & Code</th>
+                <th style={{ padding: '16px 22px' }}>Destination Target</th>
+                <th style={{ padding: '16px 22px' }}>Latency</th>
+                <th style={{ padding: '16px 22px' }}>Attempted At</th>
+                <th style={{ padding: '16px 22px', textAlign: 'right' }}>Payload & Headers</th>
+              </tr>
+            </thead>
+            <tbody>
+              {deliveriesLoading ? (
+                <tr>
+                  <td colSpan={6} style={{ padding: '40px 20px', textAlign: 'center', color: '#63636E' }}>
+                    Loading delivery attempt history...
+                  </td>
+                </tr>
+              ) : filteredDeliveries.length === 0 ? (
+                <tr>
+                  <td colSpan={6} style={{ padding: '40px 20px', textAlign: 'center', color: '#63636E' }}>
+                    No delivery attempts logged yet. Test a destination using "⚡ Ping" or ingest an inbound webhook.
+                  </td>
+                </tr>
+              ) : (
+                filteredDeliveries.map((att, idx) => {
+                  const attemptIdDisplay = `ATT-${att.id.slice(0, 5).toUpperCase()}`;
+                  const isSuccess = att.status === 'SUCCESS';
+
+                  return (
+                    <tr
+                      key={att.id}
+                      style={{
+                        borderBottom: idx === filteredDeliveries.length - 1 ? 'none' : '1px solid #2C2C32',
+                        fontSize: '13px',
+                        color: '#F2F2F5',
+                      }}
+                    >
+                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#9A9AA6' }}>
+                        {attemptIdDisplay}
+                      </td>
+
+                      <td style={{ padding: '14px 20px' }}>
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '3px 10px',
+                          borderRadius: '999px',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          backgroundColor: isSuccess ? '#1E2D22' : '#2A1C1C',
+                          color: isSuccess ? '#4ade80' : '#f87171',
+                          border: isSuccess ? '1px solid #2B4232' : '1px solid #442A2A',
+                        }}>
+                          <span style={{
+                            width: '5px',
+                            height: '5px',
+                            borderRadius: '50%',
+                            backgroundColor: isSuccess ? '#4ade80' : '#f87171',
+                          }}></span>
+                          {att.statusCode ? `HTTP ${att.statusCode}` : att.status}
+                        </span>
+                      </td>
+
+                      <td style={{ padding: '14px 20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            fontFamily: 'monospace',
+                            backgroundColor: '#0E0E10',
+                            border: '1px solid #3E3E45',
+                            color: '#F2F2F5',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                          }}>
+                            {att.requestMethod}
+                          </span>
+                          <code style={{
+                            fontSize: '12px',
+                            backgroundColor: '#0E0E10',
+                            border: '1px solid #3E3E45',
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            color: '#F2F2F5',
+                            maxWidth: '300px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            display: 'inline-block',
+                          }}>
+                            {att.requestUrl}
+                          </code>
+                        </div>
+                        {att.errorDescription && (
+                          <div style={{ fontSize: '11px', color: '#f87171', marginTop: '4px' }}>
+                            {att.errorDescription}
+                          </div>
+                        )}
+                      </td>
+
+                      <td style={{ padding: '14px 20px' }}>
+                        <span style={{
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          fontFamily: 'monospace',
+                          padding: '2px 8px',
+                          borderRadius: '999px',
+                          backgroundColor: '#232327',
+                          color: '#C9C9D2',
+                          border: '1px solid #3E3E45',
+                        }}>
+                          {att.latencyMs} ms
+                        </span>
+                      </td>
+
+                      <td style={{ padding: '14px 20px', color: '#9A9AA6', fontSize: '12px' }}>
+                        {new Date(att.createdAt).toLocaleTimeString()} · {new Date(att.createdAt).toLocaleDateString()}
+                      </td>
+
+                      <td style={{ padding: '14px 20px', textAlign: 'right' }}>
+                        <button
+                          onClick={() => setSelectedAttemptForModal(att)}
+                          style={{
+                            backgroundColor: '#232327',
+                            border: '1px solid #3E3E45',
+                            color: '#F2F2F5',
+                            borderRadius: '6px',
+                            padding: '4px 10px',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Inspect Details
+                        </button>
                       </td>
                     </tr>
                   );
@@ -2345,6 +2620,148 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: INSPECT DELIVERY ATTEMPT (MILESTONE 3 OPTION 2) */}
+      {selectedAttemptForModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(14, 14, 16, 0.75)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 50,
+          padding: '16px',
+        }}>
+          <div style={{
+            backgroundColor: '#1E1E22',
+            borderRadius: '20px',
+            border: '1px solid #3E3E45',
+            width: '100%',
+            maxWidth: '650px',
+            padding: '28px',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            boxShadow: '0 20px 30px rgba(0, 0, 0, 0.6)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#F2F2F5' }}>
+                Delivery Attempt Details
+              </h3>
+              <button
+                onClick={() => setSelectedAttemptForModal(null)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#9A9AA6',
+                  fontSize: '20px',
+                  cursor: 'pointer',
+                  padding: '4px',
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+              <div style={{ backgroundColor: '#141416', padding: '10px 14px', borderRadius: '10px', border: '1px solid #2C2C32' }}>
+                <span style={{ fontSize: '11px', color: '#9A9AA6', display: 'block' }}>Status & Latency</span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: selectedAttemptForModal.status === 'SUCCESS' ? '#4ade80' : '#f87171' }}>
+                  {selectedAttemptForModal.statusCode ? `HTTP ${selectedAttemptForModal.statusCode}` : selectedAttemptForModal.status} · {selectedAttemptForModal.latencyMs}ms
+                </span>
+              </div>
+              <div style={{ backgroundColor: '#141416', padding: '10px 14px', borderRadius: '10px', border: '1px solid #2C2C32' }}>
+                <span style={{ fontSize: '11px', color: '#9A9AA6', display: 'block' }}>Target URL</span>
+                <span style={{ fontSize: '12px', fontFamily: 'monospace', color: '#F2F2F5', wordBreak: 'break-all' }}>
+                  {selectedAttemptForModal.requestMethod} {selectedAttemptForModal.requestUrl}
+                </span>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#9A9AA6', marginBottom: '6px' }}>
+                Request Headers (including Outbound HMAC Signature)
+              </label>
+              <pre style={{
+                backgroundColor: '#0E0E10',
+                border: '1px solid #3E3E45',
+                borderRadius: '8px',
+                padding: '12px',
+                fontSize: '11px',
+                color: '#C9C9D2',
+                overflowX: 'auto',
+                margin: 0,
+              }}>
+                {JSON.stringify(selectedAttemptForModal.requestHeaders, null, 2)}
+              </pre>
+            </div>
+
+            {selectedAttemptForModal.responseHeaders && (
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#9A9AA6', marginBottom: '6px' }}>
+                  Response Headers
+                </label>
+                <pre style={{
+                  backgroundColor: '#0E0E10',
+                  border: '1px solid #3E3E45',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  fontSize: '11px',
+                  color: '#C9C9D2',
+                  overflowX: 'auto',
+                  margin: 0,
+                }}>
+                  {JSON.stringify(selectedAttemptForModal.responseHeaders, null, 2)}
+                </pre>
+              </div>
+            )}
+
+            {selectedAttemptForModal.responseBodyPreview && (
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#9A9AA6', marginBottom: '6px' }}>
+                  Response Body Preview
+                </label>
+                <pre style={{
+                  backgroundColor: '#0E0E10',
+                  border: '1px solid #3E3E45',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  fontSize: '11px',
+                  color: '#F2F2F5',
+                  overflowX: 'auto',
+                  margin: 0,
+                  whiteSpace: 'pre-wrap',
+                  maxHeight: '160px',
+                }}>
+                  {selectedAttemptForModal.responseBodyPreview}
+                </pre>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+              <button
+                onClick={() => setSelectedAttemptForModal(null)}
+                style={{
+                  padding: '8px 20px',
+                  backgroundColor: '#F2F2F5',
+                  color: '#0E0E10',
+                  border: 'none',
+                  borderRadius: '999px',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                }}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

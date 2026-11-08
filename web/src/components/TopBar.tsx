@@ -24,6 +24,8 @@ export const TopBar: React.FC<TopBarProps> = ({
         return 'Ingestion Endpoints';
       case 'destinations':
         return 'Destinations & SSRF Registry';
+      case 'deliveries':
+        return 'Delivery History & Real-Time Attempts';
       case 'settings':
         return 'Settings';
       default:
