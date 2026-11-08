@@ -625,7 +625,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         {/* Card 1: Members (Light Surface) */}
         <div style={{
           backgroundColor: '#F2F2F5',
-          border: '1px solid rgba(255, 255, 255, 0.9)',
+          border: 'none',
           borderRadius: '20px',
           padding: '22px 24px',
           boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
@@ -662,7 +662,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         {/* Card 2: Active API Keys (Light Surface) */}
         <div style={{
           backgroundColor: '#F2F2F5',
-          border: '1px solid rgba(255, 255, 255, 0.9)',
+          border: 'none',
           borderRadius: '20px',
           padding: '22px 24px',
           boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
@@ -744,7 +744,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             cursor: 'pointer',
             backgroundColor: activeTab === 'members' ? '#F2F2F5' : '#232327',
             color: activeTab === 'members' ? '#0E0E10' : '#C9C9D2',
-            border: activeTab === 'members' ? '1px solid #F2F2F5' : '1px solid #3E3E45',
+            border: activeTab === 'members' ? '1px solid transparent' : '1px solid #3E3E45',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -775,7 +775,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             cursor: 'pointer',
             backgroundColor: activeTab === 'api-keys' ? '#F2F2F5' : '#232327',
             color: activeTab === 'api-keys' ? '#0E0E10' : '#C9C9D2',
-            border: activeTab === 'api-keys' ? '1px solid #F2F2F5' : '1px solid #3E3E45',
+            border: activeTab === 'api-keys' ? '1px solid transparent' : '1px solid #3E3E45',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -806,7 +806,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             cursor: 'pointer',
             backgroundColor: activeTab === 'endpoints' ? '#F2F2F5' : '#232327',
             color: activeTab === 'endpoints' ? '#0E0E10' : '#C9C9D2',
-            border: activeTab === 'endpoints' ? '1px solid #F2F2F5' : '1px solid #3E3E45',
+            border: activeTab === 'endpoints' ? '1px solid transparent' : '1px solid #3E3E45',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -837,7 +837,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             cursor: 'pointer',
             backgroundColor: activeTab === 'destinations' ? '#F2F2F5' : '#232327',
             color: activeTab === 'destinations' ? '#0E0E10' : '#C9C9D2',
-            border: activeTab === 'destinations' ? '1px solid #F2F2F5' : '1px solid #3E3E45',
+            border: activeTab === 'destinations' ? '1px solid transparent' : '1px solid #3E3E45',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -868,7 +868,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             cursor: 'pointer',
             backgroundColor: activeTab === 'deliveries' ? '#F2F2F5' : '#232327',
             color: activeTab === 'deliveries' ? '#0E0E10' : '#C9C9D2',
-            border: activeTab === 'deliveries' ? '1px solid #F2F2F5' : '1px solid #3E3E45',
+            border: activeTab === 'deliveries' ? '1px solid transparent' : '1px solid #3E3E45',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -899,7 +899,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             cursor: 'pointer',
             backgroundColor: activeTab === 'settings' ? '#F2F2F5' : '#232327',
             color: activeTab === 'settings' ? '#0E0E10' : '#C9C9D2',
-            border: activeTab === 'settings' ? '1px solid #F2F2F5' : '1px solid #3E3E45',
+            border: activeTab === 'settings' ? '1px solid transparent' : '1px solid #3E3E45',
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
@@ -964,9 +964,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       {/* FEEDBACK BANNER: CREATED RAW API KEY */}
       {createdRawKey && (
         <div style={{
-          backgroundColor: '#232327',
-          border: '1px solid #C9C9D2',
-          borderRadius: '12px',
+          backgroundColor: '#1A1A1E',
+          border: '1px solid #3E3E45',
+          borderRadius: '16px',
           padding: '20px 24px',
           marginBottom: '20px',
           boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
@@ -1029,9 +1029,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       {/* FEEDBACK BANNER: CREATED RAW SIGNING SECRET (PHASE 2 & 3) */}
       {createdRawSecret && (
         <div style={{
-          backgroundColor: '#232327',
-          border: '1px solid #C9C9D2',
-          borderRadius: '12px',
+          backgroundColor: '#1A1A1E',
+          border: '1px solid #3E3E45',
+          borderRadius: '16px',
           padding: '20px 24px',
           marginBottom: '20px',
           boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
