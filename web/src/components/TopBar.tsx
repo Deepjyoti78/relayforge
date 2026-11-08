@@ -28,6 +28,10 @@ export const TopBar: React.FC<TopBarProps> = ({
         return 'Delivery History & Real-Time Attempts';
       case 'workflows':
         return 'Sequential Workflows & Orchestration';
+      case 'metrics':
+        return 'Operational Metrics & Telemetry Stream';
+      case 'dlq':
+        return 'Dead Letter Queue & Bulk Replay';
       case 'settings':
         return 'Settings';
       default:

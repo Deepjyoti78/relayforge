@@ -48,7 +48,7 @@ export class ConfigurationError extends Error {
 
 export function parseEnvironment(role: ProcessRole, input: NodeJS.ProcessEnv) {
   const roleSchema = role === 'api'
-    ? baseSchema.extend({ DATABASE_URL: databaseUrl })
+    ? baseSchema.extend({ DATABASE_URL: databaseUrl, REDIS_URL: redisUrl.optional() })
     : baseSchema.extend({ WORKER_DATABASE_URL: databaseUrl, REDIS_URL: redisUrl });
   const result = roleSchema.safeParse(input);
 
@@ -67,7 +67,7 @@ export function parseEnvironment(role: ProcessRole, input: NodeJS.ProcessEnv) {
     port: values.PORT,
     logLevel: values.LOG_LEVEL,
     databaseUrl: role === 'api' ? input.DATABASE_URL! : input.WORKER_DATABASE_URL!,
-    redisUrl: role === 'worker' ? input.REDIS_URL! : undefined,
+    redisUrl: input.REDIS_URL || undefined,
     databasePoolSize: values.DATABASE_POOL_SIZE,
     databaseTimeoutMs: values.DATABASE_TIMEOUT_MS,
     workerConcurrency: values.WORKER_CONCURRENCY,

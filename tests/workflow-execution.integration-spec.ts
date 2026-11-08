@@ -8,8 +8,10 @@ import { serializeCookie } from '../src/common/cookies';
 import { generateToken, hashToken } from '../src/common/crypto';
 import { DatabaseService } from '../src/modules/database/database.service';
 import { DeliveryService } from '../src/modules/delivery/delivery.service';
+import { RateLimiterService } from '../src/modules/delivery/rate-limiter.service';
 import { EndpointService } from '../src/modules/endpoints/endpoint.service';
 import { IngestionService } from '../src/modules/ingestion/ingestion.service';
+import { EventStreamService } from '../src/modules/observability/event-stream.service';
 import { WorkflowEngineService } from '../src/modules/workflows/workflow-engine.service';
 import type { WorkflowDefinition } from '../src/modules/workflows/workflow.types';
 import { OutboxWorkerService } from '../src/worker/outbox-worker.service';
@@ -90,7 +92,13 @@ describe('Sequential Workflow Execution Engine (Integration)', () => {
     endpointService = app.get(EndpointService);
     ingestionService = app.get(IngestionService);
     workflowEngine = app.get(WorkflowEngineService);
-    outboxWorker = new OutboxWorkerService(database, deliveryService, workflowEngine);
+    outboxWorker = new OutboxWorkerService(
+      database,
+      deliveryService,
+      app.get(RateLimiterService),
+      app.get(EventStreamService),
+      workflowEngine,
+    );
 
     // 3. Create test users and sessions
     const createUser = async (name: string, email: string) => {

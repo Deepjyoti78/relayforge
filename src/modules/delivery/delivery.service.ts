@@ -5,6 +5,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import { createHash, randomUUID } from 'node:crypto';
 import { fetch as undiciFetch } from 'undici';
@@ -14,6 +15,7 @@ import type { Prisma } from '../../generated/prisma/client';
 import { AuthorizationService } from '../auth/authorization.service';
 import { RuntimeConfig } from '../config/config.module';
 import { TenantContextService } from '../database/tenant-context.service';
+import { EventStreamService } from '../observability/event-stream.service';
 
 /**
  * Computes a deterministic logical delivery UUID for an event-destination pair.
@@ -73,6 +75,7 @@ export class DeliveryService {
     private readonly tenantContext: TenantContextService,
     private readonly authz: AuthorizationService,
     private readonly config: RuntimeConfig,
+    @Optional() private readonly eventStream?: EventStreamService,
   ) {}
 
   /**
@@ -312,7 +315,7 @@ export class DeliveryService {
         },
       });
 
-      return {
+      const res: DeliveryAttemptRecord = {
         id: record.id,
         organizationId: record.organizationId,
         eventId: record.eventId,
@@ -330,6 +333,25 @@ export class DeliveryService {
         errorDescription: record.errorDescription,
         createdAt: record.createdAt,
       };
+
+      if (this.eventStream) {
+        void this.eventStream.publishEvent({
+          type: 'delivery.attempt',
+          organizationId: record.organizationId,
+          timestamp: record.createdAt.toISOString(),
+          payload: {
+            attemptId: record.id,
+            eventId: record.eventId,
+            destinationId: record.destinationId,
+            status: record.status,
+            statusCode: record.statusCode,
+            latencyMs: record.latencyMs,
+            attemptNumber: record.attemptNumber,
+          },
+        });
+      }
+
+      return res;
     });
   }
 

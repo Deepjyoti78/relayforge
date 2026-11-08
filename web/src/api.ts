@@ -4,10 +4,13 @@ import type {
   CreatedEndpointResponse,
   DeliveryAttemptMetadata,
   DestinationMetadata,
+  DlqFilterParams,
+  DlqRecordItem,
   EndpointMetadata,
   MembershipRole,
   OrganizationDetails,
   OrganizationMember,
+  TelemetryMetrics,
   UserProfile,
   WorkflowExecutionMetadata,
   WorkflowMetadata,
@@ -454,4 +457,61 @@ export async function resumeExecution(
     throw new Error(err.message || 'Failed to resume execution');
   }
   return res.json() as Promise<{ success: boolean; executionId: string; status: string; message: string }>;
+}
+
+// Milestone 5: Observability, Metrics & Advanced DLQ API
+
+export async function fetchMetrics(
+  orgId: string,
+  windowHours = 24,
+): Promise<TelemetryMetrics> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/metrics?windowHours=${windowHours}`);
+  if (!res.ok) throw new Error('Failed to fetch organization metrics');
+  return res.json() as Promise<TelemetryMetrics>;
+}
+
+export async function fetchDlq(
+  orgId: string,
+  filters?: DlqFilterParams,
+): Promise<{ total: number; records: DlqRecordItem[] }> {
+  const q = new URLSearchParams();
+  if (filters?.destinationId) q.set('destinationId', filters.destinationId);
+  if (filters?.errorCategory) q.set('errorCategory', filters.errorCategory);
+  if (filters?.search) q.set('search', filters.search);
+  if (filters?.limit) q.set('limit', filters.limit.toString());
+  if (filters?.offset) q.set('offset', filters.offset.toString());
+  const qs = q.toString();
+  const res = await apiFetch(`/v1/organizations/${orgId}/dlq${qs ? `?${qs}` : ''}`);
+  if (!res.ok) throw new Error('Failed to fetch DLQ records');
+  return res.json() as Promise<{ total: number; records: DlqRecordItem[] }>;
+}
+
+export async function bulkReplayDlq(
+  orgId: string,
+  outboxIds: string[],
+): Promise<{ replayedCount: number; replayedIds: string[]; skippedIds: string[] }> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/dlq/bulk-replay`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ outboxIds }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Failed to bulk replay DLQ messages' })) as { message?: string };
+    throw new Error(err.message || 'Failed to bulk replay DLQ messages');
+  }
+  return res.json() as Promise<{ replayedCount: number; replayedIds: string[]; skippedIds: string[] }>;
+}
+
+export async function purgeDlqMessage(
+  orgId: string,
+  outboxId: string,
+): Promise<{ success: boolean; message: string }> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/dlq/${outboxId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Failed to purge DLQ message' })) as { message?: string };
+    throw new Error(err.message || 'Failed to purge DLQ message');
+  }
+  return res.json() as Promise<{ success: boolean; message: string }>;
 }

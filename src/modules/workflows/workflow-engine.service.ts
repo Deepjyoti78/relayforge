@@ -2,6 +2,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import type { Prisma } from '../../generated/prisma/client';
@@ -9,6 +10,7 @@ import { DatabaseService } from '../database/database.service';
 import { TenantContextService } from '../database/tenant-context.service';
 import { DeliveryService } from '../delivery/delivery.service';
 import { calculateNextRetryDelay, evaluateRetry } from '../delivery/retry-policy';
+import { EventStreamService } from '../observability/event-stream.service';
 import { safeError } from '../observability/logging';
 import { evaluateConditionGroup } from './condition-evaluator';
 import { applyJsonTransformation } from './json-transformer';
@@ -38,6 +40,7 @@ export class WorkflowEngineService {
     private readonly database: DatabaseService,
     private readonly tenantContext: TenantContextService,
     private readonly deliveryService: DeliveryService,
+    @Optional() private readonly eventStream?: EventStreamService,
   ) {}
 
   /**
@@ -498,6 +501,19 @@ export class WorkflowEngineService {
         },
       });
     });
+
+    if (this.eventStream) {
+      void this.eventStream.publishEvent({
+        type: 'workflow.completed',
+        organizationId,
+        timestamp: new Date().toISOString(),
+        payload: {
+          executionId,
+          status: 'SUCCEEDED',
+          stepsCount: definition.actions.length,
+        },
+      });
+    }
 
     if (outboxContext) {
       await this.completeOutbox(outboxContext, event.id, 'DISPATCHED', 'COMPLETED');

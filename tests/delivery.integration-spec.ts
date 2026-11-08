@@ -9,8 +9,10 @@ import { generateToken, hashToken, signWebhookPayload } from '../src/common/cryp
 import { DatabaseService } from '../src/modules/database/database.service';
 import { TenantContextService } from '../src/modules/database/tenant-context.service';
 import { DeliveryService } from '../src/modules/delivery/delivery.service';
+import { RateLimiterService } from '../src/modules/delivery/rate-limiter.service';
 import { EndpointService } from '../src/modules/endpoints/endpoint.service';
 import { IngestionService } from '../src/modules/ingestion/ingestion.service';
+import { EventStreamService } from '../src/modules/observability/event-stream.service';
 import { OutboxWorkerService } from '../src/worker/outbox-worker.service';
 
 interface ReceivedRequest {
@@ -83,7 +85,12 @@ describe('Milestone 3 Option 2: Durable HTTP Delivery Pipeline & Outbox Dispatch
     deliveryService = app.get(DeliveryService);
     endpointService = app.get(EndpointService);
     ingestionService = app.get(IngestionService);
-    outboxWorker = new OutboxWorkerService(database, deliveryService);
+    outboxWorker = new OutboxWorkerService(
+      database,
+      deliveryService,
+      app.get(RateLimiterService),
+      app.get(EventStreamService),
+    );
 
     const createUserWithSession = async (displayName: string, email: string) => {
       const user = await database.client.user.create({

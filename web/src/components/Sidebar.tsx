@@ -8,7 +8,7 @@ interface SidebarProps {
   activeTab: string;
   onSelectOrg: (orgId: string) => void;
   onCreateOrg: (name: string, slug?: string) => Promise<void>;
-  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'settings') => void;
+  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'metrics' | 'dlq' | 'settings') => void;
   onLogout: () => void;
   isMobile?: boolean;
   onCloseMobile?: () => void;
@@ -49,7 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const handleTabClick = (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'settings') => {
+  const handleTabClick = (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'metrics' | 'dlq' | 'settings') => {
     onTabChange(tab);
     if (isMobile && onCloseMobile) {
       onCloseMobile();
@@ -406,6 +406,88 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 border: '1px solid #3E3E45',
               }}>
                 M4
+              </span>
+            </button>
+
+            {/* Metrics (M5) */}
+            <button
+              onClick={() => handleTabClick('metrics')}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '9px 12px',
+                borderRadius: '999px',
+                fontSize: '13px',
+                fontWeight: activeTab === 'metrics' ? 700 : 500,
+                backgroundColor: activeTab === 'metrics' ? '#F2F2F5' : 'transparent',
+                color: activeTab === 'metrics' ? '#0E0E10' : '#9A9AA6',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M18 20V10"></path>
+                  <path d="M12 20V4"></path>
+                  <path d="M6 20v-6"></path>
+                </svg>
+                <span>Metrics & Streams</span>
+              </div>
+              <span style={{
+                fontSize: '10px',
+                fontWeight: 700,
+                backgroundColor: activeTab === 'metrics' ? '#232327' : '#232327',
+                color: activeTab === 'metrics' ? '#F2F2F5' : '#9A9AA6',
+                padding: '2px 7px',
+                borderRadius: '999px',
+                border: '1px solid #3E3E45',
+              }}>
+                M5
+              </span>
+            </button>
+
+            {/* Dead Letter Queue (M5) */}
+            <button
+              onClick={() => handleTabClick('dlq')}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '9px 12px',
+                borderRadius: '999px',
+                fontSize: '13px',
+                fontWeight: activeTab === 'dlq' ? 700 : 500,
+                backgroundColor: activeTab === 'dlq' ? '#F2F2F5' : 'transparent',
+                color: activeTab === 'dlq' ? '#0E0E10' : '#9A9AA6',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                </svg>
+                <span>Dead Letter Queue</span>
+              </div>
+              <span style={{
+                fontSize: '10px',
+                fontWeight: 700,
+                backgroundColor: activeTab === 'dlq' ? '#232327' : '#232327',
+                color: activeTab === 'dlq' ? '#F2F2F5' : '#9A9AA6',
+                padding: '2px 7px',
+                borderRadius: '999px',
+                border: '1px solid #3E3E45',
+              }}>
+                M5
               </span>
             </button>
           </nav>

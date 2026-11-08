@@ -28,14 +28,16 @@ import type {
   WorkflowExecutionMetadata,
   WorkflowMetadata,
 } from '../types.ts';
+import { DlqConsole } from './DlqConsole.tsx';
+import { MetricsDashboard } from './MetricsDashboard.tsx';
 import { WorkflowConsole } from './WorkflowConsole.tsx';
 
 interface OrgManagementProps {
   organization: OrganizationDetails;
   members: OrganizationMember[];
   currentUserId: string;
-  activeTab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'settings';
-  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'settings') => void;
+  activeTab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'metrics' | 'dlq' | 'settings';
+  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'metrics' | 'dlq' | 'settings') => void;
   onUpdateOrgName: (name: string) => Promise<void>;
   onAddMember: (identifier: { email?: string; username?: string }, role: MembershipRole) => Promise<void>;
   onUpdateRole: (memberId: string, role: MembershipRole) => Promise<void>;
@@ -782,6 +784,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               ? 'Monitor transactional outbox deliveries, exponential retries, and dead letters.'
               : activeTab === 'workflows'
               ? 'Compose sequential pipelines: Webhook trigger → Conditions → JSON transform → HTTP actions.'
+              : activeTab === 'metrics'
+              ? 'Real-time telemetry streams, latency quantiles (p50/p95/p99), and outbox backlog rates.'
+              : activeTab === 'dlq'
+              ? 'Dead Letter Queue management, error category filtering, and atomic bulk message replay.'
               : 'Organization parameters, slug identifier, and Row-Level Security isolation.'}
           </p>
           {renameError && (
@@ -1287,6 +1293,68 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           </button>
 
           <button
+            onClick={() => onTabChange('metrics')}
+            style={{
+              padding: '7px 18px',
+              borderRadius: '999px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'metrics' ? '#F2F2F5' : '#232327',
+              color: activeTab === 'metrics' ? '#0E0E10' : '#C9C9D2',
+              border: activeTab === 'metrics' ? '1px solid transparent' : '1px solid #3E3E45',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s ease',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span>Metrics</span>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: 700,
+              backgroundColor: activeTab === 'metrics' ? '#0E0E10' : '#3E3E45',
+              color: '#F2F2F5',
+              padding: '1px 6px',
+              borderRadius: '999px',
+            }}>
+              M5
+            </span>
+          </button>
+
+          <button
+            onClick={() => onTabChange('dlq')}
+            style={{
+              padding: '7px 18px',
+              borderRadius: '999px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'dlq' ? '#F2F2F5' : '#232327',
+              color: activeTab === 'dlq' ? '#0E0E10' : '#C9C9D2',
+              border: activeTab === 'dlq' ? '1px solid transparent' : '1px solid #3E3E45',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s ease',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span>Dead Letter Queue</span>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: 700,
+              backgroundColor: activeTab === 'dlq' ? '#0E0E10' : '#3E3E45',
+              color: '#F2F2F5',
+              padding: '1px 6px',
+              borderRadius: '999px',
+            }}>
+              M5
+            </span>
+          </button>
+
+          <button
             onClick={() => onTabChange('settings')}
             style={{
               padding: '7px 18px',
@@ -1310,7 +1378,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       )}
 
       {/* SEARCH BAR (ROUNDED PILL - SHOWN IN DIRECTORY VIEWS) */}
-      {activeTab !== 'dashboard' && activeTab !== 'settings' && activeTab !== 'workflows' && (
+      {activeTab !== 'dashboard' && activeTab !== 'settings' && activeTab !== 'workflows' && activeTab !== 'metrics' && activeTab !== 'dlq' && (
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -2516,6 +2584,19 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           canManage={canManageKeys}
           onRefreshWorkflows={loadWorkflows}
           onRefreshExecutions={loadExecutions}
+          onRequestConfirm={(opts) => setConfirmModal({ ...opts, isOpen: true })}
+        />
+      )}
+
+      {/* OPERATIONAL METRICS & REAL-TIME TELEMETRY (MILESTONE 5) */}
+      {activeTab === 'metrics' && (
+        <MetricsDashboard organizationId={organization.id} />
+      )}
+
+      {/* DEAD LETTER QUEUE & BULK REMEDIATION (MILESTONE 5) */}
+      {activeTab === 'dlq' && (
+        <DlqConsole
+          organizationId={organization.id}
           onRequestConfirm={(opts) => setConfirmModal({ ...opts, isOpen: true })}
         />
       )}

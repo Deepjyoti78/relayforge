@@ -31,3 +31,22 @@ and minimal React/TypeScript management UI.
 5. Checkpointed step transitions (`workflow_step_executions`) ensuring previously succeeded actions are never re-executed on resume.
 6. Stable downstream idempotency keys (`wf_${executionId}_${nodeId}`).
 7. Monochromatic Management Console with visual sequential flow canvas, live definition validation, immutable publication, execution lineage timeline, and in-app modal confirmations (zero browser dialogs).
+
+## Completed: Milestone 5 — Real-Time Operational Observability, Destination Rate Limiting & Advanced DLQ Management
+
+1. **Per-Destination Sliding-Window Rate Limiting:**
+   - Atomic Redis token bucket via embedded Lua script enforcing `rate_limit_per_second` per target destination.
+   - Non-destructive outbox postpone procedure (`postpone_outbox_rate_limit`) resetting worker lease tokens and delaying next attempt without consuming customer retry quota during destination rate spikes.
+2. **Real-Time Telemetry & Server-Sent Events (SSE):**
+   - Redis Pub/Sub multiplexer streaming live pipeline telemetry (`webhook.ingested`, `delivery.attempt`, `workflow.step`, `workflow.completed`, `dlq.routed`).
+   - Resilient `@Sse('events/stream')` endpoint with automated 15-second keep-alive heartbeats and tenant isolation.
+3. **Advanced Dead Letter Queue (DLQ) Management & Bulk Replay:**
+   - Classification filter by failure categories: `PERMANENT_HTTP` (4xx), `EXHAUSTED_RETRIES`, `SSRF_BLOCKED`, and `TIMEOUT` (408/504).
+   - Atomic bulk replay (up to 100 messages) with `FOR UPDATE SKIP LOCKED` and lease expiration protection (`lease_expires_at <= NOW()`).
+   - Single message permanent purge capability.
+4. **Statistical Metrics & Latency Quantiles:**
+   - Ingestion throughput, outbox lag seconds, delivery success/failure rates, and p50, p95, p99 millisecond latency sampling.
+5. **Monochromatic Dashboard Enhancements:**
+   - Real-time streaming event console with pause/resume and auto-scroll terminal.
+   - Interactive DLQ management console with multi-select checkboxes and error inspector drawer.
+   - Restricting stat cards strictly to the Overview section, fixing boundary line spacing to prevent card clipping, and replacing 100% of browser popups with custom in-app confirmation dialogs.

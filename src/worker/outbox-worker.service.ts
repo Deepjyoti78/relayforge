@@ -2,7 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { DatabaseService } from '../modules/database/database.service';
 import { DeliveryService } from '../modules/delivery/delivery.service';
+import { RateLimiterService } from '../modules/delivery/rate-limiter.service';
 import { evaluateRetry } from '../modules/delivery/retry-policy';
+import { EventStreamService } from '../modules/observability/event-stream.service';
 import { safeError } from '../modules/observability/logging';
 import { WorkflowEngineService } from '../modules/workflows/workflow-engine.service';
 
@@ -44,6 +46,8 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly database: DatabaseService,
     private readonly deliveryService: DeliveryService,
+    private readonly rateLimiter: RateLimiterService,
+    private readonly eventStream: EventStreamService,
     private readonly workflowEngine?: WorkflowEngineService,
   ) {}
 
@@ -163,6 +167,29 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
         return;
       }
 
+      // 2. Check destination rate limits before delivery
+      for (const dest of destinations) {
+        if (dest.rate_limit_per_second > 0) {
+          const rateLimit = await this.rateLimiter.checkRateLimit(
+            dest.id,
+            dest.rate_limit_per_second,
+          );
+          if (!rateLimit.allowed) {
+            // Postpone delivery instead of burning customer retry quota
+            await this.database.client.$queryRaw<{ postpone_outbox_rate_limit: boolean }[]>`
+              SELECT postpone_outbox_rate_limit(${msg.id}::uuid, ${msg.lease_token}::uuid, ${rateLimit.retryAfterSeconds}::int)
+            `;
+            this.logger.warn({
+              event: 'delivery_rate_limit_postponed',
+              outboxId: msg.id,
+              destinationId: dest.id,
+              retryAfterSeconds: rateLimit.retryAfterSeconds,
+            });
+            return;
+          }
+        }
+      }
+
       // 3. Deliver to each destination target
       let anySucceeded = false;
       let lastStatusCode: number | null = null;
@@ -260,6 +287,21 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
               reason: evalResult.reason,
               statusCode: lastStatusCode,
               error: lastErrorDescription,
+            });
+
+            // Publish DLQ real-time telemetry event
+            void this.eventStream.publishEvent({
+              type: 'dlq.routed',
+              organizationId: msg.org_id,
+              timestamp: new Date().toISOString(),
+              payload: {
+                outboxId: msg.id,
+                eventId: msg.event_id,
+                attemptCount: msg.attempt_count,
+                reason: evalResult.reason,
+                statusCode: lastStatusCode,
+                error: lastErrorDescription,
+              },
             });
           }
         }

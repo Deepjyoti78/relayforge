@@ -1,6 +1,7 @@
 import {
   Injectable,
   NotFoundException,
+  Optional,
   UnauthorizedException,
 } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
@@ -8,6 +9,7 @@ import { computeHmacSignature, verifyWebhookSignature } from '../../common/crypt
 import type { Prisma } from '../../generated/prisma/client';
 import { DatabaseService } from '../database/database.service';
 import { EndpointService } from '../endpoints/endpoint.service';
+import { EventStreamService } from '../observability/event-stream.service';
 
 export interface IngestResult {
   eventId: string;
@@ -26,6 +28,7 @@ export class IngestionService {
   constructor(
     private readonly database: DatabaseService,
     private readonly endpointService: EndpointService,
+    @Optional() private readonly eventStream?: EventStreamService,
   ) {}
 
   /**
@@ -162,11 +165,27 @@ export class IngestionService {
           });
         }
 
-        return {
+        const result: IngestResult = {
           eventId: event.id,
           status: 'accepted',
           receivedAt: event.createdAt,
         };
+
+        if (this.eventStream) {
+          void this.eventStream.publishEvent({
+            type: 'webhook.ingested',
+            organizationId: endpoint.organizationId,
+            timestamp: event.createdAt.toISOString(),
+            payload: {
+              eventId: event.id,
+              endpointId: endpoint.id,
+              eventType: event.eventType,
+              idempotencyKey: event.idempotencyKey,
+            },
+          });
+        }
+
+        return result;
       });
     } catch (err: unknown) {
       // Handle concurrent duplicate insertion under race conditions

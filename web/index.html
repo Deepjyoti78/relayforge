@@ -82,6 +82,11 @@
 
       .rf-sidebar-desktop {
         display: flex !important;
+        flex-shrink: 0;
+        width: 260px;
+        height: 100vh;
+        position: relative;
+        z-index: 10;
       }
       .rf-sidebar-mobile-backdrop {
         display: none;
@@ -108,7 +113,7 @@
 
       .rf-main-content {
         flex: 1;
-        padding: 28px 32px;
+        padding: 32px 36px;
         overflow-y: auto;
         overflow-x: hidden;
         background-color: #0E0E10;
@@ -116,9 +121,14 @@
         box-sizing: border-box;
         min-width: 0;
       }
+      @media (max-width: 1024px) {
+        .rf-main-content {
+          padding: 24px 28px;
+        }
+      }
       @media (max-width: 768px) {
         .rf-main-content {
-          padding: 16px 14px;
+          padding: 20px 18px;
         }
       }
 

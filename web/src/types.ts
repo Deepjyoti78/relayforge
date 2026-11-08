@@ -204,3 +204,76 @@ export interface WorkflowExecutionMetadata {
   steps?: WorkflowStepExecutionMetadata[];
 }
 
+// Milestone 5: Observability, Metrics & Advanced DLQ Types
+
+export interface TelemetryMetrics {
+  organizationId: string;
+  generatedAt: string;
+  ingestion: {
+    totalEvents: number;
+    lastHourEvents: number;
+    last24HourEvents: number;
+  };
+  delivery: {
+    totalAttempts: number;
+    successCount: number;
+    failedCount: number;
+    unknownCount: number;
+    successRatePercentage: number;
+    latency: {
+      minMs: number;
+      avgMs: number;
+      p50Ms: number;
+      p95Ms: number;
+      p99Ms: number;
+      maxMs: number;
+    };
+  };
+  outbox: {
+    pendingBacklogCount: number;
+    oldestPendingLagSeconds: number;
+    dlqBacklogCount: number;
+  };
+  workflows: {
+    totalExecutions: number;
+    activeRunningCount: number;
+    succeededCount: number;
+    filteredCount: number;
+    failedCount: number;
+  };
+}
+
+export interface DlqRecordItem {
+  id: string;
+  eventId: string;
+  channel: string;
+  attemptCount: number;
+  maxRetries: number;
+  status: string;
+  createdAt: string;
+  lastAttemptAt: string | null;
+  lastStatusCode: number | null;
+  lastErrorDescription: string | null;
+  destinationId: string | null;
+  destinationName: string | null;
+  destinationUrl: string | null;
+  replayedAt: string | null;
+  payloadSummary: unknown;
+  errorCategory?: 'PERMANENT_HTTP' | 'EXHAUSTED_RETRIES' | 'SSRF_BLOCKED' | 'TIMEOUT';
+}
+
+export interface DlqFilterParams {
+  destinationId?: string;
+  errorCategory?: 'PERMANENT_HTTP' | 'EXHAUSTED_RETRIES' | 'SSRF_BLOCKED' | 'TIMEOUT';
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface RealtimeTelemetryEvent {
+  type: 'webhook.ingested' | 'delivery.attempt' | 'workflow.step' | 'workflow.completed' | 'dlq.routed' | 'ping';
+  organizationId: string;
+  timestamp: string;
+  payload: Record<string, unknown>;
+}
+
