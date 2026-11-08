@@ -44,4 +44,32 @@ describe('process configuration boundaries', () => {
       REDIS_URL: 'redis://localhost/not-a-database',
     })).toThrow(ConfigurationError);
   });
+
+  it('enforces strict production checks when NODE_ENV is production', () => {
+    // Fails with default placeholder keys in production
+    expect(() => parseEnvironment('api', {
+      ...apiEnvironment,
+      NODE_ENV: 'production',
+    })).toThrow(ConfigurationError);
+
+    // Passes when production keys are supplied
+    const prodConfig = parseEnvironment('api', {
+      ...apiEnvironment,
+      NODE_ENV: 'production',
+      ENCRYPTION_KEY: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef_prod',
+      GITHUB_CLIENT_ID: 'gh_client_1234567890',
+      GITHUB_CLIENT_SECRET: 'gh_secret_abcdef1234567890abcdef',
+    });
+    expect(prodConfig.environment).toBe('production');
+
+    // Fails if ALLOW_PRIVATE_DESTINATIONS is set to true in production
+    expect(() => parseEnvironment('api', {
+      ...apiEnvironment,
+      NODE_ENV: 'production',
+      ENCRYPTION_KEY: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef_prod',
+      GITHUB_CLIENT_ID: 'gh_client_1234567890',
+      GITHUB_CLIENT_SECRET: 'gh_secret_abcdef1234567890abcdef',
+      ALLOW_PRIVATE_DESTINATIONS: 'true',
+    })).toThrow(ConfigurationError);
+  });
 });

@@ -19,6 +19,10 @@ const redisUrl = z.string().url().refine((value) => {
   } catch { return false; }
 }, 'Expected a Redis connection URL with a numeric database');
 
+const DEFAULT_INSECURE_ENCRYPTION_KEY = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+const DEFAULT_INSECURE_GITHUB_CLIENT_ID = 'gh_placeholder_client_id';
+const DEFAULT_INSECURE_GITHUB_CLIENT_SECRET = 'gh_placeholder_client_secret';
+
 const baseSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   APP_VERSION: z.string().regex(/^[a-zA-Z0-9.+_-]{1,64}$/).default('0.1.0'),
@@ -30,12 +34,12 @@ const baseSchema = z.object({
   WORKER_CONCURRENCY: z.coerce.number().int().min(1).max(32).default(2),
   WORKER_HEARTBEAT_MS: z.coerce.number().int().min(1000).max(60000).default(10000),
   QUEUE_PREFIX: z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/).default('relayforge'),
-  GITHUB_CLIENT_ID: z.string().default('gh_placeholder_client_id'),
-  GITHUB_CLIENT_SECRET: z.string().default('gh_placeholder_client_secret'),
+  GITHUB_CLIENT_ID: z.string().default(DEFAULT_INSECURE_GITHUB_CLIENT_ID),
+  GITHUB_CLIENT_SECRET: z.string().default(DEFAULT_INSECURE_GITHUB_CLIENT_SECRET),
   GITHUB_CALLBACK_URL: z.string().url().default('http://127.0.0.1:3100/auth/github/callback'),
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
   SESSION_COOKIE_NAME: z.string().default('rf_session'),
-  ENCRYPTION_KEY: z.string().default('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'),
+  ENCRYPTION_KEY: z.string().default(DEFAULT_INSECURE_ENCRYPTION_KEY),
   ALLOW_PRIVATE_DESTINATIONS: z.preprocess(
     (val) => val === 'true' || val === true || val === '1' || val === 1,
     z.boolean().default(false),
@@ -47,9 +51,42 @@ export class ConfigurationError extends Error {
 }
 
 export function parseEnvironment(role: ProcessRole, input: NodeJS.ProcessEnv) {
-  const roleSchema = role === 'api'
+  const roleSchema = (role === 'api'
     ? baseSchema.extend({ DATABASE_URL: databaseUrl, REDIS_URL: redisUrl.optional() })
-    : baseSchema.extend({ WORKER_DATABASE_URL: databaseUrl, REDIS_URL: redisUrl });
+    : baseSchema.extend({ WORKER_DATABASE_URL: databaseUrl, REDIS_URL: redisUrl })
+  ).superRefine((data, ctx) => {
+    if (data.NODE_ENV === 'production') {
+      if (data.ENCRYPTION_KEY === DEFAULT_INSECURE_ENCRYPTION_KEY || data.ENCRYPTION_KEY.length < 32) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['ENCRYPTION_KEY'],
+          message: 'Production requires a secure ENCRYPTION_KEY of at least 32 characters',
+        });
+      }
+      if (data.GITHUB_CLIENT_ID === DEFAULT_INSECURE_GITHUB_CLIENT_ID) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['GITHUB_CLIENT_ID'],
+          message: 'Production requires a valid GITHUB_CLIENT_ID',
+        });
+      }
+      if (data.GITHUB_CLIENT_SECRET === DEFAULT_INSECURE_GITHUB_CLIENT_SECRET) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['GITHUB_CLIENT_SECRET'],
+          message: 'Production requires a valid GITHUB_CLIENT_SECRET',
+        });
+      }
+      if (data.ALLOW_PRIVATE_DESTINATIONS) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['ALLOW_PRIVATE_DESTINATIONS'],
+          message: 'Private destinations cannot be allowed in production',
+        });
+      }
+    }
+  });
+
   const result = roleSchema.safeParse(input);
 
   if (!result.success) {

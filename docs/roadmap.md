@@ -50,3 +50,29 @@ and minimal React/TypeScript management UI.
    - Real-time streaming event console with pause/resume and auto-scroll terminal.
    - Interactive DLQ management console with multi-select checkboxes and error inspector drawer.
    - Restricting stat cards strictly to the Overview section, fixing boundary line spacing to prevent card clipping, and replacing 100% of browser popups with custom in-app confirmation dialogs.
+
+## Completed: Milestone 6 — Production Hardening & Deployment
+
+1. **Split-Pane Sign-In Modal & Landing Experience:**
+   - Monochromatic public landing page with one-click "Sign In" trigger.
+   - Split-pane authentication modal: left-side branded design system artwork card; right-side GitHub OAuth flow with fallback session token entry and security guardrail badges.
+2. **Independent Security Audit & Hardening:**
+   - Verified zero-trust SSRF defense with socket IP pinning and disabled HTTP redirects.
+   - PostgreSQL RLS tenant isolation enforced across all database queries via `app.current_org_id`.
+   - Comprehensive AppSec reference documented in `docs/production-security.md`.
+3. **Production Configuration & Environment Validation:**
+   - Strict runtime configuration schema (`src/modules/config/environment.ts`) rejecting insecure placeholder keys, default passwords, and private destination flags in production.
+   - Sanitized `.env.production.example` template with clear guidance.
+4. **Disaster Recovery & Database Operations:**
+   - Automated zero-downtime backup utility (`scripts/backup-db.cjs`) and restoration drill script (`scripts/restore-db.cjs`).
+   - Validated restoration drill into disposable test database verifying schema and table consistency.
+   - Comprehensive recovery runbook and migration troubleshooting guide in `docs/backup-and-recovery.md`.
+5. **Operations Runbook & Golden Signals:**
+   - Incident response playbooks for worker crash recovery, outbox backlog growth, and DLQ spikes in `docs/operations-runbook.md`.
+   - Clear alerting thresholds for worker heartbeats, outbox lag, and destination rate limiting.
+6. **Performance & Scalability Results:**
+   - Documented throughput, p50/p95/p99 latency quantiles, and scaling recommendations in `docs/performance-results.md`.
+7. **CI/CD Pipeline & Packaging:**
+   - Automated multi-stage GitHub Actions workflow in `.github/workflows/deploy.yml` with linting, strict typechecks, unit tests, integration tests, container image compilation, and migration checks.
+8. **Deployment Architecture Guide:**
+   - Complete hosting evaluation (Render vs Railway vs AWS) with cost breakdown and topology diagrams in `docs/deployment.md`.

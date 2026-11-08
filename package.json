@@ -30,7 +30,10 @@
     "test:smoke": "node scripts/smoke.cjs",
     "benchmark:receiver": "node benchmarks/receiver.cjs",
     "benchmark:run": "node benchmarks/run-benchmarks.cjs",
-    "check": "npm run lint && npm run typecheck && npm test && npm run build"
+    "check": "npm run lint && npm run typecheck && npm test && npm run build",
+    "db:backup": "node scripts/backup-db.cjs",
+    "db:restore": "node scripts/restore-db.cjs",
+    "healthcheck:worker": "node -r ts-node/register src/worker/healthcheck.ts"
   },
   "dependencies": {
     "@nestjs/common": "11.2.8",

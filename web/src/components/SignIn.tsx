@@ -1,117 +1,532 @@
-import React from 'react';
+import React, { useState } from 'react';
+import brandGraphic from '../assets/brand-graphic.png';
 
-export const SignIn: React.FC = () => {
+interface SignInProps {
+  onTokenSignIn?: (token: string) => void;
+}
+
+export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [manualToken, setManualToken] = useState('');
+  const [showManualInput, setShowManualInput] = useState(false);
+
   const startUrl = `/auth/github/start?redirect_uri=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : '')}`;
+
+  const handleManualSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualToken.trim()) return;
+    if (onTokenSignIn) {
+      onTokenSignIn(manualToken.trim());
+    } else {
+      localStorage.setItem('relayforge_session_token', manualToken.trim());
+      window.location.reload();
+    }
+  };
 
   return (
     <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
       minHeight: '100vh',
       backgroundColor: '#0E0E10',
-      padding: '24px',
+      color: '#F2F2F5',
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'relative',
+      overflowX: 'hidden',
     }}>
-      <div style={{
-        backgroundColor: '#232327',
-        border: '1px solid #3E3E45',
-        borderRadius: '16px',
-        padding: '44px 36px',
-        maxWidth: '420px',
-        width: '100%',
-        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.4)',
-        textAlign: 'center',
+      {/* Top Navbar */}
+      <header style={{
+        height: '68px',
+        borderBottom: '1px solid #232327',
+        padding: '0 32px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#0E0E10',
+        zIndex: 10,
       }}>
-        <div style={{
-          width: '52px',
-          height: '52px',
-          borderRadius: '12px',
-          backgroundColor: '#0E0E10',
-          border: '1px solid #3E3E45',
-          color: '#F2F2F5',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '0 auto 20px',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
-        }}>
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-          </svg>
-        </div>
-
-        <div style={{
-          display: 'inline-block',
-          fontSize: '11px',
-          fontWeight: 700,
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-          color: '#9A9AA6',
-          marginBottom: '8px',
-        }}>
-          RELAYFORGE DEVELOPER CONSOLE
-        </div>
-
-        <h1 style={{ fontSize: '24px', fontWeight: 800, margin: '0 0 10px', color: '#F2F2F5', letterSpacing: '-0.02em' }}>
-          Welcome back
-        </h1>
-        <p style={{ fontSize: '14px', color: '#9A9AA6', margin: '0 0 32px', lineHeight: '1.5' }}>
-          Sign in to manage your organizations, secure API keys, and event-driven webhook workflows.
-        </p>
-
-        <a
-          href={startUrl}
-          style={{
-            display: 'inline-flex',
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '9px',
+            backgroundColor: '#232327',
+            border: '1px solid #3E3E45',
+            color: '#F2F2F5',
+            display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '12px',
-            width: '100%',
-            backgroundColor: '#F2F2F5',
-            color: '#0E0E10',
-            textDecoration: 'none',
-            padding: '13px 20px',
-            borderRadius: '10px',
-            fontSize: '14px',
-            fontWeight: 700,
-            border: '1px solid #F2F2F5',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#C9C9D2';
-            e.currentTarget.style.borderColor = '#C9C9D2';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#F2F2F5';
-            e.currentTarget.style.borderColor = '#F2F2F5';
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div>
+            <div style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '-0.02em', color: '#F2F2F5' }}>
+              RELAYFORGE
+            </div>
+            <div style={{ fontSize: '10px', color: '#63636E', letterSpacing: '0.04em', fontWeight: 600 }}>
+              ENTERPRISE WEBHOOK GATEWAY
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '12px',
+            color: '#9A9AA6',
+            backgroundColor: '#18181B',
+            padding: '5px 12px',
+            borderRadius: '999px',
+            border: '1px solid #232327',
+          }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#F2F2F5' }}></span>
+            Production Ready v1.0
+          </span>
+
+          <button
+            id="open-signin-button"
+            onClick={() => setModalOpen(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              backgroundColor: '#F2F2F5',
+              color: '#0E0E10',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '9px 18px',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'background-color 0.15s ease',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#C9C9D2'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#F2F2F5'; }}
+          >
+            Sign In
+          </button>
+        </div>
+      </header>
+
+      {/* Main Landing / Hero Content */}
+      <main style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '60px 24px',
+        textAlign: 'center',
+        maxWidth: '960px',
+        margin: '0 auto',
+        width: '100%',
+      }}>
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 14px',
+          borderRadius: '999px',
+          backgroundColor: '#18181B',
+          border: '1px solid #3E3E45',
+          fontSize: '12px',
+          color: '#9A9AA6',
+          marginBottom: '28px',
+        }}>
+          <span style={{ color: '#F2F2F5', fontWeight: 600 }}>Durable Systems Engine</span>
+          <span>•</span>
+          <span>SSRF DNS Pinning</span>
+          <span>•</span>
+          <span>Transactional Outbox</span>
+        </div>
+
+        <h1 style={{
+          fontSize: 'clamp(32px, 5vw, 54px)',
+          fontWeight: 900,
+          lineHeight: 1.1,
+          letterSpacing: '-0.04em',
+          color: '#F2F2F5',
+          margin: '0 0 20px',
+        }}>
+          Durable Webhooks &amp; Sequential Workflow Engine
+        </h1>
+
+        <p style={{
+          fontSize: '17px',
+          color: '#9A9AA6',
+          maxWidth: '680px',
+          lineHeight: 1.6,
+          margin: '0 0 36px',
+        }}>
+          Ingest high-throughput payloads with sub-millisecond persistence, execute isolated sequential multi-step pipelines, and guarantee at-least-once delivery with jittered exponential retries.
+        </p>
+
+        <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <button
+            id="hero-signin-btn"
+            onClick={() => setModalOpen(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              backgroundColor: '#F2F2F5',
+              color: '#0E0E10',
+              border: 'none',
+              borderRadius: '10px',
+              padding: '14px 28px',
+              fontSize: '15px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 4px 18px rgba(255, 255, 255, 0.12)',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#C9C9D2'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#F2F2F5'; }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            Sign In to Console
+          </button>
+        </div>
+
+        {/* Feature Grid Summary */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: '20px',
+          width: '100%',
+          marginTop: '64px',
+          textAlign: 'left',
+        }}>
+          <div style={{
+            backgroundColor: '#18181B',
+            border: '1px solid #232327',
+            borderRadius: '12px',
+            padding: '24px',
+          }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5', marginBottom: '8px' }}>
+              🛡️ Zero-Trust SSRF Defense
+            </div>
+            <div style={{ fontSize: '13px', color: '#9A9AA6', lineHeight: 1.5 }}>
+              DNS rebinding and TOCTOU prevention with socket IP pinning and manual redirect rejection.
+            </div>
+          </div>
+
+          <div style={{
+            backgroundColor: '#18181B',
+            border: '1px solid #232327',
+            borderRadius: '12px',
+            padding: '24px',
+          }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5', marginBottom: '8px' }}>
+              ⚡ Transactional Outbox
+            </div>
+            <div style={{ fontSize: '13px', color: '#9A9AA6', lineHeight: 1.5 }}>
+              PostgreSQL ACID guarantees, lease tokens with fenced crash recovery, and zero message loss.
+            </div>
+          </div>
+
+          <div style={{
+            backgroundColor: '#18181B',
+            border: '1px solid #232327',
+            borderRadius: '12px',
+            padding: '24px',
+          }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5', marginBottom: '8px' }}>
+              🔄 Sequential Orchestrator
+            </div>
+            <div style={{ fontSize: '13px', color: '#9A9AA6', lineHeight: 1.5 }}>
+              Conditional branching, JSON transformations, rate limiting, and real-time SSE telemetry.
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Split-Pane Sign-In Modal */}
+      {modalOpen && (
+        <div
+          id="signin-modal-backdrop"
+          onClick={() => setModalOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.78)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            zIndex: 1000,
+            animation: 'fadeIn 0.2s ease',
           }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-          </svg>
-          Continue with GitHub
-        </a>
+          <div
+            id="signin-modal-container"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#18181B',
+              border: '1px solid #3E3E45',
+              borderRadius: '20px',
+              maxWidth: '860px',
+              width: '100%',
+              display: 'flex',
+              overflow: 'hidden',
+              boxShadow: '0 24px 60px rgba(0, 0, 0, 0.65)',
+              position: 'relative',
+              flexDirection: 'row',
+            }}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setModalOpen(false)}
+              aria-label="Close modal"
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                backgroundColor: '#232327',
+                border: '1px solid #3E3E45',
+                color: '#9A9AA6',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                zIndex: 20,
+                fontSize: '18px',
+                lineHeight: 1,
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#F2F2F5'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#9A9AA6'; }}
+            >
+              ×
+            </button>
 
-        <div style={{
-          marginTop: '28px',
-          paddingTop: '20px',
-          borderTop: '1px solid #3E3E45',
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '16px',
-          fontSize: '12px',
-          color: '#63636E',
-        }}>
-          <span>PostgreSQL RLS</span>
-          <span>•</span>
-          <span>PKCE OAuth 2.0</span>
-          <span>•</span>
-          <span>Milestone 3</span>
+            {/* Left Side: Uploaded Image Visual Panel */}
+            <div style={{
+              flex: '1 1 48%',
+              backgroundColor: '#0E0E10',
+              borderRight: '1px solid #232327',
+              padding: '36px 28px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+              background: 'radial-gradient(circle at center, #1F1F24 0%, #0E0E10 85%)',
+            }}>
+              <div style={{
+                position: 'relative',
+                width: '100%',
+                maxWidth: '280px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}>
+                <img
+                  src={brandGraphic}
+                  alt="RelayForge Design System Palette"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '340px',
+                    objectFit: 'contain',
+                    borderRadius: '16px',
+                    filter: 'drop-shadow(0 14px 28px rgba(0,0,0,0.65))',
+                    border: '1px solid #232327',
+                  }}
+                />
+                <div style={{
+                  marginTop: '16px',
+                  textAlign: 'center',
+                }}>
+                  <div style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: '#C9C9D2',
+                  }}>
+                    Monochromatic Precision
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#63636E', marginTop: '4px' }}>
+                    Engineered for zero cognitive overload
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side: Main Content */}
+            <div style={{
+              flex: '1 1 52%',
+              padding: '44px 36px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: '#9A9AA6',
+                marginBottom: '10px',
+              }}>
+                <span style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  backgroundColor: '#F2F2F5',
+                }}></span>
+                AUTHENTICATION PORTAL
+              </div>
+
+              <h2 style={{
+                fontSize: '24px',
+                fontWeight: 800,
+                color: '#F2F2F5',
+                letterSpacing: '-0.02em',
+                margin: '0 0 10px',
+              }}>
+                Welcome to RelayForge
+              </h2>
+
+              <p style={{
+                fontSize: '13px',
+                color: '#9A9AA6',
+                lineHeight: 1.5,
+                margin: '0 0 28px',
+              }}>
+                Sign in with GitHub to access tenant isolation, encrypted API keys, workflow orchestrations, and the Dead Letter Queue.
+              </p>
+
+              {/* GitHub OAuth Button */}
+              <a
+                id="github-oauth-button"
+                href={startUrl}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '12px',
+                  width: '100%',
+                  backgroundColor: '#F2F2F5',
+                  color: '#0E0E10',
+                  textDecoration: 'none',
+                  padding: '13px 20px',
+                  borderRadius: '10px',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'background-color 0.15s ease',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#C9C9D2'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#F2F2F5'; }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                </svg>
+                Continue with GitHub
+              </a>
+
+              {/* Developer Test Mode Session Input */}
+              <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowManualInput(!showManualInput)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#9A9AA6',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    padding: '4px',
+                  }}
+                >
+                  {showManualInput ? 'Hide developer token entry' : 'Direct Session Token Entry'}
+                </button>
+
+                {showManualInput && (
+                  <form onSubmit={handleManualSubmit} style={{ marginTop: '12px', display: 'flex', gap: '8px' }}>
+                    <input
+                      type="text"
+                      placeholder="Paste session token..."
+                      value={manualToken}
+                      onChange={(e) => setManualToken(e.target.value)}
+                      style={{
+                        flex: 1,
+                        backgroundColor: '#0E0E10',
+                        border: '1px solid #3E3E45',
+                        borderRadius: '6px',
+                        padding: '8px 12px',
+                        fontSize: '12px',
+                        color: '#F2F2F5',
+                        outline: 'none',
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      style={{
+                        backgroundColor: '#232327',
+                        border: '1px solid #3E3E45',
+                        color: '#F2F2F5',
+                        borderRadius: '6px',
+                        padding: '8px 14px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Authenticate
+                    </button>
+                  </form>
+                )}
+              </div>
+
+              {/* Security Guardrails Footer */}
+              <div style={{
+                marginTop: '32px',
+                paddingTop: '20px',
+                borderTop: '1px solid #232327',
+                display: 'flex',
+                justifyContent: 'space-between',
+                fontSize: '11px',
+                color: '#63636E',
+              }}>
+                <span>PostgreSQL RLS</span>
+                <span>•</span>
+                <span>SSRF Pinned</span>
+                <span>•</span>
+                <span>AES-256-GCM</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Global Modal Animation Style */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.98); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @media (max-width: 768px) {
+          #signin-modal-container {
+            flex-direction: column !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

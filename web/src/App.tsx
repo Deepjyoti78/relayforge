@@ -157,7 +157,14 @@ export const App: React.FC = () => {
   }
 
   if (!user) {
-    return <SignIn />;
+    return (
+      <SignIn
+        onTokenSignIn={async (token) => {
+          setSessionToken(token);
+          await loadUser();
+        }}
+      />
+    );
   }
 
   return (
