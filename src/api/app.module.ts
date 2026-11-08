@@ -10,6 +10,7 @@ import { HealthController } from '../modules/health/health.controller';
 import { IngestionModule } from '../modules/ingestion/ingestion.module';
 import { ObservabilityModule } from '../modules/observability/observability.module';
 import { OrganizationModule } from '../modules/organizations/organization.module';
+import { WorkflowsModule } from '../modules/workflows/workflows.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { OrganizationModule } from '../modules/organizations/organization.module
     DestinationModule,
     DeliveryModule,
     IngestionModule,
+    WorkflowsModule,
   ],
   controllers: [HealthController],
 })

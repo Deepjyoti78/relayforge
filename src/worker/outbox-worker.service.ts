@@ -4,10 +4,12 @@ import { DatabaseService } from '../modules/database/database.service';
 import { DeliveryService } from '../modules/delivery/delivery.service';
 import { evaluateRetry } from '../modules/delivery/retry-policy';
 import { safeError } from '../modules/observability/logging';
+import { WorkflowEngineService } from '../modules/workflows/workflow-engine.service';
 
 interface ClaimedOutboxRow {
   id: string;
   event_id: string;
+  workflow_execution_id?: string | null;
   org_id: string;
   channel: string;
   payload: unknown;
@@ -42,6 +44,7 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly database: DatabaseService,
     private readonly deliveryService: DeliveryService,
+    private readonly workflowEngine?: WorkflowEngineService,
   ) {}
 
   onModuleInit(): void {
@@ -132,6 +135,18 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
 
   private async processOutboxMessage(msg: ClaimedOutboxRow): Promise<void> {
     try {
+      // If outbox message belongs to a workflow execution, delegate to WorkflowEngineService
+      if (msg.channel === 'workflow' && this.workflowEngine) {
+        await this.workflowEngine.processWorkflowOutbox({
+          id: msg.id,
+          event_id: msg.event_id,
+          org_id: msg.org_id,
+          workflow_execution_id: msg.workflow_execution_id ?? null,
+          lease_token: msg.lease_token,
+        });
+        return;
+      }
+
       // 1. Fetch active destinations for this tenant
       const destinations = await this.database.client.$queryRaw<ActiveDestinationRow[]>`
         SELECT id, org_id, name, url, http_method, headers, rate_limit_per_second, timeout_ms, is_active

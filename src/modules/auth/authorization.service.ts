@@ -54,4 +54,21 @@ export class AuthorizationService {
   canManageDestinations(memberRole: MembershipRole): boolean {
     return this.hasRole(memberRole, 'DEVELOPER');
   }
+
+  /**
+   * Looks up membership and verifies user belongs to organization.
+   */
+  async verifyMembership(
+    tx: { membership: { findUnique: (args: { where: { organizationId_userId: { organizationId: string; userId: string } } }) => Promise<{ role: MembershipRole } | null> } },
+    organizationId: string,
+    userId: string,
+  ): Promise<{ role: MembershipRole }> {
+    const membership = await tx.membership.findUnique({
+      where: { organizationId_userId: { organizationId, userId } },
+    });
+    if (!membership) {
+      throw new ForbiddenException('Organization not found or access denied');
+    }
+    return membership;
+  }
 }

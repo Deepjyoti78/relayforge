@@ -13,23 +13,21 @@ user profiles, multi-organization membership, Owner/Developer/Viewer RBAC,
 transaction-local tenant context, PostgreSQL Row-Level Security (RLS) enforcement,
 and minimal React/TypeScript management UI.
 
-## Next: Milestone 3 — API keys, encrypted secrets, and approved destinations
+## Completed: Milestone 3 — API keys, encrypted secrets, approved destinations, and transactional delivery
 
-1. Organization-scoped API keys (hashed storage, prefix, rotation).
-2. AES-256-GCM envelope encryption for webhook secrets.
-3. Destination registry and egress URL policy verification (SSRF protection).
-4. Immutable workflow publication and endpoint configuration.
-2. Endpoint configuration and immutable bounded workflow publication.
-3. Signed ingestion, schema validation, deduplication, and transactional outbox.
-4. One real HTTP delivery with leases and durable attempt records.
-5. Retry scheduling, unknown outcomes, dead letters, and crash recovery.
-6. Sequential action progression and failed-step resume.
-7. Operational UI, execution history, and durable SSE.
-8. Deployment verification, load measurements, backup/restore, and runbooks.
+1. Organization-scoped API keys (SHA-256 hashed storage, prefixes, immediate revocation).
+2. AES-256-GCM envelope encryption for webhook secrets with HMAC-SHA256 signing.
+3. Destination registry with SSRF protection, strict IPv4/IPv6 private IP filtering, DNS rebinding socket-pinning, and disabled redirects.
+4. Signed ingestion with deduplication via PostgreSQL transactions and transactional outbox pattern.
+5. Durable HTTP deliveries with worker leases (`claim_pending_outbox_messages` via `FOR UPDATE SKIP LOCKED`), crash recovery, and dead letter queue.
+6. Exponential retry backoff with jitter and RFC-compliant `Retry-After` parsing.
 
-Every accepted event will use a frozen workflow version. Automatic retries may
-repeat HTTP requests; downstream idempotency is required to prevent duplicate
-external side effects. Failed-step resume will preserve completed steps.
+## Completed: Milestone 4 — Sequential Workflow Execution Engine
 
-Arbitrary workflow graphs, loops, user code, collaborative editing, and
-compensation are outside the first release.
+1. Durable sequential workflow execution engine: Webhook Trigger → Condition Groups → Bounded JSON Transform → Sequential HTTP Actions.
+2. Immutable published workflow versions (`workflow_versions`) with deterministic SHA-256 definition digests.
+3. PostgreSQL Row-Level Security across workflows, versions, executions, and step execution checkpoints.
+4. Bounded expression DSL: ALL/ANY condition groups and safe JSON path mapping (dot/bracket notation, prototype pollution prevention, 10-depth limit).
+5. Checkpointed step transitions (`workflow_step_executions`) ensuring previously succeeded actions are never re-executed on resume.
+6. Stable downstream idempotency keys (`wf_${executionId}_${nodeId}`).
+7. Monochromatic Management Console with visual sequential flow canvas, live definition validation, immutable publication, execution lineage timeline, and in-app modal confirmations (zero browser dialogs).

@@ -119,16 +119,48 @@ export class IngestionService {
           },
         });
 
-        await tx.outboxMessage.create({
-          data: {
-            id: outboxId,
-            eventId: event.id,
-            organizationId: endpoint.organizationId,
-            channel: 'events',
-            payload: payloadJson,
-            status: 'PENDING',
-          },
-        });
+        // Check for active workflow configured for this endpoint
+        const activeWorkflows = await tx.$queryRaw<Array<{ workflow_id: string; org_id: string; version_id: string }>>`
+          SELECT workflow_id, org_id, version_id
+          FROM get_active_workflow_for_endpoint(${endpoint.id}::uuid)
+        `;
+
+        if (activeWorkflows.length > 0 && activeWorkflows[0]?.version_id) {
+          const wf = activeWorkflows[0];
+          const workflowExecution = await tx.workflowExecution.create({
+            data: {
+              organizationId: endpoint.organizationId,
+              workflowId: wf.workflow_id,
+              workflowVersionId: wf.version_id,
+              eventId: event.id,
+              status: 'QUEUED',
+              currentStep: 0,
+            },
+          });
+
+          await tx.outboxMessage.create({
+            data: {
+              id: outboxId,
+              eventId: event.id,
+              workflowExecutionId: workflowExecution.id,
+              organizationId: endpoint.organizationId,
+              channel: 'workflow',
+              payload: payloadJson,
+              status: 'PENDING',
+            },
+          });
+        } else {
+          await tx.outboxMessage.create({
+            data: {
+              id: outboxId,
+              eventId: event.id,
+              organizationId: endpoint.organizationId,
+              channel: 'events',
+              payload: payloadJson,
+              status: 'PENDING',
+            },
+          });
+        }
 
         return {
           eventId: event.id,
@@ -176,14 +208,18 @@ export class IngestionService {
       throw new NotFoundException(`Endpoint '${endpointId}' not found or inactive.`);
     }
 
-    // Verify user belongs to the endpoint's organization
-    const membership = await this.database.client.membership.findUnique({
-      where: {
-        organizationId_userId: {
-          organizationId: endpoint.organizationId,
-          userId,
+    // Verify user belongs to the endpoint's organization inside tenant context
+    const membership = await this.database.client.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT set_config('app.current_org_id', ${endpoint.organizationId}, true)`;
+      await tx.$executeRaw`SELECT set_config('app.current_user_id', ${userId}, true)`;
+      return tx.membership.findUnique({
+        where: {
+          organizationId_userId: {
+            organizationId: endpoint.organizationId,
+            userId,
+          },
         },
-      },
+      });
     });
     if (!membership) {
       throw new UnauthorizedException('You do not have access to this organization.');

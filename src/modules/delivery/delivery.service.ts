@@ -40,6 +40,9 @@ export interface DeliverEventParams {
   outboxMessageId?: string;
   attemptNumber?: number;
   signingSecret?: string;
+  workflowExecutionId?: string;
+  stepExecutionId?: string;
+  customDeliveryId?: string;
 }
 
 export interface DeliveryAttemptRecord {
@@ -79,7 +82,7 @@ export class DeliveryService {
    */
   async deliverEventToDestination(params: DeliverEventParams): Promise<DeliveryAttemptRecord> {
     const attemptId = randomUUID();
-    const stableDeliveryId = getStableDeliveryId(params.eventId, params.destination.id);
+    const stableDeliveryId = params.customDeliveryId ?? getStableDeliveryId(params.eventId, params.destination.id);
     const bodyStr = typeof params.payload === 'string' ? params.payload : JSON.stringify(params.payload);
 
     // Defense-in-depth: Validate SSRF egress policy and obtain pinned IP address
@@ -104,6 +107,8 @@ export class DeliveryService {
         eventId: params.eventId,
         destinationId: params.destination.id,
         outboxMessageId: params.outboxMessageId ?? null,
+        workflowExecutionId: params.workflowExecutionId ?? null,
+        stepExecutionId: params.stepExecutionId ?? null,
         attemptNumber: params.attemptNumber ?? 1,
         status: 'FAILED',
         statusCode: null,
@@ -239,6 +244,8 @@ export class DeliveryService {
       eventId: params.eventId,
       destinationId: params.destination.id,
       outboxMessageId: params.outboxMessageId ?? null,
+      workflowExecutionId: params.workflowExecutionId ?? null,
+      stepExecutionId: params.stepExecutionId ?? null,
       attemptNumber: params.attemptNumber ?? 1,
       status,
       statusCode,
@@ -268,6 +275,8 @@ export class DeliveryService {
       eventId: string;
       destinationId: string;
       outboxMessageId: string | null;
+      workflowExecutionId?: string | null;
+      stepExecutionId?: string | null;
       attemptNumber: number;
       status: 'SUCCESS' | 'FAILED' | 'UNKNOWN';
       statusCode: number | null;
@@ -288,6 +297,8 @@ export class DeliveryService {
           eventId: data.eventId,
           destinationId: data.destinationId,
           outboxMessageId: data.outboxMessageId,
+          workflowExecutionId: data.workflowExecutionId ?? null,
+          stepExecutionId: data.stepExecutionId ?? null,
           attemptNumber: data.attemptNumber,
           status: data.status,
           statusCode: data.statusCode,

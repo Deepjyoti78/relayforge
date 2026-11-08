@@ -26,6 +26,8 @@ export const TopBar: React.FC<TopBarProps> = ({
         return 'Destinations & SSRF Registry';
       case 'deliveries':
         return 'Delivery History & Real-Time Attempts';
+      case 'workflows':
+        return 'Sequential Workflows & Orchestration';
       case 'settings':
         return 'Settings';
       default:

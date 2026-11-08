@@ -106,6 +106,10 @@ model Organization {
   events         Event[]
   outboxMessages OutboxMessage[]
   deliveryAttempts DeliveryAttempt[]
+  workflows        Workflow[]
+  workflowVersions WorkflowVersion[]
+  workflowExecutions WorkflowExecution[]
+  workflowStepExecutions WorkflowStepExecution[]
 
   @@map("organizations")
 }
@@ -168,6 +172,7 @@ model Endpoint {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   events       Event[]
+  workflows    Workflow[]
 
   @@unique([organizationId, slug])
   @@index([organizationId])
@@ -199,6 +204,7 @@ model Event {
   endpoint       Endpoint        @relation(fields: [endpointId], references: [id], onDelete: Cascade)
   outboxMessages OutboxMessage[]
   deliveryAttempts DeliveryAttempt[]
+  workflowExecutions WorkflowExecution[]
 
   @@unique([endpointId, idempotencyKey])
   @@index([organizationId])
@@ -230,17 +236,20 @@ model OutboxMessage {
   leaseToken     String?      @map("lease_token") @db.Uuid
   replayedBy     String?      @map("replayed_by") @db.Uuid
   replayedAt     DateTime?    @map("replayed_at") @db.Timestamptz(3)
+  workflowExecutionId String? @map("workflow_execution_id") @db.Uuid
   createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
   dispatchedAt   DateTime?    @map("dispatched_at") @db.Timestamptz(3)
 
-  event            Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  event            Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  organization     Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  workflowExecution WorkflowExecution? @relation(fields: [workflowExecutionId], references: [id], onDelete: SetNull)
   deliveryAttempts DeliveryAttempt[]
 
   @@index([status, createdAt])
   @@index([status, nextRetryAt])
   @@index([leaseExpiresAt])
   @@index([organizationId])
+  @@index([workflowExecutionId])
   @@map("outbox_messages")
 }
 
@@ -283,6 +292,8 @@ model DeliveryAttempt {
   eventId             String         @map("event_id") @db.Uuid
   destinationId       String         @map("destination_id") @db.Uuid
   outboxMessageId     String?        @map("outbox_message_id") @db.Uuid
+  workflowExecutionId String?        @map("workflow_execution_id") @db.Uuid
+  stepExecutionId     String?        @map("step_execution_id") @db.Uuid
   attemptNumber       Int            @default(1) @map("attempt_number")
   status              DeliveryStatus @map("status")
   statusCode          Int?           @map("status_code")
@@ -295,14 +306,162 @@ model DeliveryAttempt {
   errorDescription    String?        @map("error_description") @db.Text
   createdAt           DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
 
-  organization  Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  destination   Destination    @relation(fields: [destinationId], references: [id], onDelete: Cascade)
-  outboxMessage OutboxMessage? @relation(fields: [outboxMessageId], references: [id], onDelete: SetNull)
+  organization      Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  event             Event                  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  destination       Destination            @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  outboxMessage     OutboxMessage?         @relation(fields: [outboxMessageId], references: [id], onDelete: SetNull)
+  workflowExecution WorkflowExecution?     @relation(fields: [workflowExecutionId], references: [id], onDelete: SetNull)
+  stepExecution     WorkflowStepExecution? @relation(fields: [stepExecutionId], references: [id], onDelete: SetNull)
 
   @@index([organizationId])
   @@index([eventId])
   @@index([destinationId])
+  @@index([workflowExecutionId])
+  @@index([stepExecutionId])
   @@index([createdAt])
   @@map("delivery_attempts")
+}
+
+// Milestone: Sequential Workflow Execution Engine
+
+enum WorkflowStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+
+  @@map("workflow_status")
+}
+
+model Workflow {
+  id              String         @id @default(uuid()) @db.Uuid
+  organizationId  String         @map("org_id") @db.Uuid
+  endpointId      String         @map("endpoint_id") @db.Uuid
+  name            String         @db.VarChar(128)
+  description     String?        @db.VarChar(512)
+  status          WorkflowStatus @default(DRAFT) @map("status")
+  activeVersionId String?        @map("active_version_id") @db.Uuid
+  createdAt       DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  organization  Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  endpoint      Endpoint            @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  activeVersion WorkflowVersion?    @relation("ActiveVersion", fields: [activeVersionId], references: [id], onDelete: SetNull)
+  versions      WorkflowVersion[]   @relation("WorkflowVersions")
+  executions    WorkflowExecution[]
+
+  @@index([organizationId])
+  @@index([endpointId])
+  @@index([organizationId, status])
+  @@map("workflows")
+}
+
+model WorkflowVersion {
+  id             String   @id @default(uuid()) @db.Uuid
+  workflowId     String   @map("workflow_id") @db.Uuid
+  organizationId String   @map("org_id") @db.Uuid
+  versionNumber  Int      @map("version_number")
+  definition     Json     @map("definition")
+  definitionHash String   @map("definition_hash") @db.VarChar(64)
+  publishedAt    DateTime @default(now()) @map("published_at") @db.Timestamptz(3)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  workflow          Workflow            @relation("WorkflowVersions", fields: [workflowId], references: [id], onDelete: Cascade)
+  organization      Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  activeInWorkflows Workflow[]          @relation("ActiveVersion")
+  executions        WorkflowExecution[]
+
+  @@unique([workflowId, versionNumber])
+  @@index([organizationId])
+  @@index([workflowId])
+  @@map("workflow_versions")
+}
+
+enum WorkflowExecutionStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+  FILTERED
+  RETRY_WAIT
+  CANCELLED
+
+  @@map("workflow_execution_status")
+}
+
+model WorkflowExecution {
+  id                String                  @id @default(uuid()) @db.Uuid
+  organizationId    String                  @map("org_id") @db.Uuid
+  workflowId        String                  @map("workflow_id") @db.Uuid
+  workflowVersionId String                  @map("workflow_version_id") @db.Uuid
+  eventId           String                  @map("event_id") @db.Uuid
+  status            WorkflowExecutionStatus @default(QUEUED) @map("status")
+  currentStep       Int                     @default(0) @map("current_step")
+  startedAt         DateTime?               @map("started_at") @db.Timestamptz(3)
+  completedAt       DateTime?               @map("completed_at") @db.Timestamptz(3)
+  failureReason     String?                 @map("failure_reason") @db.Text
+  context           Json?                   @map("context")
+  createdAt         DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  organization    Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  workflow        Workflow                @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  workflowVersion WorkflowVersion         @relation(fields: [workflowVersionId], references: [id], onDelete: Restrict)
+  event           Event                   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  steps           WorkflowStepExecution[]
+  deliveryAttempts DeliveryAttempt[]
+  outboxMessages  OutboxMessage[]
+
+  @@index([organizationId])
+  @@index([workflowId])
+  @@index([eventId])
+  @@index([status, createdAt])
+  @@map("workflow_executions")
+}
+
+enum WorkflowStepType {
+  TRIGGER
+  CONDITION
+  TRANSFORM
+  HTTP_ACTION
+
+  @@map("workflow_step_type")
+}
+
+enum WorkflowStepStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+  SKIPPED
+  RETRY_WAIT
+
+  @@map("workflow_step_status")
+}
+
+model WorkflowStepExecution {
+  id             String             @id @default(uuid()) @db.Uuid
+  executionId    String             @map("execution_id") @db.Uuid
+  organizationId String             @map("org_id") @db.Uuid
+  nodeId         String             @map("node_id") @db.VarChar(64)
+  stepIndex      Int                @map("step_index")
+  stepType       WorkflowStepType   @map("step_type")
+  status         WorkflowStepStatus @default(PENDING) @map("status")
+  attemptCount   Int                @default(0) @map("attempt_count")
+  inputSnapshot  Json?              @map("input_snapshot")
+  outputSnapshot Json?              @map("output_snapshot")
+  errorDetails   Json?              @map("error_details")
+  startedAt      DateTime?          @map("started_at") @db.Timestamptz(3)
+  completedAt    DateTime?          @map("completed_at") @db.Timestamptz(3)
+  createdAt      DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  execution        WorkflowExecution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deliveryAttempts DeliveryAttempt[]
+
+  @@unique([executionId, stepIndex])
+  @@index([organizationId])
+  @@index([executionId])
+  @@map("workflow_step_executions")
 }

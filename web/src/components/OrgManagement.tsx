@@ -9,6 +9,8 @@ import {
   fetchDeliveries,
   fetchDestinations,
   fetchEndpoints,
+  fetchExecutions,
+  fetchWorkflows,
   replayDelivery,
   revokeApiKey,
   rotateEndpointSecret,
@@ -23,14 +25,17 @@ import type {
   MembershipRole,
   OrganizationDetails,
   OrganizationMember,
+  WorkflowExecutionMetadata,
+  WorkflowMetadata,
 } from '../types.ts';
+import { WorkflowConsole } from './WorkflowConsole.tsx';
 
 interface OrgManagementProps {
   organization: OrganizationDetails;
   members: OrganizationMember[];
   currentUserId: string;
-  activeTab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'settings';
-  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'settings') => void;
+  activeTab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'settings';
+  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'settings') => void;
   onUpdateOrgName: (name: string) => Promise<void>;
   onAddMember: (identifier: { email?: string; username?: string }, role: MembershipRole) => Promise<void>;
   onUpdateRole: (memberId: string, role: MembershipRole) => Promise<void>;
@@ -108,6 +113,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
   const [replayingDeliveryId, setReplayingDeliveryId] = useState<string | null>(null);
   const [replayMessage, setReplayMessage] = useState<string | null>(null);
   const [selectedAttemptForModal, setSelectedAttemptForModal] = useState<DeliveryAttemptMetadata | null>(null);
+
+  // Sequential Workflows & Execution Lineage State (Milestone 4)
+  const [workflows, setWorkflows] = useState<WorkflowMetadata[]>([]);
+  const [, setWorkflowsLoading] = useState(false);
+  const [executions, setExecutions] = useState<WorkflowExecutionMetadata[]>([]);
+  const [, setExecutionsLoading] = useState(false);
 
   // Inbound Webhook Simulator State (Milestone 3 Option 3 / Step 7)
   const [showSimulatorModal, setShowSimulatorModal] = useState(false);
@@ -281,7 +292,33 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
     void loadEndpoints();
     void loadDestinations();
     void loadDeliveries();
+    void loadWorkflows();
+    void loadExecutions();
   }, [organization.id]);
+
+  const loadWorkflows = async () => {
+    setWorkflowsLoading(true);
+    try {
+      const data = await fetchWorkflows(organization.id);
+      setWorkflows(data);
+    } catch {
+      // Ignore if user lacks permissions
+    } finally {
+      setWorkflowsLoading(false);
+    }
+  };
+
+  const loadExecutions = async () => {
+    setExecutionsLoading(true);
+    try {
+      const data = await fetchExecutions(organization.id);
+      setExecutions(data);
+    } catch {
+      // Ignore if user lacks permissions
+    } finally {
+      setExecutionsLoading(false);
+    }
+  };
 
   const loadDeliveries = async () => {
     setDeliveriesLoading(true);
@@ -743,6 +780,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               ? 'Configure outbound destination targets with private network SSRF protection.'
               : activeTab === 'deliveries'
               ? 'Monitor transactional outbox deliveries, exponential retries, and dead letters.'
+              : activeTab === 'workflows'
+              ? 'Compose sequential pipelines: Webhook trigger → Conditions → JSON transform → HTTP actions.'
               : 'Organization parameters, slug identifier, and Row-Level Security isolation.'}
           </p>
           {renameError && (
@@ -1217,6 +1256,37 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           </button>
 
           <button
+            onClick={() => onTabChange('workflows')}
+            style={{
+              padding: '7px 18px',
+              borderRadius: '999px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'workflows' ? '#F2F2F5' : '#232327',
+              color: activeTab === 'workflows' ? '#0E0E10' : '#C9C9D2',
+              border: activeTab === 'workflows' ? '1px solid transparent' : '1px solid #3E3E45',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s ease',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span>Workflows (M4)</span>
+            <span style={{
+              fontSize: '11px',
+              padding: '1px 7px',
+              borderRadius: '999px',
+              backgroundColor: activeTab === 'workflows' ? '#0E0E10' : '#3E3E45',
+              color: '#F2F2F5',
+              fontWeight: 700,
+            }}>
+              {workflows.length}
+            </span>
+          </button>
+
+          <button
             onClick={() => onTabChange('settings')}
             style={{
               padding: '7px 18px',
@@ -1240,7 +1310,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       )}
 
       {/* SEARCH BAR (ROUNDED PILL - SHOWN IN DIRECTORY VIEWS) */}
-      {activeTab !== 'dashboard' && activeTab !== 'settings' && (
+      {activeTab !== 'dashboard' && activeTab !== 'settings' && activeTab !== 'workflows' && (
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -1483,7 +1553,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       )}
 
       {/* TABLE CONTAINER FOR DIRECTORY / LOG VIEWS */}
-      {activeTab !== 'dashboard' && activeTab !== 'settings' && (
+      {activeTab !== 'dashboard' && activeTab !== 'settings' && activeTab !== 'workflows' && (
         <div className="rf-table-responsive">
           {/* MEMBERS VIEW */}
           {activeTab === 'members' && (
@@ -2435,18 +2505,26 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         </div>
       )}
 
+      {/* SEQUENTIAL WORKFLOWS VIEW (MILESTONE 4) */}
+      {activeTab === 'workflows' && (
+        <WorkflowConsole
+          organization={organization}
+          workflows={workflows}
+          executions={executions}
+          endpoints={endpoints}
+          destinations={destinations}
+          canManage={canManageKeys}
+          onRefreshWorkflows={loadWorkflows}
+          onRefreshExecutions={loadExecutions}
+          onRequestConfirm={(opts) => setConfirmModal({ ...opts, isOpen: true })}
+        />
+      )}
+
       {/* OVERVIEW DASHBOARD VIEW (ACTIVE WHEN activeTab === 'dashboard') */}
       {activeTab === 'dashboard' && (
         <div style={{ padding: '8px 0 24px', width: '100%', boxSizing: 'border-box' }}>
-          {/* Quick Navigation Cards Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '16px',
-            marginBottom: '20px',
-            width: '100%',
-            boxSizing: 'border-box',
-          }}>
+          {/* Quick Navigation Cards Grid (Matches 4-column responsive layout of top stats cards) */}
+          <div className="rf-nav-grid">
               {/* Box 1: Members Directory */}
               <div style={{
                 backgroundColor: '#1E1E22',
@@ -2606,6 +2684,74 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   Inspect Deliveries →
                 </button>
               </div>
+            </div>
+
+            {/* Sequential Workflows (M4) Feature Banner */}
+            <div style={{
+              backgroundColor: '#1E1E22',
+              border: '1px solid #3E3E45',
+              borderRadius: '16px',
+              padding: '20px 24px',
+              marginBottom: '20px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '16px',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '12px',
+                  backgroundColor: '#0E0E10',
+                  border: '1px solid #3E3E45',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#F2F2F5',
+                  fontSize: '20px',
+                  flexShrink: 0,
+                }}>
+                  ⚡
+                </div>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ fontSize: '15px', fontWeight: 700, color: '#F2F2F5' }}>
+                      Sequential Workflow Execution Engine (M4)
+                    </span>
+                    <span style={{
+                      fontSize: '11px',
+                      padding: '2px 8px',
+                      borderRadius: '999px',
+                      backgroundColor: '#232327',
+                      color: '#34D399',
+                      fontWeight: 700,
+                    }}>
+                      {workflows.length} active
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#9A9AA6', margin: '4px 0 0' }}>
+                    Compose multi-step pipelines: Webhook trigger → Conditions → JSON transformation → Sequential HTTP deliveries with resume checkpointing.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => onTabChange('workflows')}
+                style={{
+                  padding: '9px 18px',
+                  backgroundColor: '#F2F2F5',
+                  color: '#0E0E10',
+                  border: 'none',
+                  borderRadius: '999px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Open Workflow Console →
+              </button>
             </div>
 
             {/* Architecture Banner */}

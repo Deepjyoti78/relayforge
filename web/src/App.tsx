@@ -23,7 +23,7 @@ export const App: React.FC = () => {
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
   const [activeOrg, setActiveOrg] = useState<OrganizationDetails | null>(null);
   const [members, setMembers] = useState<OrganizationMember[]>([]);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'settings'>('members');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'settings'>('members');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const loadUser = async () => {
@@ -213,7 +213,7 @@ export const App: React.FC = () => {
           onOpenMobileMenu={() => setMobileSidebarOpen(true)}
         />
 
-        <main style={{ flex: 1, display: 'flex', overflowY: 'auto', overflowX: 'hidden', backgroundColor: '#0E0E10', minWidth: 0 }}>
+        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#0E0E10', minWidth: 0, width: '100%' }}>
           {activeOrg ? (
             <OrgManagement
               organization={activeOrg}

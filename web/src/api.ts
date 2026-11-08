@@ -9,6 +9,8 @@ import type {
   OrganizationDetails,
   OrganizationMember,
   UserProfile,
+  WorkflowExecutionMetadata,
+  WorkflowMetadata,
 } from './types.ts';
 
 const TOKEN_KEY = 'rf_session_token';
@@ -336,4 +338,120 @@ export async function replayDelivery(
     throw new Error(err.message || 'Failed to replay delivery');
   }
   return res.json() as Promise<{ success: boolean; outboxMessageId: string; eventId: string; status: string }>;
+}
+
+// Milestone 4: Sequential Workflow Engine API
+
+export async function fetchWorkflows(orgId: string): Promise<WorkflowMetadata[]> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/workflows`);
+  if (!res.ok) throw new Error('Failed to fetch workflows');
+  return res.json() as Promise<WorkflowMetadata[]>;
+}
+
+export async function fetchWorkflow(orgId: string, workflowId: string): Promise<WorkflowMetadata> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/workflows/${workflowId}`);
+  if (!res.ok) throw new Error('Failed to fetch workflow');
+  return res.json() as Promise<WorkflowMetadata>;
+}
+
+export async function createWorkflow(
+  orgId: string,
+  data: { name: string; description?: string; endpointId?: string; definition?: unknown },
+): Promise<WorkflowMetadata> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/workflows`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Failed to create workflow' })) as { message?: string };
+    throw new Error(err.message || 'Failed to create workflow');
+  }
+  return res.json() as Promise<WorkflowMetadata>;
+}
+
+export async function updateWorkflow(
+  orgId: string,
+  workflowId: string,
+  data: { name?: string; description?: string; endpointId?: string; status?: 'DRAFT' | 'ACTIVE' | 'PAUSED' },
+): Promise<WorkflowMetadata> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/workflows/${workflowId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Failed to update workflow' })) as { message?: string };
+    throw new Error(err.message || 'Failed to update workflow');
+  }
+  return res.json() as Promise<WorkflowMetadata>;
+}
+
+export async function publishWorkflowVersion(
+  orgId: string,
+  workflowId: string,
+  definition: unknown,
+): Promise<{ success: boolean; versionNumber: number; definitionHash: string }> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/workflows/${workflowId}/publish`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ definition }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Failed to publish workflow version' })) as { message?: string };
+    throw new Error(err.message || 'Failed to publish workflow version');
+  }
+  return res.json() as Promise<{ success: boolean; versionNumber: number; definitionHash: string }>;
+}
+
+export async function validateWorkflowDefinition(
+  orgId: string,
+  definition: unknown,
+): Promise<{ valid: boolean; errors: string[]; definitionHash?: string }> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/workflows/validate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ definition }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Failed to validate workflow definition' })) as { message?: string };
+    throw new Error(err.message || 'Failed to validate workflow definition');
+  }
+  return res.json() as Promise<{ valid: boolean; errors: string[]; definitionHash?: string }>;
+}
+
+export async function fetchExecutions(
+  orgId: string,
+  filters?: { workflowId?: string; status?: string },
+): Promise<WorkflowExecutionMetadata[]> {
+  const q = new URLSearchParams();
+  if (filters?.workflowId) q.set('workflowId', filters.workflowId);
+  if (filters?.status) q.set('status', filters.status);
+  const qs = q.toString();
+  const res = await apiFetch(`/v1/organizations/${orgId}/executions${qs ? `?${qs}` : ''}`);
+  if (!res.ok) throw new Error('Failed to fetch workflow executions');
+  return res.json() as Promise<WorkflowExecutionMetadata[]>;
+}
+
+export async function fetchExecution(
+  orgId: string,
+  executionId: string,
+): Promise<WorkflowExecutionMetadata> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/executions/${executionId}`);
+  if (!res.ok) throw new Error('Failed to fetch execution details');
+  return res.json() as Promise<WorkflowExecutionMetadata>;
+}
+
+export async function resumeExecution(
+  orgId: string,
+  executionId: string,
+): Promise<{ success: boolean; executionId: string; status: string; message: string }> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/executions/${executionId}/resume`, {
+    method: 'POST',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Failed to resume execution' })) as { message?: string };
+    throw new Error(err.message || 'Failed to resume execution');
+  }
+  return res.json() as Promise<{ success: boolean; executionId: string; status: string; message: string }>;
 }

@@ -4,6 +4,7 @@ import { DatabaseModule } from '../modules/database/database.module';
 import { DeliveryModule } from '../modules/delivery/delivery.module';
 import { ObservabilityModule } from '../modules/observability/observability.module';
 import { RedisModule } from '../modules/redis/redis.module';
+import { WorkflowsModule } from '../modules/workflows/workflows.module';
 import { HeartbeatService } from './heartbeat.service';
 import { OutboxWorkerService } from './outbox-worker.service';
 import { SystemWorkerService } from './system-worker.service';
@@ -15,6 +16,7 @@ import { SystemWorkerService } from './system-worker.service';
     DatabaseModule,
     RedisModule,
     DeliveryModule,
+    WorkflowsModule,
   ],
   providers: [HeartbeatService, SystemWorkerService, OutboxWorkerService],
 })

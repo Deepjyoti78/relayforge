@@ -8,7 +8,7 @@ interface SidebarProps {
   activeTab: string;
   onSelectOrg: (orgId: string) => void;
   onCreateOrg: (name: string, slug?: string) => Promise<void>;
-  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'settings') => void;
+  onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'settings') => void;
   onLogout: () => void;
   isMobile?: boolean;
   onCloseMobile?: () => void;
@@ -49,7 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const handleTabClick = (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'settings') => {
+  const handleTabClick = (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'settings') => {
     onTabChange(tab);
     if (isMobile && onCloseMobile) {
       onCloseMobile();
@@ -364,6 +364,48 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 border: '1px solid #3E3E45',
               }}>
                 M3
+              </span>
+            </button>
+
+            {/* Sequential Workflows Engine (Milestone 4) */}
+            <button
+              onClick={() => handleTabClick('workflows')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+                padding: '9px 14px',
+                borderRadius: '999px',
+                fontSize: '13px',
+                fontWeight: activeTab === 'workflows' ? 700 : 500,
+                backgroundColor: activeTab === 'workflows' ? '#F2F2F5' : 'transparent',
+                color: activeTab === 'workflows' ? '#0E0E10' : '#9A9AA6',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="6" height="6" rx="1"></rect>
+                  <rect x="15" y="15" width="6" height="6" rx="1"></rect>
+                  <path d="M6 9v3a3 3 0 0 0 3 3h6"></path>
+                  <polyline points="15 12 18 15 15 18"></polyline>
+                </svg>
+                <span>Workflows</span>
+              </div>
+              <span style={{
+                fontSize: '10px',
+                fontWeight: 700,
+                backgroundColor: activeTab === 'workflows' ? '#232327' : '#232327',
+                color: activeTab === 'workflows' ? '#F2F2F5' : '#9A9AA6',
+                padding: '2px 7px',
+                borderRadius: '999px',
+                border: '1px solid #3E3E45',
+              }}>
+                M4
               </span>
             </button>
           </nav>
