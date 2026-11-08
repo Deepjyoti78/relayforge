@@ -16,6 +16,7 @@ interface ClaimedOutboxRow {
   created_at: Date;
   event_type: string;
   max_retries: number;
+  lease_token: string;
 }
 
 interface ActiveDestinationRow {
@@ -76,8 +77,8 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
 
   /**
    * Concurrently claims and dispatches pending transactional outbox messages.
-   * Uses FOR UPDATE SKIP LOCKED via claim_pending_outbox_messages to prevent
-   * double-delivery across multi-instance worker deployments.
+   * Uses FOR UPDATE SKIP LOCKED with unique lease_token via claim_pending_outbox_messages
+   * to guarantee single-delivery ownership and optimistic concurrency control across workers.
    */
   async sweepPendingOutbox(): Promise<number> {
     if (!this.isRunning || this.isProcessing) return 0;
@@ -86,7 +87,7 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
     let processedCount = 0;
     try {
       const claimedMessages = await this.database.client.$queryRaw<ClaimedOutboxRow[]>`
-        SELECT id, event_id, org_id, channel, payload, status, attempt_count, created_at, event_type, max_retries
+        SELECT id, event_id, org_id, channel, payload, status, attempt_count, created_at, event_type, max_retries, lease_token
         FROM claim_pending_outbox_messages(25, 30)
       `;
 
@@ -141,8 +142,8 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
 
       // If no active destinations exist, mark outbox dispatched and event completed
       if (!destinations || destinations.length === 0) {
-        await this.database.client.$executeRaw`
-          SELECT complete_outbox_dispatch(${msg.id}::uuid, ${msg.event_id}::uuid, 'DISPATCHED', 'COMPLETED')
+        await this.database.client.$queryRaw<{ complete_outbox_dispatch: boolean }[]>`
+          SELECT complete_outbox_dispatch(${msg.id}::uuid, ${msg.event_id}::uuid, 'DISPATCHED', 'COMPLETED', ${msg.lease_token}::uuid)
         `;
         return;
       }
@@ -182,11 +183,20 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
         }
       }
 
-      // 4. Update status or schedule retry / dead-letter
+      // 4. Update status or schedule retry / dead-letter with lease_token verification
       if (anySucceeded) {
-        await this.database.client.$executeRaw`
-          SELECT complete_outbox_dispatch(${msg.id}::uuid, ${msg.event_id}::uuid, 'DISPATCHED', 'COMPLETED')
+        const res = await this.database.client.$queryRaw<{ complete_outbox_dispatch: boolean }[]>`
+          SELECT complete_outbox_dispatch(${msg.id}::uuid, ${msg.event_id}::uuid, 'DISPATCHED', 'COMPLETED', ${msg.lease_token}::uuid)
         `;
+        const completed = res?.[0]?.complete_outbox_dispatch ?? false;
+        if (!completed) {
+          this.logger.warn({
+            event: 'stale_worker_complete_rejected',
+            outboxId: msg.id,
+            leaseToken: msg.lease_token,
+            message: 'Worker lease expired or was superseded before completion.',
+          });
+        }
       } else {
         const evalResult = evaluateRetry({
           attemptCount: msg.attempt_count,
@@ -197,28 +207,46 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
         });
 
         if (evalResult.shouldRetry && evalResult.nextRetryAt) {
-          await this.database.client.$executeRaw`
-            SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, ${evalResult.nextRetryAt}::timestamptz, false)
+          const res = await this.database.client.$queryRaw<{ schedule_outbox_retry: boolean }[]>`
+            SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, ${evalResult.nextRetryAt}::timestamptz, false, ${msg.lease_token}::uuid)
           `;
-          this.logger.log({
-            event: 'delivery_retry_scheduled',
-            outboxId: msg.id,
-            attemptCount: msg.attempt_count,
-            delayMs: evalResult.delayMs,
-            nextRetryAt: evalResult.nextRetryAt.toISOString(),
-          });
+          const retried = res?.[0]?.schedule_outbox_retry ?? false;
+          if (!retried) {
+            this.logger.warn({
+              event: 'stale_worker_retry_rejected',
+              outboxId: msg.id,
+              leaseToken: msg.lease_token,
+            });
+          } else {
+            this.logger.log({
+              event: 'delivery_retry_scheduled',
+              outboxId: msg.id,
+              attemptCount: msg.attempt_count,
+              delayMs: evalResult.delayMs,
+              nextRetryAt: evalResult.nextRetryAt.toISOString(),
+            });
+          }
         } else {
-          await this.database.client.$executeRaw`
-            SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, NOW(), true)
+          const res = await this.database.client.$queryRaw<{ schedule_outbox_retry: boolean }[]>`
+            SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, NOW(), true, ${msg.lease_token}::uuid)
           `;
-          this.logger.warn({
-            event: 'delivery_dead_lettered',
-            outboxId: msg.id,
-            attemptCount: msg.attempt_count,
-            reason: evalResult.reason,
-            statusCode: lastStatusCode,
-            error: lastErrorDescription,
-          });
+          const deadLettered = res?.[0]?.schedule_outbox_retry ?? false;
+          if (!deadLettered) {
+            this.logger.warn({
+              event: 'stale_worker_deadletter_rejected',
+              outboxId: msg.id,
+              leaseToken: msg.lease_token,
+            });
+          } else {
+            this.logger.warn({
+              event: 'delivery_dead_lettered',
+              outboxId: msg.id,
+              attemptCount: msg.attempt_count,
+              reason: evalResult.reason,
+              statusCode: lastStatusCode,
+              error: lastErrorDescription,
+            });
+          }
         }
       }
     } catch (err: unknown) {
@@ -236,12 +264,12 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
       });
 
       if (evalResult.shouldRetry && evalResult.nextRetryAt) {
-        await this.database.client.$executeRaw`
-          SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, ${evalResult.nextRetryAt}::timestamptz, false)
+        await this.database.client.$queryRaw<{ schedule_outbox_retry: boolean }[]>`
+          SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, ${evalResult.nextRetryAt}::timestamptz, false, ${msg.lease_token}::uuid)
         `;
       } else {
-        await this.database.client.$executeRaw`
-          SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, NOW(), true)
+        await this.database.client.$queryRaw<{ schedule_outbox_retry: boolean }[]>`
+          SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, NOW(), true, ${msg.lease_token}::uuid)
         `;
       }
     }

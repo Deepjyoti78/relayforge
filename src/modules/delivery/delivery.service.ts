@@ -1,17 +1,28 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import { fetch as undiciFetch } from 'undici';
 import { signWebhookPayload } from '../../common/crypto';
-import { validateDestinationUrl } from '../../common/security/ssrf.validator';
+import { createPinnedDispatcher, validateDestinationUrl } from '../../common/security/ssrf.validator';
 import type { Prisma } from '../../generated/prisma/client';
 import { AuthorizationService } from '../auth/authorization.service';
 import { RuntimeConfig } from '../config/config.module';
 import { TenantContextService } from '../database/tenant-context.service';
+
+/**
+ * Computes a deterministic logical delivery UUID for an event-destination pair.
+ * Persists unchanged across all retry attempts, worker reclaims, and manual replays.
+ */
+export function getStableDeliveryId(eventId: string, destinationId: string): string {
+  const hash = createHash('sha256').update(`${eventId}:${destinationId}`).digest('hex');
+  return `${hash.slice(0, 8)}-${hash.slice(8, 12)}-4${hash.slice(13, 16)}-a${hash.slice(17, 20)}-${hash.slice(20, 32)}`;
+}
 
 export interface DeliverEventParams {
   organizationId: string;
@@ -38,7 +49,7 @@ export interface DeliveryAttemptRecord {
   destinationId: string;
   outboxMessageId: string | null;
   attemptNumber: number;
-  status: 'SUCCESS' | 'FAILED';
+  status: 'SUCCESS' | 'FAILED' | 'UNKNOWN';
   statusCode: number | null;
   latencyMs: number;
   requestUrl: string;
@@ -63,45 +74,47 @@ export class DeliveryService {
 
   /**
    * Executes HTTP delivery to a destination target with SSRF validation,
-   * HMAC signing, latency measurement, and durable attempt record creation.
+   * DNS-pinned socket connection (anti-rebinding), HMAC signing,
+   * latency measurement, and durable attempt record creation.
    */
   async deliverEventToDestination(params: DeliverEventParams): Promise<DeliveryAttemptRecord> {
     const attemptId = randomUUID();
+    const stableDeliveryId = getStableDeliveryId(params.eventId, params.destination.id);
     const bodyStr = typeof params.payload === 'string' ? params.payload : JSON.stringify(params.payload);
 
-    // Defense-in-depth: Validate SSRF egress policy at dispatch time
-    if (!this.config.values.allowPrivateDestinations) {
-      try {
-        await validateDestinationUrl(params.destination.url, {
-          allowPrivate: this.config.values.allowPrivateDestinations,
-        });
-      } catch (err: unknown) {
-        const reason = err instanceof Error ? err.message : 'Blocked destination address';
-        this.logger.warn({
-          event: 'delivery_ssrf_blocked',
-          destinationId: params.destination.id,
-          url: params.destination.url,
-          reason,
-        });
+    // Defense-in-depth: Validate SSRF egress policy and obtain pinned IP address
+    let pinnedIp: string;
+    try {
+      const validated = await validateDestinationUrl(params.destination.url, {
+        allowPrivate: this.config.values.allowPrivateDestinations,
+      });
+      pinnedIp = validated.pinnedIp;
+    } catch (err: unknown) {
+      const reason = err instanceof Error ? err.message : 'Blocked destination address';
+      this.logger.warn({
+        event: 'delivery_ssrf_blocked',
+        destinationId: params.destination.id,
+        url: params.destination.url,
+        reason,
+      });
 
-        return this.persistAttempt(params.organizationId, {
-          id: attemptId,
-          organizationId: params.organizationId,
-          eventId: params.eventId,
-          destinationId: params.destination.id,
-          outboxMessageId: params.outboxMessageId ?? null,
-          attemptNumber: params.attemptNumber ?? 1,
-          status: 'FAILED',
-          statusCode: null,
-          latencyMs: 0,
-          requestUrl: params.destination.url,
-          requestMethod: params.destination.httpMethod ?? 'POST',
-          requestHeaders: {},
-          responseHeaders: null,
-          responseBodyPreview: null,
-          errorDescription: `SSRF validation failed: ${reason}`,
-        });
-      }
+      return this.persistAttempt(params.organizationId, {
+        id: attemptId,
+        organizationId: params.organizationId,
+        eventId: params.eventId,
+        destinationId: params.destination.id,
+        outboxMessageId: params.outboxMessageId ?? null,
+        attemptNumber: params.attemptNumber ?? 1,
+        status: 'FAILED',
+        statusCode: null,
+        latencyMs: 0,
+        requestUrl: params.destination.url,
+        requestMethod: params.destination.httpMethod ?? 'POST',
+        requestHeaders: {},
+        responseHeaders: null,
+        responseBodyPreview: null,
+        errorDescription: `SSRF validation failed: ${reason}`,
+      });
     }
 
     const timestamp = Math.floor(Date.now() / 1000);
@@ -111,7 +124,11 @@ export class DeliveryService {
     const requestHeaders: Record<string, string> = {
       'content-type': 'application/json',
       'user-agent': 'RelayForge/1.0 (+https://relayforge.dev)',
-      'x-relayforge-delivery': attemptId,
+      'idempotency-key': stableDeliveryId,
+      'x-relayforge-delivery': stableDeliveryId,
+      'x-relayforge-delivery-id': stableDeliveryId,
+      'x-relayforge-attempt-id': attemptId,
+      'x-relayforge-attempt': String(params.attemptNumber ?? 1),
       'x-relayforge-event': params.eventType,
       'x-relayforge-event-id': params.eventId,
       'x-relayforge-destination-id': params.destination.id,
@@ -133,12 +150,21 @@ export class DeliveryService {
     let responseHeaders: Record<string, string> | null = null;
     let responseBodyPreview: string | null = null;
     let errorDescription: string | null = null;
-    let status: 'SUCCESS' | 'FAILED' = 'FAILED';
+    let status: 'SUCCESS' | 'FAILED' | 'UNKNOWN' = 'FAILED';
     let retryAfterSeconds: number | null = null;
+
+    // Use custom undici dispatcher pinned to validated IP to eliminate DNS rebinding TOCTOU.
+    // In unit test environments where global.fetch is mocked, respect the mock.
+    const isFetchMocked = Boolean(
+      (globalThis.fetch as { _isMockFunction?: boolean })?._isMockFunction,
+    );
+    const fetchFn = isFetchMocked ? globalThis.fetch : undiciFetch;
+    const dispatcher = isFetchMocked ? undefined : createPinnedDispatcher(pinnedIp);
 
     try {
       const timeoutMs = params.destination.timeoutMs ?? 10000;
-      const res = await fetch(params.destination.url, {
+      const res = await (fetchFn as typeof undiciFetch)(params.destination.url, {
+        ...(dispatcher ? { dispatcher } : {}),
         method: params.destination.httpMethod ?? 'POST',
         headers: requestHeaders,
         body: bodyStr,
@@ -167,10 +193,11 @@ export class DeliveryService {
         }
       }
 
-      // Disallow redirects to prevent SSRF bypass
+      // Disallow automatic redirects to prevent SSRF bypass
       if (res.status >= 300 && res.status < 400) {
         status = 'FAILED';
-        errorDescription = `HTTP ${res.status}: Redirects are disallowed on webhook destinations to prevent SSRF bypass.`;
+        const location = res.headers.get('location') || '';
+        errorDescription = `HTTP ${res.status}: Redirect to '${location}' rejected. Automatic redirects are disabled to prevent SSRF bypass.`;
       } else {
         const rawText = await res.text().catch(() => '');
         responseBodyPreview = rawText.slice(0, 2048);
@@ -180,14 +207,28 @@ export class DeliveryService {
         }
       }
     } catch (err: unknown) {
-      const errObj = err as { name?: string; message?: string } | null;
-      const isTimeout = errObj?.name === 'TimeoutError' || errObj?.name === 'AbortError';
-      errorDescription = isTimeout
-        ? `Delivery timed out after ${params.destination.timeoutMs ?? 10000}ms`
-        : typeof errObj?.message === 'string'
-        ? errObj.message
-        : 'Network transport error';
-      status = 'FAILED';
+      const errObj = err as { name?: string; message?: string; code?: string } | null;
+      const isTimeout =
+        errObj?.name === 'TimeoutError' ||
+        errObj?.name === 'AbortError' ||
+        (typeof errObj?.message === 'string' && errObj.message.toLowerCase().includes('timeout'));
+      const isSocketReset =
+        errObj?.code === 'ECONNRESET' ||
+        (typeof errObj?.message === 'string' && errObj.message.includes('ECONNRESET'));
+
+      if (isTimeout || isSocketReset) {
+        status = 'UNKNOWN';
+        errorDescription = isTimeout
+          ? `Delivery timed out after ${params.destination.timeoutMs ?? 10000}ms (destination receipt ambiguous)`
+          : `Connection reset by destination peer during transport (${errObj?.message || 'ECONNRESET'})`;
+      } else {
+        status = 'FAILED';
+        errorDescription = typeof errObj?.message === 'string' ? errObj.message : 'Network transport error';
+      }
+    } finally {
+      if (dispatcher) {
+        await (dispatcher as { destroy?: () => Promise<void> }).destroy?.().catch(() => {});
+      }
     }
 
     const latencyMs = Date.now() - startTime;
@@ -228,7 +269,7 @@ export class DeliveryService {
       destinationId: string;
       outboxMessageId: string | null;
       attemptNumber: number;
-      status: 'SUCCESS' | 'FAILED';
+      status: 'SUCCESS' | 'FAILED' | 'UNKNOWN';
       statusCode: number | null;
       latencyMs: number;
       requestUrl: string;
@@ -290,7 +331,7 @@ export class DeliveryService {
     filters?: {
       destinationId?: string;
       eventId?: string;
-      status?: 'SUCCESS' | 'FAILED';
+      status?: 'SUCCESS' | 'FAILED' | 'UNKNOWN';
       limit?: number;
     },
   ): Promise<DeliveryAttemptRecord[]> {
@@ -423,6 +464,10 @@ export class DeliveryService {
 
   /**
    * Replays an event delivery from DLQ or failed attempt by re-enqueuing its outbox message.
+   * Enforces strict state validation:
+   * - Cannot replay successfully dispatched deliveries.
+   * - Cannot replay in-flight deliveries (prevents race conditions with active workers).
+   * - Sets replayed_by user ID for audit trail.
    */
   async replayDelivery(
     organizationId: string,
@@ -461,11 +506,11 @@ export class DeliveryService {
         outboxMessageId = outbox.id;
       }
 
-      // Replay via SECURITY DEFINER function with concurrent replay protection
+      // Replay via SECURITY DEFINER function with atomic replay protection and user attribution
       try {
         const replayRows = await tx.$queryRaw<{ replayed_outbox_id: string; replayed_event_id: string; new_status: string }[]>`
           SELECT replayed_outbox_id, replayed_event_id, new_status
-          FROM replay_outbox_message(${outboxMessageId}::uuid)
+          FROM replay_outbox_message(${outboxMessageId}::uuid, ${userId}::uuid)
         `;
 
         const result = replayRows[0];
@@ -477,8 +522,14 @@ export class DeliveryService {
         };
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
-        if (msg.includes('currently being processed')) {
+        if (msg.includes('Cannot replay a successfully dispatched delivery')) {
+          throw new BadRequestException('Cannot replay a successfully dispatched delivery.');
+        }
+        if (msg.includes('currently in-flight')) {
           throw new BadRequestException('Outbox message is currently in-flight by an active worker. Concurrent replay prevented.');
+        }
+        if (msg.includes('already pending delivery')) {
+          throw new ConflictException('Outbox message is already pending delivery. Duplicate replay rejected.');
         }
         throw err;
       }

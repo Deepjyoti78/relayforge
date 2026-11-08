@@ -1,9 +1,35 @@
 import * as dns from 'node:dns';
 import * as net from 'node:net';
 import { BadRequestException } from '@nestjs/common';
+import { Agent, type Dispatcher } from 'undici';
 
 export interface SsrfValidationOptions {
   allowPrivate?: boolean;
+}
+
+/**
+ * Creates an undici Dispatcher (Agent) with custom DNS resolution pinned strictly
+ * to the pre-validated IP address.
+ *
+ * This prevents Time-of-Check to Time-of-Use (TOCTOU) DNS rebinding attacks:
+ * 1. Outbound socket connects directly to pinnedIp.
+ * 2. TLS SNI and certificate verification preserve the original target hostname.
+ * 3. Connection pooling is restricted (pipelining: 0, maxRedirections: 0).
+ */
+export function createPinnedDispatcher(pinnedIp: string): Dispatcher {
+  const family = net.isIP(pinnedIp);
+  return new Agent({
+    pipelining: 0,
+    connect: {
+      lookup(_hostname, options, cb) {
+        if (options && options.all) {
+          cb(null, [{ address: pinnedIp, family }]);
+        } else {
+          cb(null, pinnedIp, family);
+        }
+      },
+    },
+  });
 }
 
 /**
@@ -127,7 +153,7 @@ const FORBIDDEN_HOSTNAMES = new Set([
 export async function validateDestinationUrl(
   urlInput: string,
   options: SsrfValidationOptions = {},
-): Promise<{ url: URL; resolvedIps: string[] }> {
+): Promise<{ url: URL; resolvedIps: string[]; pinnedIp: string }> {
   if (!urlInput || typeof urlInput !== 'string') {
     throw new BadRequestException('Destination URL must be a non-empty string');
   }
@@ -205,5 +231,6 @@ export async function validateDestinationUrl(
     }
   }
 
-  return { url: parsed, resolvedIps };
+  const pinnedIp = addresses[0]!.address;
+  return { url: parsed, resolvedIps, pinnedIp };
 }

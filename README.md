@@ -19,6 +19,20 @@ the durable database. Redis and BullMQ provide background queue infrastructure.
 
 Webhook ingestion, delivery pipelines, transactional outbox, automatic retries, and dead-letter queues are part of the delivery milestones.
 
+## Delivery Semantics & Distributed Guarantees
+
+RelayForge provides **at-least-once delivery semantics** (never false "exactly-once" claims):
+- **Downstream Deduplication:** Downstream destinations must deduplicate deliveries using the stable logical delivery identifier passed in the standard `Idempotency-Key` and `x-relayforge-delivery` headers.
+- **Attempt Identification:** Individual transmissions carry a unique `x-relayforge-attempt-id`, ordinal `x-relayforge-attempt`, and fresh HMAC signature (`x-relayforge-signature`) with timestamp (`x-relayforge-timestamp`).
+- **Retry Semantics:** Five attempts means **one initial attempt plus up to four retries**.
+- **Bounded Backoff & Jitter:** Exponential backoff with additive uniform jitter (0–499ms), bounded at a maximum of 5 minutes (`maxDelayMs = 300000`).
+- **Retry-After Adherence:** Explicitly respects destination `Retry-After` headers (both delta seconds and HTTP date), scheduling retries no earlier than requested (capped at 5 minutes).
+- **Ambiguous Outcomes (`UNKNOWN`):** Network timeouts and socket resets during transport are classified as `UNKNOWN` rather than prematurely assumed failed before receipt.
+- **Optimistic Concurrency:** Distributed workers use monotonic `lease_token UUID` claims with PostgreSQL row-level locks (`SKIP LOCKED`). Stale or delayed workers cannot overwrite newer worker state.
+- **SSRF Hardening:** Anti-DNS rebinding via socket connection pinning, dual-homed multi-IP validation, private/cloud metadata blocking, and strict prohibition of automatic HTTP redirects (`redirect: 'manual'`).
+
+For full technical specifications, see [Delivery Architecture](docs/delivery-architecture.md) and [Security Architecture](docs/security.md).
+
 ## Run the full application
 
 Prerequisites: Node.js 22.20+ or 24+, npm 10+, and Docker Desktop. All commands run from this folder.

@@ -227,6 +227,9 @@ model OutboxMessage {
   maxRetries     Int          @default(5) @map("max_retries")
   nextRetryAt    DateTime?    @map("next_retry_at") @db.Timestamptz(3)
   leaseExpiresAt DateTime?    @map("lease_expires_at") @db.Timestamptz(3)
+  leaseToken     String?      @map("lease_token") @db.Uuid
+  replayedBy     String?      @map("replayed_by") @db.Uuid
+  replayedAt     DateTime?    @map("replayed_at") @db.Timestamptz(3)
   createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
   dispatchedAt   DateTime?    @map("dispatched_at") @db.Timestamptz(3)
 
@@ -269,6 +272,7 @@ model Destination {
 enum DeliveryStatus {
   SUCCESS
   FAILED
+  UNKNOWN
 
   @@map("delivery_status")
 }

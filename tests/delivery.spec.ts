@@ -191,7 +191,7 @@ describe('Milestone 3 Option 2: DeliveryService Unit Tests', () => {
         eventType: 'test.event',
       });
 
-      expect(attempt.status).toBe('FAILED');
+      expect(attempt.status).toBe('UNKNOWN');
       expect(attempt.statusCode).toBeNull();
       expect(attempt.errorDescription).toContain('timed out');
     });
