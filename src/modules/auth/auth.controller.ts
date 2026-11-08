@@ -59,14 +59,16 @@ export class AuthController {
 
     res.setHeader('Set-Cookie', cookieHeader);
 
-    // Pass token in redirect URL to support seamless multi-origin local dev (localhost <-> 127.0.0.1)
+    // Pass token in redirect URL ONLY for local development
     let destination = redirectUri;
-    try {
-      const redirectUrl = new URL(redirectUri);
-      redirectUrl.searchParams.set('token', token);
-      destination = redirectUrl.toString();
-    } catch {
-      destination = redirectUri;
+    if (this.config.values.environment !== 'production') {
+      try {
+        const redirectUrl = new URL(redirectUri);
+        redirectUrl.searchParams.set('token', token);
+        destination = redirectUrl.toString();
+      } catch {
+        destination = redirectUri;
+      }
     }
 
     res.redirect(302, destination);

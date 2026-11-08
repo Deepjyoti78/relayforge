@@ -9,6 +9,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [manualToken, setManualToken] = useState('');
   const [showManualInput, setShowManualInput] = useState(false);
+  const isDev = import.meta.env.DEV || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
 
   const startUrl = `/auth/github/start?redirect_uri=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : '')}`;
 
@@ -439,7 +440,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 Continue with GitHub
               </a>
 
-              {/* Developer Test Mode Session Input */}
+              {/* Developer Test Mode Session Input (Disabled in Staging / Production) */}
+              {isDev && (
               <div style={{ marginTop: '20px', textAlign: 'center' }}>
                 <button
                   type="button"
@@ -493,6 +495,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   </form>
                 )}
               </div>
+              )}
 
               {/* Security Guardrails Footer */}
               <div style={{

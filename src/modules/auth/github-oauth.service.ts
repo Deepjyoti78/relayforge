@@ -40,7 +40,7 @@ export class GitHubOAuthService {
       data: {
         state,
         codeVerifier: verifier,
-        redirectUri: redirectUri ?? this.config.values.frontendUrl,
+        redirectUri: (() => { if (!redirectUri) return this.config.values.frontendUrl; try { const parsed = new URL(redirectUri); const frontendOrigin = new URL(this.config.values.frontendUrl).origin; if (parsed.origin === frontendOrigin || (this.config.values.environment !== 'production' && (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1'))) { return redirectUri; } } catch {} return this.config.values.frontendUrl; })(),
         expiresAt,
       },
     });

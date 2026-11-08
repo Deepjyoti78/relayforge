@@ -30,7 +30,8 @@ export class AuthGuard implements CanActivate {
     // Parse session cookie
     const cookies = parseCookies(request.headers.cookie);
     const cookieName = this.config.values.sessionCookieName;
-    const token = cookies[cookieName] || this.extractBearerToken(request);
+    const isProd = this.config.values.environment === 'production';
+    const token = cookies[cookieName] || (!isProd ? this.extractBearerToken(request) : undefined);
 
     if (!token) {
       throw new UnauthorizedException('Authentication required');
