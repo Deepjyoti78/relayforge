@@ -108,10 +108,10 @@ services:
         value: "false"
 
   # 5. RelayForge Web Console (React Vite SPA)
+  # Static sites on Render are distributed globally on CDN and must not specify a region
   - type: web
     name: relayforge-staging-web
     runtime: static
-    region: oregon
     plan: free
     buildCommand: npm ci && npm run build:web
     staticPublishPath: ./web/dist
@@ -126,7 +126,6 @@ services:
         name: Referrer-Policy
         value: strict-origin-when-cross-origin
     routes:
-      # Rewrite API requests to staging backend or use direct HTTPS domain
       - type: rewrite
         source: /*
         destination: /index.html
