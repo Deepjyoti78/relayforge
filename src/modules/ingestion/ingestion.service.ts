@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { verifyWebhookSignature } from '../../common/crypto';
+import { computeHmacSignature, verifyWebhookSignature } from '../../common/crypto';
 import type { Prisma } from '../../generated/prisma/client';
 import { DatabaseService } from '../database/database.service';
 import { EndpointService } from '../endpoints/endpoint.service';
@@ -159,6 +159,72 @@ export class IngestionService {
 
       throw err;
     }
+  }
+
+  /**
+   * Simulates an inbound webhook from the authenticated management console.
+   * Cryptographically signs the payload with the endpoint's real secret,
+   * passes it into the transactional outbox pipeline, and returns the execution trace.
+   */
+  async simulateWebhook(
+    endpointId: string,
+    userId: string,
+    input: { eventType?: string; idempotencyKey?: string; payload?: unknown },
+  ) {
+    const endpoint = await this.endpointService.getEndpointForIngestion(endpointId);
+    if (!endpoint) {
+      throw new NotFoundException(`Endpoint '${endpointId}' not found or inactive.`);
+    }
+
+    // Verify user belongs to the endpoint's organization
+    const membership = await this.database.client.membership.findUnique({
+      where: {
+        organizationId_userId: {
+          organizationId: endpoint.organizationId,
+          userId,
+        },
+      },
+    });
+    if (!membership) {
+      throw new UnauthorizedException('You do not have access to this organization.');
+    }
+
+    const payload = input.payload || {
+      event: input.eventType || 'test.simulated',
+      source: 'RelayForge Ingest Console',
+      timestamp: new Date().toISOString(),
+      data: {
+        message: 'Hello from RelayForge Inbound Webhook Simulator!',
+        status: 'simulated_ok',
+      },
+    };
+
+    const rawBody = Buffer.from(typeof payload === 'string' ? payload : JSON.stringify(payload));
+    const signature = `sha256=${computeHmacSignature(rawBody, endpoint.signingSecret)}`;
+
+    const headers: Record<string, string> = {
+      'content-type': 'application/json',
+      'user-agent': 'RelayForge-Simulator/1.0',
+      'x-relayforge-signature': signature,
+      'x-event-type': input.eventType || 'test.simulated',
+    };
+    if (input.idempotencyKey) {
+      headers['x-idempotency-key'] = input.idempotencyKey;
+    }
+
+    const result = await this.ingestWebhook(endpointId, rawBody, headers, payload);
+
+    return {
+      success: true,
+      endpointId,
+      endpointName: endpoint.name,
+      eventId: result.eventId,
+      status: result.status,
+      receivedAt: result.receivedAt,
+      signature,
+      headers,
+      payload,
+    };
   }
 
   /**

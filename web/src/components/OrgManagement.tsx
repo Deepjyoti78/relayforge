@@ -109,6 +109,138 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
   const [replayMessage, setReplayMessage] = useState<string | null>(null);
   const [selectedAttemptForModal, setSelectedAttemptForModal] = useState<DeliveryAttemptMetadata | null>(null);
 
+  // Inbound Webhook Simulator State (Milestone 3 Option 3 / Step 7)
+  const [showSimulatorModal, setShowSimulatorModal] = useState(false);
+  const [simulatorEndpointId, setSimulatorEndpointId] = useState<string>('');
+  const [simulatorEventType, setSimulatorEventType] = useState('payment.succeeded');
+  const [simulatorIdempotencyKey, setSimulatorIdempotencyKey] = useState(`idem_${Math.random().toString(36).substring(2, 10)}`);
+  const [simulatorPayload, setSimulatorPayload] = useState(JSON.stringify({
+    event: 'payment.succeeded',
+    amount: 4900,
+    currency: 'USD',
+    customer: {
+      id: 'cus_9821',
+      name: 'Jane Doe',
+      email: 'jane@example.com'
+    },
+    metadata: {
+      source: 'RelayForge Console',
+      env: 'production'
+    }
+  }, null, 2));
+  const [simulatorLoading, setSimulatorLoading] = useState(false);
+  const [simulatorError, setSimulatorError] = useState<string | null>(null);
+  const [simulatorResult, setSimulatorResult] = useState<{
+    success: boolean;
+    eventId: string;
+    status: string;
+    receivedAt: string;
+    signature: string;
+  } | null>(null);
+  const [copiedCurl, setCopiedCurl] = useState(false);
+
+  const openSimulator = (endpointId?: string) => {
+    const targetId = endpointId || (endpoints.length > 0 ? endpoints[0].id : '');
+    setSimulatorEndpointId(targetId);
+    setSimulatorResult(null);
+    setSimulatorError(null);
+    setSimulatorIdempotencyKey(`idem_${Math.random().toString(36).substring(2, 10)}`);
+    setShowSimulatorModal(true);
+  };
+
+  const handleRunSimulator = async () => {
+    if (!simulatorEndpointId) {
+      setSimulatorError('Please select an ingestion endpoint.');
+      return;
+    }
+
+    let parsedPayload: Record<string, unknown>;
+    try {
+      parsedPayload = JSON.parse(simulatorPayload);
+    } catch {
+      setSimulatorError('Invalid JSON payload format. Please check syntax.');
+      return;
+    }
+
+    setSimulatorLoading(true);
+    setSimulatorError(null);
+
+    try {
+      const res = await fetch(`/v1/ingest/simulate/${simulatorEndpointId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          eventType: simulatorEventType,
+          idempotencyKey: simulatorIdempotencyKey || undefined,
+          payload: parsedPayload,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || `Simulation failed with HTTP status ${res.status}`);
+      }
+
+      const data = await res.json();
+      setSimulatorResult({
+        success: true,
+        eventId: data.eventId,
+        status: data.status,
+        receivedAt: data.receivedAt,
+        signature: data.signature,
+      });
+
+      // Refresh deliveries in background so user can see it right away
+      void loadDeliveries();
+    } catch (err: unknown) {
+      setSimulatorError(err instanceof Error ? err.message : 'Unknown simulation error');
+    } finally {
+      setSimulatorLoading(false);
+    }
+  };
+
+  const setSimulatorPreset = (type: string) => {
+    setSimulatorEventType(type);
+    setSimulatorIdempotencyKey(`idem_${Math.random().toString(36).substring(2, 10)}`);
+    if (type === 'payment.succeeded') {
+      setSimulatorPayload(JSON.stringify({
+        event: 'payment.succeeded',
+        amount: 4900,
+        currency: 'USD',
+        customer: { id: 'cus_9821', name: 'Jane Doe', email: 'jane@example.com' },
+        metadata: { source: 'RelayForge Console' }
+      }, null, 2));
+    } else if (type === 'user.signup') {
+      setSimulatorPayload(JSON.stringify({
+        event: 'user.signup',
+        user: { id: 'usr_4102', email: 'dev@relayforge.io', plan: 'enterprise' },
+        timestamp: new Date().toISOString()
+      }, null, 2));
+    } else if (type === 'order.fulfilled') {
+      setSimulatorPayload(JSON.stringify({
+        event: 'order.fulfilled',
+        orderId: 'ord_7718',
+        trackingNumber: 'TRK-98127391',
+        itemsCount: 3
+      }, null, 2));
+    }
+  };
+
+  const handleCopyCurl = () => {
+    const ep = endpoints.find(e => e.id === simulatorEndpointId);
+    const ingestUrl = ep
+      ? `http://127.0.0.1:3100/v1/ingest/${ep.id}`
+      : 'http://127.0.0.1:3100/v1/ingest/<ENDPOINT_ID>';
+
+    const inlinePayload = simulatorPayload.replace(/\r?\n/g, '').replace(/\s+/g, ' ');
+    const curlCmd = `curl -X POST "${ingestUrl}" \\\n  -H "Content-Type: application/json" \\\n  -H "X-Event-Type: ${simulatorEventType}" \\\n  -H "X-Idempotency-Key: ${simulatorIdempotencyKey}" \\\n  -d '${inlinePayload}'`;
+
+    void navigator.clipboard.writeText(curlCmd);
+    setCopiedCurl(true);
+    setTimeout(() => setCopiedCurl(false), 2000);
+  };
+
   // Generic In-App Confirmation Modal (Replaces all browser popups)
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
@@ -666,26 +798,50 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             </button>
           )}
 
-          {canManageKeys && activeTab === 'endpoints' && (
-            <button
-              onClick={() => setShowAddEndpointModal(true)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '10px 22px',
-                backgroundColor: '#F2F2F5',
-                border: 'none',
-                borderRadius: '999px',
-                color: '#0E0E10',
-                fontSize: '13px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
-              }}
-            >
-              + New Endpoint
-            </button>
+          {activeTab === 'endpoints' && (
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => openSimulator()}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '10px 18px',
+                  backgroundColor: '#232327',
+                  border: '1px solid #3E3E45',
+                  borderRadius: '999px',
+                  color: '#F2F2F5',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <span>⚡</span>
+                <span>Test Webhook</span>
+              </button>
+              {canManageKeys && (
+                <button
+                  onClick={() => setShowAddEndpointModal(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '10px 22px',
+                    backgroundColor: '#F2F2F5',
+                    border: 'none',
+                    borderRadius: '999px',
+                    color: '#0E0E10',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+                  }}
+                >
+                  + New Endpoint
+                </button>
+              )}
+            </div>
           )}
 
           {canManageKeys && activeTab === 'destinations' && (
@@ -711,24 +867,46 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           )}
 
           {activeTab === 'deliveries' && (
-            <button
-              onClick={() => void loadDeliveries()}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '10px 22px',
-                backgroundColor: '#232327',
-                border: '1px solid #3E3E45',
-                borderRadius: '999px',
-                color: '#F2F2F5',
-                fontSize: '13px',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              ↻ Refresh
-            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => openSimulator()}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '10px 18px',
+                  backgroundColor: '#F2F2F5',
+                  border: 'none',
+                  borderRadius: '999px',
+                  color: '#0E0E10',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+                }}
+              >
+                <span>⚡</span>
+                <span>Send Test Webhook</span>
+              </button>
+              <button
+                onClick={() => void loadDeliveries()}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '10px 18px',
+                  backgroundColor: '#232327',
+                  border: '1px solid #3E3E45',
+                  borderRadius: '999px',
+                  color: '#F2F2F5',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                ↻ Refresh
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -748,13 +926,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
               cursor: 'pointer',
               transition: 'transform 0.15s ease',
+              minWidth: 0,
+              boxSizing: 'border-box',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 800, color: '#0E0E10', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              <span style={{ fontSize: '11px', fontWeight: 800, color: '#0E0E10', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 TOTAL MEMBERS
               </span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E0E10" strokeWidth="2.2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E0E10" strokeWidth="2.2" style={{ flexShrink: 0 }}>
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                 <circle cx="9" cy="7" r="4"></circle>
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -764,7 +944,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             <div style={{ fontSize: '32px', fontWeight: 800, color: '#0E0E10', lineHeight: '1.2' }}>
               {members.length}
             </div>
-            <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap', overflow: 'hidden' }}>
               <span style={{
                 fontSize: '11px',
                 fontWeight: 700,
@@ -772,10 +952,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 color: '#F2F2F5',
                 padding: '2px 8px',
                 borderRadius: '999px',
+                flexShrink: 0,
               }}>
                 +{members.length} active
               </span>
-              <span style={{ fontSize: '11px', color: '#63636E', fontWeight: 500 }}>Enrolled</span>
+              <span style={{ fontSize: '11px', color: '#63636E', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis' }}>Enrolled</span>
             </div>
           </div>
 
@@ -791,20 +972,22 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
               cursor: 'pointer',
               transition: 'transform 0.15s ease',
+              minWidth: 0,
+              boxSizing: 'border-box',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 800, color: '#0E0E10', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              <span style={{ fontSize: '11px', fontWeight: 800, color: '#0E0E10', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 ACTIVE API KEYS
               </span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E0E10" strokeWidth="2.2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E0E10" strokeWidth="2.2" style={{ flexShrink: 0 }}>
                 <path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5-3 3 1.5 1.5L9 14l-5 5H2v-2l5-5 1.5 1.5 3-3-1.5-1.5 3.5-3.5 1.5 1.5L21 2z"></path>
               </svg>
             </div>
             <div style={{ fontSize: '32px', fontWeight: 800, color: '#0E0E10', lineHeight: '1.2' }}>
               {activeKeyCount}
             </div>
-            <div style={{ marginTop: '10px', fontSize: '11px', color: '#63636E', fontWeight: 500 }}>
+            <div style={{ marginTop: '10px', fontSize: '11px', color: '#63636E', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               SHA-256 hashed live keys
             </div>
           </div>
@@ -820,13 +1003,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               padding: '22px 24px',
               cursor: 'pointer',
               transition: 'transform 0.15s ease',
+              minWidth: 0,
+              boxSizing: 'border-box',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 ENDPOINTS (M3)
               </span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A9AA6" strokeWidth="2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A9AA6" strokeWidth="2" style={{ flexShrink: 0 }}>
                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
               </svg>
@@ -834,7 +1019,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             <div style={{ fontSize: '32px', fontWeight: 800, color: '#F2F2F5', lineHeight: '1.2' }}>
               {endpoints.length}
             </div>
-            <div style={{ marginTop: '10px', fontSize: '11px', color: '#9A9AA6', fontWeight: 500 }}>
+            <div style={{ marginTop: '10px', fontSize: '11px', color: '#9A9AA6', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               AES-256-GCM signed
             </div>
           </div>
@@ -850,22 +1035,24 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               padding: '22px 24px',
               cursor: 'pointer',
               transition: 'transform 0.15s ease',
+              minWidth: 0,
+              boxSizing: 'border-box',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 TENANT ISOLATION
               </span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A9AA6" strokeWidth="2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A9AA6" strokeWidth="2" style={{ flexShrink: 0 }}>
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
               </svg>
             </div>
             <div style={{ fontSize: '26px', fontWeight: 800, color: '#F2F2F5', lineHeight: '1.2' }}>
               Enforced
             </div>
-            <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981' }}></span>
-              <span style={{ fontSize: '11px', color: '#9A9AA6', fontWeight: 500 }}>• PostgreSQL RLS Active</span>
+            <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0 }}></span>
+              <span style={{ fontSize: '11px', color: '#9A9AA6', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis' }}>• PostgreSQL RLS Active</span>
             </div>
           </div>
         </div>
@@ -1295,10 +1482,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         </div>
       )}
 
-      {/* TABLE CONTAINER */}
-      <div className="rf-table-responsive">
-        {/* MEMBERS VIEW */}
-        {activeTab === 'members' && (
+      {/* TABLE CONTAINER FOR DIRECTORY / LOG VIEWS */}
+      {activeTab !== 'dashboard' && activeTab !== 'settings' && (
+        <div className="rf-table-responsive">
+          {/* MEMBERS VIEW */}
+          {activeTab === 'members' && (
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '680px' }}>
             <thead>
               <tr style={{
@@ -1805,42 +1993,60 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                       </td>
 
                       <td style={{ padding: '14px 20px', textAlign: 'right' }}>
-                        {canManageKeys && (
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
-                            <button
-                              title="Rotate signing secret"
-                              onClick={() => promptRotateSecret(ep)}
-                              style={{
-                                backgroundColor: 'transparent',
-                                border: '1px solid #3E3E45',
-                                color: '#C9C9D2',
-                                borderRadius: '6px',
-                                padding: '4px 10px',
-                                fontSize: '11px',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                              }}
-                            >
-                              Rotate
-                            </button>
-                            <button
-                              title="Delete endpoint"
-                              onClick={() => promptDeleteEndpoint(ep)}
-                              style={{
-                                backgroundColor: 'transparent',
-                                border: '1px solid #4A2828',
-                                color: '#f87171',
-                                borderRadius: '6px',
-                                padding: '4px 10px',
-                                fontSize: '11px',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                              }}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        )}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                          <button
+                            title="Test inbound webhook simulation"
+                            onClick={() => openSimulator(ep.id)}
+                            style={{
+                              backgroundColor: '#232327',
+                              border: '1px solid #3E3E45',
+                              color: '#F2F2F5',
+                              borderRadius: '6px',
+                              padding: '4px 10px',
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            ⚡ Test
+                          </button>
+                          {canManageKeys && (
+                            <>
+                              <button
+                                title="Rotate signing secret"
+                                onClick={() => promptRotateSecret(ep)}
+                                style={{
+                                  backgroundColor: 'transparent',
+                                  border: '1px solid #3E3E45',
+                                  color: '#C9C9D2',
+                                  borderRadius: '6px',
+                                  padding: '4px 10px',
+                                  fontSize: '11px',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                Rotate
+                              </button>
+                              <button
+                                title="Delete endpoint"
+                                onClick={() => promptDeleteEndpoint(ep)}
+                                style={{
+                                  backgroundColor: 'transparent',
+                                  border: '1px solid #4A2828',
+                                  color: '#f87171',
+                                  borderRadius: '6px',
+                                  padding: '4px 10px',
+                                  fontSize: '11px',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                Delete
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -2226,17 +2432,21 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             </tbody>
           </table>
         )}
+        </div>
+      )}
 
-        {/* OVERVIEW DASHBOARD VIEW (ACTIVE WHEN activeTab === 'dashboard') */}
-        {activeTab === 'dashboard' && (
-          <div style={{ padding: '8px 0 24px' }}>
-            {/* Quick Navigation Cards Grid */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: '16px',
-              marginBottom: '20px',
-            }}>
+      {/* OVERVIEW DASHBOARD VIEW (ACTIVE WHEN activeTab === 'dashboard') */}
+      {activeTab === 'dashboard' && (
+        <div style={{ padding: '8px 0 24px', width: '100%', boxSizing: 'border-box' }}>
+          {/* Quick Navigation Cards Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '16px',
+            marginBottom: '20px',
+            width: '100%',
+            boxSizing: 'border-box',
+          }}>
               {/* Box 1: Members Directory */}
               <div style={{
                 backgroundColor: '#1E1E22',
@@ -2521,7 +2731,6 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             </div>
           </div>
         )}
-      </div>
 
       {/* MODAL: ADD MEMBER */}
       {showAddMemberModal && (
@@ -3258,6 +3467,400 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               >
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: INBOUND WEBHOOK SIMULATOR (MILESTONE 3 OPTION 3 / STEP 7) */}
+      {showSimulatorModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(14, 14, 16, 0.75)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 50,
+          padding: '16px',
+        }}>
+          <div style={{
+            backgroundColor: '#1E1E22',
+            borderRadius: '20px',
+            border: '1px solid #3E3E45',
+            width: '100%',
+            maxWidth: '680px',
+            padding: '28px',
+            maxHeight: '92vh',
+            overflowY: 'auto',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.7)',
+          }}>
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '10px',
+                  backgroundColor: '#0E0E10',
+                  border: '1px solid #3E3E45',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '18px',
+                }}>
+                  ⚡
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px', color: '#F2F2F5' }}>
+                    Inbound Webhook Simulator
+                  </h3>
+                  <p style={{ fontSize: '12px', color: '#9A9AA6', margin: 0 }}>
+                    Simulate authenticated webhook ingestion, HMAC-SHA256 signature verification, and outbox dispatch.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSimulatorModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#9A9AA6',
+                  fontSize: '20px',
+                  cursor: 'pointer',
+                  padding: '4px',
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Target Endpoint Selection */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#9A9AA6', textTransform: 'uppercase', marginBottom: '6px' }}>
+                Target Ingestion Endpoint
+              </label>
+              {endpoints.length === 0 ? (
+                <div style={{
+                  padding: '12px 14px',
+                  backgroundColor: '#2A1C1C',
+                  border: '1px solid #442A2A',
+                  borderRadius: '8px',
+                  color: '#f87171',
+                  fontSize: '12px',
+                }}>
+                  No ingestion endpoints available. Create an endpoint first to simulate webhooks.
+                </div>
+              ) : (
+                <select
+                  value={simulatorEndpointId}
+                  onChange={(e) => setSimulatorEndpointId(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    border: '1px solid #3E3E45',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    backgroundColor: '#0E0E10',
+                    color: '#F2F2F5',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  {endpoints.map((ep) => (
+                    <option key={ep.id} value={ep.id}>
+                      {ep.name} (/{ep.slug}) — ID: {ep.id.slice(0, 8)}...
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {/* Preset Event Types Bar */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#9A9AA6', textTransform: 'uppercase', marginBottom: '6px' }}>
+                Sample Event Presets
+              </label>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => setSimulatorPreset('payment.succeeded')}
+                  style={{
+                    padding: '5px 12px',
+                    borderRadius: '999px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    backgroundColor: simulatorEventType === 'payment.succeeded' ? '#F2F2F5' : '#232327',
+                    color: simulatorEventType === 'payment.succeeded' ? '#0E0E10' : '#C9C9D2',
+                    border: '1px solid #3E3E45',
+                  }}
+                >
+                  ⚡ payment.succeeded
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSimulatorPreset('user.signup')}
+                  style={{
+                    padding: '5px 12px',
+                    borderRadius: '999px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    backgroundColor: simulatorEventType === 'user.signup' ? '#F2F2F5' : '#232327',
+                    color: simulatorEventType === 'user.signup' ? '#0E0E10' : '#C9C9D2',
+                    border: '1px solid #3E3E45',
+                  }}
+                >
+                  👤 user.signup
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSimulatorPreset('order.fulfilled')}
+                  style={{
+                    padding: '5px 12px',
+                    borderRadius: '999px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    backgroundColor: simulatorEventType === 'order.fulfilled' ? '#F2F2F5' : '#232327',
+                    color: simulatorEventType === 'order.fulfilled' ? '#0E0E10' : '#C9C9D2',
+                    border: '1px solid #3E3E45',
+                  }}
+                >
+                  📦 order.fulfilled
+                </button>
+              </div>
+            </div>
+
+            {/* Event Type & Idempotency Key */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#9A9AA6', textTransform: 'uppercase', marginBottom: '6px' }}>
+                  X-Event-Type Header
+                </label>
+                <input
+                  type="text"
+                  value={simulatorEventType}
+                  onChange={(e) => setSimulatorEventType(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px',
+                    border: '1px solid #3E3E45',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    backgroundColor: '#0E0E10',
+                    color: '#F2F2F5',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', textTransform: 'uppercase' }}>
+                    Idempotency Key
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setSimulatorIdempotencyKey(`idem_${Math.random().toString(36).substring(2, 10)}`)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#9A9AA6',
+                      fontSize: '11px',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      padding: 0,
+                    }}
+                  >
+                    🎲 Regenerate
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={simulatorIdempotencyKey}
+                  onChange={(e) => setSimulatorIdempotencyKey(e.target.value)}
+                  placeholder="e.g. idem_a1b2c3d4"
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px',
+                    border: '1px solid #3E3E45',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    backgroundColor: '#0E0E10',
+                    color: '#F2F2F5',
+                    boxSizing: 'border-box',
+                    fontFamily: 'monospace',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* JSON Payload Editor */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#9A9AA6', textTransform: 'uppercase', marginBottom: '6px' }}>
+                Webhook Body (JSON Payload)
+              </label>
+              <textarea
+                rows={6}
+                value={simulatorPayload}
+                onChange={(e) => setSimulatorPayload(e.target.value)}
+                style={{
+                  width: '100%',
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                  backgroundColor: '#0E0E10',
+                  color: '#F2F2F5',
+                  border: '1px solid #3E3E45',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  boxSizing: 'border-box',
+                  resize: 'vertical',
+                  lineHeight: '1.4',
+                }}
+              />
+            </div>
+
+            {/* Error Message */}
+            {simulatorError && (
+              <div style={{
+                padding: '10px 14px',
+                backgroundColor: '#2A1C1C',
+                border: '1px solid #442A2A',
+                borderRadius: '8px',
+                color: '#f87171',
+                fontSize: '12px',
+                marginBottom: '16px',
+              }}>
+                {simulatorError}
+              </div>
+            )}
+
+            {/* Simulation Result Receipt Card */}
+            {simulatorResult && (
+              <div style={{
+                backgroundColor: '#141416',
+                border: '1px solid #2C2C32',
+                borderRadius: '12px',
+                padding: '16px',
+                marginBottom: '18px',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{
+                      padding: '3px 10px',
+                      borderRadius: '999px',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      backgroundColor: simulatorResult.status === 'duplicate' ? '#2B2314' : '#1E2D22',
+                      color: simulatorResult.status === 'duplicate' ? '#f59e0b' : '#4ade80',
+                      border: simulatorResult.status === 'duplicate' ? '1px solid #4D3C1D' : '1px solid #2B4232',
+                    }}>
+                      {simulatorResult.status === 'duplicate' ? 'HTTP 200 (DUPLICATE)' : 'HTTP 202 ACCEPTED'}
+                    </span>
+                    <span style={{ fontSize: '12px', color: '#9A9AA6' }}>
+                      {simulatorResult.status === 'duplicate' ? 'Idempotently deduplicated' : 'Outbox message queued'}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowSimulatorModal(false);
+                      onTabChange('deliveries');
+                      void loadDeliveries();
+                    }}
+                    style={{
+                      padding: '5px 12px',
+                      backgroundColor: '#232327',
+                      border: '1px solid #3E3E45',
+                      borderRadius: '999px',
+                      color: '#F2F2F5',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    View in Deliveries →
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '11px' }}>
+                  <div>
+                    <span style={{ color: '#63636E', display: 'block' }}>Event ID</span>
+                    <code style={{ color: '#F2F2F5' }}>{simulatorResult.eventId}</code>
+                  </div>
+                  <div>
+                    <span style={{ color: '#63636E', display: 'block' }}>HMAC Signature</span>
+                    <code style={{ color: '#9A9AA6' }}>{simulatorResult.signature.slice(0, 24)}...</code>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={handleCopyCurl}
+                style={{
+                  padding: '9px 16px',
+                  backgroundColor: '#232327',
+                  border: '1px solid #3E3E45',
+                  borderRadius: '999px',
+                  color: copiedCurl ? '#4ade80' : '#C9C9D2',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                {copiedCurl ? '✓ cURL Copied' : 'Copy cURL Command'}
+              </button>
+
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowSimulatorModal(false)}
+                  style={{
+                    padding: '9px 18px',
+                    backgroundColor: 'transparent',
+                    border: '1px solid #3E3E45',
+                    borderRadius: '999px',
+                    color: '#9A9AA6',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  disabled={simulatorLoading || endpoints.length === 0}
+                  onClick={() => void handleRunSimulator()}
+                  style={{
+                    padding: '9px 24px',
+                    backgroundColor: '#F2F2F5',
+                    border: 'none',
+                    borderRadius: '999px',
+                    color: '#0E0E10',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: simulatorLoading || endpoints.length === 0 ? 'not-allowed' : 'pointer',
+                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+                    opacity: simulatorLoading || endpoints.length === 0 ? 0.6 : 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  {simulatorLoading ? 'Ingesting...' : '⚡ Send Test Webhook'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

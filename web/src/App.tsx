@@ -213,7 +213,7 @@ export const App: React.FC = () => {
           onOpenMobileMenu={() => setMobileSidebarOpen(true)}
         />
 
-        <main style={{ flex: 1, display: 'flex', overflowY: 'auto', backgroundColor: '#0E0E10' }}>
+        <main style={{ flex: 1, display: 'flex', overflowY: 'auto', overflowX: 'hidden', backgroundColor: '#0E0E10', minWidth: 0 }}>
           {activeOrg ? (
             <OrgManagement
               organization={activeOrg}
