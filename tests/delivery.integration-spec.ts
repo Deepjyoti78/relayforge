@@ -391,6 +391,22 @@ describe('Milestone 3 Option 2: Durable HTTP Delivery Pipeline & Outbox Dispatch
       expect(outboxReplayed?.status).toBe('PENDING');
       expect(outboxReplayed?.attemptCount).toBe(0);
       expect(outboxReplayed?.nextRetryAt!.getTime()).toBeLessThanOrEqual(Date.now() + 1000);
+
+      // Simulate worker leasing the message in-flight
+      await tenantContext.runInTenantContext(orgA.id, userA.id, async (tx) => {
+        await tx.outboxMessage.update({
+          where: { id: outbox!.id },
+          data: { leaseExpiresAt: new Date(Date.now() + 30000) },
+        });
+      });
+
+      // Attempting replay while outbox message is actively in-flight should be rejected with 400
+      const inFlightReplayRes = await request(app.getHttpServer())
+        .post(`/v1/organizations/${orgA.id}/deliveries/${attempts[0]!.id}/replay`)
+        .set('Cookie', userA.cookie)
+        .expect(400);
+
+      expect((inFlightReplayRes.body as { message: string }).message).toContain('currently in-flight');
     });
 
     it('transitions exhausted delivery to DEAD_LETTER when max retries exceeded', async () => {

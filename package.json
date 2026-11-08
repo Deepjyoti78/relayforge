@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "description": "Reliable webhook delivery and bounded workflow orchestration",
-  "engines": { "node": "^22.20.0 || ^24.0.0", "npm": ">=10" },
+  "engines": {
+    "node": "^22.20.0 || ^24.0.0",
+    "npm": ">=10"
+  },
   "scripts": {
     "setup": "node scripts/setup.cjs",
     "dev:api": "node --watch -r ts-node/register src/api/main.ts",
@@ -25,6 +28,8 @@
     "test": "jest --config jest.config.cjs --runInBand",
     "test:integration": "jest --config jest.integration.config.cjs --runInBand",
     "test:smoke": "node scripts/smoke.cjs",
+    "benchmark:receiver": "node benchmarks/receiver.cjs",
+    "benchmark:run": "node benchmarks/run-benchmarks.cjs",
     "check": "npm run lint && npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
@@ -52,6 +57,7 @@
     "@types/node": "22.20.5",
     "@types/pg": "8.23.1",
     "@types/supertest": "7.2.1",
+    "autocannon": "9.0.0",
     "eslint": "10.14.0",
     "jest": "30.5.2",
     "prisma": "7.10.1",

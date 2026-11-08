@@ -151,6 +151,7 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
       let anySucceeded = false;
       let lastStatusCode: number | null = null;
       let lastErrorDescription: string | null = null;
+      let lastRetryAfterSeconds: number | null = null;
 
       for (const dest of destinations) {
         const attempt = await this.deliveryService.deliverEventToDestination({
@@ -175,6 +176,9 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
         } else {
           lastStatusCode = attempt.statusCode;
           lastErrorDescription = attempt.errorDescription;
+          if (attempt.retryAfterSeconds) {
+            lastRetryAfterSeconds = attempt.retryAfterSeconds;
+          }
         }
       }
 
@@ -189,6 +193,7 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
           maxRetries: msg.max_retries ?? 5,
           statusCode: lastStatusCode,
           errorDescription: lastErrorDescription,
+          ...(lastRetryAfterSeconds ? { retryAfterMs: lastRetryAfterSeconds * 1000 } : {}),
         });
 
         if (evalResult.shouldRetry && evalResult.nextRetryAt) {

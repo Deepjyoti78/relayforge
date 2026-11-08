@@ -12,7 +12,8 @@ describe('Milestone 3 Option 3: Retry Policy & Failure Classification', () => {
       expect(isRetryableFailure(null, 'DNS lookup failed')).toBe(true);
     });
 
-    it('classifies HTTP 429 Rate Limit as retryable', () => {
+    it('classifies HTTP 408 Request Timeout and HTTP 429 Rate Limit as retryable', () => {
+      expect(isRetryableFailure(408, 'Request Timeout')).toBe(true);
       expect(isRetryableFailure(429, 'Too many requests')).toBe(true);
     });
 
@@ -101,6 +102,34 @@ describe('Milestone 3 Option 3: Retry Policy & Failure Classification', () => {
       expect(result.shouldRetry).toBe(false);
       expect(result.reason).toBe('PERMANENT_NON_RETRYABLE');
       expect(result.nextRetryAt).toBeNull();
+    });
+
+    it('respects retryAfterMs when specified by destination Retry-After header', () => {
+      const result = evaluateRetry({
+        attemptCount: 1,
+        maxRetries: 5,
+        statusCode: 429,
+        errorDescription: 'Rate limited',
+        retryAfterMs: 15000,
+      });
+
+      expect(result.shouldRetry).toBe(true);
+      expect(result.delayMs).toBe(15000);
+      expect(result.nextRetryAt!.getTime()).toBeGreaterThanOrEqual(Date.now() + 14900);
+    });
+
+    it('caps retryAfterMs at maxDelayMs', () => {
+      const result = evaluateRetry({
+        attemptCount: 1,
+        maxRetries: 5,
+        statusCode: 429,
+        errorDescription: 'Rate limited',
+        maxDelayMs: 60000,
+        retryAfterMs: 120000,
+      });
+
+      expect(result.shouldRetry).toBe(true);
+      expect(result.delayMs).toBe(60000);
     });
   });
 });

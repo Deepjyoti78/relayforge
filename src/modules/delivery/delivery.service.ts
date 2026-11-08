@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   Logger,
@@ -47,6 +48,7 @@ export interface DeliveryAttemptRecord {
   responseBodyPreview: string | null;
   errorDescription: string | null;
   createdAt: Date;
+  retryAfterSeconds?: number | null;
 }
 
 @Injectable()
@@ -111,6 +113,8 @@ export class DeliveryService {
       'user-agent': 'RelayForge/1.0 (+https://relayforge.dev)',
       'x-relayforge-delivery': attemptId,
       'x-relayforge-event': params.eventType,
+      'x-relayforge-event-id': params.eventId,
+      'x-relayforge-destination-id': params.destination.id,
       'x-relayforge-timestamp': String(timestamp),
       'x-relayforge-signature': signature,
     };
@@ -130,6 +134,7 @@ export class DeliveryService {
     let responseBodyPreview: string | null = null;
     let errorDescription: string | null = null;
     let status: 'SUCCESS' | 'FAILED' = 'FAILED';
+    let retryAfterSeconds: number | null = null;
 
     try {
       const timeoutMs = params.destination.timeoutMs ?? 10000;
@@ -138,6 +143,7 @@ export class DeliveryService {
         headers: requestHeaders,
         body: bodyStr,
         signal: AbortSignal.timeout(timeoutMs),
+        redirect: 'manual',
       });
 
       statusCode = res.status;
@@ -147,11 +153,31 @@ export class DeliveryService {
       });
       responseHeaders = resHeadersObj;
 
-      const rawText = await res.text().catch(() => '');
-      responseBodyPreview = rawText.slice(0, 2048);
-      status = res.ok ? 'SUCCESS' : 'FAILED';
-      if (!res.ok) {
-        errorDescription = `HTTP ${res.status}: ${res.statusText || 'Delivery destination rejected webhook'}`;
+      // Parse Retry-After header if present (seconds or HTTP date)
+      const rawRetryAfter = res.headers.get('retry-after');
+      if (rawRetryAfter) {
+        const asSec = Number.parseInt(rawRetryAfter, 10);
+        if (!Number.isNaN(asSec) && asSec >= 0) {
+          retryAfterSeconds = asSec;
+        } else {
+          const parsedDate = Date.parse(rawRetryAfter);
+          if (!Number.isNaN(parsedDate)) {
+            retryAfterSeconds = Math.max(0, Math.ceil((parsedDate - Date.now()) / 1000));
+          }
+        }
+      }
+
+      // Disallow redirects to prevent SSRF bypass
+      if (res.status >= 300 && res.status < 400) {
+        status = 'FAILED';
+        errorDescription = `HTTP ${res.status}: Redirects are disallowed on webhook destinations to prevent SSRF bypass.`;
+      } else {
+        const rawText = await res.text().catch(() => '');
+        responseBodyPreview = rawText.slice(0, 2048);
+        status = res.ok ? 'SUCCESS' : 'FAILED';
+        if (!res.ok) {
+          errorDescription = `HTTP ${res.status}: ${res.statusText || 'Delivery destination rejected webhook'}`;
+        }
       }
     } catch (err: unknown) {
       const errObj = err as { name?: string; message?: string } | null;
@@ -166,7 +192,7 @@ export class DeliveryService {
 
     const latencyMs = Date.now() - startTime;
 
-    return this.persistAttempt(params.organizationId, {
+    const persisted = await this.persistAttempt(params.organizationId, {
       id: attemptId,
       organizationId: params.organizationId,
       eventId: params.eventId,
@@ -183,6 +209,11 @@ export class DeliveryService {
       responseBodyPreview,
       errorDescription,
     });
+
+    return {
+      ...persisted,
+      retryAfterSeconds,
+    };
   }
 
   /**
@@ -430,19 +461,27 @@ export class DeliveryService {
         outboxMessageId = outbox.id;
       }
 
-      // Replay via SECURITY DEFINER function
-      const replayRows = await tx.$queryRaw<{ replayed_outbox_id: string; replayed_event_id: string; new_status: string }[]>`
-        SELECT replayed_outbox_id, replayed_event_id, new_status
-        FROM replay_outbox_message(${outboxMessageId}::uuid)
-      `;
+      // Replay via SECURITY DEFINER function with concurrent replay protection
+      try {
+        const replayRows = await tx.$queryRaw<{ replayed_outbox_id: string; replayed_event_id: string; new_status: string }[]>`
+          SELECT replayed_outbox_id, replayed_event_id, new_status
+          FROM replay_outbox_message(${outboxMessageId}::uuid)
+        `;
 
-      const result = replayRows[0];
-      return {
-        success: true,
-        outboxMessageId: result?.replayed_outbox_id ?? outboxMessageId,
-        eventId: result?.replayed_event_id ?? attempt.eventId,
-        status: result?.new_status ?? 'PENDING',
-      };
+        const result = replayRows[0];
+        return {
+          success: true,
+          outboxMessageId: result?.replayed_outbox_id ?? outboxMessageId,
+          eventId: result?.replayed_event_id ?? attempt.eventId,
+          status: result?.new_status ?? 'PENDING',
+        };
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.includes('currently being processed')) {
+          throw new BadRequestException('Outbox message is currently in-flight by an active worker. Concurrent replay prevented.');
+        }
+        throw err;
+      }
     });
   }
 }

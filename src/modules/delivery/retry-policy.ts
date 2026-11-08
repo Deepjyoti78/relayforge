@@ -27,8 +27,8 @@ export function isRetryableFailure(
     return true;
   }
 
-  // HTTP 429 Too Many Requests is transient
-  if (statusCode === 429) {
+  // HTTP 408 Request Timeout and HTTP 429 Too Many Requests are transient
+  if (statusCode === 408 || statusCode === 429) {
     return true;
   }
 
@@ -42,7 +42,7 @@ export function isRetryableFailure(
 }
 
 /**
- * Calculates exponential backoff with decorrelated full jitter to prevent thundering herd.
+ * Calculates exponential backoff with additive uniform jitter (0-499ms) to spread retry spikes.
  * Formula: min(maxDelayMs, baseDelayMs * 2^(attempt - 1)) + random_jitter(0, 500ms)
  */
 export function calculateNextRetryDelay(
@@ -61,11 +61,12 @@ export function calculateNextRetryDelay(
  */
 export function evaluateRetry(params: {
   attemptCount: number;
-  maxRetries?: number;
+  maxRetries?: number | undefined;
   statusCode: number | null;
   errorDescription: string | null;
-  baseDelayMs?: number;
-  maxDelayMs?: number;
+  baseDelayMs?: number | undefined;
+  maxDelayMs?: number | undefined;
+  retryAfterMs?: number | undefined;
 }): RetryEvaluation {
   const maxRetries = params.maxRetries ?? 5;
   const retryable = isRetryableFailure(params.statusCode, params.errorDescription);
@@ -88,11 +89,16 @@ export function evaluateRetry(params: {
     };
   }
 
-  const delayMs = calculateNextRetryDelay(
+  const calculatedDelay = calculateNextRetryDelay(
     params.attemptCount,
     params.baseDelayMs ?? 1000,
     params.maxDelayMs ?? 300000,
   );
+
+  const delayMs =
+    params.retryAfterMs && params.retryAfterMs > 0
+      ? Math.min(params.maxDelayMs ?? 300000, Math.max(calculatedDelay, params.retryAfterMs))
+      : calculatedDelay;
 
   return {
     shouldRetry: true,
