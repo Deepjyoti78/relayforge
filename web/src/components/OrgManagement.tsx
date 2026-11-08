@@ -109,6 +109,30 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
   const [replayMessage, setReplayMessage] = useState<string | null>(null);
   const [selectedAttemptForModal, setSelectedAttemptForModal] = useState<DeliveryAttemptMetadata | null>(null);
 
+  // Generic In-App Confirmation Modal (Replaces all browser popups)
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmLabel: string;
+    confirmVariant?: 'danger' | 'warning' | 'primary';
+    onConfirm: () => Promise<void> | void;
+  } | null>(null);
+  const [isConfirmLoading, setIsConfirmLoading] = useState(false);
+
+  const executeConfirmedAction = async () => {
+    if (!confirmModal) return;
+    setIsConfirmLoading(true);
+    try {
+      await confirmModal.onConfirm();
+      setConfirmModal(null);
+    } catch {
+      // Handlers set their own action error state
+    } finally {
+      setIsConfirmLoading(false);
+    }
+  };
+
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState('');
   const [activeMenuMemberId, setActiveMenuMemberId] = useState<string | null>(null);
@@ -229,17 +253,23 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
     }
   };
 
-  const handleRevokeApiKey = async (keyId: string) => {
-    if (!window.confirm('Are you sure you want to revoke this API key? This action is irreversible.')) {
-      return;
-    }
-    setKeyActionError(null);
-    try {
-      const updated = await revokeApiKey(organization.id, keyId);
-      setApiKeys((prev) => prev.map((k) => (k.id === keyId ? updated : k)));
-    } catch (err: unknown) {
-      setKeyActionError(err instanceof Error ? err.message : 'Failed to revoke API key');
-    }
+  const promptRevokeApiKey = (key: ApiKeyMetadata) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Revoke API Key',
+      message: `Are you sure you want to revoke API key "${key.name}" (${key.keyPrefix}...)? This action is permanent and cannot be undone. Any service utilizing this key will immediately be denied access.`,
+      confirmLabel: 'Revoke Key',
+      confirmVariant: 'danger',
+      onConfirm: async () => {
+        setKeyActionError(null);
+        try {
+          const updated = await revokeApiKey(organization.id, key.id);
+          setApiKeys((prev) => prev.map((k) => (k.id === key.id ? updated : k)));
+        } catch (err: unknown) {
+          setKeyActionError(err instanceof Error ? err.message : 'Failed to revoke API key');
+        }
+      },
+    });
   };
 
   const handleCreateEndpoint = async (e: React.FormEvent) => {
@@ -258,31 +288,43 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
     }
   };
 
-  const handleRotateSecret = async (endpointId: string) => {
-    if (!window.confirm('Rotate webhook signing secret? Previous signatures will no longer be accepted.')) {
-      return;
-    }
-    setEndpointActionError(null);
-    try {
-      const res = await rotateEndpointSecret(organization.id, endpointId);
-      setCreatedRawSecret(res.signingSecret);
-      setEndpoints((prev) => prev.map((ep) => (ep.id === endpointId ? res.endpoint : ep)));
-    } catch (err: unknown) {
-      setEndpointActionError(err instanceof Error ? err.message : 'Failed to rotate secret');
-    }
+  const promptRotateSecret = (endpoint: EndpointMetadata) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Rotate Webhook Signing Secret',
+      message: `Are you sure you want to rotate the HMAC signing secret for endpoint "${endpoint.name}" (${endpoint.slug})? Previous webhook signatures will immediately fail verification until downstream services adopt the new secret.`,
+      confirmLabel: 'Rotate Secret',
+      confirmVariant: 'warning',
+      onConfirm: async () => {
+        setEndpointActionError(null);
+        try {
+          const res = await rotateEndpointSecret(organization.id, endpoint.id);
+          setCreatedRawSecret(res.signingSecret);
+          setEndpoints((prev) => prev.map((ep) => (ep.id === endpoint.id ? res.endpoint : ep)));
+        } catch (err: unknown) {
+          setEndpointActionError(err instanceof Error ? err.message : 'Failed to rotate secret');
+        }
+      },
+    });
   };
 
-  const handleDeleteEndpoint = async (endpointId: string) => {
-    if (!window.confirm('Are you sure you want to delete this endpoint? Inbound webhooks sent to it will be rejected.')) {
-      return;
-    }
-    setEndpointActionError(null);
-    try {
-      await deleteEndpoint(organization.id, endpointId);
-      setEndpoints((prev) => prev.filter((ep) => ep.id !== endpointId));
-    } catch (err: unknown) {
-      setEndpointActionError(err instanceof Error ? err.message : 'Failed to delete endpoint');
-    }
+  const promptDeleteEndpoint = (endpoint: EndpointMetadata) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Delete Ingestion Endpoint',
+      message: `Are you sure you want to delete endpoint "${endpoint.name}" (${endpoint.slug})? Inbound webhooks directed to this endpoint will immediately be rejected.`,
+      confirmLabel: 'Delete Endpoint',
+      confirmVariant: 'danger',
+      onConfirm: async () => {
+        setEndpointActionError(null);
+        try {
+          await deleteEndpoint(organization.id, endpoint.id);
+          setEndpoints((prev) => prev.filter((ep) => ep.id !== endpoint.id));
+        } catch (err: unknown) {
+          setEndpointActionError(err instanceof Error ? err.message : 'Failed to delete endpoint');
+        }
+      },
+    });
   };
 
   const handleCreateDestination = async (e: React.FormEvent) => {
@@ -304,17 +346,23 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
     }
   };
 
-  const handleDeleteDestination = async (destinationId: string) => {
-    if (!window.confirm('Are you sure you want to delete this destination target? Webhooks will no longer be forwarded to it.')) {
-      return;
-    }
-    setDestinationActionError(null);
-    try {
-      await deleteDestination(organization.id, destinationId);
-      setDestinations((prev) => prev.filter((d) => d.id !== destinationId));
-    } catch (err: unknown) {
-      setDestinationActionError(err instanceof Error ? err.message : 'Failed to delete destination');
-    }
+  const promptDeleteDestination = (destination: DestinationMetadata) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Delete Destination Target',
+      message: `Are you sure you want to delete destination target "${destination.name}" (${destination.url})? Webhooks will no longer be forwarded to this target.`,
+      confirmLabel: 'Delete Destination',
+      confirmVariant: 'danger',
+      onConfirm: async () => {
+        setDestinationActionError(null);
+        try {
+          await deleteDestination(organization.id, destination.id);
+          setDestinations((prev) => prev.filter((d) => d.id !== destination.id));
+        } catch (err: unknown) {
+          setDestinationActionError(err instanceof Error ? err.message : 'Failed to delete destination');
+        }
+      },
+    });
   };
 
   const handleToggleDestinationStatus = async (destination: DestinationMetadata) => {
@@ -384,13 +432,23 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
     }
   };
 
-  const handleRemove = async (memberId: string) => {
-    setActionError(null);
-    try {
-      await onRemoveMember(memberId);
-    } catch (err: unknown) {
-      setActionError(err instanceof Error ? err.message : 'Failed to remove member');
-    }
+  const promptRemoveMember = (member: OrganizationMember) => {
+    const memberName = member.user.displayName || member.user.email || 'this member';
+    setConfirmModal({
+      isOpen: true,
+      title: 'Remove Member',
+      message: `Are you sure you want to remove ${memberName} from "${organization.name}"? They will immediately lose access to organization resources.`,
+      confirmLabel: 'Remove Member',
+      confirmVariant: 'danger',
+      onConfirm: async () => {
+        setActionError(null);
+        try {
+          await onRemoveMember(member.id);
+        } catch (err: unknown) {
+          setActionError(err instanceof Error ? err.message : 'Failed to remove member');
+        }
+      },
+    });
   };
 
   const activeKeyCount = apiKeys.filter((k) => !k.revokedAt).length;
@@ -541,7 +599,19 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             color: '#9A9AA6',
             margin: '6px 0 0 0',
           }}>
-            Manage members, high-throughput webhook ingestion endpoints, and AES-256-GCM signing secrets.
+            {activeTab === 'dashboard'
+              ? 'Tenant overview, system metrics, credential counts, and pipeline architecture.'
+              : activeTab === 'members'
+              ? 'Manage registered team members, membership roles, and administrative rights.'
+              : activeTab === 'api-keys'
+              ? 'Manage scoped organization API keys for high-throughput ingestion authentication.'
+              : activeTab === 'endpoints'
+              ? 'Manage webhook ingestion endpoints and rotate AES-256-GCM signing secrets.'
+              : activeTab === 'destinations'
+              ? 'Configure outbound destination targets with private network SSRF protection.'
+              : activeTab === 'deliveries'
+              ? 'Monitor transactional outbox deliveries, exponential retries, and dead letters.'
+              : 'Organization parameters, slug identifier, and Row-Level Security isolation.'}
           </p>
           {renameError && (
             <div style={{ color: '#f87171', fontSize: '12px', marginTop: '6px' }}>
@@ -617,349 +687,422 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               + New Endpoint
             </button>
           )}
+
+          {canManageKeys && activeTab === 'destinations' && (
+            <button
+              onClick={() => setShowAddDestinationModal(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '10px 22px',
+                backgroundColor: '#F2F2F5',
+                border: 'none',
+                borderRadius: '999px',
+                color: '#0E0E10',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+              }}
+            >
+              + Add Destination
+            </button>
+          )}
+
+          {activeTab === 'deliveries' && (
+            <button
+              onClick={() => void loadDeliveries()}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '10px 22px',
+                backgroundColor: '#232327',
+                border: '1px solid #3E3E45',
+                borderRadius: '999px',
+                color: '#F2F2F5',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              ↻ Refresh
+            </button>
+          )}
         </div>
       </div>
 
-      {/* STATS CARDS ROW (EXACT DESIGN MATCHING 7a30a006.jpg) */}
-      <div className="rf-stats-grid">
-        {/* Card 1: Members (Light Surface) */}
-        <div style={{
-          backgroundColor: '#F2F2F5',
-          border: 'none',
-          borderRadius: '20px',
-          padding: '22px 24px',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#0E0E10', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              TOTAL MEMBERS
-            </span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E0E10" strokeWidth="2.2">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
+      {/* STATS CARDS ROW (SHOWN ONLY IN OVERVIEW SECTION) */}
+      {activeTab === 'dashboard' && (
+        <div className="rf-stats-grid">
+          {/* Card 1: Members (Light Surface) */}
+          <div
+            onClick={() => onTabChange('members')}
+            title="Click to view Members Directory"
+            style={{
+              backgroundColor: '#F2F2F5',
+              border: 'none',
+              borderRadius: '20px',
+              padding: '22px 24px',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
+              cursor: 'pointer',
+              transition: 'transform 0.15s ease',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 800, color: '#0E0E10', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                TOTAL MEMBERS
+              </span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E0E10" strokeWidth="2.2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <div style={{ fontSize: '32px', fontWeight: 800, color: '#0E0E10', lineHeight: '1.2' }}>
+              {members.length}
+            </div>
+            <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                backgroundColor: '#0E0E10',
+                color: '#F2F2F5',
+                padding: '2px 8px',
+                borderRadius: '999px',
+              }}>
+                +{members.length} active
+              </span>
+              <span style={{ fontSize: '11px', color: '#63636E', fontWeight: 500 }}>Enrolled</span>
+            </div>
           </div>
-          <div style={{ fontSize: '32px', fontWeight: 800, color: '#0E0E10', lineHeight: '1.2' }}>
-            {members.length}
+
+          {/* Card 2: Active API Keys (Light Surface) */}
+          <div
+            onClick={() => onTabChange('api-keys')}
+            title="Click to manage API Keys"
+            style={{
+              backgroundColor: '#F2F2F5',
+              border: 'none',
+              borderRadius: '20px',
+              padding: '22px 24px',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
+              cursor: 'pointer',
+              transition: 'transform 0.15s ease',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 800, color: '#0E0E10', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                ACTIVE API KEYS
+              </span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E0E10" strokeWidth="2.2">
+                <path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5-3 3 1.5 1.5L9 14l-5 5H2v-2l5-5 1.5 1.5 3-3-1.5-1.5 3.5-3.5 1.5 1.5L21 2z"></path>
+              </svg>
+            </div>
+            <div style={{ fontSize: '32px', fontWeight: 800, color: '#0E0E10', lineHeight: '1.2' }}>
+              {activeKeyCount}
+            </div>
+            <div style={{ marginTop: '10px', fontSize: '11px', color: '#63636E', fontWeight: 500 }}>
+              SHA-256 hashed live keys
+            </div>
           </div>
-          <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+
+          {/* Card 3: Ingestion Endpoints (Dark Surface) */}
+          <div
+            onClick={() => onTabChange('endpoints')}
+            title="Click to view Endpoints"
+            style={{
+              backgroundColor: '#232327',
+              border: '1px solid #3E3E45',
+              borderRadius: '20px',
+              padding: '22px 24px',
+              cursor: 'pointer',
+              transition: 'transform 0.15s ease',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                ENDPOINTS (M3)
+              </span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A9AA6" strokeWidth="2">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+            </div>
+            <div style={{ fontSize: '32px', fontWeight: 800, color: '#F2F2F5', lineHeight: '1.2' }}>
+              {endpoints.length}
+            </div>
+            <div style={{ marginTop: '10px', fontSize: '11px', color: '#9A9AA6', fontWeight: 500 }}>
+              AES-256-GCM signed
+            </div>
+          </div>
+
+          {/* Card 4: Tenant Isolation (Dark Surface) */}
+          <div
+            onClick={() => onTabChange('settings')}
+            title="Click to view Architecture & Settings"
+            style={{
+              backgroundColor: '#232327',
+              border: '1px solid #3E3E45',
+              borderRadius: '20px',
+              padding: '22px 24px',
+              cursor: 'pointer',
+              transition: 'transform 0.15s ease',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                TENANT ISOLATION
+              </span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A9AA6" strokeWidth="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+            </div>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: '#F2F2F5', lineHeight: '1.2' }}>
+              Enforced
+            </div>
+            <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981' }}></span>
+              <span style={{ fontSize: '11px', color: '#9A9AA6', fontWeight: 500 }}>• PostgreSQL RLS Active</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FILTER PILLS ROW (ROUNDED PILLS - SHOWN IN TAB VIEWS) */}
+      {activeTab !== 'dashboard' && (
+        <div className="rf-filter-pills">
+          <button
+            onClick={() => onTabChange('members')}
+            style={{
+              padding: '7px 18px',
+              borderRadius: '999px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'members' ? '#F2F2F5' : '#232327',
+              color: activeTab === 'members' ? '#0E0E10' : '#C9C9D2',
+              border: activeTab === 'members' ? '1px solid transparent' : '1px solid #3E3E45',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s ease',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span>All Members</span>
             <span style={{
               fontSize: '11px',
-              fontWeight: 700,
-              backgroundColor: '#0E0E10',
-              color: '#F2F2F5',
-              padding: '2px 8px',
+              padding: '1px 7px',
               borderRadius: '999px',
-            }}>
-              +{members.length} active
-            </span>
-            <span style={{ fontSize: '11px', color: '#63636E', fontWeight: 500 }}>Enrolled</span>
-          </div>
-        </div>
-
-        {/* Card 2: Active API Keys (Light Surface) */}
-        <div style={{
-          backgroundColor: '#F2F2F5',
-          border: 'none',
-          borderRadius: '20px',
-          padding: '22px 24px',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#0E0E10', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              ACTIVE API KEYS
-            </span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E0E10" strokeWidth="2.2">
-              <path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5-3 3 1.5 1.5L9 14l-5 5H2v-2l5-5 1.5 1.5 3-3-1.5-1.5 3.5-3.5 1.5 1.5L21 2z"></path>
-            </svg>
-          </div>
-          <div style={{ fontSize: '32px', fontWeight: 800, color: '#0E0E10', lineHeight: '1.2' }}>
-            {activeKeyCount}
-          </div>
-          <div style={{ marginTop: '10px', fontSize: '11px', color: '#63636E', fontWeight: 500 }}>
-            SHA-256 hashed live keys
-          </div>
-        </div>
-
-        {/* Card 3: Ingestion Endpoints (Dark Surface) */}
-        <div style={{
-          backgroundColor: '#232327',
-          border: '1px solid #3E3E45',
-          borderRadius: '20px',
-          padding: '22px 24px',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              ENDPOINTS (M3)
-            </span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A9AA6" strokeWidth="2">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-            </svg>
-          </div>
-          <div style={{ fontSize: '32px', fontWeight: 800, color: '#F2F2F5', lineHeight: '1.2' }}>
-            {endpoints.length}
-          </div>
-          <div style={{ marginTop: '10px', fontSize: '11px', color: '#9A9AA6', fontWeight: 500 }}>
-            AES-256-GCM signed
-          </div>
-        </div>
-
-        {/* Card 4: Tenant Isolation (Dark Surface) */}
-        <div style={{
-          backgroundColor: '#232327',
-          border: '1px solid #3E3E45',
-          borderRadius: '20px',
-          padding: '22px 24px',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              TENANT ISOLATION
-            </span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A9AA6" strokeWidth="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg>
-          </div>
-          <div style={{ fontSize: '26px', fontWeight: 800, color: '#F2F2F5', lineHeight: '1.2' }}>
-            Enforced
-          </div>
-          <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981' }}></span>
-            <span style={{ fontSize: '11px', color: '#9A9AA6', fontWeight: 500 }}>• PostgreSQL RLS Active</span>
-          </div>
-        </div>
-      </div>
-
-      {/* FILTER PILLS ROW (ROUNDED PILLS) */}
-      <div className="rf-filter-pills">
-        <button
-          onClick={() => onTabChange('members')}
-          style={{
-            padding: '7px 18px',
-            borderRadius: '999px',
-            fontSize: '13px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            backgroundColor: activeTab === 'members' ? '#F2F2F5' : '#232327',
-            color: activeTab === 'members' ? '#0E0E10' : '#C9C9D2',
-            border: activeTab === 'members' ? '1px solid transparent' : '1px solid #3E3E45',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'all 0.15s ease',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <span>All Members</span>
-          <span style={{
-            fontSize: '11px',
-            padding: '1px 7px',
-            borderRadius: '999px',
-            backgroundColor: activeTab === 'members' ? '#0E0E10' : '#3E3E45',
-            color: '#F2F2F5',
-            fontWeight: 700,
-          }}>
-            {members.length}
-          </span>
-        </button>
-
-        <button
-          onClick={() => onTabChange('api-keys')}
-          style={{
-            padding: '7px 18px',
-            borderRadius: '999px',
-            fontSize: '13px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            backgroundColor: activeTab === 'api-keys' ? '#F2F2F5' : '#232327',
-            color: activeTab === 'api-keys' ? '#0E0E10' : '#C9C9D2',
-            border: activeTab === 'api-keys' ? '1px solid transparent' : '1px solid #3E3E45',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'all 0.15s ease',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <span>API Keys</span>
-          <span style={{
-            fontSize: '11px',
-            padding: '1px 7px',
-            borderRadius: '999px',
-            backgroundColor: activeTab === 'api-keys' ? '#0E0E10' : '#3E3E45',
-            color: '#F2F2F5',
-            fontWeight: 700,
-          }}>
-            {apiKeys.length}
-          </span>
-        </button>
-
-        <button
-          onClick={() => onTabChange('endpoints')}
-          style={{
-            padding: '7px 18px',
-            borderRadius: '999px',
-            fontSize: '13px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            backgroundColor: activeTab === 'endpoints' ? '#F2F2F5' : '#232327',
-            color: activeTab === 'endpoints' ? '#0E0E10' : '#C9C9D2',
-            border: activeTab === 'endpoints' ? '1px solid transparent' : '1px solid #3E3E45',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'all 0.15s ease',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <span>Endpoints</span>
-          <span style={{
-            fontSize: '11px',
-            padding: '1px 7px',
-            borderRadius: '999px',
-            backgroundColor: activeTab === 'endpoints' ? '#0E0E10' : '#3E3E45',
-            color: '#F2F2F5',
-            fontWeight: 700,
-          }}>
-            {endpoints.length}
-          </span>
-        </button>
-
-        <button
-          onClick={() => onTabChange('destinations')}
-          style={{
-            padding: '7px 18px',
-            borderRadius: '999px',
-            fontSize: '13px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            backgroundColor: activeTab === 'destinations' ? '#F2F2F5' : '#232327',
-            color: activeTab === 'destinations' ? '#0E0E10' : '#C9C9D2',
-            border: activeTab === 'destinations' ? '1px solid transparent' : '1px solid #3E3E45',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'all 0.15s ease',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <span>Destinations</span>
-          <span style={{
-            fontSize: '11px',
-            padding: '1px 7px',
-            borderRadius: '999px',
-            backgroundColor: activeTab === 'destinations' ? '#0E0E10' : '#3E3E45',
-            color: '#F2F2F5',
-            fontWeight: 700,
-          }}>
-            {destinations.length}
-          </span>
-        </button>
-
-        <button
-          onClick={() => onTabChange('deliveries')}
-          style={{
-            padding: '7px 18px',
-            borderRadius: '999px',
-            fontSize: '13px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            backgroundColor: activeTab === 'deliveries' ? '#F2F2F5' : '#232327',
-            color: activeTab === 'deliveries' ? '#0E0E10' : '#C9C9D2',
-            border: activeTab === 'deliveries' ? '1px solid transparent' : '1px solid #3E3E45',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'all 0.15s ease',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <span>Deliveries</span>
-          <span style={{
-            fontSize: '11px',
-            padding: '1px 7px',
-            borderRadius: '999px',
-            backgroundColor: activeTab === 'deliveries' ? '#0E0E10' : '#3E3E45',
-            color: '#F2F2F5',
-            fontWeight: 700,
-          }}>
-            {deliveries.length}
-          </span>
-        </button>
-
-        <button
-          onClick={() => onTabChange('settings')}
-          style={{
-            padding: '7px 18px',
-            borderRadius: '999px',
-            fontSize: '13px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            backgroundColor: activeTab === 'settings' ? '#F2F2F5' : '#232327',
-            color: activeTab === 'settings' ? '#0E0E10' : '#C9C9D2',
-            border: activeTab === 'settings' ? '1px solid transparent' : '1px solid #3E3E45',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            transition: 'all 0.15s ease',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <span>Settings</span>
-        </button>
-      </div>
-
-      {/* SEARCH BAR (ROUNDED PILL MATCHING 7a30a006.jpg) */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: '16px',
-        marginBottom: '20px',
-      }}>
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          backgroundColor: '#232327',
-          border: '1px solid #3E3E45',
-          borderRadius: '999px',
-          padding: '12px 22px',
-          boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.2)',
-        }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#63636E" strokeWidth="2.2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input
-            type="text"
-            placeholder={
-              activeTab === 'api-keys'
-                ? 'Search API key by name, prefix, or scope...'
-                : activeTab === 'endpoints'
-                ? 'Search endpoint by name, slug, or ID...'
-                : activeTab === 'destinations'
-                ? 'Search destination by name, URL, or method...'
-                : activeTab === 'deliveries'
-                ? 'Search deliveries by ID, URL, status code, or error...'
-                : 'Search member by name, contact email, role...'
-            }
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              border: 'none',
-              backgroundColor: 'transparent',
-              outline: 'none',
-              fontSize: '13px',
+              backgroundColor: activeTab === 'members' ? '#0E0E10' : '#3E3E45',
               color: '#F2F2F5',
-              width: '100%',
+              fontWeight: 700,
+            }}>
+              {members.length}
+            </span>
+          </button>
+
+          <button
+            onClick={() => onTabChange('api-keys')}
+            style={{
+              padding: '7px 18px',
+              borderRadius: '999px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'api-keys' ? '#F2F2F5' : '#232327',
+              color: activeTab === 'api-keys' ? '#0E0E10' : '#C9C9D2',
+              border: activeTab === 'api-keys' ? '1px solid transparent' : '1px solid #3E3E45',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s ease',
+              whiteSpace: 'nowrap',
             }}
-          />
+          >
+            <span>API Keys</span>
+            <span style={{
+              fontSize: '11px',
+              padding: '1px 7px',
+              borderRadius: '999px',
+              backgroundColor: activeTab === 'api-keys' ? '#0E0E10' : '#3E3E45',
+              color: '#F2F2F5',
+              fontWeight: 700,
+            }}>
+              {apiKeys.length}
+            </span>
+          </button>
+
+          <button
+            onClick={() => onTabChange('endpoints')}
+            style={{
+              padding: '7px 18px',
+              borderRadius: '999px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'endpoints' ? '#F2F2F5' : '#232327',
+              color: activeTab === 'endpoints' ? '#0E0E10' : '#C9C9D2',
+              border: activeTab === 'endpoints' ? '1px solid transparent' : '1px solid #3E3E45',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s ease',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span>Endpoints</span>
+            <span style={{
+              fontSize: '11px',
+              padding: '1px 7px',
+              borderRadius: '999px',
+              backgroundColor: activeTab === 'endpoints' ? '#0E0E10' : '#3E3E45',
+              color: '#F2F2F5',
+              fontWeight: 700,
+            }}>
+              {endpoints.length}
+            </span>
+          </button>
+
+          <button
+            onClick={() => onTabChange('destinations')}
+            style={{
+              padding: '7px 18px',
+              borderRadius: '999px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'destinations' ? '#F2F2F5' : '#232327',
+              color: activeTab === 'destinations' ? '#0E0E10' : '#C9C9D2',
+              border: activeTab === 'destinations' ? '1px solid transparent' : '1px solid #3E3E45',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s ease',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span>Destinations</span>
+            <span style={{
+              fontSize: '11px',
+              padding: '1px 7px',
+              borderRadius: '999px',
+              backgroundColor: activeTab === 'destinations' ? '#0E0E10' : '#3E3E45',
+              color: '#F2F2F5',
+              fontWeight: 700,
+            }}>
+              {destinations.length}
+            </span>
+          </button>
+
+          <button
+            onClick={() => onTabChange('deliveries')}
+            style={{
+              padding: '7px 18px',
+              borderRadius: '999px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'deliveries' ? '#F2F2F5' : '#232327',
+              color: activeTab === 'deliveries' ? '#0E0E10' : '#C9C9D2',
+              border: activeTab === 'deliveries' ? '1px solid transparent' : '1px solid #3E3E45',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s ease',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span>Deliveries</span>
+            <span style={{
+              fontSize: '11px',
+              padding: '1px 7px',
+              borderRadius: '999px',
+              backgroundColor: activeTab === 'deliveries' ? '#0E0E10' : '#3E3E45',
+              color: '#F2F2F5',
+              fontWeight: 700,
+            }}>
+              {deliveries.length}
+            </span>
+          </button>
+
+          <button
+            onClick={() => onTabChange('settings')}
+            style={{
+              padding: '7px 18px',
+              borderRadius: '999px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              backgroundColor: activeTab === 'settings' ? '#F2F2F5' : '#232327',
+              color: activeTab === 'settings' ? '#0E0E10' : '#C9C9D2',
+              border: activeTab === 'settings' ? '1px solid transparent' : '1px solid #3E3E45',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.15s ease',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span>Settings</span>
+          </button>
         </div>
-      </div>
+      )}
+
+      {/* SEARCH BAR (ROUNDED PILL - SHOWN IN DIRECTORY VIEWS) */}
+      {activeTab !== 'dashboard' && activeTab !== 'settings' && (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '16px',
+          marginBottom: '20px',
+        }}>
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            backgroundColor: '#232327',
+            border: '1px solid #3E3E45',
+            borderRadius: '999px',
+            padding: '12px 22px',
+            boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.2)',
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#63636E" strokeWidth="2.2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              type="text"
+              placeholder={
+                activeTab === 'api-keys'
+                  ? 'Search API key by name, prefix, or scope...'
+                  : activeTab === 'endpoints'
+                  ? 'Search endpoint by name, slug, or ID...'
+                  : activeTab === 'destinations'
+                  ? 'Search destination by name, URL, or method...'
+                  : activeTab === 'deliveries'
+                  ? 'Search deliveries by ID, URL, status code, or error...'
+                  : 'Search member by name, contact email, role...'
+              }
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                border: 'none',
+                backgroundColor: 'transparent',
+                outline: 'none',
+                fontSize: '13px',
+                color: '#F2F2F5',
+                width: '100%',
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* FEEDBACK BANNER: CREATED RAW API KEY */}
       {createdRawKey && (
@@ -1353,7 +1496,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                   <div style={{ height: '1px', backgroundColor: '#3E3E45', margin: '4px 0' }} />
                                   <button
                                     onClick={() => {
-                                      void handleRemove(m.id);
+                                      promptRemoveMember(m);
                                       setActiveMenuMemberId(null);
                                     }}
                                     style={{
@@ -1375,7 +1518,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                               ) : isCurrent && !isOwner ? (
                                 <button
                                   onClick={() => {
-                                    void handleRemove(m.id);
+                                    promptRemoveMember(m);
                                     setActiveMenuMemberId(null);
                                   }}
                                   style={{
@@ -1518,7 +1661,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                         {canManageKeys && !isRevoked && (
                           <button
                             title="Revoke key"
-                            onClick={() => void handleRevokeApiKey(k.id)}
+                            onClick={() => promptRevokeApiKey(k)}
                             style={{
                               backgroundColor: 'transparent',
                               border: '1px solid #4A2828',
@@ -1666,7 +1809,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
                             <button
                               title="Rotate signing secret"
-                              onClick={() => void handleRotateSecret(ep.id)}
+                              onClick={() => promptRotateSecret(ep)}
                               style={{
                                 backgroundColor: 'transparent',
                                 border: '1px solid #3E3E45',
@@ -1682,7 +1825,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                             </button>
                             <button
                               title="Delete endpoint"
-                              onClick={() => void handleDeleteEndpoint(ep.id)}
+                              onClick={() => promptDeleteEndpoint(ep)}
                               style={{
                                 backgroundColor: 'transparent',
                                 border: '1px solid #4A2828',
@@ -1878,7 +2021,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                             </button>
                             <button
                               title="Delete destination"
-                              onClick={() => void handleDeleteDestination(d.id)}
+                              onClick={() => promptDeleteDestination(d)}
                               style={{
                                 backgroundColor: 'transparent',
                                 border: '1px solid #4A2828',
@@ -2084,32 +2227,298 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           </table>
         )}
 
-        {/* SETTINGS / DASHBOARD VIEW */}
-        {(activeTab === 'dashboard' || activeTab === 'settings') && (
-          <div style={{ padding: '60px 20px', textAlign: 'center', color: '#9A9AA6' }}>
+        {/* OVERVIEW DASHBOARD VIEW (ACTIVE WHEN activeTab === 'dashboard') */}
+        {activeTab === 'dashboard' && (
+          <div style={{ padding: '8px 0 24px' }}>
+            {/* Quick Navigation Cards Grid */}
             <div style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '10px',
-              backgroundColor: '#0E0E10',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '16px',
+              marginBottom: '20px',
+            }}>
+              {/* Box 1: Members Directory */}
+              <div style={{
+                backgroundColor: '#1E1E22',
+                border: '1px solid #3E3E45',
+                borderRadius: '16px',
+                padding: '22px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5' }}>Members Directory</span>
+                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#232327', color: '#9A9AA6' }}>
+                      {members.length} enrolled
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#9A9AA6', margin: 0, lineHeight: 1.5 }}>
+                    Manage member permissions, RBAC roles (Owner, Developer, Member), and invitations.
+                  </p>
+                </div>
+                <button
+                  onClick={() => onTabChange('members')}
+                  style={{
+                    marginTop: '16px',
+                    padding: '8px 16px',
+                    backgroundColor: '#232327',
+                    border: '1px solid #3E3E45',
+                    borderRadius: '999px',
+                    color: '#F2F2F5',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    width: 'fit-content',
+                  }}
+                >
+                  View Directory →
+                </button>
+              </div>
+
+              {/* Box 2: API Keys */}
+              <div style={{
+                backgroundColor: '#1E1E22',
+                border: '1px solid #3E3E45',
+                borderRadius: '16px',
+                padding: '22px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5' }}>API Keys & Credentials</span>
+                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#232327', color: '#9A9AA6' }}>
+                      {activeKeyCount} active
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#9A9AA6', margin: 0, lineHeight: 1.5 }}>
+                    High-throughput ingestion keys with SHA-256 database hashing and instant revocation.
+                  </p>
+                </div>
+                <button
+                  onClick={() => onTabChange('api-keys')}
+                  style={{
+                    marginTop: '16px',
+                    padding: '8px 16px',
+                    backgroundColor: '#232327',
+                    border: '1px solid #3E3E45',
+                    borderRadius: '999px',
+                    color: '#F2F2F5',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    width: 'fit-content',
+                  }}
+                >
+                  Manage API Keys →
+                </button>
+              </div>
+
+              {/* Box 3: Endpoints */}
+              <div style={{
+                backgroundColor: '#1E1E22',
+                border: '1px solid #3E3E45',
+                borderRadius: '16px',
+                padding: '22px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5' }}>Webhook Ingestion</span>
+                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#232327', color: '#9A9AA6' }}>
+                      {endpoints.length} endpoints
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#9A9AA6', margin: 0, lineHeight: 1.5 }}>
+                    Dedicated tenant endpoints secured by rotated AES-256-GCM signing secrets.
+                  </p>
+                </div>
+                <button
+                  onClick={() => onTabChange('endpoints')}
+                  style={{
+                    marginTop: '16px',
+                    padding: '8px 16px',
+                    backgroundColor: '#232327',
+                    border: '1px solid #3E3E45',
+                    borderRadius: '999px',
+                    color: '#F2F2F5',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    width: 'fit-content',
+                  }}
+                >
+                  Configure Endpoints →
+                </button>
+              </div>
+
+              {/* Box 4: Deliveries & Pipeline */}
+              <div style={{
+                backgroundColor: '#1E1E22',
+                border: '1px solid #3E3E45',
+                borderRadius: '16px',
+                padding: '22px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5' }}>Deliveries & DLQ</span>
+                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#232327', color: '#9A9AA6' }}>
+                      {deliveries.length} logs
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#9A9AA6', margin: 0, lineHeight: 1.5 }}>
+                    Durable HTTP outbox worker, exponential retry backoff with jitter, and dead letter routing.
+                  </p>
+                </div>
+                <button
+                  onClick={() => onTabChange('deliveries')}
+                  style={{
+                    marginTop: '16px',
+                    padding: '8px 16px',
+                    backgroundColor: '#232327',
+                    border: '1px solid #3E3E45',
+                    borderRadius: '999px',
+                    color: '#F2F2F5',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    width: 'fit-content',
+                  }}
+                >
+                  Inspect Deliveries →
+                </button>
+              </div>
+            </div>
+
+            {/* Architecture Banner */}
+            <div style={{
+              backgroundColor: '#17171B',
               border: '1px solid #3E3E45',
+              borderRadius: '16px',
+              padding: '22px 24px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 16px',
-              color: '#F2F2F5',
+              gap: '16px',
             }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-              </svg>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '12px',
+                backgroundColor: '#0E0E10',
+                border: '1px solid #3E3E45',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#10b981',
+                flexShrink: 0,
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5', marginBottom: '4px' }}>
+                  PostgreSQL Row-Level Security Enforced
+                </div>
+                <div style={{ fontSize: '12px', color: '#9A9AA6', lineHeight: 1.5 }}>
+                  Organization slug: <code>{organization.slug}</code> (Tenant ID: <code>{organization.id}</code>). All queries and outbox workers execute with strict tenant isolation.
+                </div>
+              </div>
             </div>
-            <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 8px', color: '#F2F2F5' }}>
-              Organization Settings & Architecture
-            </h3>
-            <p style={{ fontSize: '13px', margin: 0, color: '#9A9AA6' }}>
-              PostgreSQL Row-Level Security isolation is active. Slug: <code>{organization.slug}</code>
-            </p>
+          </div>
+        )}
+
+        {/* SETTINGS VIEW (ACTIVE WHEN activeTab === 'settings') */}
+        {activeTab === 'settings' && (
+          <div style={{ padding: '40px 20px', maxWidth: '640px', margin: '0 auto', textAlign: 'left' }}>
+            <div style={{
+              backgroundColor: '#1E1E22',
+              border: '1px solid #3E3E45',
+              borderRadius: '20px',
+              padding: '28px',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+            }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#F2F2F5' }}>
+                Organization Parameters
+              </h3>
+              <p style={{ fontSize: '13px', color: '#9A9AA6', margin: '0 0 20px' }}>
+                Manage configuration and security policies for {organization.name}.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#9A9AA6', textTransform: 'uppercase', marginBottom: '6px' }}>
+                    Organization ID
+                  </label>
+                  <input
+                    type="text"
+                    readOnly
+                    value={organization.id}
+                    style={{
+                      width: '100%',
+                      fontFamily: 'monospace',
+                      fontSize: '12px',
+                      padding: '10px 14px',
+                      backgroundColor: '#0E0E10',
+                      border: '1px solid #3E3E45',
+                      borderRadius: '8px',
+                      color: '#9A9AA6',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#9A9AA6', textTransform: 'uppercase', marginBottom: '6px' }}>
+                    Tenant URL Slug
+                  </label>
+                  <input
+                    type="text"
+                    readOnly
+                    value={organization.slug}
+                    style={{
+                      width: '100%',
+                      fontFamily: 'monospace',
+                      fontSize: '12px',
+                      padding: '10px 14px',
+                      backgroundColor: '#0E0E10',
+                      border: '1px solid #3E3E45',
+                      borderRadius: '8px',
+                      color: '#9A9AA6',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#9A9AA6', textTransform: 'uppercase', marginBottom: '6px' }}>
+                    Tenant Isolation Mode
+                  </label>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 14px',
+                    backgroundColor: '#0E0E10',
+                    border: '1px solid #3E3E45',
+                    borderRadius: '8px',
+                  }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981' }} />
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#F2F2F5' }}>
+                      Enforced (PostgreSQL Row-Level Security)
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -2848,6 +3257,118 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 }}
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: CUSTOM CONFIRMATION DIALOG (REPLACES ALL BROWSER POPUPS) */}
+      {confirmModal && confirmModal.isOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(14, 14, 16, 0.8)',
+          backdropFilter: 'blur(6px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 100,
+          padding: '16px',
+        }}>
+          <div style={{
+            backgroundColor: '#1E1E22',
+            borderRadius: '20px',
+            border: '1px solid #3E3E45',
+            width: '100%',
+            maxWidth: '460px',
+            padding: '28px',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.7)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', marginBottom: '16px' }}>
+              <div style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '12px',
+                backgroundColor: confirmModal.confirmVariant === 'warning' ? '#2B2314' : '#2A1C1C',
+                border: confirmModal.confirmVariant === 'warning' ? '1px solid #4D3C1D' : '1px solid #442A2A',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                color: confirmModal.confirmVariant === 'warning' ? '#f59e0b' : '#f87171',
+              }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: '#F2F2F5' }}>
+                  {confirmModal.title}
+                </h3>
+                <p style={{ fontSize: '13px', color: '#9A9AA6', margin: 0, lineHeight: 1.5 }}>
+                  {confirmModal.message}
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
+              <button
+                type="button"
+                disabled={isConfirmLoading}
+                onClick={() => setConfirmModal(null)}
+                style={{
+                  padding: '10px 18px',
+                  backgroundColor: '#232327',
+                  border: '1px solid #3E3E45',
+                  borderRadius: '999px',
+                  color: '#F2F2F5',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: isConfirmLoading ? 'not-allowed' : 'pointer',
+                  opacity: isConfirmLoading ? 0.6 : 1,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isConfirmLoading}
+                onClick={() => void executeConfirmedAction()}
+                style={{
+                  padding: '10px 22px',
+                  backgroundColor: confirmModal.confirmVariant === 'warning' ? '#d97706' : '#dc2626',
+                  border: 'none',
+                  borderRadius: '999px',
+                  color: '#ffffff',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: isConfirmLoading ? 'not-allowed' : 'pointer',
+                  boxShadow: confirmModal.confirmVariant === 'warning'
+                    ? '0 2px 10px rgba(217, 119, 6, 0.35)'
+                    : '0 2px 10px rgba(220, 38, 38, 0.35)',
+                  opacity: isConfirmLoading ? 0.7 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                {isConfirmLoading && (
+                  <div style={{
+                    width: '14px',
+                    height: '14px',
+                    border: '2px solid rgba(255, 255, 255, 0.4)',
+                    borderTopColor: '#ffffff',
+                    borderRadius: '50%',
+                    animation: 'spin 0.8s linear infinite',
+                  }} />
+                )}
+                <span>{confirmModal.confirmLabel}</span>
               </button>
             </div>
           </div>
