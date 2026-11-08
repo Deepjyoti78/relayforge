@@ -389,4 +389,60 @@ export class DeliveryService {
       });
     });
   }
+
+  /**
+   * Replays an event delivery from DLQ or failed attempt by re-enqueuing its outbox message.
+   */
+  async replayDelivery(
+    organizationId: string,
+    userId: string,
+    deliveryAttemptId: string,
+  ): Promise<{ success: boolean; outboxMessageId: string; eventId: string; status: string }> {
+    return this.tenantContext.runInTenantContext(organizationId, userId, async (tx) => {
+      const membership = await tx.membership.findUnique({
+        where: { organizationId_userId: { organizationId, userId } },
+      });
+
+      if (!membership) {
+        throw new NotFoundException('Organization not found or access denied.');
+      }
+
+      if (!this.authz.canManageDestinations(membership.role)) {
+        throw new ForbiddenException('Only OWNER or DEVELOPER roles can replay event deliveries.');
+      }
+
+      const attempt = await tx.deliveryAttempt.findFirst({
+        where: { id: deliveryAttemptId, organizationId },
+      });
+
+      if (!attempt) {
+        throw new NotFoundException('Delivery attempt record not found.');
+      }
+
+      let outboxMessageId = attempt.outboxMessageId;
+      if (!outboxMessageId) {
+        const outbox = await tx.outboxMessage.findFirst({
+          where: { eventId: attempt.eventId, organizationId },
+        });
+        if (!outbox) {
+          throw new NotFoundException('Associated outbox message not found for replay.');
+        }
+        outboxMessageId = outbox.id;
+      }
+
+      // Replay via SECURITY DEFINER function
+      const replayRows = await tx.$queryRaw<{ replayed_outbox_id: string; replayed_event_id: string; new_status: string }[]>`
+        SELECT replayed_outbox_id, replayed_event_id, new_status
+        FROM replay_outbox_message(${outboxMessageId}::uuid)
+      `;
+
+      const result = replayRows[0];
+      return {
+        success: true,
+        outboxMessageId: result?.replayed_outbox_id ?? outboxMessageId,
+        eventId: result?.replayed_event_id ?? attempt.eventId,
+        status: result?.new_status ?? 'PENDING',
+      };
+    });
+  }
 }

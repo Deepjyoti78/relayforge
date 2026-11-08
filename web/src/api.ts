@@ -323,3 +323,17 @@ export async function testDestinationPing(
   }
   return res.json() as Promise<DeliveryAttemptMetadata>;
 }
+
+export async function replayDelivery(
+  orgId: string,
+  deliveryId: string,
+): Promise<{ success: boolean; outboxMessageId: string; eventId: string; status: string }> {
+  const res = await apiFetch(`/v1/organizations/${orgId}/deliveries/${deliveryId}/replay`, {
+    method: 'POST',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Failed to replay delivery' })) as { message?: string };
+    throw new Error(err.message || 'Failed to replay delivery');
+  }
+  return res.json() as Promise<{ success: boolean; outboxMessageId: string; eventId: string; status: string }>;
+}

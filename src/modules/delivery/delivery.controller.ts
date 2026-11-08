@@ -57,4 +57,14 @@ export class DeliveryController {
   ) {
     return this.deliveryService.testDestinationPing(orgId, user.id, destinationId);
   }
+
+  @Post('deliveries/:deliveryId/replay')
+  @HttpCode(HttpStatus.OK)
+  async replayDelivery(
+    @Param('orgId', ParseUUIDPipe) orgId: string,
+    @Param('deliveryId', ParseUUIDPipe) deliveryId: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.deliveryService.replayDelivery(orgId, user.id, deliveryId);
+  }
 }

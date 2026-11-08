@@ -294,4 +294,196 @@ describe('Milestone 3 Option 2: Durable HTTP Delivery Pipeline & Outbox Dispatch
         .expect(404);
     });
   });
+
+  describe('Milestone 3 Option 3: Retry Scheduling, Dead Letters & Crash Recovery', () => {
+    let failEndpoint: { id: string; signingSecret: string };
+    let failDestination: { id: string; url: string };
+
+    beforeAll(async () => {
+      // Create endpoint in Org A for failure tests
+      const createdEp = await endpointService.createEndpoint(orgA.id, userA.id, {
+        name: 'Retry Ingest Endpoint',
+        slug: `retry-${randomUUID().slice(0, 8)}`,
+      });
+      failEndpoint = { id: createdEp.endpoint.id, signingSecret: createdEp.signingSecret };
+
+      // Deactivate destinationA so Org A only delivers to fail destination
+      await tenantContext.runInTenantContext(orgA.id, userA.id, async (tx) => {
+        await tx.destination.update({
+          where: { id: destinationA.id },
+          data: { isActive: false },
+        });
+      });
+
+      // Create destination targeting the 500 endpoint
+      const failUrl = testServerUrl.replace('/webhook-target', '/fail');
+      const resDest = await request(app.getHttpServer())
+        .post(`/v1/organizations/${orgA.id}/destinations`)
+        .set('Cookie', userA.cookie)
+        .send({
+          name: 'Failing Destination Target',
+          url: failUrl,
+          httpMethod: 'POST',
+        })
+        .expect(201);
+
+      failDestination = { id: (resDest.body as { id: string }).id, url: failUrl };
+      expect(failDestination.id).toBeDefined();
+    });
+
+    it('schedules retry with exponential backoff on transient failure (HTTP 500)', async () => {
+      const payload = { event: 'order.placed', orderId: 999 };
+      const rawBody = JSON.stringify(payload);
+      const signature = signWebhookPayload(rawBody, failEndpoint.signingSecret);
+
+      const ingestRes = await ingestionService.ingestWebhook(
+        failEndpoint.id,
+        rawBody,
+        {
+          'content-type': 'application/json',
+          'x-relayforge-signature': signature,
+          'x-event-type': 'order.placed',
+          'x-idempotency-key': `retry-test-${randomUUID()}`,
+        },
+        payload,
+      );
+
+      // Trigger worker sweep
+      await outboxWorker.sweepPendingOutbox();
+
+      // Verify outbox message is still PENDING with nextRetryAt scheduled in the future
+      const outbox = await tenantContext.runInTenantContext(orgA.id, userA.id, async (tx) => {
+        return tx.outboxMessage.findFirst({
+          where: { eventId: ingestRes.eventId },
+        });
+      });
+
+      expect(outbox).toBeDefined();
+      expect(outbox?.status).toBe('PENDING');
+      expect(outbox?.attemptCount).toBe(1);
+      expect(outbox?.nextRetryAt).toBeDefined();
+      expect(outbox?.nextRetryAt!.getTime()).toBeGreaterThan(Date.now());
+      expect(outbox?.leaseExpiresAt).toBeNull();
+
+      // Verify delivery attempt record captured 500 FAILED
+      const attempts = await tenantContext.runInTenantContext(orgA.id, userA.id, async (tx) => {
+        return tx.deliveryAttempt.findMany({
+          where: { eventId: ingestRes.eventId },
+        });
+      });
+      expect(attempts).toHaveLength(1);
+      expect(attempts[0]?.status).toBe('FAILED');
+      expect(attempts[0]?.statusCode).toBe(500);
+
+      // Verify manual replay API redelivers by resetting next_retry_at to NOW()
+      const replayRes = await request(app.getHttpServer())
+        .post(`/v1/organizations/${orgA.id}/deliveries/${attempts[0]!.id}/replay`)
+        .set('Cookie', userA.cookie)
+        .expect(200);
+
+      expect((replayRes.body as { success: boolean }).success).toBe(true);
+
+      const outboxReplayed = await tenantContext.runInTenantContext(orgA.id, userA.id, async (tx) => {
+        return tx.outboxMessage.findUnique({
+          where: { id: outbox!.id },
+        });
+      });
+      expect(outboxReplayed?.status).toBe('PENDING');
+      expect(outboxReplayed?.attemptCount).toBe(0);
+      expect(outboxReplayed?.nextRetryAt!.getTime()).toBeLessThanOrEqual(Date.now() + 1000);
+    });
+
+    it('transitions exhausted delivery to DEAD_LETTER when max retries exceeded', async () => {
+      const payload = { event: 'invoice.failed', invoiceId: 101 };
+      const rawBody = JSON.stringify(payload);
+      const signature = signWebhookPayload(rawBody, failEndpoint.signingSecret);
+
+      const ingestRes = await ingestionService.ingestWebhook(
+        failEndpoint.id,
+        rawBody,
+        {
+          'content-type': 'application/json',
+          'x-relayforge-signature': signature,
+          'x-event-type': 'invoice.failed',
+          'x-idempotency-key': `dlq-test-${randomUUID()}`,
+        },
+        payload,
+      );
+
+      // Simulate 4 prior failed attempts
+      await tenantContext.runInTenantContext(orgA.id, userA.id, async (tx) => {
+        await tx.outboxMessage.updateMany({
+          where: { eventId: ingestRes.eventId },
+          data: {
+            attemptCount: 4,
+            nextRetryAt: new Date(Date.now() - 1000), // Ready to run
+          },
+        });
+      });
+
+      // Sweep will attempt 5th time (attempt_count becomes 5 >= maxRetries) and fail
+      await outboxWorker.sweepPendingOutbox();
+
+      const outbox = await tenantContext.runInTenantContext(orgA.id, userA.id, async (tx) => {
+        return tx.outboxMessage.findFirst({
+          where: { eventId: ingestRes.eventId },
+        });
+      });
+
+      expect(outbox?.status).toBe('DEAD_LETTER');
+      expect(outbox?.dispatchedAt).toBeDefined();
+
+      const event = await tenantContext.runInTenantContext(orgA.id, userA.id, async (tx) => {
+        return tx.event.findUnique({
+          where: { id: ingestRes.eventId },
+        });
+      });
+      expect(event?.status).toBe('FAILED');
+    });
+
+    it('reclaims stale in-flight leases left by crashed workers', async () => {
+      // Insert a simulated in-flight message with expired lease
+      const outboxId = randomUUID();
+      const eventId = randomUUID();
+
+      await tenantContext.runInTenantContext(orgA.id, userA.id, async (tx) => {
+        await tx.event.create({
+          data: {
+            id: eventId,
+            organizationId: orgA.id,
+            endpointId: failEndpoint.id,
+            eventType: 'crash.simulated',
+            payload: { crashed: true },
+            status: 'PROCESSING',
+          },
+        });
+
+        await tx.outboxMessage.create({
+          data: {
+            id: outboxId,
+            organizationId: orgA.id,
+            eventId,
+            channel: 'events',
+            payload: { crashed: true },
+            status: 'PENDING',
+            attemptCount: 1,
+            leaseExpiresAt: new Date(Date.now() - 5000), // Lease expired 5 seconds ago
+          },
+        });
+      });
+
+      // Run crash recovery lease sweep
+      const reclaimed = await outboxWorker.sweepStaleLeases();
+      expect(reclaimed).toBeGreaterThanOrEqual(1);
+
+      // Verify lease was cleared so new workers can claim it
+      const outbox = await tenantContext.runInTenantContext(orgA.id, userA.id, async (tx) => {
+        return tx.outboxMessage.findUnique({
+          where: { id: outboxId },
+        });
+      });
+      expect(outbox?.status).toBe('PENDING');
+      expect(outbox?.leaseExpiresAt).toBeNull();
+    });
+  });
 });

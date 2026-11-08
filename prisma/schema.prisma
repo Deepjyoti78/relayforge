@@ -211,6 +211,7 @@ enum OutboxStatus {
   PENDING
   DISPATCHED
   FAILED
+  DEAD_LETTER
 
   @@map("outbox_status")
 }
@@ -223,6 +224,9 @@ model OutboxMessage {
   payload        Json         @map("payload")
   status         OutboxStatus @default(PENDING) @map("status")
   attemptCount   Int          @default(0) @map("attempt_count")
+  maxRetries     Int          @default(5) @map("max_retries")
+  nextRetryAt    DateTime?    @map("next_retry_at") @db.Timestamptz(3)
+  leaseExpiresAt DateTime?    @map("lease_expires_at") @db.Timestamptz(3)
   createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
   dispatchedAt   DateTime?    @map("dispatched_at") @db.Timestamptz(3)
 
@@ -231,6 +235,8 @@ model OutboxMessage {
   deliveryAttempts DeliveryAttempt[]
 
   @@index([status, createdAt])
+  @@index([status, nextRetryAt])
+  @@index([leaseExpiresAt])
   @@index([organizationId])
   @@map("outbox_messages")
 }

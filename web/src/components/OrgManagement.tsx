@@ -9,6 +9,7 @@ import {
   fetchDeliveries,
   fetchDestinations,
   fetchEndpoints,
+  replayDelivery,
   revokeApiKey,
   rotateEndpointSecret,
   testDestinationPing,
@@ -48,6 +49,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
   onRemoveMember,
 }) => {
   const isOwner = organization.role === 'OWNER';
+  const isDeveloper = organization.role === 'DEVELOPER';
   const canManageKeys = organization.role === 'OWNER' || organization.role === 'DEVELOPER';
 
   // Org Rename State
@@ -103,6 +105,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
   const [deliveriesLoading, setDeliveriesLoading] = useState(false);
   const [pingLoadingId, setPingLoadingId] = useState<string | null>(null);
   const [pingResult, setPingResult] = useState<{ id: string; status: 'SUCCESS' | 'FAILED'; text: string } | null>(null);
+  const [replayingDeliveryId, setReplayingDeliveryId] = useState<string | null>(null);
+  const [replayMessage, setReplayMessage] = useState<string | null>(null);
   const [selectedAttemptForModal, setSelectedAttemptForModal] = useState<DeliveryAttemptMetadata | null>(null);
 
   // Search & Filter
@@ -156,6 +160,21 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       });
     } finally {
       setPingLoadingId(null);
+    }
+  };
+
+  const handleReplay = async (deliveryId: string) => {
+    setReplayingDeliveryId(deliveryId);
+    setDestinationActionError(null);
+    try {
+      const res = await replayDelivery(organization.id, deliveryId);
+      setReplayMessage(`Delivery re-queued (Outbox: ${res.outboxMessageId.slice(0, 8)})`);
+      setTimeout(() => setReplayMessage(null), 4000);
+      void loadDeliveries();
+    } catch (err: unknown) {
+      setDestinationActionError(err instanceof Error ? err.message : 'Failed to replay delivery');
+    } finally {
+      setReplayingDeliveryId(null);
     }
   };
 
@@ -1114,6 +1133,25 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         </div>
       )}
 
+      {replayMessage && (
+        <div style={{
+          backgroundColor: '#1E2D22',
+          border: '1px solid #2B4232',
+          color: '#4ade80',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          fontSize: '13px',
+          fontWeight: 600,
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+        }}>
+          <span>🔄</span>
+          <span>{replayMessage}</span>
+        </div>
+      )}
+
       {/* TABLE CONTAINER */}
       <div className="rf-table-responsive">
         {/* MEMBERS VIEW */}
@@ -1997,21 +2035,46 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                       </td>
 
                       <td style={{ padding: '14px 20px', textAlign: 'right' }}>
-                        <button
-                          onClick={() => setSelectedAttemptForModal(att)}
-                          style={{
-                            backgroundColor: '#232327',
-                            border: '1px solid #3E3E45',
-                            color: '#F2F2F5',
-                            borderRadius: '6px',
-                            padding: '4px 10px',
-                            fontSize: '11px',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          Inspect Details
-                        </button>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                          {(isOwner || isDeveloper) && (
+                            <button
+                              onClick={() => void handleReplay(att.id)}
+                              disabled={replayingDeliveryId === att.id}
+                              title="Re-enqueue event delivery attempt"
+                              style={{
+                                backgroundColor: replayingDeliveryId === att.id ? '#3E3E45' : '#232327',
+                                border: '1px solid #3E3E45',
+                                color: '#F2F2F5',
+                                borderRadius: '6px',
+                                padding: '4px 10px',
+                                fontSize: '11px',
+                                fontWeight: 600,
+                                cursor: replayingDeliveryId === att.id ? 'not-allowed' : 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                              }}
+                            >
+                              <span>🔄</span>
+                              <span>{replayingDeliveryId === att.id ? '...' : 'Replay'}</span>
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setSelectedAttemptForModal(att)}
+                            style={{
+                              backgroundColor: '#232327',
+                              border: '1px solid #3E3E45',
+                              color: '#F2F2F5',
+                              borderRadius: '6px',
+                              padding: '4px 10px',
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Inspect Details
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -2745,7 +2808,32 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               </div>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+              {(isOwner || isDeveloper) && (
+                <button
+                  onClick={() => {
+                    const id = selectedAttemptForModal.id;
+                    setSelectedAttemptForModal(null);
+                    void handleReplay(id);
+                  }}
+                  style={{
+                    padding: '8px 20px',
+                    backgroundColor: '#232327',
+                    color: '#F2F2F5',
+                    border: '1px solid #3E3E45',
+                    borderRadius: '999px',
+                    fontWeight: 700,
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <span>🔄</span>
+                  <span>Replay Delivery</span>
+                </button>
+              )}
               <button
                 onClick={() => setSelectedAttemptForModal(null)}
                 style={{

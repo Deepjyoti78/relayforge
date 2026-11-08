@@ -239,5 +239,55 @@ describe('Milestone 3 Option 2: DeliveryService Unit Tests', () => {
         ForbiddenException,
       );
     });
+
+    it('replays delivery by re-enqueuing outbox message', async () => {
+      mockTenantContext.runInTenantContext = jest
+        .fn()
+        .mockImplementation(
+          <T>(_orgId: string, _userId: string, fn: (tx: unknown) => Promise<T>): Promise<T> => {
+            const mockTx = {
+              membership: {
+                findUnique: jest.fn().mockResolvedValue({ role: 'DEVELOPER' }),
+              },
+              deliveryAttempt: {
+                findFirst: jest.fn().mockResolvedValue({
+                  id: 'att-1',
+                  organizationId: orgId,
+                  eventId: eventId,
+                  outboxMessageId: 'outbox-1',
+                }),
+              },
+              $queryRaw: jest.fn().mockResolvedValue([
+                { replayed_outbox_id: 'outbox-1', replayed_event_id: eventId, new_status: 'PENDING' },
+              ]),
+            };
+            return fn(mockTx);
+          },
+        );
+
+      const result = await deliveryService.replayDelivery(orgId, userId, 'att-1');
+      expect(result.success).toBe(true);
+      expect(result.outboxMessageId).toBe('outbox-1');
+      expect(result.status).toBe('PENDING');
+    });
+
+    it('rejects replay for VIEWER role', async () => {
+      mockTenantContext.runInTenantContext = jest
+        .fn()
+        .mockImplementation(
+          <T>(_orgId: string, _userId: string, fn: (tx: unknown) => Promise<T>): Promise<T> => {
+            const mockTx = {
+              membership: {
+                findUnique: jest.fn().mockResolvedValue({ role: 'VIEWER' }),
+              },
+            };
+            return fn(mockTx);
+          },
+        );
+
+      await expect(deliveryService.replayDelivery(orgId, userId, 'att-1')).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
   });
 });

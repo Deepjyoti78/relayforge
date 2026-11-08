@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { DatabaseService } from '../modules/database/database.service';
 import { DeliveryService } from '../modules/delivery/delivery.service';
+import { evaluateRetry } from '../modules/delivery/retry-policy';
 import { safeError } from '../modules/observability/logging';
 
 interface ClaimedOutboxRow {
@@ -14,6 +15,7 @@ interface ClaimedOutboxRow {
   attempt_count: number;
   created_at: Date;
   event_type: string;
+  max_retries: number;
 }
 
 interface ActiveDestinationRow {
@@ -32,6 +34,7 @@ interface ActiveDestinationRow {
 export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(OutboxWorkerService.name);
   private sweepTimer: NodeJS.Timeout | undefined;
+  private staleRecoveryTimer: NodeJS.Timeout | undefined;
   private isProcessing = false;
   private isRunning = true;
 
@@ -48,8 +51,14 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
       void this.sweepPendingOutbox();
     }, 1000);
 
-    // Initial immediate sweep
+    // Start crash recovery stale lease sweeper every 15000ms
+    this.staleRecoveryTimer = setInterval(() => {
+      void this.sweepStaleLeases();
+    }, 15000);
+
+    // Initial immediate sweeps
     void this.sweepPendingOutbox();
+    void this.sweepStaleLeases();
     this.logger.log({ event: 'outbox_worker_started', pollIntervalMs: 1000 });
   }
 
@@ -58,6 +67,10 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
     if (this.sweepTimer) {
       clearInterval(this.sweepTimer);
       this.sweepTimer = undefined;
+    }
+    if (this.staleRecoveryTimer) {
+      clearInterval(this.staleRecoveryTimer);
+      this.staleRecoveryTimer = undefined;
     }
   }
 
@@ -73,8 +86,8 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
     let processedCount = 0;
     try {
       const claimedMessages = await this.database.client.$queryRaw<ClaimedOutboxRow[]>`
-        SELECT id, event_id, org_id, channel, payload, status, attempt_count, created_at, event_type
-        FROM claim_pending_outbox_messages(25)
+        SELECT id, event_id, org_id, channel, payload, status, attempt_count, created_at, event_type, max_retries
+        FROM claim_pending_outbox_messages(25, 30)
       `;
 
       if (!claimedMessages || claimedMessages.length === 0) {
@@ -97,6 +110,25 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
     return processedCount;
   }
 
+  /**
+   * Reclaims stale outbox message leases in case of worker crashes or ungraceful terminations.
+   */
+  async sweepStaleLeases(): Promise<number> {
+    try {
+      const res = await this.database.client.$queryRaw<{ reclaim_stale_outbox_leases: number }[]>`
+        SELECT reclaim_stale_outbox_leases()
+      `;
+      const count = res?.[0]?.reclaim_stale_outbox_leases ?? 0;
+      if (count > 0) {
+        this.logger.warn({ event: 'stale_leases_reclaimed', count });
+      }
+      return count;
+    } catch (err: unknown) {
+      this.logger.error({ event: 'stale_lease_recovery_error', error: safeError(err) });
+      return 0;
+    }
+  }
+
   private async processOutboxMessage(msg: ClaimedOutboxRow): Promise<void> {
     try {
       // 1. Fetch active destinations for this tenant
@@ -117,6 +149,9 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
 
       // 3. Deliver to each destination target
       let anySucceeded = false;
+      let lastStatusCode: number | null = null;
+      let lastErrorDescription: string | null = null;
+
       for (const dest of destinations) {
         const attempt = await this.deliveryService.deliverEventToDestination({
           organizationId: msg.org_id,
@@ -137,25 +172,48 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
 
         if (attempt.status === 'SUCCESS') {
           anySucceeded = true;
+        } else {
+          lastStatusCode = attempt.statusCode;
+          lastErrorDescription = attempt.errorDescription;
         }
       }
 
-      // 4. Update status based on results
+      // 4. Update status or schedule retry / dead-letter
       if (anySucceeded) {
         await this.database.client.$executeRaw`
           SELECT complete_outbox_dispatch(${msg.id}::uuid, ${msg.event_id}::uuid, 'DISPATCHED', 'COMPLETED')
         `;
       } else {
-        // If max retry threshold reached (e.g. 5 attempts)
-        if (msg.attempt_count >= 5) {
+        const evalResult = evaluateRetry({
+          attemptCount: msg.attempt_count,
+          maxRetries: msg.max_retries ?? 5,
+          statusCode: lastStatusCode,
+          errorDescription: lastErrorDescription,
+        });
+
+        if (evalResult.shouldRetry && evalResult.nextRetryAt) {
           await this.database.client.$executeRaw`
-            SELECT complete_outbox_dispatch(${msg.id}::uuid, ${msg.event_id}::uuid, 'FAILED', 'FAILED')
+            SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, ${evalResult.nextRetryAt}::timestamptz, false)
           `;
+          this.logger.log({
+            event: 'delivery_retry_scheduled',
+            outboxId: msg.id,
+            attemptCount: msg.attempt_count,
+            delayMs: evalResult.delayMs,
+            nextRetryAt: evalResult.nextRetryAt.toISOString(),
+          });
         } else {
-          // Reset to PENDING for subsequent retry
           await this.database.client.$executeRaw`
-            SELECT reset_outbox_pending(${msg.id}::uuid)
+            SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, NOW(), true)
           `;
+          this.logger.warn({
+            event: 'delivery_dead_lettered',
+            outboxId: msg.id,
+            attemptCount: msg.attempt_count,
+            reason: evalResult.reason,
+            statusCode: lastStatusCode,
+            error: lastErrorDescription,
+          });
         }
       }
     } catch (err: unknown) {
@@ -165,14 +223,20 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
         error: safeError(err),
       });
 
-      // Reset to PENDING if within retry limit, else fail
-      if (msg.attempt_count < 5) {
+      const evalResult = evaluateRetry({
+        attemptCount: msg.attempt_count,
+        maxRetries: msg.max_retries ?? 5,
+        statusCode: null,
+        errorDescription: err instanceof Error ? err.message : 'Unknown dispatch error',
+      });
+
+      if (evalResult.shouldRetry && evalResult.nextRetryAt) {
         await this.database.client.$executeRaw`
-          SELECT reset_outbox_pending(${msg.id}::uuid)
+          SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, ${evalResult.nextRetryAt}::timestamptz, false)
         `;
       } else {
         await this.database.client.$executeRaw`
-          SELECT complete_outbox_dispatch(${msg.id}::uuid, ${msg.event_id}::uuid, 'FAILED', 'FAILED')
+          SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, NOW(), true)
         `;
       }
     }
