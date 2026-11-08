@@ -1,32 +1,14 @@
-# RelayForge Staging Infrastructure Blueprint (Render.com)
-# Defines all 5 core isolated staging services with private networking
+# RelayForge 100% Free Staging Infrastructure Blueprint (Render.com)
+# Zero-card required: Uses free tiers for API, Worker, and Web
+# Connected to free cloud databases (Supabase for PostgreSQL, Upstash for Redis)
 version: "1"
 
-databases:
-  # 1. Managed PostgreSQL Staging Database
-  - name: relayforge-staging-db
-    databaseName: relayforge_staging
-    user: relayforge_admin
-    plan: starter
-    region: oregon
-    postgresMajorVersion: "16"
-    ipAllowList: [] # Private network only - no public internet exposure
-
 services:
-  # 2. Managed Redis Staging Cache & Distributed Limiter
-  - type: redis
-    name: relayforge-staging-redis
-    plan: starter
-    region: oregon
-    ipAllowList: [] # Private network only
-    maxmemoryPolicy: noeviction
-
-  # 3. RelayForge API Web Service (NestJS)
+  # 1. RelayForge API Web Service (NestJS) - Free Tier
   - type: web
     name: relayforge-staging-api
     runtime: node
-    region: oregon
-    plan: starter
+    plan: free
     buildCommand: npm ci && npm run db:generate && npm run build
     startCommand: npm run start:api
     healthCheckPath: /health/ready
@@ -42,18 +24,13 @@ services:
       - key: LOG_LEVEL
         value: info
       - key: DATABASE_POOL_SIZE
-        value: "10"
+        value: "5"
       - key: DATABASE_TIMEOUT_MS
         value: "3000"
       - key: DATABASE_URL
-        fromDatabase:
-          name: relayforge-staging-db
-          property: connectionString
+        sync: false # Paste Supabase PostgreSQL Connection String
       - key: REDIS_URL
-        fromService:
-          type: redis
-          name: relayforge-staging-redis
-          property: connectionString
+        sync: false # Paste Upstash Redis TLS Connection String (rediss://...)
       - key: ENCRYPTION_KEY
         generateValue: true # Generates high-entropy 256-bit secret automatically
       - key: ALLOW_PRIVATE_DESTINATIONS
@@ -65,18 +42,19 @@ services:
       - key: GITHUB_CALLBACK_URL
         value: https://relayforge-staging-api.onrender.com/auth/github/callback
       - key: GITHUB_CLIENT_ID
-        sync: false # Set manually in Render dashboard from GitHub OAuth App
+        sync: false # Paste GitHub OAuth App Client ID
       - key: GITHUB_CLIENT_SECRET
-        sync: false # Set manually in Render dashboard from GitHub OAuth App
+        sync: false # Paste GitHub OAuth App Client Secret
 
-  # 4. RelayForge Background Outbox Worker (NestJS Daemon)
-  - type: worker
+  # 2. RelayForge Background Outbox Worker (NestJS Daemon) - Free Tier
+  # Runs as an isolated Web Service listening on /health for zero cloud costs
+  - type: web
     name: relayforge-staging-worker
     runtime: node
-    region: oregon
-    plan: starter
+    plan: free
     buildCommand: npm ci && npm run db:generate && npm run build
     startCommand: npm run start:worker
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
@@ -85,20 +63,21 @@ services:
       - key: LOG_LEVEL
         value: info
       - key: WORKER_CONCURRENCY
-        value: "4"
+        value: "2"
       - key: WORKER_HEARTBEAT_MS
         value: "10000"
       - key: QUEUE_PREFIX
         value: relayforge_staging
       - key: WORKER_DATABASE_URL
-        fromDatabase:
-          name: relayforge-staging-db
-          property: connectionString
+        fromService:
+          type: web
+          name: relayforge-staging-api
+          envVarKey: DATABASE_URL
       - key: REDIS_URL
         fromService:
-          type: redis
-          name: relayforge-staging-redis
-          property: connectionString
+          type: web
+          name: relayforge-staging-api
+          envVarKey: REDIS_URL
       - key: ENCRYPTION_KEY
         fromService:
           type: web
@@ -107,8 +86,7 @@ services:
       - key: ALLOW_PRIVATE_DESTINATIONS
         value: "false"
 
-  # 5. RelayForge Web Console (React Vite SPA)
-  # Static sites on Render are distributed globally on CDN and must not specify a region
+  # 3. RelayForge Web Console (React Vite SPA) - Free Tier
   - type: web
     name: relayforge-staging-web
     runtime: static
