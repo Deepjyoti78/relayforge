@@ -86,4 +86,7 @@ npm run db:restore
 
 # Worker Health Probe
 npm run healthcheck:worker
+
+# Staging Synthetic End-to-End Verification
+STAGING_API_URL=https://relayforge-staging-api.onrender.com node scripts/staging-e2e-verify.cjs
 ```

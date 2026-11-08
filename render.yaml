@@ -1,0 +1,132 @@
+# RelayForge Staging Infrastructure Blueprint (Render.com)
+# Defines all 5 core isolated staging services with private networking
+version: "1"
+
+databases:
+  # 1. Managed PostgreSQL Staging Database
+  - name: relayforge-staging-db
+    databaseName: relayforge_staging
+    user: relayforge_admin
+    plan: starter
+    region: oregon
+    postgresMajorVersion: "16"
+    ipAllowList: [] # Private network only - no public internet exposure
+
+services:
+  # 2. Managed Redis Staging Cache & Distributed Limiter
+  - type: redis
+    name: relayforge-staging-redis
+    plan: starter
+    region: oregon
+    ipAllowList: [] # Private network only
+    maxmemoryPolicy: noeviction
+
+  # 3. RelayForge API Web Service (NestJS)
+  - type: web
+    name: relayforge-staging-api
+    runtime: node
+    region: oregon
+    plan: starter
+    buildCommand: npm ci && npm run db:generate && npm run build
+    startCommand: npm run start:api
+    healthCheckPath: /health/ready
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_VERSION
+        value: 1.0.0-staging
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 3100
+      - key: LOG_LEVEL
+        value: info
+      - key: DATABASE_POOL_SIZE
+        value: "10"
+      - key: DATABASE_TIMEOUT_MS
+        value: "3000"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: relayforge-staging-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: relayforge-staging-redis
+          property: connectionString
+      - key: ENCRYPTION_KEY
+        generateValue: true # Generates high-entropy 256-bit secret automatically
+      - key: ALLOW_PRIVATE_DESTINATIONS
+        value: "false"
+      - key: SESSION_COOKIE_NAME
+        value: rf_staging_session
+      - key: FRONTEND_URL
+        value: https://relayforge-staging-web.onrender.com
+      - key: GITHUB_CALLBACK_URL
+        value: https://relayforge-staging-api.onrender.com/auth/github/callback
+      - key: GITHUB_CLIENT_ID
+        sync: false # Set manually in Render dashboard from GitHub OAuth App
+      - key: GITHUB_CLIENT_SECRET
+        sync: false # Set manually in Render dashboard from GitHub OAuth App
+
+  # 4. RelayForge Background Outbox Worker (NestJS Daemon)
+  - type: worker
+    name: relayforge-staging-worker
+    runtime: node
+    region: oregon
+    plan: starter
+    buildCommand: npm ci && npm run db:generate && npm run build
+    startCommand: npm run start:worker
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_VERSION
+        value: 1.0.0-staging
+      - key: LOG_LEVEL
+        value: info
+      - key: WORKER_CONCURRENCY
+        value: "4"
+      - key: WORKER_HEARTBEAT_MS
+        value: "10000"
+      - key: QUEUE_PREFIX
+        value: relayforge_staging
+      - key: WORKER_DATABASE_URL
+        fromDatabase:
+          name: relayforge-staging-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: relayforge-staging-redis
+          property: connectionString
+      - key: ENCRYPTION_KEY
+        fromService:
+          type: web
+          name: relayforge-staging-api
+          envVarKey: ENCRYPTION_KEY
+      - key: ALLOW_PRIVATE_DESTINATIONS
+        value: "false"
+
+  # 5. RelayForge Web Console (React Vite SPA)
+  - type: web
+    name: relayforge-staging-web
+    runtime: static
+    region: oregon
+    plan: free
+    buildCommand: npm ci && npm run build:web
+    staticPublishPath: ./web/dist
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+    routes:
+      # Rewrite API requests to staging backend or use direct HTTPS domain
+      - type: rewrite
+        source: /*
+        destination: /index.html

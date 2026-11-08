@@ -21,6 +21,8 @@ This document records the independent security architecture verification across:
 - **Account Linking & Provisioning:** User accounts linked via GitHub identities are tied to immutable GitHub IDs. Email addresses are treated as secondary verified identifiers.
 
 ### 1.2 Session Token Security
+- **Disabled Direct Token Injection:** Direct session token entry / Bearer token authentication is strictly disabled server-side in production and staging environments (`NODE_ENV === 'production'`). Browser sessions must be established exclusively via the secure HttpOnly cookie from verified OAuth callbacks.
+- **OAuth Open Redirect Defense:** `createAuthorizationUrl` cryptographically validates all `redirect_uri` parameters against the configured frontend origin, strictly rejecting untrusted external domains.
 - **Cookie Flags:**
   - `HttpOnly`: Always enforced; JavaScript running in the browser cannot read session cookies.
   - `SameSite=Lax`: Prevents Cross-Site Request Forgery (CSRF) on mutating requests while permitting top-level navigation.

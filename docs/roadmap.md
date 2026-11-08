@@ -76,3 +76,11 @@ and minimal React/TypeScript management UI.
    - Automated multi-stage GitHub Actions workflow in `.github/workflows/deploy.yml` with linting, strict typechecks, unit tests, integration tests, container image compilation, and migration checks.
 8. **Deployment Architecture Guide:**
    - Complete hosting evaluation (Render vs Railway vs AWS) with cost breakdown and topology diagrams in `docs/deployment.md`.
+
+## Active: Milestone 7 — Actual Staging Deployment & End-to-End Validation
+
+1. **Staging IaC Blueprint:** Authored declarative [`render.yaml`](../render.yaml) blueprint declaring all 5 staging services (Postgres, Redis, API, Worker, Web) with private VPC networking.
+2. **Server-Side Auth Hardening:** Disabled direct session token injection and Bearer token parsing in production/staging environments; restricted browser sessions strictly to `HttpOnly; SameSite=Lax; Secure` cookies.
+3. **OAuth Open Redirect Defense:** Sanitized `redirect_uri` in `createAuthorizationUrl` to enforce origin matching against `frontendUrl`.
+4. **Staging Database Provisioning Tooling:** Authored [`scripts/staging-db-init.cjs`](../scripts/staging-db-init.cjs) for least-privilege role setup (`relayforge_api`, `relayforge_worker`) prior to migration deployment.
+5. **Automated Verification Harness:** Authored [`scripts/staging-e2e-verify.cjs`](../scripts/staging-e2e-verify.cjs) executing non-destructive synthetic acceptance checks against the staging target.

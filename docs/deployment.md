@@ -11,21 +11,21 @@ RelayForge consists of:
 
 Below is an objective evaluation of hosting options tailored for an independent engineer or small engineering team:
 
-| Criteria | Render.com (Recommended) | Railway.app | AWS ECS Fargate + RDS |
+| Criteria | Render.com (Selected for Staging) | Railway.app | AWS ECS Fargate + RDS |
 | :--- | :--- | :--- | :--- |
 | **Complexity** | Low — Native support for Web Services + Background Workers | Low — Unified project canvas, multi-service deployments | High — Requires VPC, Subnets, IAM, ALB, Task Definitions |
 | **Setup Time** | < 1 hour | < 1 hour | 1–2 days (Terraform/CloudFormation) |
 | **Zero-Downtime Deploy** | Native rolling deployments with health check gating | Native rolling restarts | Managed rolling deployments via target groups |
 | **Background Worker** | Dedicated "Background Worker" service type | Standard service running custom command | Separate ECS Task Definition |
 | **Managed DB & Redis** | Native Managed Postgres + Redis with private networking | Native Redis & PostgreSQL plugins | Amazon RDS PostgreSQL + Amazon ElastiCache |
-| **Estimated Monthly Cost** | \$35–\$75 / month | \$25–\$60 / month | \$120–\$250 / month |
+| **Estimated Monthly Cost** | \$31–\$35 / month (Staging tier) | \$25–\$45 / month | \$120–\$250 / month |
 
-### Recommendation
-**Render.com** or **Railway.app** provides the ideal operational balance for RelayForge. Both provide:
-- Private VPC networking (Postgres and Redis never exposed to public internet).
-- Separate Web and Background Worker process types.
-- Automatic SSL termination and DDoS mitigation.
-- Native environment variable encryption.
+### Selection Justification: Render.com
+Render is selected for the RelayForge staging environment due to:
+- Dedicated, persistent `type: worker` processes that run indefinitely without HTTP ingress timeouts.
+- Isolated private network addresses (`*.internal`) ensuring PostgreSQL and Redis are strictly inaccessible to the public internet.
+- Automatic SSL/TLS termination on custom and onrender.com subdomains.
+- Declarative Infrastructure-as-Code via [`render.yaml`](../render.yaml).
 
 ---
 
@@ -38,7 +38,7 @@ flowchart TD
     Cloudflare -->|HTTPS / Static Assets| StaticWeb[RelayForge Web Console\nVite React SPA]
 
     subgraph Private VPC [Isolated Private Network]
-        ApiService -->|SQL / RLS Enforced| Postgres[(PostgreSQL 17\nPrimary Database)]
+        ApiService -->|SQL / RLS Enforced| Postgres[(PostgreSQL 16\nPrimary Database)]
         ApiService -->|Publish Telemetry & Limit| RedisCluster[(Redis 7.4\nSliding Window Limits & PubSub)]
 
         WorkerService[RelayForge Worker Service\nOutbox Leaser & Delivery Pipeline]
@@ -71,47 +71,85 @@ flowchart TD
 - Minimum connection limit: 50.
 - Pool settings: `DATABASE_POOL_SIZE=10`.
 - Extensions: `uuid-ossp` or native `gen_random_uuid()`.
-- Storage: 20 GB SSD with auto-grow enabled.
+- Storage: 10 GB SSD with auto-grow enabled.
 
 ### 3.4 Redis (Redis 7+)
-- Connection mode: `rediss://` (TLS enabled).
+- Connection mode: `rediss://` or private VPC host.
 - Eviction policy: `noeviction` (prevents dropping rate limit or outbox state).
 - Memory: 256 MB minimum.
 
 ---
 
-## 4. Production Environment Mapping
+## 4. Production & Staging Environment Mapping
 
-| Variable | Description | Example Production Value |
+| Variable | Description | Example Staging Value |
 | :--- | :--- | :--- |
 | `NODE_ENV` | Application environment mode | `production` |
-| `DATABASE_URL` | API database connection URL (least-privilege `relayforge_api`) | `postgresql://relayforge_api:...@db.internal:5432/relayforge?sslmode=require` |
-| `WORKER_DATABASE_URL` | Worker database connection URL (`relayforge_worker`) | `postgresql://relayforge_worker:...@db.internal:5432/relayforge?sslmode=require` |
-| `REDIS_URL` | Redis cluster URL with TLS | `rediss://default:...@redis.internal:6380/0` |
-| `ENCRYPTION_KEY` | AES-256 master encryption key (64 hex characters) | High-entropy key generated via `openssl rand -hex 32` |
-| `ALLOW_PRIVATE_DESTINATIONS`| SSRF bypass flag | `false` (Mandatory in production) |
+| `DATABASE_URL` | API database connection URL (least-privilege `relayforge_api`) | `postgresql://relayforge_api:...@relayforge-staging-db.internal:5432/relayforge_staging` |
+| `WORKER_DATABASE_URL` | Worker database connection URL (`relayforge_worker`) | `postgresql://relayforge_worker:...@relayforge-staging-db.internal:5432/relayforge_staging` |
+| `REDIS_URL` | Redis cluster URL | `redis://relayforge-staging-redis.internal:6379/0` |
+| `ENCRYPTION_KEY` | AES-256 master encryption key (64 hex characters) | High-entropy key generated automatically by Render Blueprint |
+| `ALLOW_PRIVATE_DESTINATIONS`| SSRF bypass flag | `false` (Strictly enforced) |
 | `WORKER_CONCURRENCY` | Concurrent delivery tasks per worker process | `4` |
 | `WORKER_HEARTBEAT_MS` | Outbox lease heartbeat interval | `10000` |
-| `GITHUB_CLIENT_ID` | GitHub OAuth application client ID | Real OAuth App Client ID |
-| `GITHUB_CLIENT_SECRET` | GitHub OAuth application secret | Real OAuth App Client Secret |
-| `GITHUB_CALLBACK_URL` | Public OAuth redirect target | `https://api.yourdomain.com/auth/github/callback` |
-| `FRONTEND_URL` | Management console base origin | `https://app.yourdomain.com` |
+| `GITHUB_CLIENT_ID` | GitHub OAuth application client ID | Staging GitHub OAuth App Client ID |
+| `GITHUB_CLIENT_SECRET` | GitHub OAuth application secret | Staging GitHub OAuth App Client Secret |
+| `GITHUB_CALLBACK_URL` | Public OAuth redirect target | `https://relayforge-staging-api.onrender.com/auth/github/callback` |
+| `FRONTEND_URL` | Management console base origin | `https://relayforge-staging-web.onrender.com` |
 
 ---
 
 ## 5. Zero-Downtime Deployment & Migration Protocol
 
 1. **Pre-Deployment:**
+   - Provision runtime least-privilege roles (`scripts/staging-db-init.cjs`).
    - Execute database migrations via GitHub Actions or deployment hook:
      ```bash
      npx prisma migrate deploy
      ```
-   - Prisma migrations in RelayForge are designed to be forward-compatible (additive columns and nullable constraints first).
 2. **Worker Deployment:**
    - Deploy new Worker instances.
    - Older workers finish active delivery leases and terminate gracefully via `SIGTERM`.
 3. **API Deployment:**
    - Deploy new API instances behind load balancer.
    - Traffic switches only after `/health/ready` returns HTTP 200.
-4. **Rollback Contingency:**
-   - If an issue occurs, the previous container image is rolled back immediately; database schema backward-compatibility prevents older workers from crashing.
+
+---
+
+## 6. Staging Deployment Execution Guide (Step-by-Step)
+
+### Step 1: Push Repository to GitHub
+Ensure branch `release/staging-deployment` is pushed to GitHub:
+```bash
+git push -u origin release/staging-deployment
+```
+
+### Step 2: Register GitHub OAuth App (Staging)
+1. Go to **GitHub Settings → Developer settings → OAuth Apps → New OAuth App**.
+2. Fill in:
+   - **Application name:** `RelayForge Staging`
+   - **Homepage URL:** `https://relayforge-staging-web.onrender.com`
+   - **Authorization callback URL:** `https://relayforge-staging-api.onrender.com/auth/github/callback`
+3. Click **Register application** and generate a new **Client Secret**.
+4. Note your `Client ID` and `Client Secret`.
+
+### Step 3: Deploy via Render Blueprint
+1. Log in to [Render.com](https://dashboard.render.com).
+2. Click **New + → Blueprint**.
+3. Select the `RelayForge` repository and branch `release/staging-deployment`.
+4. Render will parse [`render.yaml`](../render.yaml) and prompt for:
+   - `GITHUB_CLIENT_ID`: Paste your GitHub App Client ID.
+   - `GITHUB_CLIENT_SECRET`: Paste your GitHub App Client Secret.
+5. Click **Apply Blueprint**. Render automatically provisions all 5 services.
+
+### Step 4: Run Staging Role Init & Migrations
+From the Render dashboard shell on `relayforge-staging-api` (or locally connected to staging DB):
+```bash
+node scripts/staging-db-init.cjs
+npx prisma migrate deploy
+```
+
+### Step 5: Execute Automated Verification
+```bash
+STAGING_API_URL=https://relayforge-staging-api.onrender.com node scripts/staging-e2e-verify.cjs
+```
