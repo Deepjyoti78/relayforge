@@ -103,7 +103,7 @@ export const App: React.FC = () => {
   );
   const [members, setMembers] = useState<OrganizationMember[]>(initialMembers);
   const [isSyncing, setIsSyncing] = useState<boolean>(tokenPresent);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'metrics' | 'dlq' | 'settings'>('members');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'metrics' | 'dlq' | 'settings'>('dashboard');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
@@ -407,11 +407,7 @@ export const App: React.FC = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  backgroundColor: '#FFFFFF',
-                  color: '#000000',
-                  border: 'none',
-                  borderRadius: '999px',
-                  padding: '11px 26px',
+                  backgroundColor: '#F7EFE2', color: '#121214', border: 'none', borderRadius: '999px', padding: '11px 26px',
                   fontSize: '14px',
                   fontWeight: 700,
                   cursor: 'pointer',
@@ -547,12 +543,7 @@ export const App: React.FC = () => {
                   disabled={modalOrgLoading}
                   style={{
                     padding: '9px 20px',
-                    backgroundColor: '#FFFFFF',
-                    border: 'none',
-                    borderRadius: '8px',
-                    color: '#000000',
-                    fontSize: '13px',
-                    fontWeight: 700,
+                    backgroundColor: '#F7EFE2', border: 'none', borderRadius: '8px', color: '#121214', fontSize: '13px', fontWeight: 700,
                     cursor: 'pointer',
                   }}
                 >

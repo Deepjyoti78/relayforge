@@ -749,10 +749,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 type="submit"
                 style={{
                   padding: '7px 16px',
-                  backgroundColor: '#FFFFFF',
-                  color: '#000000',
-                  border: 'none',
-                  borderRadius: '999px',
+                  backgroundColor: '#F7EFE2', color: '#121214', border: 'none', borderRadius: '999px',
                   cursor: 'pointer',
                   fontWeight: 700,
                   fontSize: '13px',
@@ -887,10 +884,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 alignItems: 'center',
                 gap: '6px',
                 padding: '10px 22px',
-                backgroundColor: '#FFFFFF',
-                border: 'none',
-                borderRadius: '999px',
-                color: '#000000',
+                backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
                 fontSize: '13px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -909,10 +903,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 alignItems: 'center',
                 gap: '6px',
                 padding: '10px 22px',
-                backgroundColor: '#FFFFFF',
-                border: 'none',
-                borderRadius: '999px',
-                color: '#000000',
+                backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
                 fontSize: '13px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -953,10 +944,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     alignItems: 'center',
                     gap: '6px',
                     padding: '10px 22px',
-                    backgroundColor: '#FFFFFF',
-                    border: 'none',
-                    borderRadius: '999px',
-                    color: '#000000',
+                    backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
                     fontSize: '13px',
                     fontWeight: 700,
                     cursor: 'pointer',
@@ -977,10 +965,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 alignItems: 'center',
                 gap: '6px',
                 padding: '10px 22px',
-                backgroundColor: '#FFFFFF',
-                border: 'none',
-                borderRadius: '999px',
-                color: '#000000',
+                backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
                 fontSize: '13px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -1000,10 +985,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   alignItems: 'center',
                   gap: '6px',
                   padding: '10px 18px',
-                  backgroundColor: '#FFFFFF',
-                  border: 'none',
-                  borderRadius: '999px',
-                  color: '#000000',
+                  backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
                   fontSize: '13px',
                   fontWeight: 700,
                   cursor: 'pointer',
@@ -1223,94 +1205,115 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         </div>
       )}
 
-      {/* STATS CARDS ROW (SHOWN ONLY IN OVERVIEW SECTION) */}
+      {/* STATS CARDS ROW (SHOWN ONLY IN OVERVIEW SECTION - EXACTLY MATCHING IMAGE 2) */}
       {activeTab === 'dashboard' && (
         <div className="rf-stats-grid">
-          {/* Card 1: Members (Light Surface) */}
+          {/* Card 1: TOTAL MEMBERS (Active Highlight Surface: Warm Ivory Cream #F7EFE2) */}
           <div
             onClick={() => onTabChange('members')}
             title="Click to view Members Directory"
             style={{
-              backgroundColor: '#FFFFFF',
-              border: 'none',
+              backgroundColor: '#F7EFE2',
+              border: '1px solid #E5DAC8',
               borderRadius: '20px',
               padding: '22px 24px',
-              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
               cursor: 'pointer',
               transition: 'transform 0.15s ease',
               minWidth: 0,
               boxSizing: 'border-box',
+              position: 'relative',
+              overflow: 'hidden',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 800, color: '#000000', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                TOTAL MEMBERS
-              </span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2.2" style={{ flexShrink: 0 }}>
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#121214" strokeWidth="2.2" style={{ flexShrink: 0 }}>
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span style={{ fontSize: '11px', fontWeight: 800, color: '#121214', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  TOTAL MEMBERS
+                </span>
+              </div>
+              <div style={{ fontSize: '34px', fontWeight: 800, color: '#121214', lineHeight: '1.1' }}>
+                {members.length}
+              </div>
+              <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  backgroundColor: '#121214',
+                  color: '#4ADE80',
+                  padding: '3px 8px',
+                  borderRadius: '999px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}>
+                  ↑ {members.length} active
+                </span>
+                <span style={{ fontSize: '11px', color: '#737373', fontWeight: 600 }}>Enrolled</span>
+              </div>
+            </div>
+
+            {/* Subtle Watermark on right matching Image 2 */}
+            <div style={{
+              position: 'absolute',
+              right: '12px',
+              bottom: '10px',
+              opacity: 0.15,
+              pointerEvents: 'none',
+              color: '#121214',
+            }}>
+              <svg width="74" height="74" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <path d="M20 8v6M23 11h-6"></path>
               </svg>
-            </div>
-            <div style={{ fontSize: '32px', fontWeight: 800, color: '#000000', lineHeight: '1.2' }}>
-              {members.length}
-            </div>
-            <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap', overflow: 'hidden' }}>
-              <span style={{
-                fontSize: '11px',
-                fontWeight: 700,
-                backgroundColor: '#000000',
-                color: '#FFFFFF',
-                padding: '2px 8px',
-                borderRadius: '999px',
-                flexShrink: 0,
-              }}>
-                +{members.length} active
-              </span>
-              <span style={{ fontSize: '11px', color: '#737373', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis' }}>Enrolled</span>
             </div>
           </div>
 
-          {/* Card 2: Active API Keys (Light Surface) */}
+          {/* Card 2: ACTIVE API KEYS (Dark Surface matching Image 2) */}
           <div
             onClick={() => onTabChange('api-keys')}
             title="Click to manage API Keys"
             style={{
-              backgroundColor: '#FFFFFF',
-              border: 'none',
+              backgroundColor: '#111111',
+              border: '1px solid #202020',
               borderRadius: '20px',
               padding: '22px 24px',
-              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
               cursor: 'pointer',
               transition: 'transform 0.15s ease',
               minWidth: 0,
               boxSizing: 'border-box',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 800, color: '#000000', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                ACTIVE API KEYS
-              </span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2.2" style={{ flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2.2" style={{ flexShrink: 0 }}>
                 <path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5-3 3 1.5 1.5L9 14l-5 5H2v-2l5-5 1.5 1.5 3-3-1.5-1.5 3.5-3.5 1.5 1.5L21 2z"></path>
               </svg>
+              <span style={{ fontSize: '11px', fontWeight: 800, color: '#A3A3A3', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                ACTIVE API KEYS
+              </span>
             </div>
-            <div style={{ fontSize: '32px', fontWeight: 800, color: '#000000', lineHeight: '1.2' }}>
+            <div style={{ fontSize: '34px', fontWeight: 800, color: '#FFFFFF', lineHeight: '1.1' }}>
               {activeKeyCount}
             </div>
-            <div style={{ marginTop: '10px', fontSize: '11px', color: '#737373', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ marginTop: '12px', fontSize: '11px', color: '#737373', fontWeight: 500 }}>
               SHA-256 hashed live keys
             </div>
           </div>
 
-          {/* Card 3: Ingestion Endpoints (Dark Surface) */}
+          {/* Card 3: Ingestion Endpoints (Dark Surface matching Image 2) */}
           <div
             onClick={() => onTabChange('endpoints')}
             title="Click to view Endpoints"
             style={{
-              backgroundColor: '#202020',
-              border: '1px solid #2A2A2A',
+              backgroundColor: '#111111',
+              border: '1px solid #202020',
               borderRadius: '20px',
               padding: '22px 24px',
               cursor: 'pointer',
@@ -1319,30 +1322,30 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               boxSizing: 'border-box',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                ENDPOINTS (M3)
-              </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2" style={{ flexShrink: 0 }}>
                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
               </svg>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                ENDPOINTS (M3)
+              </span>
             </div>
-            <div style={{ fontSize: '32px', fontWeight: 800, color: '#FFFFFF', lineHeight: '1.2' }}>
+            <div style={{ fontSize: '34px', fontWeight: 800, color: '#FFFFFF', lineHeight: '1.1' }}>
               {endpoints.length}
             </div>
-            <div style={{ marginTop: '10px', fontSize: '11px', color: '#A3A3A3', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ marginTop: '12px', fontSize: '11px', color: '#737373', fontWeight: 500 }}>
               AES-256-GCM signed
             </div>
           </div>
 
-          {/* Card 4: Tenant Isolation (Dark Surface) */}
+          {/* Card 4: Tenant Isolation (Dark Surface matching Image 2) */}
           <div
             onClick={() => onTabChange('settings')}
             title="Click to view Architecture & Settings"
             style={{
-              backgroundColor: '#202020',
-              border: '1px solid #2A2A2A',
+              backgroundColor: '#111111',
+              border: '1px solid #202020',
               borderRadius: '20px',
               padding: '22px 24px',
               cursor: 'pointer',
@@ -1351,20 +1354,20 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               boxSizing: 'border-box',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                TENANT ISOLATION
-              </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2" style={{ flexShrink: 0 }}>
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
               </svg>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                TENANT ISOLATION
+              </span>
             </div>
             <div style={{ fontSize: '26px', fontWeight: 800, color: '#FFFFFF', lineHeight: '1.2' }}>
               Enforced
             </div>
-            <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0 }}></span>
-              <span style={{ fontSize: '11px', color: '#A3A3A3', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis' }}>• PostgreSQL RLS Active</span>
+            <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0 }}></span>
+              <span style={{ fontSize: '11px', color: '#A3A3A3', fontWeight: 500 }}>PostgreSQL RLS Active</span>
             </div>
           </div>
         </div>
@@ -3052,277 +3055,331 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         />
       )}
 
-      {/* OVERVIEW DASHBOARD VIEW (ACTIVE WHEN activeTab === 'dashboard') */}
+      {/* OVERVIEW DASHBOARD VIEW (ACTIVE WHEN activeTab === 'dashboard' - EXACTLY MATCHING IMAGE 2) */}
       {activeTab === 'dashboard' && (
         <div style={{ padding: '8px 0 24px', width: '100%', boxSizing: 'border-box' }}>
-          {/* Quick Navigation Cards Grid (Matches 4-column responsive layout of top stats cards) */}
+          {/* Header Row: Tenant Operations & Quick Actions */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '16px',
+            marginTop: '8px',
+          }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
+              Tenant Operations
+            </h3>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#737373' }}>
+              Quick Actions
+            </span>
+          </div>
+
+          {/* Quick Navigation Cards Grid (4 columns matching Image 2) */}
           <div className="rf-nav-grid">
-              {/* Box 1: Members Directory */}
-              <div style={{
-                backgroundColor: '#161616',
-                border: '1px solid #2A2A2A',
-                borderRadius: '16px',
-                padding: '22px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-              }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>Members Directory</span>
-                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#202020', color: '#A3A3A3' }}>
-                      {members.length} enrolled
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '12px', color: '#A3A3A3', margin: 0, lineHeight: 1.5 }}>
-                    Manage member permissions, RBAC roles (Owner, Developer, Member), and invitations.
-                  </p>
-                </div>
-                <button
-                  onClick={() => onTabChange('members')}
-                  style={{
-                    marginTop: '16px',
-                    padding: '8px 16px',
-                    backgroundColor: '#202020',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '999px',
-                    color: '#FFFFFF',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    width: 'fit-content',
-                  }}
-                >
-                  View Directory →
-                </button>
-              </div>
-
-              {/* Box 2: API Keys */}
-              <div style={{
-                backgroundColor: '#161616',
-                border: '1px solid #2A2A2A',
-                borderRadius: '16px',
-                padding: '22px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-              }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>API Keys & Credentials</span>
-                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#202020', color: '#A3A3A3' }}>
-                      {activeKeyCount} active
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '12px', color: '#A3A3A3', margin: 0, lineHeight: 1.5 }}>
-                    High-throughput ingestion keys with SHA-256 database hashing and instant revocation.
-                  </p>
-                </div>
-                <button
-                  onClick={() => onTabChange('api-keys')}
-                  style={{
-                    marginTop: '16px',
-                    padding: '8px 16px',
-                    backgroundColor: '#202020',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '999px',
-                    color: '#FFFFFF',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    width: 'fit-content',
-                  }}
-                >
-                  Manage API Keys →
-                </button>
-              </div>
-
-              {/* Box 3: Endpoints */}
-              <div style={{
-                backgroundColor: '#161616',
-                border: '1px solid #2A2A2A',
-                borderRadius: '16px',
-                padding: '22px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-              }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>Webhook Ingestion</span>
-                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#202020', color: '#A3A3A3' }}>
-                      {endpoints.length} endpoints
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '12px', color: '#A3A3A3', margin: 0, lineHeight: 1.5 }}>
-                    Dedicated tenant endpoints secured by rotated AES-256-GCM signing secrets.
-                  </p>
-                </div>
-                <button
-                  onClick={() => onTabChange('endpoints')}
-                  style={{
-                    marginTop: '16px',
-                    padding: '8px 16px',
-                    backgroundColor: '#202020',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '999px',
-                    color: '#FFFFFF',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    width: 'fit-content',
-                  }}
-                >
-                  Configure Endpoints →
-                </button>
-              </div>
-
-              {/* Box 4: Deliveries & Pipeline */}
-              <div style={{
-                backgroundColor: '#161616',
-                border: '1px solid #2A2A2A',
-                borderRadius: '16px',
-                padding: '22px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-              }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>Deliveries & DLQ</span>
-                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#202020', color: '#A3A3A3' }}>
-                      {deliveries.length} logs
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '12px', color: '#A3A3A3', margin: 0, lineHeight: 1.5 }}>
-                    Durable HTTP outbox worker, exponential retry backoff with jitter, and dead letter routing.
-                  </p>
-                </div>
-                <button
-                  onClick={() => onTabChange('deliveries')}
-                  style={{
-                    marginTop: '16px',
-                    padding: '8px 16px',
-                    backgroundColor: '#202020',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '999px',
-                    color: '#FFFFFF',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    width: 'fit-content',
-                  }}
-                >
-                  Inspect Deliveries →
-                </button>
-              </div>
-            </div>
-
-            {/* Sequential Workflows (M4) Feature Banner */}
-            <div style={{
-              backgroundColor: '#161616',
-              border: '1px solid #2A2A2A',
-              borderRadius: '16px',
-              padding: '20px 24px',
-              marginBottom: '20px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '16px',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '12px',
-                  backgroundColor: '#000000',
-                  border: '1px solid #2A2A2A',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                  fontSize: '20px',
-                  flexShrink: 0,
-                }}>
-                  ⚡
-                </div>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '15px', fontWeight: 700, color: '#FFFFFF' }}>
-                      Sequential Workflow Execution Engine (M4)
-                    </span>
-                    <span style={{
-                      fontSize: '11px',
-                      padding: '2px 8px',
-                      borderRadius: '999px',
-                      backgroundColor: '#202020',
-                      color: '#34D399',
-                      fontWeight: 700,
-                    }}>
-                      {workflows.length} active
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '12px', color: '#A3A3A3', margin: '4px 0 0' }}>
-                    Compose multi-step pipelines: Webhook trigger → Conditions → JSON transformation → Sequential HTTP deliveries with resume checkpointing.
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => onTabChange('workflows')}
-                style={{
-                  padding: '9px 18px',
-                  backgroundColor: '#FFFFFF',
-                  color: '#000000',
-                  border: 'none',
-                  borderRadius: '999px',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                Open Workflow Console →
-              </button>
-            </div>
-
-            {/* Architecture Banner */}
+            {/* Box 1: Members Directory */}
             <div style={{
               backgroundColor: '#111111',
-              border: '1px solid #2A2A2A',
+              border: '1px solid #202020',
               borderRadius: '16px',
               padding: '22px 24px',
               display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: '170px',
             }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                    </svg>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>Members Directory</span>
+                  </div>
+                  <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#181818', border: '1px solid #262626', color: '#A3A3A3', fontWeight: 600 }}>
+                    {members.length} enrolled
+                  </span>
+                </div>
+                <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
+                  Manage member permissions, RBAC roles (Owner, Developer, Member), and invitations.
+                </p>
+              </div>
+              <button
+                onClick={() => onTabChange('members')}
+                style={{
+                  marginTop: '18px',
+                  padding: '9px 18px',
+                  backgroundColor: '#F7EFE2',
+                  border: 'none',
+                  borderRadius: '999px',
+                  color: '#121214',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  width: 'fit-content',
+                  transition: 'opacity 0.15s ease',
+                }}
+              >
+                View Directory →
+              </button>
+            </div>
+
+            {/* Box 2: API Keys */}
+            <div style={{
+              backgroundColor: '#111111',
+              border: '1px solid #202020',
+              borderRadius: '16px',
+              padding: '22px 24px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: '170px',
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2">
+                      <path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5-3 3 1.5 1.5L9 14l-5 5H2v-2l5-5 1.5 1.5 3-3-1.5-1.5 3.5-3.5 1.5 1.5L21 2z"></path>
+                    </svg>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>API Keys & Credentials</span>
+                  </div>
+                  <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#181818', border: '1px solid #262626', color: '#A3A3A3', fontWeight: 600 }}>
+                    {activeKeyCount} active
+                  </span>
+                </div>
+                <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
+                  High-throughput ingestion keys with SHA-256 database hashing and instant revocation.
+                </p>
+              </div>
+              <button
+                onClick={() => onTabChange('api-keys')}
+                style={{
+                  marginTop: '18px',
+                  padding: '9px 18px',
+                  backgroundColor: '#F7EFE2',
+                  border: 'none',
+                  borderRadius: '999px',
+                  color: '#121214',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  width: 'fit-content',
+                  transition: 'opacity 0.15s ease',
+                }}
+              >
+                Manage API Keys →
+              </button>
+            </div>
+
+            {/* Box 3: Endpoints */}
+            <div style={{
+              backgroundColor: '#111111',
+              border: '1px solid #202020',
+              borderRadius: '16px',
+              padding: '22px 24px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: '170px',
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>Webhook Ingestion</span>
+                  </div>
+                  <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#181818', border: '1px solid #262626', color: '#A3A3A3', fontWeight: 600 }}>
+                    {endpoints.length} endpoints
+                  </span>
+                </div>
+                <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
+                  Dedicated tenant endpoints secured by rotated AES-256-CCM signing secrets.
+                </p>
+              </div>
+              <button
+                onClick={() => onTabChange('endpoints')}
+                style={{
+                  marginTop: '18px',
+                  padding: '9px 18px',
+                  backgroundColor: '#F7EFE2',
+                  border: 'none',
+                  borderRadius: '999px',
+                  color: '#121214',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  width: 'fit-content',
+                  transition: 'opacity 0.15s ease',
+                }}
+              >
+                Configure Endpoints →
+              </button>
+            </div>
+
+            {/* Box 4: Deliveries & Pipeline */}
+            <div style={{
+              backgroundColor: '#111111',
+              border: '1px solid #202020',
+              borderRadius: '16px',
+              padding: '22px 24px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: '170px',
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    </svg>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>Deliveries & DLQ</span>
+                  </div>
+                  <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#181818', border: '1px solid #262626', color: '#A3A3A3', fontWeight: 600 }}>
+                    {deliveries.length} logs
+                  </span>
+                </div>
+                <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
+                  Durable HTTP outbox worker, exponential retry, and dead letter routing.
+                </p>
+              </div>
+              <button
+                onClick={() => onTabChange('deliveries')}
+                style={{
+                  marginTop: '18px',
+                  padding: '9px 18px',
+                  backgroundColor: '#F7EFE2',
+                  border: 'none',
+                  borderRadius: '999px',
+                  color: '#121214',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  width: 'fit-content',
+                  transition: 'opacity 0.15s ease',
+                }}
+              >
+                Inspect Deliveries →
+              </button>
+            </div>
+          </div>
+
+          {/* Sequential Workflows (M4) Feature Banner matching Image 2 */}
+          <div style={{
+            backgroundColor: '#111111',
+            border: '1px solid #202020',
+            borderRadius: '16px',
+            padding: '20px 24px',
+            marginTop: '20px',
+            marginBottom: '16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '16px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '12px',
-                backgroundColor: '#000000',
-                border: '1px solid #2A2A2A',
+                width: '38px',
+                height: '38px',
+                borderRadius: '10px',
+                backgroundColor: '#F7EFE2',
+                color: '#121214',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#10b981',
                 flexShrink: 0,
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
               }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                 </svg>
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', marginBottom: '4px' }}>
-                  PostgreSQL Row-Level Security Enforced
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '15px', fontWeight: 700, color: '#FFFFFF' }}>
+                    Sequential Workflow Execution Engine (M4)
+                  </span>
+                  <span style={{
+                    fontSize: '11px',
+                    padding: '2px 8px',
+                    borderRadius: '999px',
+                    backgroundColor: '#181818',
+                    border: '1px solid #262626',
+                    color: '#4ADE80',
+                    fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}>
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#4ADE80' }}></span>
+                    Active
+                  </span>
                 </div>
-                <div style={{ fontSize: '12px', color: '#A3A3A3', lineHeight: 1.5 }}>
-                  Organization slug: <code>{organization.slug}</code> (Tenant ID: <code>{organization.id}</code>). All queries and outbox workers execute with strict tenant isolation.
-                </div>
+                <p style={{ fontSize: '12px', color: '#737373', margin: '4px 0 0', lineHeight: 1.4 }}>
+                  Compose multi-step pipelines: Webhook trigger → Conditions → JSON transformation → Sequential HTTP deliveries with resume checkpointing.
+                </p>
               </div>
             </div>
+            <button
+              onClick={() => onTabChange('workflows')}
+              style={{
+                padding: '9px 20px',
+                backgroundColor: '#F7EFE2',
+                color: '#121214',
+                border: 'none',
+                borderRadius: '999px',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'opacity 0.15s ease',
+              }}
+            >
+              Open Workflow Console →
+            </button>
           </div>
-        )}
+
+          {/* Architecture Banner matching Image 2 */}
+          <div style={{
+            backgroundColor: '#111111',
+            border: '1px solid #202020',
+            borderRadius: '16px',
+            padding: '20px 24px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+          }}>
+            <div style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(16, 185, 129, 0.08)',
+              border: '1px solid rgba(16, 185, 129, 0.25)',
+              color: '#34D399',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+            </div>
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>
+                PostgreSQL Row-Level Security Enforced
+              </div>
+              <p style={{ fontSize: '12px', color: '#737373', margin: '4px 0 0', lineHeight: 1.4 }}>
+                Organization slug: {organization.slug} · {organization.id.slice(0, 8)} (Tenant ID: {organization.id}). All queries and outbox workers execute with strict tenant isolation.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
         {/* SETTINGS VIEW (ACTIVE WHEN activeTab === 'settings') */}
         {activeTab === 'settings' && (
@@ -3560,10 +3617,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   disabled={addLoading}
                   style={{
                     padding: '9px 22px',
-                    backgroundColor: '#FFFFFF',
-                    border: 'none',
-                    borderRadius: '999px',
-                    color: '#000000',
+                    backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
                     fontSize: '13px',
                     fontWeight: 700,
                     cursor: 'pointer',
@@ -3681,10 +3735,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   type="submit"
                   style={{
                     padding: '9px 22px',
-                    backgroundColor: '#FFFFFF',
-                    border: 'none',
-                    borderRadius: '999px',
-                    color: '#000000',
+                    backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
                     fontSize: '13px',
                     fontWeight: 700,
                     cursor: 'pointer',
@@ -3804,10 +3855,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   type="submit"
                   style={{
                     padding: '9px 22px',
-                    backgroundColor: '#FFFFFF',
-                    border: 'none',
-                    borderRadius: '999px',
-                    color: '#000000',
+                    backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
                     fontSize: '13px',
                     fontWeight: 700,
                     cursor: 'pointer',
@@ -3997,10 +4045,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   type="submit"
                   style={{
                     padding: '9px 22px',
-                    backgroundColor: '#FFFFFF',
-                    border: 'none',
-                    borderRadius: '999px',
-                    color: '#000000',
+                    backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
                     fontSize: '13px',
                     fontWeight: 700,
                     cursor: 'pointer',
@@ -4165,10 +4210,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 onClick={() => setSelectedAttemptForModal(null)}
                 style={{
                   padding: '8px 20px',
-                  backgroundColor: '#FFFFFF',
-                  color: '#000000',
-                  border: 'none',
-                  borderRadius: '999px',
+                  backgroundColor: '#F7EFE2', color: '#121214', border: 'none', borderRadius: '999px',
                   fontWeight: 700,
                   fontSize: '13px',
                   cursor: 'pointer',
@@ -4553,10 +4595,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onClick={() => void handleRunSimulator()}
                   style={{
                     padding: '9px 24px',
-                    backgroundColor: '#FFFFFF',
-                    border: 'none',
-                    borderRadius: '999px',
-                    color: '#000000',
+                    backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
                     fontSize: '13px',
                     fontWeight: 700,
                     cursor: simulatorLoading || endpoints.length === 0 ? 'not-allowed' : 'pointer',
