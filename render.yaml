@@ -86,11 +86,11 @@ services:
       - key: ALLOW_PRIVATE_DESTINATIONS
         value: "false"
 
-  # 3. RelayForge Web Console (React Vite SPA) - Free Tier
+  # 3. RelayForge Web Console (React Vite SPA) - Inherently Free (CDN)
+  # Static sites on Render do not have server compute plans
   - type: web
     name: relayforge-staging-web
     runtime: static
-    plan: free
     buildCommand: npm ci && npm run build:web
     staticPublishPath: ./web/dist
     headers:
