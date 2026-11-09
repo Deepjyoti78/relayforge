@@ -11,14 +11,16 @@ export class DatabaseService implements OnModuleInit, OnApplicationShutdown {
   readonly client: PrismaClient;
 
   constructor(config: RuntimeConfig) {
+    const isCloudDb = config.values.databaseUrl.includes('supabase.com') || config.values.databaseUrl.includes('pooler');
     const adapter = new PrismaPg({
       connectionString: config.values.databaseUrl,
       max: config.values.databasePoolSize,
-      connectionTimeoutMillis: config.values.databaseTimeoutMs,
-      query_timeout: config.values.databaseTimeoutMs,
-      statement_timeout: config.values.databaseTimeoutMs,
+      connectionTimeoutMillis: Math.max(config.values.databaseTimeoutMs, 10000),
+      query_timeout: Math.max(config.values.databaseTimeoutMs, 10000),
+      statement_timeout: Math.max(config.values.databaseTimeoutMs, 10000),
       idleTimeoutMillis: 10000,
       application_name: `relayforge-${config.values.role}`,
+      ...(isCloudDb ? { ssl: { rejectUnauthorized: false } } : {}),
     }, {
       onPoolError: (error) => this.logger.error({ event: 'database_pool_error', error: safeError(error) }),
       onConnectionError: (error) => this.logger.error({ event: 'database_connection_error', error: safeError(error) }),
@@ -28,14 +30,21 @@ export class DatabaseService implements OnModuleInit, OnApplicationShutdown {
 
   async onModuleInit(): Promise<void> {
     await this.client.$connect();
-    const roles = await this.client.$queryRaw<{ unsafe: boolean }[]>`
-      SELECT (rolsuper OR rolbypassrls OR rolcreatedb OR rolcreaterole) AS unsafe
-      FROM pg_roles WHERE rolname = current_user
-    `;
-    if (roles.length === 1 && roles[0]?.unsafe) {
+    try {
+      const roles = await this.client.$queryRaw<{ unsafe: boolean }[]>`
+        SELECT (rolsuper OR rolbypassrls OR rolcreatedb OR rolcreaterole) AS unsafe
+        FROM pg_roles WHERE rolname = current_user
+      `;
+      if (roles.length === 1 && roles[0]?.unsafe) {
+        this.logger.warn({
+          event: 'database_role_advisory',
+          message: 'Runtime is operating with administrative database role. In production, ensure dedicated least-privilege credentials are used.',
+        });
+      }
+    } catch {
       this.logger.warn({
         event: 'database_role_advisory',
-        message: 'Runtime is operating with administrative database role. In production, ensure dedicated least-privilege credentials are used.',
+        message: 'Could not query pg_roles for current_user, continuing with current database connection.',
       });
     }
     this.logger.log({ event: 'database_connected' });

@@ -12,10 +12,12 @@ export class RedisService implements OnModuleInit, OnApplicationShutdown {
 
   constructor(config: RuntimeConfig) {
     if (!config.values.redisUrl) throw new Error('Worker Redis configuration is missing');
+    const isTls = config.values.redisUrl.startsWith('rediss://');
     this.connection = new Redis(config.values.redisUrl, {
       lazyConnect: true,
       maxRetriesPerRequest: null,
-      connectTimeout: 2000,
+      connectTimeout: 10000,
+      ...(isTls ? { tls: { rejectUnauthorized: false } } : {}),
       retryStrategy: (attempt) => Math.min(attempt * 250, 2000),
     });
     this.connection.on('error', (error: Error) => {
@@ -25,7 +27,7 @@ export class RedisService implements OnModuleInit, OnApplicationShutdown {
 
   async onModuleInit(): Promise<void> {
     try {
-      await withDeadline(this.connection.connect(), 5000);
+      await withDeadline(this.connection.connect(), 10000);
       try {
         const memory = await withDeadline(this.connection.info('memory'), 2000);
         if (!/^maxmemory_policy:noeviction\r?$/m.test(memory)) {

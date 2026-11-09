@@ -26,7 +26,7 @@ services:
       - key: DATABASE_POOL_SIZE
         value: "5"
       - key: DATABASE_TIMEOUT_MS
-        value: "3000"
+        value: "10000"
       - key: DATABASE_URL
         sync: false # Paste Supabase PostgreSQL Connection String
       - key: REDIS_URL
