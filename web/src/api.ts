@@ -17,6 +17,82 @@ import type {
 } from './types.ts';
 
 const TOKEN_KEY = 'rf_session_token';
+const USER_CACHE_KEY = 'rf_cached_user';
+const ORG_CACHE_KEY = 'rf_cached_org';
+const MEMBERS_CACHE_KEY = 'rf_cached_members';
+
+export function getCachedUser(): UserProfile | null {
+  try {
+    const raw = localStorage.getItem(USER_CACHE_KEY);
+    return raw ? (JSON.parse(raw) as UserProfile) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setCachedUser(user: UserProfile | null): void {
+  try {
+    if (user) {
+      localStorage.setItem(USER_CACHE_KEY, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(USER_CACHE_KEY);
+    }
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+export function getCachedOrg(): OrganizationDetails | null {
+  try {
+    const raw = localStorage.getItem(ORG_CACHE_KEY);
+    return raw ? (JSON.parse(raw) as OrganizationDetails) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setCachedOrg(org: OrganizationDetails | null): void {
+  try {
+    if (org) {
+      localStorage.setItem(ORG_CACHE_KEY, JSON.stringify(org));
+    } else {
+      localStorage.removeItem(ORG_CACHE_KEY);
+    }
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+export function getCachedMembers(): OrganizationMember[] | null {
+  try {
+    const raw = localStorage.getItem(MEMBERS_CACHE_KEY);
+    return raw ? (JSON.parse(raw) as OrganizationMember[]) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setCachedMembers(members: OrganizationMember[] | null): void {
+  try {
+    if (members) {
+      localStorage.setItem(MEMBERS_CACHE_KEY, JSON.stringify(members));
+    } else {
+      localStorage.removeItem(MEMBERS_CACHE_KEY);
+    }
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+export function clearAppCache(): void {
+  try {
+    localStorage.removeItem(USER_CACHE_KEY);
+    localStorage.removeItem(ORG_CACHE_KEY);
+    localStorage.removeItem(MEMBERS_CACHE_KEY);
+  } catch {
+    // Ignore storage errors
+  }
+}
 
 export function getSessionToken(): string | null {
   try {
@@ -66,14 +142,30 @@ async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Promise<R
     url = `${baseUrl}${input}`;
   }
 
+  let controller: AbortController | undefined;
+  let signal = init?.signal;
+  if (!signal && typeof AbortController !== 'undefined') {
+    controller = new AbortController();
+    signal = controller.signal;
+    setTimeout(() => {
+      try {
+        controller?.abort();
+      } catch {
+        // Ignore abort errors
+      }
+    }, 12000);
+  }
+
   const res = await fetch(url, {
     ...init,
+    signal,
     credentials: 'include',
     headers,
   });
 
   if (res.status === 401) {
     setSessionToken(null);
+    clearAppCache();
   }
 
   return res;
@@ -90,12 +182,16 @@ export async function fetchMe(): Promise<UserProfile | null> {
 }
 
 export async function logout(): Promise<void> {
-  const res = await apiFetch('/v1/auth/logout', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-  });
+  try {
+    await apiFetch('/v1/auth/logout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch {
+    // Ignore network error on logout
+  }
   setSessionToken(null);
-  if (!res.ok) throw new Error('Failed to logout');
+  clearAppCache();
 }
 
 export async function createOrganization(name: string, slug?: string): Promise<OrganizationDetails> {

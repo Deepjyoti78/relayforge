@@ -1,4 +1,4 @@
-import { getApiBaseUrl } from '../api.ts';
+import { getApiBaseUrl, setSessionToken } from '../api.ts';
 import React, { useState } from 'react';
 import brandGraphic from '../assets/brand-graphic.png';
 
@@ -21,7 +21,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
     if (onTokenSignIn) {
       onTokenSignIn(manualToken.trim());
     } else {
-      localStorage.setItem('relayforge_session_token', manualToken.trim());
+      setSessionToken(manualToken.trim());
       window.location.reload();
     }
   };
