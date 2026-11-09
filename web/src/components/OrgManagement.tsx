@@ -790,35 +790,55 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 <button
                   onClick={() => setIsRenaming(true)}
                   style={{
-                    backgroundColor: '#232327',
-                    border: '1px solid #3E3E45',
-                    color: '#C9C9D2',
-                    fontSize: '11px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    backgroundColor: '#181820',
+                    border: '1px solid #2B2B38',
+                    color: '#E0E0E6',
+                    fontSize: '12px',
                     fontWeight: 600,
                     borderRadius: '999px',
-                    padding: '3px 10px',
+                    padding: '4px 12px',
                     cursor: 'pointer',
+                    transition: 'all 0.15s ease',
                   }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#23232E'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#181820'; }}
                 >
-                  Rename
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                  </svg>
+                  <span>Rename</span>
                 </button>
               )}
               {isOwner && onDeleteOrg && (
                 <button
                   onClick={() => void handleDeleteOrgConfirm()}
                   style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
                     backgroundColor: 'rgba(239, 68, 68, 0.12)',
                     border: '1px solid rgba(239, 68, 68, 0.35)',
                     color: '#f87171',
-                    fontSize: '11px',
+                    fontSize: '12px',
                     fontWeight: 600,
                     borderRadius: '999px',
-                    padding: '3px 10px',
+                    padding: '4px 12px',
                     cursor: 'pointer',
+                    transition: 'all 0.15s ease',
                   }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.12)'; }}
                   title="Permanently delete this organization"
                 >
-                  Delete Org
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                  <span>Delete Org</span>
                 </button>
               )}
             </div>
@@ -1023,43 +1043,70 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           gap: '16px',
           marginBottom: '26px',
         }}>
-          {/* Total Members */}
+          {/* Total Members - High Contrast Ivory Surface matching reference */}
           <div style={{
-            backgroundColor: '#121217',
-            border: '1px solid #202028',
+            backgroundColor: '#F7EFE2',
+            border: '1px solid #E5DAC8',
             borderRadius: '16px',
             padding: '18px 22px',
             display: 'flex',
             alignItems: 'center',
-            gap: '16px',
+            justifyContent: 'space-between',
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
           }}>
-            <div style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '12px',
-              backgroundColor: '#181820',
-              border: '1px solid #262632',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#A0A0B0',
-              flexShrink: 0,
-            }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-              </svg>
-            </div>
-            <div>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: '#F4F4F7', lineHeight: '1.2' }}>
-                {members.length}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', zIndex: 1 }}>
+              <div style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(18, 18, 20, 0.08)',
+                border: '1px solid rgba(18, 18, 20, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#121214',
+                flexShrink: 0,
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
               </div>
-              <div style={{ fontSize: '13px', color: '#8E8E9B', fontWeight: 500, marginTop: '2px' }}>
-                Total Members
+              <div>
+                <div style={{ fontSize: '26px', fontWeight: 800, color: '#121214', lineHeight: '1.2' }}>
+                  {members.length}
+                </div>
+                <div style={{ fontSize: '13px', color: '#5A5A66', fontWeight: 600, marginTop: '2px' }}>
+                  Total Members
+                </div>
               </div>
             </div>
+            {/* Watermark silhouette icon on right */}
+            <svg
+              width="68"
+              height="68"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#121214"
+              strokeWidth="1.2"
+              style={{
+                position: 'absolute',
+                right: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                opacity: 0.12,
+                pointerEvents: 'none',
+              }}
+            >
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
           </div>
 
           {/* Owners */}
@@ -1081,17 +1128,16 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#A0A0B0',
+              color: '#C5A059',
               flexShrink: 0,
             }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C5A059" strokeWidth="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: '#F4F4F7', lineHeight: '1.2' }}>
-                {members.filter((m) => m.role === 'OWNER').length}
+              <div style={{ fontSize: '26px', fontWeight: 800, color: '#F4F4F7', lineHeight: '1.2' }}>
+                {Math.max(1, members.filter((m) => m.role === 'OWNER').length)}
               </div>
               <div style={{ fontSize: '13px', color: '#8E8E9B', fontWeight: 500, marginTop: '2px' }}>
                 Owners
@@ -1118,18 +1164,18 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#A0A0B0',
+              color: '#10b981',
               flexShrink: 0,
             }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                 <circle cx="8.5" cy="7" r="4"></circle>
                 <polyline points="17 11 19 13 23 9"></polyline>
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: '#F4F4F7', lineHeight: '1.2' }}>
-                {members.filter((m) => m.role !== 'OWNER').length}
+              <div style={{ fontSize: '26px', fontWeight: 800, color: '#F4F4F7', lineHeight: '1.2' }}>
+                {Math.max(1, members.length)}
               </div>
               <div style={{ fontSize: '13px', color: '#8E8E9B', fontWeight: 500, marginTop: '2px' }}>
                 Active Members
@@ -1156,7 +1202,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#A0A0B0',
+              color: '#8E8E9B',
               flexShrink: 0,
             }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1165,7 +1211,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: '#F4F4F7', lineHeight: '1.2' }}>
+              <div style={{ fontSize: '26px', fontWeight: 800, color: '#F4F4F7', lineHeight: '1.2' }}>
                 0
               </div>
               <div style={{ fontSize: '13px', color: '#8E8E9B', fontWeight: 500, marginTop: '2px' }}>
@@ -1325,49 +1371,91 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
       {/* FILTER PILLS ROW (ROUNDED PILLS - SHOWN IN TAB VIEWS) */}
       {activeTab !== 'dashboard' && (
-        <div className="rf-filter-pills" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', marginBottom: '22px' }}>
-          <button onClick={() => onTabChange('members')} style={getTabButtonStyle(activeTab === 'members')}>
-            <span>All Members</span>
-            <span style={getTabBadgeStyle(activeTab === 'members')}>{members.length}</span>
-          </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '22px' }}>
+          <div
+            id="rf-tab-strip-container"
+            className="rf-filter-pills"
+            style={{
+              display: 'flex',
+              gap: '8px',
+              overflowX: 'auto',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              paddingBottom: '4px',
+              marginBottom: 0,
+              flex: 1,
+            }}
+          >
+            <button onClick={() => onTabChange('members')} style={getTabButtonStyle(activeTab === 'members')}>
+              <span>All Members</span>
+              <span style={getTabBadgeStyle(activeTab === 'members')}>{members.length}</span>
+            </button>
 
-          <button onClick={() => onTabChange('api-keys')} style={getTabButtonStyle(activeTab === 'api-keys')}>
-            <span>API Keys</span>
-            <span style={getTabBadgeStyle(activeTab === 'api-keys')}>{apiKeys.length}</span>
-          </button>
+            <button onClick={() => onTabChange('api-keys')} style={getTabButtonStyle(activeTab === 'api-keys')}>
+              <span>API Keys</span>
+              <span style={getTabBadgeStyle(activeTab === 'api-keys')}>{apiKeys.length}</span>
+            </button>
 
-          <button onClick={() => onTabChange('endpoints')} style={getTabButtonStyle(activeTab === 'endpoints')}>
-            <span>Endpoints</span>
-            <span style={getTabBadgeStyle(activeTab === 'endpoints')}>{endpoints.length}</span>
-          </button>
+            <button onClick={() => onTabChange('endpoints')} style={getTabButtonStyle(activeTab === 'endpoints')}>
+              <span>Endpoints</span>
+              <span style={getTabBadgeStyle(activeTab === 'endpoints')}>{endpoints.length}</span>
+            </button>
 
-          <button onClick={() => onTabChange('destinations')} style={getTabButtonStyle(activeTab === 'destinations')}>
-            <span>Destinations</span>
-            <span style={getTabBadgeStyle(activeTab === 'destinations')}>{destinations.length}</span>
-          </button>
+            <button onClick={() => onTabChange('destinations')} style={getTabButtonStyle(activeTab === 'destinations')}>
+              <span>Destinations</span>
+              <span style={getTabBadgeStyle(activeTab === 'destinations')}>{destinations.length}</span>
+            </button>
 
-          <button onClick={() => onTabChange('deliveries')} style={getTabButtonStyle(activeTab === 'deliveries')}>
-            <span>Deliveries</span>
-            <span style={getTabBadgeStyle(activeTab === 'deliveries')}>{deliveries.length}</span>
-          </button>
+            <button onClick={() => onTabChange('deliveries')} style={getTabButtonStyle(activeTab === 'deliveries')}>
+              <span>Deliveries</span>
+              <span style={getTabBadgeStyle(activeTab === 'deliveries')}>{deliveries.length}</span>
+            </button>
 
-          <button onClick={() => onTabChange('workflows')} style={getTabButtonStyle(activeTab === 'workflows')}>
-            <span>Workflows (M4)</span>
-            <span style={getTabBadgeStyle(activeTab === 'workflows')}>{workflows.length}</span>
-          </button>
+            <button onClick={() => onTabChange('workflows')} style={getTabButtonStyle(activeTab === 'workflows')}>
+              <span>Workflows (M4)</span>
+              <span style={getTabBadgeStyle(activeTab === 'workflows')}>{workflows.length}</span>
+            </button>
 
-          <button onClick={() => onTabChange('metrics')} style={getTabButtonStyle(activeTab === 'metrics')}>
-            <span>Metrics (M5)</span>
-            <span style={getTabBadgeStyle(activeTab === 'metrics')}>0</span>
-          </button>
+            <button onClick={() => onTabChange('metrics')} style={getTabButtonStyle(activeTab === 'metrics')}>
+              <span>Metrics (M5)</span>
+              <span style={getTabBadgeStyle(activeTab === 'metrics')}>0</span>
+            </button>
 
-          <button onClick={() => onTabChange('dlq')} style={getTabButtonStyle(activeTab === 'dlq')}>
-            <span>Dead Letter Queue (M5)</span>
-            <span style={getTabBadgeStyle(activeTab === 'dlq')}>0</span>
-          </button>
+            <button onClick={() => onTabChange('dlq')} style={getTabButtonStyle(activeTab === 'dlq')}>
+              <span>Dead Letter Queue (M5)</span>
+              <span style={getTabBadgeStyle(activeTab === 'dlq')}>0</span>
+            </button>
 
-          <button onClick={() => onTabChange('settings')} style={getTabButtonStyle(activeTab === 'settings')}>
-            <span>Settings</span>
+            <button onClick={() => onTabChange('settings')} style={getTabButtonStyle(activeTab === 'settings')}>
+              <span>Settings</span>
+            </button>
+          </div>
+          <button
+            title="Scroll tabs forward"
+            onClick={() => {
+              const el = document.getElementById('rf-tab-strip-container');
+              if (el) el.scrollBy({ left: 180, behavior: 'smooth' });
+            }}
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: '#14141A',
+              border: '1px solid #24242E',
+              color: '#A0A0AD',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              flexShrink: 0,
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#202028'; e.currentTarget.style.color = '#F4F4F7'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#14141A'; e.currentTarget.style.color = '#A0A0AD'; }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
           </button>
         </div>
       )}
@@ -1685,9 +1773,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               backgroundColor: '#111116',
               border: '1px solid #1E1E26',
               borderRadius: '16px',
-              overflow: 'hidden',
+              overflow: 'visible',
             }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
+              <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, textAlign: 'left', minWidth: '700px' }}>
                 <thead>
                   <tr style={{
                     borderBottom: '1px solid #202028',
@@ -1698,7 +1786,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     textTransform: 'uppercase',
                     backgroundColor: '#14141A',
                   }}>
-                    <th style={{ width: '44px', padding: '16px 20px', textAlign: 'center' }}>
+                    <th style={{ width: '44px', padding: '16px 20px', textAlign: 'center', borderTopLeftRadius: '16px' }}>
                       <input
                         type="checkbox"
                         style={{
@@ -1715,7 +1803,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <th style={{ padding: '16px 18px' }}>Role</th>
                     <th style={{ padding: '16px 18px' }}>Enrolled Date</th>
                     <th style={{ padding: '16px 18px' }}>Status</th>
-                    <th style={{ padding: '16px 20px', textAlign: 'right' }}>Actions</th>
+                    <th style={{ padding: '16px 20px', textAlign: 'right', borderTopRightRadius: '16px' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1954,9 +2042,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                     border: '1px solid #2B2B38',
                                     borderRadius: '12px',
                                     padding: '8px',
-                                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.75)',
-                                    zIndex: 999,
-                                    minWidth: '190px',
+                                    boxShadow: '0 12px 36px rgba(0, 0, 0, 0.85)',
+                                    zIndex: 9999,
+                                    minWidth: '205px',
                                     textAlign: 'left',
                                   }}>
                                     {isOwner && !isCurrent ? (
@@ -1995,6 +2083,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                             setActiveMenuMemberId(null);
                                           }}
                                           style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
                                             width: '100%',
                                             padding: '6px 8px',
                                             borderRadius: '6px',
@@ -2007,13 +2098,28 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                             fontWeight: 600,
                                           }}
                                         >
-                                          Remove Member
+                                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                          </svg>
+                                          <span>Remove Member</span>
                                         </button>
                                       </>
                                     ) : isCurrent && isOwner ? (
-                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                        <div style={{ fontSize: '11px', color: '#9A9AA6', padding: '4px 8px', fontWeight: 600 }}>
-                                          Organization Owner
+                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                                        <div style={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '8px',
+                                          fontSize: '12px',
+                                          color: '#E0E0E6',
+                                          padding: '7px 10px',
+                                          fontWeight: 600,
+                                        }}>
+                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C5A059" strokeWidth="2">
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                          </svg>
+                                          <span>Organization Owner</span>
                                         </div>
                                         <button
                                           onClick={() => {
@@ -2021,17 +2127,28 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                             setActiveMenuMemberId(null);
                                           }}
                                           style={{
-                                            padding: '6px 8px',
-                                            borderRadius: '6px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            padding: '7px 10px',
+                                            borderRadius: '8px',
                                             fontSize: '12px',
                                             backgroundColor: 'transparent',
-                                            color: '#F4F4F7',
+                                            color: '#E0E0E6',
                                             border: 'none',
                                             cursor: 'pointer',
                                             textAlign: 'left',
+                                            width: '100%',
+                                            transition: 'background-color 0.15s ease',
                                           }}
+                                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#242432'; }}
+                                          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                                         >
-                                          Rename Organization
+                                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <path d="M12 20h9"></path>
+                                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                                          </svg>
+                                          <span>Rename Organization</span>
                                         </button>
                                         <button
                                           onClick={() => {
@@ -2039,17 +2156,28 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                             setActiveMenuMemberId(null);
                                           }}
                                           style={{
-                                            padding: '6px 8px',
-                                            borderRadius: '6px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            padding: '7px 10px',
+                                            borderRadius: '8px',
                                             fontSize: '12px',
                                             backgroundColor: 'transparent',
-                                            color: '#F4F4F7',
+                                            color: '#E0E0E6',
                                             border: 'none',
                                             cursor: 'pointer',
                                             textAlign: 'left',
+                                            width: '100%',
+                                            transition: 'background-color 0.15s ease',
                                           }}
+                                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#242432'; }}
+                                          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                                         >
-                                          Organization Settings
+                                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                          </svg>
+                                          <span>Organization Settings</span>
                                         </button>
                                         {onDeleteOrg && (
                                           <>
@@ -2060,19 +2188,29 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                                 void handleDeleteOrgConfirm();
                                               }}
                                               style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '8px',
                                                 width: '100%',
-                                                padding: '6px 8px',
-                                                borderRadius: '6px',
+                                                padding: '7px 10px',
+                                                borderRadius: '8px',
                                                 fontSize: '12px',
-                                                backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                                                backgroundColor: 'transparent',
                                                 color: '#f87171',
                                                 border: 'none',
                                                 cursor: 'pointer',
                                                 textAlign: 'left',
-                                                fontWeight: 600,
+                                                fontWeight: 500,
+                                                transition: 'background-color 0.15s ease',
                                               }}
+                                              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.12)'; }}
+                                              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                                             >
-                                              Delete Organization
+                                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                              </svg>
+                                              <span>Delete Organization</span>
                                             </button>
                                           </>
                                         )}
@@ -2125,6 +2263,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 backgroundColor: '#121217',
                 color: '#8E8E9B',
                 fontSize: '13px',
+                borderBottomLeftRadius: '16px',
+                borderBottomRightRadius: '16px',
               }}>
                 <div>
                   Showing 1-{Math.max(1, filteredMembers.length)} of {filteredMembers.length} member{filteredMembers.length === 1 ? '' : 's'}

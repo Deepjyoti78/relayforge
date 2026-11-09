@@ -181,22 +181,22 @@
 
       .rf-table-responsive {
         width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        border-radius: 20px;
-        border: 1px solid #3E3E45;
-        background-color: #232327;
-        min-height: 280px;
-        padding-bottom: 60px;
+        overflow: visible;
+        border-radius: 16px;
+        background-color: transparent;
+        min-height: auto;
+        padding-bottom: 0;
       }
 
       .rf-filter-pills {
         display: flex;
         gap: 8px;
-        margin-bottom: 20px;
+        margin-bottom: 22px;
         align-items: center;
-        flex-wrap: wrap;
-        overflow-x: visible;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
         padding: 4px 0;
         width: 100%;
       }
