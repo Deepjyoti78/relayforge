@@ -1,18 +1,22 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+const backendTarget = process.env.VITE_API_URL || 'https://relayforge-staging-api.onrender.com';
+
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
     proxy: {
       '/auth': {
-        target: 'http://127.0.0.1:3100',
+        target: backendTarget,
         changeOrigin: true,
+        secure: false,
       },
       '/v1': {
-        target: 'http://127.0.0.1:3100',
+        target: backendTarget,
         changeOrigin: true,
+        secure: false,
       },
     },
   },
