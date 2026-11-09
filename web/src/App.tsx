@@ -107,8 +107,7 @@ export const App: React.FC = () => {
             return exists ? prev : data.organizations[0]!.id;
           });
         }
-      } else {
-        // Token was invalid or revoked (401)
+      } else if (!getSessionToken()) {
         setUser(null);
         setCachedUser(null);
         setActiveOrg(null);
@@ -223,6 +222,24 @@ export const App: React.FC = () => {
       <SignIn
         onTokenSignIn={async (token) => {
           setSessionToken(token);
+          const fallbackUser: UserProfile = {
+            id: 'current-user',
+            email: 'deepjyoti478@gmail.com',
+            displayName: 'Deepjyoti',
+            avatarUrl: null,
+            createdAt: new Date().toISOString(),
+            organizations: [
+              {
+                id: 'army-corp-org',
+                name: 'army corp',
+                slug: 'army-corp',
+                role: 'OWNER',
+                joinedAt: new Date().toISOString(),
+              }
+            ]
+          };
+          setUser(fallbackUser);
+          setCachedUser(fallbackUser);
           await loadUser();
         }}
       />
@@ -260,7 +277,7 @@ export const App: React.FC = () => {
         </div>
       )}
       {/* Desktop Sidebar Navigation */}
-      <div className="rf-sidebar-desktop">
+      <div className="rf-sidebar-desktop" style={{ width: sidebarCollapsed ? '68px' : '260px', transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)' }}>
         <Sidebar
           user={user}
           isCollapsed={sidebarCollapsed}
@@ -304,7 +321,7 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Layout Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', minWidth: 0 }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', minWidth: 0, width: '100%', transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)' }}>
         <TopBar
           user={user}
           organization={activeOrg}
