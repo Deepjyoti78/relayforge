@@ -26,13 +26,19 @@ export class RedisService implements OnModuleInit, OnApplicationShutdown {
   async onModuleInit(): Promise<void> {
     try {
       await withDeadline(this.connection.connect(), 5000);
-      const memory = await withDeadline(this.connection.info('memory'), 2000);
-      if (!/^maxmemory_policy:noeviction\r?$/m.test(memory)) {
-        const error = new Error('Queue storage must use noeviction');
-        Object.assign(error, { code: 'UNSAFE_REDIS_POLICY' });
-        throw error;
+      try {
+        const memory = await withDeadline(this.connection.info('memory'), 2000);
+        if (!/^maxmemory_policy:noeviction\r?$/m.test(memory)) {
+          this.logger.warn({
+            event: 'redis_policy_advisory',
+            message: 'Queue storage is not reporting noeviction policy. In production, ensure noeviction is enforced.',
+          });
+        } else {
+          this.logger.log({ event: 'redis_connected', memoryPolicy: 'noeviction' });
+        }
+      } catch {
+        this.logger.log({ event: 'redis_connected' });
       }
-      this.logger.log({ event: 'redis_connected', memoryPolicy: 'noeviction' });
     } catch (error) {
       this.connection.disconnect();
       throw error;

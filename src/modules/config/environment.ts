@@ -11,13 +11,29 @@ const databaseUrl = z.string().url().refine((value) => {
   } catch { return false; }
 }, 'Expected a PostgreSQL connection URL');
 
-const redisUrl = z.string().url().refine((value) => {
+const redisUrl = z.preprocess((val) => {
+  if (typeof val !== 'string') return val;
+  let s = val.trim().replace(/^[\"']|[\"']$/g, '').trim();
+  if (!s) return undefined;
+  const matchCli = s.match(/-u\s+([^\s]+)/);
+  if (matchCli && matchCli[1]) s = matchCli[1];
+  if (!/^rediss?:\/\//i.test(s)) {
+    if (s.startsWith('default:')) {
+      s = `rediss://${s}`;
+    } else {
+      s = `rediss://default:${s}`;
+    }
+  } else if (s.startsWith('redis://') && s.includes('upstash.io')) {
+    s = s.replace(/^redis:\/\//, 'rediss://');
+  }
+  return s;
+}, z.string().url().refine((value) => {
   try {
     const url = new URL(value);
     return ['redis:', 'rediss:'].includes(url.protocol)
       && /^\/(\d+)?$/.test(url.pathname || '/');
   } catch { return false; }
-}, 'Expected a Redis connection URL with a numeric database');
+}, 'Expected a Redis connection URL with a numeric database'));
 
 const DEFAULT_INSECURE_ENCRYPTION_KEY = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
 const DEFAULT_INSECURE_GITHUB_CLIENT_ID = 'gh_placeholder_client_id';
@@ -104,7 +120,7 @@ export function parseEnvironment(role: ProcessRole, input: NodeJS.ProcessEnv) {
     port: values.PORT,
     logLevel: values.LOG_LEVEL,
     databaseUrl: role === 'api' ? input.DATABASE_URL! : input.WORKER_DATABASE_URL!,
-    redisUrl: input.REDIS_URL || undefined,
+    redisUrl: values.REDIS_URL ? String(values.REDIS_URL) : undefined,
     databasePoolSize: values.DATABASE_POOL_SIZE,
     databaseTimeoutMs: values.DATABASE_TIMEOUT_MS,
     workerConcurrency: values.WORKER_CONCURRENCY,
