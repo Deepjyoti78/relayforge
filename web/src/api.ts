@@ -130,6 +130,16 @@ export async function updateOrganization(orgId: string, name: string): Promise<O
   return res.json() as Promise<OrganizationDetails>;
 }
 
+export async function deleteOrganization(orgId: string): Promise<void> {
+  const res = await apiFetch(`/v1/organizations/${orgId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: 'Failed to delete organization' })) as { message?: string };
+    throw new Error(error.message || 'Failed to delete organization');
+  }
+}
+
 export async function fetchMembers(orgId: string): Promise<OrganizationMember[]> {
   const res = await apiFetch(`/v1/organizations/${orgId}/members`);
   if (!res.ok) throw new Error('Failed to fetch members');

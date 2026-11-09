@@ -40,6 +40,7 @@ interface OrgManagementProps {
   activeTab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'metrics' | 'dlq' | 'settings';
   onTabChange: (tab: 'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'metrics' | 'dlq' | 'settings') => void;
   onUpdateOrgName: (name: string) => Promise<void>;
+  onDeleteOrg?: (orgId: string) => Promise<void>;
   onAddMember: (identifier: { email?: string; username?: string }, role: MembershipRole) => Promise<void>;
   onUpdateRole: (memberId: string, role: MembershipRole) => Promise<void>;
   onRemoveMember: (memberId: string) => Promise<void>;
@@ -52,6 +53,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
   activeTab,
   onTabChange,
   onUpdateOrgName,
+  onDeleteOrg,
   onAddMember,
   onUpdateRole,
   onRemoveMember,
@@ -64,6 +66,19 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
   const [orgName, setOrgName] = useState(organization.name);
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameError, setRenameError] = useState<string | null>(null);
+
+  const handleDeleteOrgConfirm = async () => {
+    if (!onDeleteOrg) return;
+    const confirmed = window.confirm(
+      `Are you sure you want to permanently delete organization "${organization.name}"?\n\nThis will remove all API keys, endpoints, destinations, and delivery history. This action cannot be undone.`
+    );
+    if (!confirmed) return;
+    try {
+      await onDeleteOrg(organization.id);
+    } catch (err: unknown) {
+      setActionError(err instanceof Error ? err.message : 'Failed to delete organization');
+    }
+  };
 
   // Add Member State
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
@@ -761,6 +776,24 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   }}
                 >
                   Rename
+                </button>
+              )}
+              {isOwner && onDeleteOrg && (
+                <button
+                  onClick={() => void handleDeleteOrgConfirm()}
+                  style={{
+                    backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                    border: '1px solid rgba(239, 68, 68, 0.35)',
+                    color: '#f87171',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    borderRadius: '999px',
+                    padding: '3px 10px',
+                    cursor: 'pointer',
+                  }}
+                  title="Permanently delete this organization"
+                >
+                  Delete Org
                 </button>
               )}
             </div>
@@ -1778,49 +1811,150 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
                           {/* Action Popover Menu */}
                           {isMenuOpen && (
-                            <div style={{
-                              position: 'absolute',
-                              right: '22px',
-                              top: '52px',
-                              backgroundColor: '#1E1E22',
-                              border: '1px solid #3E3E45',
-                              borderRadius: '12px',
-                              padding: '8px',
-                              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.5)',
-                              zIndex: 30,
-                              minWidth: '180px',
-                              textAlign: 'left',
-                            }}>
-                              {isOwner && !isCurrent ? (
-                                <>
-                                  <div style={{ fontSize: '11px', color: '#9A9AA6', padding: '4px 8px', fontWeight: 600 }}>
-                                    Change Role:
+                            <>
+                              <div
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveMenuMemberId(null);
+                                }}
+                                style={{
+                                  position: 'fixed',
+                                  inset: 0,
+                                  zIndex: 998,
+                                }}
+                              />
+                              <div style={{
+                                position: 'absolute',
+                                right: '22px',
+                                top: '48px',
+                                backgroundColor: '#1E1E22',
+                                border: '1px solid #3E3E45',
+                                borderRadius: '12px',
+                                padding: '8px',
+                                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.65)',
+                                zIndex: 999,
+                                minWidth: '190px',
+                                textAlign: 'left',
+                              }}>
+                                {isOwner && !isCurrent ? (
+                                  <>
+                                    <div style={{ fontSize: '11px', color: '#9A9AA6', padding: '4px 8px', fontWeight: 600 }}>
+                                      Change Role:
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '6px' }}>
+                                      {(['OWNER', 'DEVELOPER', 'VIEWER'] as MembershipRole[]).map((r) => (
+                                        <button
+                                          key={r}
+                                          onClick={() => {
+                                            void handleRoleChange(m.id, r);
+                                            setActiveMenuMemberId(null);
+                                          }}
+                                          style={{
+                                            padding: '6px 8px',
+                                            borderRadius: '6px',
+                                            fontSize: '12px',
+                                            backgroundColor: m.role === r ? '#2A2A30' : 'transparent',
+                                            color: '#F2F2F5',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                            fontWeight: m.role === r ? 700 : 500,
+                                          }}
+                                        >
+                                          {r} {m.role === r ? '✓' : ''}
+                                        </button>
+                                      ))}
+                                    </div>
+                                    <div style={{ height: '1px', backgroundColor: '#3E3E45', margin: '4px 0' }} />
+                                    <button
+                                      onClick={() => {
+                                        promptRemoveMember(m);
+                                        setActiveMenuMemberId(null);
+                                      }}
+                                      style={{
+                                        width: '100%',
+                                        padding: '6px 8px',
+                                        borderRadius: '6px',
+                                        fontSize: '12px',
+                                        backgroundColor: 'transparent',
+                                        color: '#f87171',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        textAlign: 'left',
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      Remove Member
+                                    </button>
+                                  </>
+                                ) : isCurrent && isOwner ? (
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    <div style={{ fontSize: '11px', color: '#9A9AA6', padding: '4px 8px', fontWeight: 600 }}>
+                                      Organization Owner
+                                    </div>
+                                    <button
+                                      onClick={() => {
+                                        setIsRenaming(true);
+                                        setActiveMenuMemberId(null);
+                                      }}
+                                      style={{
+                                        padding: '6px 8px',
+                                        borderRadius: '6px',
+                                        fontSize: '12px',
+                                        backgroundColor: 'transparent',
+                                        color: '#F2F2F5',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        textAlign: 'left',
+                                      }}
+                                    >
+                                      Rename Organization
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        onTabChange('settings');
+                                        setActiveMenuMemberId(null);
+                                      }}
+                                      style={{
+                                        padding: '6px 8px',
+                                        borderRadius: '6px',
+                                        fontSize: '12px',
+                                        backgroundColor: 'transparent',
+                                        color: '#F2F2F5',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        textAlign: 'left',
+                                      }}
+                                    >
+                                      Organization Settings
+                                    </button>
+                                    {onDeleteOrg && (
+                                      <>
+                                        <div style={{ height: '1px', backgroundColor: '#3E3E45', margin: '4px 0' }} />
+                                        <button
+                                          onClick={() => {
+                                            setActiveMenuMemberId(null);
+                                            void handleDeleteOrgConfirm();
+                                          }}
+                                          style={{
+                                            width: '100%',
+                                            padding: '6px 8px',
+                                            borderRadius: '6px',
+                                            fontSize: '12px',
+                                            backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                                            color: '#f87171',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                            fontWeight: 600,
+                                          }}
+                                        >
+                                          Delete Organization
+                                        </button>
+                                      </>
+                                    )}
                                   </div>
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '6px' }}>
-                                    {(['OWNER', 'DEVELOPER', 'VIEWER'] as MembershipRole[]).map((r) => (
-                                      <button
-                                        key={r}
-                                        onClick={() => {
-                                          void handleRoleChange(m.id, r);
-                                          setActiveMenuMemberId(null);
-                                        }}
-                                        style={{
-                                          padding: '6px 8px',
-                                          borderRadius: '6px',
-                                          fontSize: '12px',
-                                          backgroundColor: m.role === r ? '#2A2A30' : 'transparent',
-                                          color: '#F2F2F5',
-                                          border: 'none',
-                                          cursor: 'pointer',
-                                          textAlign: 'left',
-                                          fontWeight: m.role === r ? 700 : 500,
-                                        }}
-                                      >
-                                        {r} {m.role === r ? '✓' : ''}
-                                      </button>
-                                    ))}
-                                  </div>
-                                  <div style={{ height: '1px', backgroundColor: '#3E3E45', margin: '4px 0' }} />
+                                ) : isCurrent && !isOwner ? (
                                   <button
                                     onClick={() => {
                                       promptRemoveMember(m);
@@ -1839,36 +1973,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                       fontWeight: 600,
                                     }}
                                   >
-                                    Remove Member
+                                    Leave Organization
                                   </button>
-                                </>
-                              ) : isCurrent && !isOwner ? (
-                                <button
-                                  onClick={() => {
-                                    promptRemoveMember(m);
-                                    setActiveMenuMemberId(null);
-                                  }}
-                                  style={{
-                                    width: '100%',
-                                    padding: '6px 8px',
-                                    borderRadius: '6px',
-                                    fontSize: '12px',
-                                    backgroundColor: 'transparent',
-                                    color: '#f87171',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    textAlign: 'left',
-                                    fontWeight: 600,
-                                  }}
-                                >
-                                  Leave Organization
-                                </button>
-                              ) : (
-                                <div style={{ fontSize: '12px', color: '#9A9AA6', padding: '6px 8px' }}>
-                                  No actions available for Organization Owner.
-                                </div>
-                              )}
-                            </div>
+                                ) : (
+                                  <div style={{ fontSize: '12px', color: '#9A9AA6', padding: '6px 8px' }}>
+                                    No actions available
+                                  </div>
+                                )}
+                              </div>
+                            </>
                           )}
                         </div>
                       </td>
@@ -2955,6 +3068,37 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     </span>
                   </div>
                 </div>
+
+                {isOwner && onDeleteOrg && (
+                  <div style={{
+                    marginTop: '12px',
+                    paddingTop: '20px',
+                    borderTop: '1px solid #3E3E45',
+                  }}>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#f87171', textTransform: 'uppercase', marginBottom: '6px' }}>
+                      Danger Zone
+                    </label>
+                    <p style={{ fontSize: '12px', color: '#9A9AA6', margin: '0 0 14px' }}>
+                      Permanently delete this organization, along with all associated API keys, endpoints, destinations, and delivery history.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => void handleDeleteOrgConfirm()}
+                      style={{
+                        padding: '10px 18px',
+                        backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                        border: '1px solid #ef4444',
+                        color: '#f87171',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Delete Organization
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

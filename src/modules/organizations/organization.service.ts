@@ -375,4 +375,25 @@ export class OrganizationService {
       return { success: true };
     });
   }
+  /**
+   * Permanently deletes an organization and all its cascaded entities.
+   * Requires OWNER role (MANAGE_ORG_SETTINGS).
+   */
+  async deleteOrganization(orgId: string, user: User) {
+    return this.tenantContext.runInTenantContext(orgId, user.id, async (tx) => {
+      const membership = await tx.membership.findUnique({
+        where: { organizationId_userId: { organizationId: orgId, userId: user.id } },
+      });
+
+      if (!membership) throw new NotFoundException('Organization not found');
+
+      this.authz.assertCanManageOrg(membership.role);
+
+      await tx.organization.delete({
+        where: { id: orgId },
+      });
+
+      return { success: true };
+    });
+  }
 }

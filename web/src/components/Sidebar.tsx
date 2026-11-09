@@ -12,6 +12,9 @@ interface SidebarProps {
   onLogout: () => void;
   isMobile?: boolean;
   onCloseMobile?: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
+  onOpenCreateModal?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -25,6 +28,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onLogout,
   isMobile = false,
   onCloseMobile,
+  isCollapsed = false,
+  onToggleCollapse,
+  onOpenCreateModal,
 }) => {
   const [isCreatingOrg, setIsCreatingOrg] = useState(false);
   const [newOrgName, setNewOrgName] = useState('');
@@ -75,7 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const sidebarContent = (
     <aside style={{
-      width: isMobile ? '280px' : '260px',
+      width: isMobile ? '280px' : (isCollapsed ? '68px' : '260px'),
       backgroundColor: '#0E0E10',
       borderRight: '1px solid #232327',
       display: 'flex',
@@ -92,11 +98,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }}>
       {/* Brand Header */}
       <div style={{
-        padding: '22px 20px 18px',
+        padding: (!isCollapsed || isMobile) ? '22px 20px 18px' : '18px 12px',
         borderBottom: '1px solid #232327',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: (!isCollapsed || isMobile) ? 'space-between' : 'center',
+        flexDirection: (!isCollapsed || isMobile) ? 'row' : 'column',
+        gap: (!isCollapsed || isMobile) ? '0' : '10px',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
@@ -110,20 +118,57 @@ export const Sidebar: React.FC<SidebarProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+            flexShrink: 0,
           }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
             </svg>
           </div>
-          <div>
-            <div style={{ fontSize: '14px', fontWeight: 800, color: '#F2F2F5', letterSpacing: '-0.02em', lineHeight: '1.2' }}>
-              RELAYFORGE
-            </div>
-            <div style={{ fontSize: '11px', color: '#9A9AA6', fontWeight: 500 }}>
-              Management Console
-            </div>
-          </div>
+          {(!isCollapsed || isMobile) && <div><div style={{ fontSize: '14px', fontWeight: 800, color: '#F2F2F5', letterSpacing: '-0.02em', lineHeight: '1.2' }}>RELAYFORGE</div><div style={{ fontSize: '11px', color: '#9A9AA6', fontWeight: 500 }}>Management Console</div></div>}
         </div>
+
+        {!isMobile && onToggleCollapse && (
+          <button
+            onClick={onToggleCollapse}
+            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            style={{
+              background: '#1A1A1E',
+              border: '1px solid #33333A',
+              color: '#9A9AA6',
+              borderRadius: '8px',
+              width: '28px',
+              height: '28px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              fontSize: '12px',
+              transition: 'all 0.15s ease',
+              padding: 0,
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#F2F2F5';
+              e.currentTarget.style.borderColor = '#55555F';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#9A9AA6';
+              e.currentTarget.style.borderColor = '#33333A';
+            }}
+          >
+            {isCollapsed ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="13 17 18 12 13 7"></polyline>
+                <polyline points="6 17 11 12 6 7"></polyline>
+              </svg>
+            ) : (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="11 17 6 12 11 7"></polyline>
+                <polyline points="18 17 13 12 18 7"></polyline>
+              </svg>
+            )}
+          </button>
+        )}
 
         {isMobile && (
           <button
@@ -511,7 +556,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               ORGANIZATIONS
             </span>
             <button
-              onClick={() => setIsCreatingOrg((prev) => !prev)}
+              onClick={() => (onOpenCreateModal ? onOpenCreateModal() : setIsCreatingOrg((prev) => !prev))}
               style={{
                 backgroundColor: '#232327',
                 border: '1px solid #3E3E45',

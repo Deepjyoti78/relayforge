@@ -186,6 +186,8 @@
         border-radius: 20px;
         border: 1px solid #3E3E45;
         background-color: #232327;
+        min-height: 280px;
+        padding-bottom: 60px;
       }
 
       .rf-filter-pills {
@@ -193,10 +195,10 @@
         gap: 8px;
         margin-bottom: 20px;
         align-items: center;
-        overflow-x: auto;
-        padding-bottom: 4px;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
+        flex-wrap: wrap;
+        overflow-x: visible;
+        padding: 4px 0;
+        width: 100%;
       }
       .rf-filter-pills::-webkit-scrollbar {
         display: none;
@@ -241,6 +243,10 @@
         }
       }
 
+    
+      .rf-sidebar-collapsed {
+        width: 68px !important;
+      }
     </style>
   </head>
   <body>

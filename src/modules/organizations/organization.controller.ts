@@ -51,6 +51,15 @@ export class OrganizationController {
     return this.organizationService.updateOrganization(orgId, user, body);
   }
 
+  @Delete(':orgId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteOrganization(
+    @Param('orgId') orgId: string,
+    @CurrentUser() user: User,
+  ) {
+    await this.organizationService.deleteOrganization(orgId, user);
+  }
+
   @Get(':orgId/members')
   async listMembers(
     @Param('orgId') orgId: string,
