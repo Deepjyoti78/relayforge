@@ -15,6 +15,7 @@ interface SidebarProps {
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
   onOpenCreateModal?: () => void;
+  onOpenProfile?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -31,6 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed = false,
   onToggleCollapse,
   onOpenCreateModal,
+  onOpenProfile,
 }) => {
   const [isCreatingOrg, setIsCreatingOrg] = useState(false);
   const [newOrgName, setNewOrgName] = useState('');
@@ -762,12 +764,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
         justifyContent: 'space-between',
         backgroundColor: '#0E0E10',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden' }}>
+        <div
+          onClick={onOpenProfile}
+          title="View profile details"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            overflow: 'hidden',
+            cursor: onOpenProfile ? 'pointer' : 'default',
+            padding: '4px 6px',
+            borderRadius: '8px',
+            transition: 'background-color 0.15s ease',
+            flex: 1,
+            minWidth: 0,
+          }}
+          onMouseEnter={(e) => {
+            if (onOpenProfile) e.currentTarget.style.backgroundColor = '#1C1C20';
+          }}
+          onMouseLeave={(e) => {
+            if (onOpenProfile) e.currentTarget.style.backgroundColor = 'transparent';
+          }}
+        >
           {user.avatarUrl ? (
             <img
               src={user.avatarUrl}
               alt=""
-              style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #3E3E45' }}
+              style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #3E3E45', flexShrink: 0 }}
             />
           ) : (
             <div style={{
@@ -782,6 +805,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               justifyContent: 'center',
               fontSize: '11px',
               fontWeight: 700,
+              flexShrink: 0,
             }}>
               {getInitials(user.displayName, user.email)}
             </div>

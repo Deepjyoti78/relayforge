@@ -13,6 +13,7 @@ import {
   updateOrganization,
 } from './api.ts';
 import { OrgManagement } from './components/OrgManagement.tsx';
+import { ProfileModal } from './components/ProfileModal.tsx';
 import { Sidebar } from './components/Sidebar.tsx';
 import { SignIn } from './components/SignIn.tsx';
 import { TopBar } from './components/TopBar.tsx';
@@ -27,6 +28,7 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'metrics' | 'dlq' | 'settings'>('members');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [createOrgModalOpen, setCreateOrgModalOpen] = useState(false);
   const [modalOrgName, setModalOrgName] = useState('');
   const [modalOrgSlug, setModalOrgSlug] = useState('');
@@ -213,6 +215,7 @@ export const App: React.FC = () => {
           isCollapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           onOpenCreateModal={() => setCreateOrgModalOpen(true)}
+          onOpenProfile={() => setProfileModalOpen(true)}
           organizations={user.organizations}
           selectedOrgId={selectedOrgId}
           activeTab={activeTab}
@@ -235,6 +238,7 @@ export const App: React.FC = () => {
             isCollapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
             onOpenCreateModal={() => setCreateOrgModalOpen(true)}
+            onOpenProfile={() => setProfileModalOpen(true)}
             organizations={user.organizations}
             selectedOrgId={selectedOrgId}
             activeTab={activeTab}
@@ -255,6 +259,7 @@ export const App: React.FC = () => {
           organization={activeOrg}
           activeTab={activeTab}
           onOpenMobileMenu={() => setMobileSidebarOpen(true)}
+          onOpenProfile={() => setProfileModalOpen(true)}
         />
 
         <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#0E0E10', minWidth: 0, width: '100%' }}>
@@ -471,6 +476,15 @@ export const App: React.FC = () => {
             </form>
           </div>
         </div>
+      )}
+      {/* User Profile Modal */}
+      {user && (
+        <ProfileModal
+          user={user}
+          isOpen={profileModalOpen}
+          onClose={() => setProfileModalOpen(false)}
+          onLogout={handleLogout}
+        />
       )}
     </div>
   );

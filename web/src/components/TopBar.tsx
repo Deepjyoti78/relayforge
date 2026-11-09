@@ -6,6 +6,7 @@ interface TopBarProps {
   organization: OrganizationDetails | null;
   activeTab: string;
   onOpenMobileMenu?: () => void;
+  onOpenProfile?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -13,6 +14,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   organization,
   activeTab,
   onOpenMobileMenu,
+  onOpenProfile,
 }) => {
   const getTabLabel = () => {
     switch (activeTab) {
@@ -202,29 +204,51 @@ export const TopBar: React.FC<TopBarProps> = ({
         </a>
 
         {/* User avatar */}
-        {user.avatarUrl ? (
-          <img
-            src={user.avatarUrl}
-            alt=""
-            style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #3E3E45' }}
-          />
-        ) : (
-          <div style={{
-            width: '30px',
-            height: '30px',
-            borderRadius: '50%',
-            backgroundColor: '#232327',
-            border: '1px solid #3E3E45',
-            color: '#F2F2F5',
+        <button
+          onClick={onOpenProfile}
+          title="View profile details"
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            cursor: onOpenProfile ? 'pointer' : 'default',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '11px',
-            fontWeight: 700,
-          }}>
-            {getInitials(user.displayName, user.email)}
-          </div>
-        )}
+            borderRadius: '50%',
+            transition: 'transform 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            if (onOpenProfile) e.currentTarget.style.transform = 'scale(1.05)';
+          }}
+          onMouseLeave={(e) => {
+            if (onOpenProfile) e.currentTarget.style.transform = 'scale(1)';
+          }}
+        >
+          {user.avatarUrl ? (
+            <img
+              src={user.avatarUrl}
+              alt=""
+              style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #3E3E45' }}
+            />
+          ) : (
+            <div style={{
+              width: '30px',
+              height: '30px',
+              borderRadius: '50%',
+              backgroundColor: '#232327',
+              border: '1px solid #3E3E45',
+              color: '#F2F2F5',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '11px',
+              fontWeight: 700,
+            }}>
+              {getInitials(user.displayName, user.email)}
+            </div>
+          )}
+        </button>
       </div>
     </header>
   );
