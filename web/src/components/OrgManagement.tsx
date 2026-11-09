@@ -687,6 +687,31 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
     );
   });
 
+  const getTabButtonStyle = (isActive: boolean) => ({
+    padding: '8px 18px',
+    borderRadius: '999px',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    backgroundColor: isActive ? '#F7EFE2' : '#131318',
+    color: isActive ? '#121214' : '#9A9AA6',
+    border: isActive ? '1px solid transparent' : '1px solid #23232C',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    transition: 'all 0.15s ease',
+    whiteSpace: 'nowrap' as const,
+  });
+
+  const getTabBadgeStyle = (isActive: boolean) => ({
+    fontSize: '11px',
+    padding: '1px 7px',
+    borderRadius: '999px',
+    backgroundColor: isActive ? '#E7DDD0' : '#1E1E26',
+    color: isActive ? '#121214' : '#8E8E9B',
+    fontWeight: 700,
+  });
+
   return (
     <div className="rf-main-content">
       {/* Eyebrow and Page Title */}
@@ -990,6 +1015,167 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         </div>
       </div>
 
+      {/* 4 SUMMARY STAT CARDS FOR MEMBERS DIRECTORY */}
+      {activeTab === 'members' && (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+          gap: '16px',
+          marginBottom: '26px',
+        }}>
+          {/* Total Members */}
+          <div style={{
+            backgroundColor: '#121217',
+            border: '1px solid #202028',
+            borderRadius: '16px',
+            padding: '18px 22px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+          }}>
+            <div style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '12px',
+              backgroundColor: '#181820',
+              border: '1px solid #262632',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#A0A0B0',
+              flexShrink: 0,
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <div>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: '#F4F4F7', lineHeight: '1.2' }}>
+                {members.length}
+              </div>
+              <div style={{ fontSize: '13px', color: '#8E8E9B', fontWeight: 500, marginTop: '2px' }}>
+                Total Members
+              </div>
+            </div>
+          </div>
+
+          {/* Owners */}
+          <div style={{
+            backgroundColor: '#121217',
+            border: '1px solid #202028',
+            borderRadius: '16px',
+            padding: '18px 22px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+          }}>
+            <div style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '12px',
+              backgroundColor: '#181820',
+              border: '1px solid #262632',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#A0A0B0',
+              flexShrink: 0,
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: '#F4F4F7', lineHeight: '1.2' }}>
+                {members.filter((m) => m.role === 'OWNER').length}
+              </div>
+              <div style={{ fontSize: '13px', color: '#8E8E9B', fontWeight: 500, marginTop: '2px' }}>
+                Owners
+              </div>
+            </div>
+          </div>
+
+          {/* Active Members */}
+          <div style={{
+            backgroundColor: '#121217',
+            border: '1px solid #202028',
+            borderRadius: '16px',
+            padding: '18px 22px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+          }}>
+            <div style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '12px',
+              backgroundColor: '#181820',
+              border: '1px solid #262632',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#A0A0B0',
+              flexShrink: 0,
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <polyline points="17 11 19 13 23 9"></polyline>
+              </svg>
+            </div>
+            <div>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: '#F4F4F7', lineHeight: '1.2' }}>
+                {members.filter((m) => m.role !== 'OWNER').length}
+              </div>
+              <div style={{ fontSize: '13px', color: '#8E8E9B', fontWeight: 500, marginTop: '2px' }}>
+                Active Members
+              </div>
+            </div>
+          </div>
+
+          {/* Invitations Pending */}
+          <div style={{
+            backgroundColor: '#121217',
+            border: '1px solid #202028',
+            borderRadius: '16px',
+            padding: '18px 22px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+          }}>
+            <div style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '12px',
+              backgroundColor: '#181820',
+              border: '1px solid #262632',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#A0A0B0',
+              flexShrink: 0,
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <div>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: '#F4F4F7', lineHeight: '1.2' }}>
+                0
+              </div>
+              <div style={{ fontSize: '13px', color: '#8E8E9B', fontWeight: 500, marginTop: '2px' }}>
+                Invitations Pending
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* STATS CARDS ROW (SHOWN ONLY IN OVERVIEW SECTION) */}
       {activeTab === 'dashboard' && (
         <div className="rf-stats-grid">
@@ -1139,299 +1325,76 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
       {/* FILTER PILLS ROW (ROUNDED PILLS - SHOWN IN TAB VIEWS) */}
       {activeTab !== 'dashboard' && (
-        <div className="rf-filter-pills">
-          <button
-            onClick={() => onTabChange('members')}
-            style={{
-              padding: '7px 18px',
-              borderRadius: '999px',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              backgroundColor: activeTab === 'members' ? '#F2F2F5' : '#232327',
-              color: activeTab === 'members' ? '#0E0E10' : '#C9C9D2',
-              border: activeTab === 'members' ? '1px solid transparent' : '1px solid #3E3E45',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.15s ease',
-              whiteSpace: 'nowrap',
-            }}
-          >
+        <div className="rf-filter-pills" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', marginBottom: '22px' }}>
+          <button onClick={() => onTabChange('members')} style={getTabButtonStyle(activeTab === 'members')}>
             <span>All Members</span>
-            <span style={{
-              fontSize: '11px',
-              padding: '1px 7px',
-              borderRadius: '999px',
-              backgroundColor: activeTab === 'members' ? '#0E0E10' : '#3E3E45',
-              color: '#F2F2F5',
-              fontWeight: 700,
-            }}>
-              {members.length}
-            </span>
+            <span style={getTabBadgeStyle(activeTab === 'members')}>{members.length}</span>
           </button>
 
-          <button
-            onClick={() => onTabChange('api-keys')}
-            style={{
-              padding: '7px 18px',
-              borderRadius: '999px',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              backgroundColor: activeTab === 'api-keys' ? '#F2F2F5' : '#232327',
-              color: activeTab === 'api-keys' ? '#0E0E10' : '#C9C9D2',
-              border: activeTab === 'api-keys' ? '1px solid transparent' : '1px solid #3E3E45',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.15s ease',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <button onClick={() => onTabChange('api-keys')} style={getTabButtonStyle(activeTab === 'api-keys')}>
             <span>API Keys</span>
-            <span style={{
-              fontSize: '11px',
-              padding: '1px 7px',
-              borderRadius: '999px',
-              backgroundColor: activeTab === 'api-keys' ? '#0E0E10' : '#3E3E45',
-              color: '#F2F2F5',
-              fontWeight: 700,
-            }}>
-              {apiKeys.length}
-            </span>
+            <span style={getTabBadgeStyle(activeTab === 'api-keys')}>{apiKeys.length}</span>
           </button>
 
-          <button
-            onClick={() => onTabChange('endpoints')}
-            style={{
-              padding: '7px 18px',
-              borderRadius: '999px',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              backgroundColor: activeTab === 'endpoints' ? '#F2F2F5' : '#232327',
-              color: activeTab === 'endpoints' ? '#0E0E10' : '#C9C9D2',
-              border: activeTab === 'endpoints' ? '1px solid transparent' : '1px solid #3E3E45',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.15s ease',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <button onClick={() => onTabChange('endpoints')} style={getTabButtonStyle(activeTab === 'endpoints')}>
             <span>Endpoints</span>
-            <span style={{
-              fontSize: '11px',
-              padding: '1px 7px',
-              borderRadius: '999px',
-              backgroundColor: activeTab === 'endpoints' ? '#0E0E10' : '#3E3E45',
-              color: '#F2F2F5',
-              fontWeight: 700,
-            }}>
-              {endpoints.length}
-            </span>
+            <span style={getTabBadgeStyle(activeTab === 'endpoints')}>{endpoints.length}</span>
           </button>
 
-          <button
-            onClick={() => onTabChange('destinations')}
-            style={{
-              padding: '7px 18px',
-              borderRadius: '999px',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              backgroundColor: activeTab === 'destinations' ? '#F2F2F5' : '#232327',
-              color: activeTab === 'destinations' ? '#0E0E10' : '#C9C9D2',
-              border: activeTab === 'destinations' ? '1px solid transparent' : '1px solid #3E3E45',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.15s ease',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <button onClick={() => onTabChange('destinations')} style={getTabButtonStyle(activeTab === 'destinations')}>
             <span>Destinations</span>
-            <span style={{
-              fontSize: '11px',
-              padding: '1px 7px',
-              borderRadius: '999px',
-              backgroundColor: activeTab === 'destinations' ? '#0E0E10' : '#3E3E45',
-              color: '#F2F2F5',
-              fontWeight: 700,
-            }}>
-              {destinations.length}
-            </span>
+            <span style={getTabBadgeStyle(activeTab === 'destinations')}>{destinations.length}</span>
           </button>
 
-          <button
-            onClick={() => onTabChange('deliveries')}
-            style={{
-              padding: '7px 18px',
-              borderRadius: '999px',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              backgroundColor: activeTab === 'deliveries' ? '#F2F2F5' : '#232327',
-              color: activeTab === 'deliveries' ? '#0E0E10' : '#C9C9D2',
-              border: activeTab === 'deliveries' ? '1px solid transparent' : '1px solid #3E3E45',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.15s ease',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <button onClick={() => onTabChange('deliveries')} style={getTabButtonStyle(activeTab === 'deliveries')}>
             <span>Deliveries</span>
-            <span style={{
-              fontSize: '11px',
-              padding: '1px 7px',
-              borderRadius: '999px',
-              backgroundColor: activeTab === 'deliveries' ? '#0E0E10' : '#3E3E45',
-              color: '#F2F2F5',
-              fontWeight: 700,
-            }}>
-              {deliveries.length}
-            </span>
+            <span style={getTabBadgeStyle(activeTab === 'deliveries')}>{deliveries.length}</span>
           </button>
 
-          <button
-            onClick={() => onTabChange('workflows')}
-            style={{
-              padding: '7px 18px',
-              borderRadius: '999px',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              backgroundColor: activeTab === 'workflows' ? '#F2F2F5' : '#232327',
-              color: activeTab === 'workflows' ? '#0E0E10' : '#C9C9D2',
-              border: activeTab === 'workflows' ? '1px solid transparent' : '1px solid #3E3E45',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.15s ease',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <button onClick={() => onTabChange('workflows')} style={getTabButtonStyle(activeTab === 'workflows')}>
             <span>Workflows (M4)</span>
-            <span style={{
-              fontSize: '11px',
-              padding: '1px 7px',
-              borderRadius: '999px',
-              backgroundColor: activeTab === 'workflows' ? '#0E0E10' : '#3E3E45',
-              color: '#F2F2F5',
-              fontWeight: 700,
-            }}>
-              {workflows.length}
-            </span>
+            <span style={getTabBadgeStyle(activeTab === 'workflows')}>{workflows.length}</span>
           </button>
 
-          <button
-            onClick={() => onTabChange('metrics')}
-            style={{
-              padding: '7px 18px',
-              borderRadius: '999px',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              backgroundColor: activeTab === 'metrics' ? '#F2F2F5' : '#232327',
-              color: activeTab === 'metrics' ? '#0E0E10' : '#C9C9D2',
-              border: activeTab === 'metrics' ? '1px solid transparent' : '1px solid #3E3E45',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.15s ease',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            <span>Metrics</span>
-            <span style={{
-              fontSize: '10px',
-              fontWeight: 700,
-              backgroundColor: activeTab === 'metrics' ? '#0E0E10' : '#3E3E45',
-              color: '#F2F2F5',
-              padding: '1px 6px',
-              borderRadius: '999px',
-            }}>
-              M5
-            </span>
+          <button onClick={() => onTabChange('metrics')} style={getTabButtonStyle(activeTab === 'metrics')}>
+            <span>Metrics (M5)</span>
+            <span style={getTabBadgeStyle(activeTab === 'metrics')}>0</span>
           </button>
 
-          <button
-            onClick={() => onTabChange('dlq')}
-            style={{
-              padding: '7px 18px',
-              borderRadius: '999px',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              backgroundColor: activeTab === 'dlq' ? '#F2F2F5' : '#232327',
-              color: activeTab === 'dlq' ? '#0E0E10' : '#C9C9D2',
-              border: activeTab === 'dlq' ? '1px solid transparent' : '1px solid #3E3E45',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.15s ease',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            <span>Dead Letter Queue</span>
-            <span style={{
-              fontSize: '10px',
-              fontWeight: 700,
-              backgroundColor: activeTab === 'dlq' ? '#0E0E10' : '#3E3E45',
-              color: '#F2F2F5',
-              padding: '1px 6px',
-              borderRadius: '999px',
-            }}>
-              M5
-            </span>
+          <button onClick={() => onTabChange('dlq')} style={getTabButtonStyle(activeTab === 'dlq')}>
+            <span>Dead Letter Queue (M5)</span>
+            <span style={getTabBadgeStyle(activeTab === 'dlq')}>0</span>
           </button>
 
-          <button
-            onClick={() => onTabChange('settings')}
-            style={{
-              padding: '7px 18px',
-              borderRadius: '999px',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              backgroundColor: activeTab === 'settings' ? '#F2F2F5' : '#232327',
-              color: activeTab === 'settings' ? '#0E0E10' : '#C9C9D2',
-              border: activeTab === 'settings' ? '1px solid transparent' : '1px solid #3E3E45',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              transition: 'all 0.15s ease',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <button onClick={() => onTabChange('settings')} style={getTabButtonStyle(activeTab === 'settings')}>
             <span>Settings</span>
           </button>
         </div>
       )}
 
-      {/* SEARCH BAR (ROUNDED PILL - SHOWN IN DIRECTORY VIEWS) */}
+      {/* SEARCH & FILTER ACTION BAR (MATCHING REFERENCE IMAGE) */}
       {activeTab !== 'dashboard' && activeTab !== 'settings' && activeTab !== 'workflows' && activeTab !== 'metrics' && activeTab !== 'dlq' && (
         <div style={{
           display: 'flex',
-          justifyContent: 'space-between',
           alignItems: 'center',
-          gap: '16px',
-          marginBottom: '20px',
+          gap: '12px',
+          marginBottom: '22px',
+          flexWrap: 'wrap',
         }}>
+          {/* Main Search Input */}
           <div style={{
             flex: 1,
+            minWidth: '260px',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
-            backgroundColor: '#232327',
-            border: '1px solid #3E3E45',
+            backgroundColor: '#121217',
+            border: '1px solid #202028',
             borderRadius: '999px',
-            padding: '12px 22px',
-            boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.2)',
+            padding: '10px 20px',
+            boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.25)',
           }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#63636E" strokeWidth="2.2">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#63636E" strokeWidth="2.2">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
@@ -1455,11 +1418,70 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 backgroundColor: 'transparent',
                 outline: 'none',
                 fontSize: '13px',
-                color: '#F2F2F5',
+                color: '#F4F4F7',
                 width: '100%',
               }}
             />
           </div>
+
+          {/* Filters Pill Button */}
+          <button
+            title="Toggle filter criteria"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 18px',
+              backgroundColor: '#131318',
+              border: '1px solid #23232C',
+              borderRadius: '999px',
+              color: '#E0E0E6',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#3E3E4D';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#23232C';
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            <span>Filters</span>
+          </button>
+
+          {/* Sort Pill Button */}
+          <button
+            title="Sort members"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 18px',
+              backgroundColor: '#131318',
+              border: '1px solid #23232C',
+              borderRadius: '999px',
+              color: '#E0E0E6',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#3E3E4D';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#23232C';
+            }}
+          >
+            <span style={{ fontSize: '14px', lineHeight: 1 }}>⇅</span>
+            <span>Sort: Enrolled Date</span>
+            <span style={{ fontSize: '11px', color: '#9A9AA6' }}>⌄</span>
+          </button>
         </div>
       )}
 
@@ -1657,291 +1679,327 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       {/* TABLE CONTAINER FOR DIRECTORY / LOG VIEWS */}
       {activeTab !== 'dashboard' && activeTab !== 'settings' && activeTab !== 'workflows' && (
         <div className="rf-table-responsive">
-          {/* MEMBERS VIEW */}
+          {/* MEMBERS VIEW (MATCHING PIXEL REFERENCE) */}
           {activeTab === 'members' && (
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '680px' }}>
-            <thead>
-              <tr style={{
-                borderBottom: '1px solid #3E3E45',
-                color: '#9A9AA6',
-                fontSize: '11px',
-                fontWeight: 700,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                backgroundColor: '#1E1E22',
-              }}>
-                <th style={{ padding: '16px 22px' }}>Member ID</th>
-                <th style={{ padding: '16px 22px' }}>Member Name & Contact</th>
-                <th style={{ padding: '16px 22px' }}>Role</th>
-                <th style={{ padding: '16px 22px' }}>Enrolled Date</th>
-                <th style={{ padding: '16px 22px' }}>Status</th>
-                <th style={{ padding: '16px 22px', textAlign: 'right' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredMembers.length === 0 ? (
-                <tr>
-                  <td colSpan={6} style={{ padding: '48px 20px', textAlign: 'center', color: '#63636E' }}>
-                    No members match your search criteria.
-                  </td>
-                </tr>
-              ) : (
-                filteredMembers.map((m, idx) => {
-                  const isCurrent = m.userId === currentUserId;
-                  const memberIdDisplay = `MEM-${m.userId.slice(0, 5).toUpperCase()}`;
-                  const isMenuOpen = activeMenuMemberId === m.id;
-
-                  return (
-                    <tr
-                      key={m.id}
-                      style={{
-                        borderBottom: idx === filteredMembers.length - 1 ? 'none' : '1px solid #2C2C32',
-                        fontSize: '13px',
-                        color: '#F2F2F5',
-                      }}
-                    >
-                      <td style={{ padding: '16px 22px', fontFamily: 'monospace', fontSize: '12px', color: '#9A9AA6' }}>
-                        {memberIdDisplay}
+            <div style={{
+              backgroundColor: '#111116',
+              border: '1px solid #1E1E26',
+              borderRadius: '16px',
+              overflow: 'hidden',
+            }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
+                <thead>
+                  <tr style={{
+                    borderBottom: '1px solid #202028',
+                    color: '#8E8E9B',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    backgroundColor: '#14141A',
+                  }}>
+                    <th style={{ width: '44px', padding: '16px 20px', textAlign: 'center' }}>
+                      <input
+                        type="checkbox"
+                        style={{
+                          accentColor: '#C5A059',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          width: '15px',
+                          height: '15px',
+                        }}
+                      />
+                    </th>
+                    <th style={{ padding: '16px 18px' }}>Member ID</th>
+                    <th style={{ padding: '16px 18px' }}>Member Name & Contact</th>
+                    <th style={{ padding: '16px 18px' }}>Role</th>
+                    <th style={{ padding: '16px 18px' }}>Enrolled Date</th>
+                    <th style={{ padding: '16px 18px' }}>Status</th>
+                    <th style={{ padding: '16px 20px', textAlign: 'right' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredMembers.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} style={{ padding: '52px 20px', textAlign: 'center', color: '#63636E', fontSize: '13px' }}>
+                        No members match your search criteria.
                       </td>
+                    </tr>
+                  ) : (
+                    filteredMembers.map((m, idx) => {
+                      const isCurrent = m.userId === currentUserId;
+                      const memberIdDisplay = `MEM-${m.userId.slice(0, 5).toUpperCase()}`;
+                      const isMenuOpen = activeMenuMemberId === m.id;
+                      const enrolledDate = new Date(m.joinedAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      });
 
-                      <td style={{ padding: '16px 22px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          {m.user.avatarUrl ? (
-                            <img
-                              src={m.user.avatarUrl}
-                              alt=""
-                              style={{ width: '34px', height: '34px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #3E3E45' }}
+                      return (
+                        <tr
+                          key={m.id}
+                          style={{
+                            borderBottom: idx === filteredMembers.length - 1 ? 'none' : '1px solid #1C1C24',
+                            fontSize: '13px',
+                            color: '#F4F4F7',
+                            transition: 'background-color 0.15s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
+                        >
+                          {/* Checkbox Column */}
+                          <td style={{ padding: '16px 20px', textAlign: 'center' }}>
+                            <input
+                              type="checkbox"
+                              style={{
+                                accentColor: '#C5A059',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                width: '15px',
+                                height: '15px',
+                              }}
                             />
-                          ) : (
-                            <div style={{
-                              width: '34px',
-                              height: '34px',
-                              borderRadius: '50%',
-                              backgroundColor: '#0E0E10',
-                              border: '1px solid #3E3E45',
-                              color: '#F2F2F5',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: '11px',
-                              fontWeight: 700,
+                          </td>
+
+                          {/* Member ID Monospace Badge */}
+                          <td style={{ padding: '16px 18px' }}>
+                            <span style={{
+                              display: 'inline-block',
+                              fontFamily: 'monospace',
+                              fontSize: '12px',
+                              fontWeight: 600,
+                              color: '#B5B5C2',
+                              backgroundColor: '#16161E',
+                              border: '1px solid #262633',
+                              borderRadius: '999px',
+                              padding: '3px 12px',
                             }}>
-                              {(m.user.displayName || m.user.email || 'U').slice(0, 2).toUpperCase()}
+                              {memberIdDisplay}
+                            </span>
+                          </td>
+
+                          {/* Member Name & Contact */}
+                          <td style={{ padding: '16px 18px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              {m.user.avatarUrl ? (
+                                <img
+                                  src={m.user.avatarUrl}
+                                  alt=""
+                                  style={{
+                                    width: '36px',
+                                    height: '36px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover',
+                                    border: '1px solid #2E2E3A',
+                                  }}
+                                />
+                              ) : (
+                                <div style={{
+                                  width: '36px',
+                                  height: '36px',
+                                  borderRadius: '50%',
+                                  backgroundColor: '#16161E',
+                                  border: '1px solid #2E2E3A',
+                                  color: '#F4F4F7',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '12px',
+                                  fontWeight: 700,
+                                }}>
+                                  {(m.user.displayName || m.user.email || 'U').slice(0, 2).toUpperCase()}
+                                </div>
+                              )}
+                              <div>
+                                <div style={{ fontWeight: 600, color: '#F4F4F7', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <span>{m.user.displayName || 'Deepjyoti'}</span>
+                                  {isCurrent && <span style={{ color: '#8E8E9B', fontWeight: 400, fontSize: '12px' }}>(You)</span>}
+                                </div>
+                                <div style={{ fontSize: '12px', color: '#8E8E9B', marginTop: '1px' }}>
+                                  {m.user.email || 'deepjyoti478@gmail.com'}
+                                </div>
+                              </div>
                             </div>
-                          )}
-                          <div>
-                            <div style={{ fontWeight: 600, color: '#F2F2F5' }}>
-                              {m.user.displayName || 'Unnamed Developer'} {isCurrent && <span style={{ color: '#9A9AA6', fontWeight: 400 }}>(You)</span>}
-                            </div>
-                            <div style={{ fontSize: '12px', color: '#9A9AA6' }}>
-                              {m.user.email || 'No public email'}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
+                          </td>
 
-                      <td style={{ padding: '16px 22px' }}>
-                        <span style={{
-                          display: 'inline-block',
-                          padding: '4px 14px',
-                          borderRadius: '999px',
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          backgroundColor: '#35353C',
-                          color: '#F2F2F5',
-                          letterSpacing: '0.04em',
-                        }}>
-                          {m.role}
-                        </span>
-                      </td>
-
-                      <td style={{ padding: '16px 22px', color: '#9A9AA6', fontSize: '12px' }}>
-                        {new Date(m.joinedAt).toLocaleDateString()}
-                      </td>
-
-                      <td style={{ padding: '16px 22px' }}>
-                        <span style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '4px 12px',
-                          borderRadius: '999px',
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          backgroundColor: '#16161A',
-                          color: '#F2F2F5',
-                          border: '1px solid #33333A',
-                        }}>
-                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#10b981' }}></span>
-                          Active
-                        </span>
-                      </td>
-
-                      <td style={{ padding: '16px 22px', textAlign: 'right', position: 'relative' }}>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                          <button
-                            title="Member Actions"
-                            onClick={() => setActiveMenuMemberId(isMenuOpen ? null : m.id)}
-                            style={{
-                              width: '32px',
-                              height: '32px',
-                              borderRadius: '50%',
-                              backgroundColor: isMenuOpen ? '#3E3E45' : 'transparent',
-                              border: '1px solid transparent',
-                              color: '#C9C9D2',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              cursor: 'pointer',
-                              transition: 'all 0.15s ease',
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = '#3E3E45';
-                            }}
-                            onMouseLeave={(e) => {
-                              if (!isMenuOpen) e.currentTarget.style.backgroundColor = 'transparent';
-                            }}
-                          >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                              <circle cx="12" cy="12" r="2"></circle>
-                              <circle cx="6" cy="12" r="2"></circle>
-                              <circle cx="18" cy="12" r="2"></circle>
-                            </svg>
-                          </button>
-
-                          {/* Action Popover Menu */}
-                          {isMenuOpen && (
-                            <>
-                              <div
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setActiveMenuMemberId(null);
-                                }}
-                                style={{
-                                  position: 'fixed',
-                                  inset: 0,
-                                  zIndex: 998,
-                                }}
-                              />
-                              <div style={{
-                                position: 'absolute',
-                                right: '22px',
-                                top: '48px',
-                                backgroundColor: '#1E1E22',
-                                border: '1px solid #3E3E45',
-                                borderRadius: '12px',
-                                padding: '8px',
-                                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.65)',
-                                zIndex: 999,
-                                minWidth: '190px',
-                                textAlign: 'left',
+                          {/* Role Badge */}
+                          <td style={{ padding: '16px 18px' }}>
+                            {m.role === 'OWNER' ? (
+                              <span style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                padding: '4px 12px',
+                                borderRadius: '999px',
+                                fontSize: '11px',
+                                fontWeight: 800,
+                                backgroundColor: '#F7EFE2',
+                                color: '#121214',
+                                letterSpacing: '0.04em',
+                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
                               }}>
-                                {isOwner && !isCurrent ? (
-                                  <>
-                                    <div style={{ fontSize: '11px', color: '#9A9AA6', padding: '4px 8px', fontWeight: 600 }}>
-                                      Change Role:
-                                    </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '6px' }}>
-                                      {(['OWNER', 'DEVELOPER', 'VIEWER'] as MembershipRole[]).map((r) => (
-                                        <button
-                                          key={r}
-                                          onClick={() => {
-                                            void handleRoleChange(m.id, r);
-                                            setActiveMenuMemberId(null);
-                                          }}
-                                          style={{
-                                            padding: '6px 8px',
-                                            borderRadius: '6px',
-                                            fontSize: '12px',
-                                            backgroundColor: m.role === r ? '#2A2A30' : 'transparent',
-                                            color: '#F2F2F5',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            textAlign: 'left',
-                                            fontWeight: m.role === r ? 700 : 500,
-                                          }}
-                                        >
-                                          {r} {m.role === r ? '✓' : ''}
-                                        </button>
-                                      ))}
-                                    </div>
-                                    <div style={{ height: '1px', backgroundColor: '#3E3E45', margin: '4px 0' }} />
-                                    <button
-                                      onClick={() => {
-                                        promptRemoveMember(m);
-                                        setActiveMenuMemberId(null);
-                                      }}
-                                      style={{
-                                        width: '100%',
-                                        padding: '6px 8px',
-                                        borderRadius: '6px',
-                                        fontSize: '12px',
-                                        backgroundColor: 'transparent',
-                                        color: '#f87171',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        textAlign: 'left',
-                                        fontWeight: 600,
-                                      }}
-                                    >
-                                      Remove Member
-                                    </button>
-                                  </>
-                                ) : isCurrent && isOwner ? (
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                    <div style={{ fontSize: '11px', color: '#9A9AA6', padding: '4px 8px', fontWeight: 600 }}>
-                                      Organization Owner
-                                    </div>
-                                    <button
-                                      onClick={() => {
-                                        setIsRenaming(true);
-                                        setActiveMenuMemberId(null);
-                                      }}
-                                      style={{
-                                        padding: '6px 8px',
-                                        borderRadius: '6px',
-                                        fontSize: '12px',
-                                        backgroundColor: 'transparent',
-                                        color: '#F2F2F5',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        textAlign: 'left',
-                                      }}
-                                    >
-                                      Rename Organization
-                                    </button>
-                                    <button
-                                      onClick={() => {
-                                        onTabChange('settings');
-                                        setActiveMenuMemberId(null);
-                                      }}
-                                      style={{
-                                        padding: '6px 8px',
-                                        borderRadius: '6px',
-                                        fontSize: '12px',
-                                        backgroundColor: 'transparent',
-                                        color: '#F2F2F5',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        textAlign: 'left',
-                                      }}
-                                    >
-                                      Organization Settings
-                                    </button>
-                                    {onDeleteOrg && (
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="#C5A059" stroke="#9A7B44" strokeWidth="1.5">
+                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                                <span>OWNER</span>
+                              </span>
+                            ) : (
+                              <span style={{
+                                display: 'inline-block',
+                                padding: '4px 12px',
+                                borderRadius: '999px',
+                                fontSize: '11px',
+                                fontWeight: 700,
+                                backgroundColor: '#1E1E26',
+                                border: '1px solid #2B2B38',
+                                color: '#C9C9D2',
+                                letterSpacing: '0.04em',
+                              }}>
+                                {m.role}
+                              </span>
+                            )}
+                          </td>
+
+                          {/* Enrolled Date */}
+                          <td style={{ padding: '16px 18px', color: '#A0A0AD', fontSize: '13px' }}>
+                            {enrolledDate}
+                          </td>
+
+                          {/* Status Pill with Glowing Green Dot */}
+                          <td style={{ padding: '16px 18px' }}>
+                            <span style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '7px',
+                              padding: '4px 12px',
+                              borderRadius: '999px',
+                              fontSize: '12px',
+                              fontWeight: 600,
+                              backgroundColor: '#141419',
+                              color: '#F4F4F7',
+                              border: '1px solid #24242E',
+                            }}>
+                              <span style={{
+                                width: '6px',
+                                height: '6px',
+                                borderRadius: '50%',
+                                backgroundColor: '#10b981',
+                                boxShadow: '0 0 6px rgba(16, 185, 129, 0.6)',
+                              }}></span>
+                              Active
+                            </span>
+                          </td>
+
+                          {/* Actions Button */}
+                          <td style={{ padding: '16px 20px', textAlign: 'right', position: 'relative' }}>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                              <button
+                                title="Member Actions"
+                                onClick={() => setActiveMenuMemberId(isMenuOpen ? null : m.id)}
+                                style={{
+                                  width: '32px',
+                                  height: '32px',
+                                  borderRadius: '50%',
+                                  backgroundColor: isMenuOpen ? '#262633' : '#14141A',
+                                  border: '1px solid #24242E',
+                                  color: '#C9C9D2',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.15s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#262633';
+                                  e.currentTarget.style.borderColor = '#3E3E4D';
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (!isMenuOpen) {
+                                    e.currentTarget.style.backgroundColor = '#14141A';
+                                    e.currentTarget.style.borderColor = '#24242E';
+                                  }
+                                }}
+                              >
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                                  <circle cx="12" cy="12" r="2"></circle>
+                                  <circle cx="6" cy="12" r="2"></circle>
+                                  <circle cx="18" cy="12" r="2"></circle>
+                                </svg>
+                              </button>
+
+                              {/* Action Popover Menu */}
+                              {isMenuOpen && (
+                                <>
+                                  <div
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setActiveMenuMemberId(null);
+                                    }}
+                                    style={{
+                                      position: 'fixed',
+                                      inset: 0,
+                                      zIndex: 998,
+                                    }}
+                                  />
+                                  <div style={{
+                                    position: 'absolute',
+                                    right: '20px',
+                                    top: '46px',
+                                    backgroundColor: '#17171E',
+                                    border: '1px solid #2B2B38',
+                                    borderRadius: '12px',
+                                    padding: '8px',
+                                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.75)',
+                                    zIndex: 999,
+                                    minWidth: '190px',
+                                    textAlign: 'left',
+                                  }}>
+                                    {isOwner && !isCurrent ? (
                                       <>
-                                        <div style={{ height: '1px', backgroundColor: '#3E3E45', margin: '4px 0' }} />
+                                        <div style={{ fontSize: '11px', color: '#9A9AA6', padding: '4px 8px', fontWeight: 600 }}>
+                                          Change Role:
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '6px' }}>
+                                          {(['OWNER', 'DEVELOPER', 'VIEWER'] as MembershipRole[]).map((r) => (
+                                            <button
+                                              key={r}
+                                              onClick={() => {
+                                                void handleRoleChange(m.id, r);
+                                                setActiveMenuMemberId(null);
+                                              }}
+                                              style={{
+                                                padding: '6px 8px',
+                                                borderRadius: '6px',
+                                                fontSize: '12px',
+                                                backgroundColor: m.role === r ? '#242430' : 'transparent',
+                                                color: '#F4F4F7',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                textAlign: 'left',
+                                                fontWeight: m.role === r ? 700 : 500,
+                                              }}
+                                            >
+                                              {r} {m.role === r ? '✓' : ''}
+                                            </button>
+                                          ))}
+                                        </div>
+                                        <div style={{ height: '1px', backgroundColor: '#2B2B38', margin: '4px 0' }} />
                                         <button
                                           onClick={() => {
+                                            promptRemoveMember(m);
                                             setActiveMenuMemberId(null);
-                                            void handleDeleteOrgConfirm();
                                           }}
                                           style={{
                                             width: '100%',
                                             padding: '6px 8px',
                                             borderRadius: '6px',
                                             fontSize: '12px',
-                                            backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                                            backgroundColor: 'transparent',
                                             color: '#f87171',
                                             border: 'none',
                                             cursor: 'pointer',
@@ -1949,51 +2007,189 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                             fontWeight: 600,
                                           }}
                                         >
-                                          Delete Organization
+                                          Remove Member
                                         </button>
                                       </>
+                                    ) : isCurrent && isOwner ? (
+                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <div style={{ fontSize: '11px', color: '#9A9AA6', padding: '4px 8px', fontWeight: 600 }}>
+                                          Organization Owner
+                                        </div>
+                                        <button
+                                          onClick={() => {
+                                            setIsRenaming(true);
+                                            setActiveMenuMemberId(null);
+                                          }}
+                                          style={{
+                                            padding: '6px 8px',
+                                            borderRadius: '6px',
+                                            fontSize: '12px',
+                                            backgroundColor: 'transparent',
+                                            color: '#F4F4F7',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                          }}
+                                        >
+                                          Rename Organization
+                                        </button>
+                                        <button
+                                          onClick={() => {
+                                            onTabChange('settings');
+                                            setActiveMenuMemberId(null);
+                                          }}
+                                          style={{
+                                            padding: '6px 8px',
+                                            borderRadius: '6px',
+                                            fontSize: '12px',
+                                            backgroundColor: 'transparent',
+                                            color: '#F4F4F7',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                          }}
+                                        >
+                                          Organization Settings
+                                        </button>
+                                        {onDeleteOrg && (
+                                          <>
+                                            <div style={{ height: '1px', backgroundColor: '#2B2B38', margin: '4px 0' }} />
+                                            <button
+                                              onClick={() => {
+                                                setActiveMenuMemberId(null);
+                                                void handleDeleteOrgConfirm();
+                                              }}
+                                              style={{
+                                                width: '100%',
+                                                padding: '6px 8px',
+                                                borderRadius: '6px',
+                                                fontSize: '12px',
+                                                backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                                                color: '#f87171',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                textAlign: 'left',
+                                                fontWeight: 600,
+                                              }}
+                                            >
+                                              Delete Organization
+                                            </button>
+                                          </>
+                                        )}
+                                      </div>
+                                    ) : isCurrent && !isOwner ? (
+                                      <button
+                                        onClick={() => {
+                                          promptRemoveMember(m);
+                                          setActiveMenuMemberId(null);
+                                        }}
+                                        style={{
+                                          width: '100%',
+                                          padding: '6px 8px',
+                                          borderRadius: '6px',
+                                          fontSize: '12px',
+                                          backgroundColor: 'transparent',
+                                          color: '#f87171',
+                                          border: 'none',
+                                          cursor: 'pointer',
+                                          textAlign: 'left',
+                                          fontWeight: 600,
+                                        }}
+                                      >
+                                        Leave Organization
+                                      </button>
+                                    ) : (
+                                      <div style={{ fontSize: '12px', color: '#9A9AA6', padding: '6px 8px' }}>
+                                        No actions available
+                                      </div>
                                     )}
                                   </div>
-                                ) : isCurrent && !isOwner ? (
-                                  <button
-                                    onClick={() => {
-                                      promptRemoveMember(m);
-                                      setActiveMenuMemberId(null);
-                                    }}
-                                    style={{
-                                      width: '100%',
-                                      padding: '6px 8px',
-                                      borderRadius: '6px',
-                                      fontSize: '12px',
-                                      backgroundColor: 'transparent',
-                                      color: '#f87171',
-                                      border: 'none',
-                                      cursor: 'pointer',
-                                      textAlign: 'left',
-                                      fontWeight: 600,
-                                    }}
-                                  >
-                                    Leave Organization
-                                  </button>
-                                ) : (
-                                  <div style={{ fontSize: '12px', color: '#9A9AA6', padding: '6px 8px' }}>
-                                    No actions available
-                                  </div>
-                                )}
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        )}
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
 
-        {/* API KEYS VIEW */}
+              {/* Pagination Footer */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '14px 20px',
+                borderTop: '1px solid #1E1E26',
+                backgroundColor: '#121217',
+                color: '#8E8E9B',
+                fontSize: '13px',
+              }}>
+                <div>
+                  Showing 1-{Math.max(1, filteredMembers.length)} of {filteredMembers.length} member{filteredMembers.length === 1 ? '' : 's'}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button
+                    disabled
+                    style={{
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '8px',
+                      border: '1px solid #23232C',
+                      backgroundColor: '#15151B',
+                      color: '#525260',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'not-allowed',
+                      fontSize: '13px',
+                    }}
+                  >
+                    &lt;
+                  </button>
+                  <button
+                    style={{
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: '#F7EFE2',
+                      color: '#121214',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                    }}
+                  >
+                    1
+                  </button>
+                  <button
+                    disabled
+                    style={{
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '8px',
+                      border: '1px solid #23232C',
+                      backgroundColor: '#15151B',
+                      color: '#525260',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'not-allowed',
+                      fontSize: '13px',
+                    }}
+                  >
+                    &gt;
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* API KEYS VIEW */}
         {activeTab === 'api-keys' && (
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '720px' }}>
             <thead>

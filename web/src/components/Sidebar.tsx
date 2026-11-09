@@ -204,7 +204,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             textTransform: 'uppercase',
             padding: '0 10px 10px',
           }}>
-            MAIN MENU
+            Main
           </div>
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -675,36 +675,49 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       width: '100%',
-                      padding: '10px 14px',
-                      borderRadius: '14px',
+                      padding: '10px 12px',
+                      borderRadius: '12px',
                       fontSize: '13px',
-                      backgroundColor: isSelected ? '#17171B' : 'transparent',
-                      color: '#F2F2F5',
-                      border: isSelected ? '1px solid #2B2B32' : '1px solid transparent',
+                      backgroundColor: isSelected ? '#15151A' : 'transparent',
+                      color: '#F4F4F7',
+                      border: isSelected ? '1px solid #282834' : '1px solid transparent',
                       cursor: 'pointer',
                       textAlign: 'left',
                       transition: 'all 0.15s ease',
-                      boxShadow: isSelected ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
+                      boxShadow: isSelected ? '0 2px 10px rgba(0,0,0,0.35)' : 'none',
                     }}
                   >
-                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      <div style={{ fontWeight: 700, color: '#F2F2F5' }}>{org.name}</div>
-                      <div style={{ fontSize: '11px', color: '#63636E', fontWeight: 400 }}>
-                        /{org.slug}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                      <div style={{ color: isSelected ? '#D4AF78' : '#63636E', flexShrink: 0 }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                          <polyline points="2 17 12 22 22 17"></polyline>
+                          <polyline points="2 12 12 17 22 12"></polyline>
+                        </svg>
+                      </div>
+                      <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontWeight: 700, color: '#F4F4F7', fontSize: '13px', lineHeight: 1.2 }}>{org.name}</div>
+                        <div style={{ fontSize: '11px', color: '#63636E', fontWeight: 400, marginTop: '2px' }}>
+                          {org.slug}.rlf
+                        </div>
                       </div>
                     </div>
-                    <span style={{
-                      fontSize: '10px',
-                      fontWeight: 700,
-                      backgroundColor: '#232327',
-                      color: '#C9C9D2',
-                      padding: '2px 7px',
-                      borderRadius: '999px',
-                      border: '1px solid #3E3E45',
-                      marginLeft: '8px',
-                    }}>
-                      {org.role}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                      <span style={{
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        backgroundColor: '#202028',
+                        color: '#C9C9D2',
+                        padding: '2px 7px',
+                        borderRadius: '999px',
+                        border: '1px solid #2E2E38',
+                      }}>
+                        {org.role}
+                      </span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#63636E" strokeWidth="2.5">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </div>
                   </button>
                 );
               })
@@ -722,7 +735,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             textTransform: 'uppercase',
             padding: '0 10px 10px',
           }}>
-            ADMINISTRATION
+            Administration
           </div>
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>

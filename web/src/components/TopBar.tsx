@@ -113,59 +113,78 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* Right Tools */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
         {/* Search bar */}
-        <div className="rf-topbar-search">
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          backgroundColor: '#121216',
+          border: '1px solid #24242E',
+          borderRadius: '999px',
+          padding: '8px 16px',
+          width: '280px',
+        }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#63636E" strokeWidth="2.5">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
           <input
             type="text"
-            placeholder="Search resources, keys..."
+            placeholder="Search resources, keys, or docs..."
             style={{
               border: 'none',
               backgroundColor: 'transparent',
               outline: 'none',
               fontSize: '12px',
-              color: '#F2F2F5',
+              color: '#F4F4F7',
               width: '100%',
             }}
           />
           <kbd style={{
             fontSize: '10px',
-            backgroundColor: '#232327',
-            border: '1px solid #3E3E45',
-            borderRadius: '4px',
-            padding: '2px 5px',
+            backgroundColor: '#1A1A22',
+            border: '1px solid #2E2E3C',
+            borderRadius: '6px',
+            padding: '2px 6px',
             color: '#9A9AA6',
             fontFamily: 'monospace',
+            whiteSpace: 'nowrap',
           }}>
-            ⌘K
+            ⌘ K
           </kbd>
         </div>
 
-        {/* Status pill */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          padding: '6px 14px',
-          borderRadius: '999px',
-          border: '1px solid #2C2C32',
-          backgroundColor: '#16161A',
-          fontSize: '12px',
-          color: '#C9C9D2',
-          fontWeight: 500,
-        }}>
-          <span style={{
-            width: '6px',
-            height: '6px',
+        {/* Notification Bell Button */}
+        <button
+          title="Notifications"
+          style={{
+            width: '34px',
+            height: '34px',
             borderRadius: '50%',
-            backgroundColor: '#10b981',
-          }}></span>
-          <span className="rf-topbar-pill-text">RLS Active</span>
-        </div>
+            backgroundColor: '#121216',
+            border: '1px solid #24242E',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#9A9AA6',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#F4F4F7';
+            e.currentTarget.style.borderColor = '#3E3E4D';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#9A9AA6';
+            e.currentTarget.style.borderColor = '#24242E';
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        </button>
 
         {/* Public docs button */}
         <a
@@ -176,23 +195,23 @@ export const TopBar: React.FC<TopBarProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            padding: '6px 14px',
+            padding: '7px 16px',
             borderRadius: '999px',
-            border: '1px solid #2C2C32',
-            backgroundColor: '#16161A',
+            border: '1px solid #24242E',
+            backgroundColor: '#121216',
             fontSize: '12px',
-            color: '#9A9AA6',
+            color: '#C9C9D2',
             textDecoration: 'none',
-            fontWeight: 500,
+            fontWeight: 600,
             transition: 'all 0.15s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#F2F2F5';
-            e.currentTarget.style.borderColor = '#3E3E45';
+            e.currentTarget.style.color = '#F4F4F7';
+            e.currentTarget.style.borderColor = '#3E3E4D';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = '#9A9AA6';
-            e.currentTarget.style.borderColor = '#2C2C32';
+            e.currentTarget.style.color = '#C9C9D2';
+            e.currentTarget.style.borderColor = '#24242E';
           }}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
