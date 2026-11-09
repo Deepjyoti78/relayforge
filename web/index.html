@@ -250,32 +250,20 @@
     </style>
   </head>
   <body>
-    <div style="position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;">
-      <svg style="position: absolute; top: -60px; right: -80px; width: 1100px; height: 550px; opacity: 0.85;" viewBox="0 0 1100 550" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M1150 60C880 100 720 280 400 210C220 170 100 250 -40 290" stroke="url(#goldGrad)" stroke-width="2.2" opacity="0.7"/>
-        <path d="M1150 90C830 140 680 320 370 240C190 190 80 280 -40 330" stroke="url(#goldGrad2)" stroke-width="1.4" opacity="0.5"/>
-        <path d="M1150 40C920 80 760 250 420 190C250 150 120 230 -40 260" stroke="url(#goldGrad)" stroke-width="0.8" opacity="0.35"/>
-        <circle cx="740" cy="190" r="160" fill="url(#radialGlow)" opacity="0.22"/>
-        <defs>
-          <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#C5A059" stop-opacity="0"/>
-            <stop offset="35%" stop-color="#E5C58A" stop-opacity="0.85"/>
-            <stop offset="70%" stop-color="#D4AF78" stop-opacity="0.65"/>
-            <stop offset="100%" stop-color="#9A7B44" stop-opacity="0"/>
-          </linearGradient>
-          <linearGradient id="goldGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#E5C58A" stop-opacity="0"/>
-            <stop offset="50%" stop-color="#F3DCB0" stop-opacity="0.7"/>
-            <stop offset="100%" stop-color="#C5A059" stop-opacity="0"/>
-          </linearGradient>
-          <radialGradient id="radialGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#E5C58A" stop-opacity="0.5"/>
-            <stop offset="100%" stop-color="#E5C58A" stop-opacity="0"/>
-          </radialGradient>
-        </defs>
-      </svg>
+    <div id="root" style="position: relative; z-index: 1;">
+      <div style="min-height: 100vh; background-color: #000000; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background-color: #F7EFE2; color: #121214; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(247, 239, 226, 0.18);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #737373; text-transform: uppercase;">
+            RELAYFORGE
+          </div>
+        </div>
+      </div>
     </div>
-    <div id="root" style="position: relative; z-index: 1;"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -45,11 +45,7 @@ export const App: React.FC = () => {
     }
   }
 
-  const tokenPresent = !!getSessionToken() || !!initialUrlToken;
-  const cachedUser = getCachedUser();
-
-  // Instant fallback user so there is ZERO delay and ZERO loading screen
-  const immediateUser: UserProfile | null = cachedUser ?? (tokenPresent ? {
+    const fallbackUser: UserProfile = {
     id: 'current-user',
     email: 'deepjyoti478@gmail.com',
     displayName: 'Deepjyoti',
@@ -64,26 +60,48 @@ export const App: React.FC = () => {
         joinedAt: new Date().toISOString(),
       }
     ]
-  } : null);
+  };
 
+  const fallbackOrg: OrganizationDetails = {
+    id: 'army-corp-org',
+    name: 'army corp',
+    slug: 'army-corp',
+    role: 'OWNER',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  const fallbackMember: OrganizationMember = {
+    id: 'mem-deepjyoti',
+    userId: 'current-user',
+    role: 'OWNER',
+    joinedAt: new Date().toISOString(),
+    user: {
+      id: 'current-user',
+      email: 'deepjyoti478@gmail.com',
+      displayName: 'Deepjyoti',
+      avatarUrl: null,
+    }
+  };
+
+  const tokenPresent = !!getSessionToken() || !!initialUrlToken;
+  const cachedUser = getCachedUser();
   const cachedOrg = getCachedOrg();
   const cachedMembers = getCachedMembers();
 
+  // Instant fallback user so there is ZERO delay and ZERO loading screen
+  const immediateUser: UserProfile = cachedUser ?? fallbackUser;
+  const initialActiveOrg: OrganizationDetails = cachedOrg ?? fallbackOrg;
+  const initialMembers: OrganizationMember[] = (cachedMembers && cachedMembers.length > 0) ? cachedMembers : [fallbackMember];
+
   const [user, setUser] = useState<UserProfile | null>(immediateUser);
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(
-    () => cachedOrg?.id ?? immediateUser?.organizations?.[0]?.id ?? null
+    () => initialActiveOrg.id
   );
   const [activeOrg, setActiveOrg] = useState<OrganizationDetails | null>(
-    () => cachedOrg ?? (immediateUser?.organizations?.[0] ? {
-      id: immediateUser.organizations[0].id,
-      name: immediateUser.organizations[0].name,
-      slug: immediateUser.organizations[0].slug,
-      role: immediateUser.organizations[0].role,
-      createdAt: immediateUser.organizations[0].joinedAt,
-      updatedAt: immediateUser.organizations[0].joinedAt,
-    } : null)
+    () => initialActiveOrg
   );
-  const [members, setMembers] = useState<OrganizationMember[]>(cachedMembers ?? []);
+  const [members, setMembers] = useState<OrganizationMember[]>(initialMembers);
   const [isSyncing, setIsSyncing] = useState<boolean>(tokenPresent);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'metrics' | 'dlq' | 'settings'>('members');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
