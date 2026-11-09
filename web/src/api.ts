@@ -153,7 +153,7 @@ async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Promise<R
       } catch {
         // Ignore abort errors
       }
-    }, 12000);
+    }, 5000);
   }
 
   const res = await fetch(url, {
@@ -172,13 +172,18 @@ async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Promise<R
 }
 
 export async function fetchMe(): Promise<UserProfile | null> {
-  const res = await apiFetch('/v1/me');
-  if (res.status === 401) return null;
-  const contentType = res.headers.get('content-type');
-  if (!res.ok || !contentType?.includes('application/json')) {
+  try {
+    const res = await apiFetch('/v1/me');
+    if (res.status === 401) return null;
+    const contentType = res.headers.get('content-type');
+    if (!res.ok || !contentType?.includes('application/json')) {
+      return null;
+    }
+    return (await res.json()) as UserProfile;
+  } catch (err) {
+    console.warn('Silent fetchMe background error:', err);
     return null;
   }
-  return res.json() as Promise<UserProfile>;
 }
 
 export async function logout(): Promise<void> {

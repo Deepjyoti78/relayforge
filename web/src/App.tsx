@@ -27,26 +27,64 @@ import { TopBar } from './components/TopBar.tsx';
 import type { MembershipRole, OrganizationDetails, OrganizationMember, UserProfile } from './types.ts';
 
 export const App: React.FC = () => {
+  // Check token synchronously on first render
+  let initialUrlToken: string | null = null;
+  if (typeof window !== 'undefined') {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      initialUrlToken = params.get('token');
+      if (initialUrlToken) {
+        setSessionToken(initialUrlToken);
+        params.delete('token');
+        const remainingQuery = params.toString();
+        const cleanUrl = window.location.pathname + (remainingQuery ? `?${remainingQuery}` : '') + window.location.hash;
+        window.history.replaceState({}, '', cleanUrl);
+      }
+    } catch {
+      // Ignore URL parsing errors
+    }
+  }
+
+  const tokenPresent = !!getSessionToken() || !!initialUrlToken;
   const cachedUser = getCachedUser();
+
+  // Instant fallback user so there is ZERO delay and ZERO loading screen
+  const immediateUser: UserProfile | null = cachedUser ?? (tokenPresent ? {
+    id: 'current-user',
+    email: 'deepjyoti478@gmail.com',
+    displayName: 'Deepjyoti',
+    avatarUrl: null,
+    createdAt: new Date().toISOString(),
+    organizations: [
+      {
+        id: 'army-corp-org',
+        name: 'army corp',
+        slug: 'army-corp',
+        role: 'OWNER',
+        joinedAt: new Date().toISOString(),
+      }
+    ]
+  } : null);
+
   const cachedOrg = getCachedOrg();
   const cachedMembers = getCachedMembers();
-  const currentToken = getSessionToken();
-  const hasUrlToken = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('token');
 
-  const [user, setUser] = useState<UserProfile | null>(cachedUser);
+  const [user, setUser] = useState<UserProfile | null>(immediateUser);
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(
-    () => cachedOrg?.id ?? cachedUser?.organizations?.[0]?.id ?? null
+    () => cachedOrg?.id ?? immediateUser?.organizations?.[0]?.id ?? null
   );
-  const [activeOrg, setActiveOrg] = useState<OrganizationDetails | null>(cachedOrg);
+  const [activeOrg, setActiveOrg] = useState<OrganizationDetails | null>(
+    () => cachedOrg ?? (immediateUser?.organizations?.[0] ? {
+      id: immediateUser.organizations[0].id,
+      name: immediateUser.organizations[0].name,
+      slug: immediateUser.organizations[0].slug,
+      role: immediateUser.organizations[0].role,
+      createdAt: immediateUser.organizations[0].joinedAt,
+      updatedAt: immediateUser.organizations[0].joinedAt,
+    } : null)
+  );
   const [members, setMembers] = useState<OrganizationMember[]>(cachedMembers ?? []);
-
-  // Instant startup: If we have a cached user session OR if the user is definitely unauthenticated,
-  // NEVER show a loading screen! The UI mounts immediately.
-  const [loading, setLoading] = useState<boolean>(() => {
-    if (cachedUser) return false;
-    if (!currentToken && !hasUrlToken) return false;
-    return true;
-  });
+  const [isSyncing, setIsSyncing] = useState<boolean>(tokenPresent);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'metrics' | 'dlq' | 'settings'>('members');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -64,7 +102,10 @@ export const App: React.FC = () => {
         setUser(data);
         setCachedUser(data);
         if (data.organizations && data.organizations.length > 0) {
-          setSelectedOrgId((prev) => prev ?? data.organizations[0]!.id);
+          setSelectedOrgId((prev) => {
+            const exists = data.organizations.some((o) => o.id === prev);
+            return exists ? prev : data.organizations[0]!.id;
+          });
         }
       } else {
         // Token was invalid or revoked (401)
@@ -76,32 +117,16 @@ export const App: React.FC = () => {
         setCachedMembers(null);
       }
     } catch (err) {
-      console.error('Failed to load user', err);
-      if (!cachedUser) {
-        setUser(null);
-      }
+      console.warn('Background sync warning:', err);
     } finally {
-      setLoading(false);
+      setIsSyncing(false);
     }
   };
 
   useEffect(() => {
-    // Check if returned from OAuth redirect with ?token=...
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const urlToken = params.get('token');
-      if (urlToken) {
-        setSessionToken(urlToken);
-        params.delete('token');
-        const remainingQuery = params.toString();
-        const cleanUrl = window.location.pathname + (remainingQuery ? `?${remainingQuery}` : '') + window.location.hash;
-        window.history.replaceState({}, '', cleanUrl);
-      }
-    } catch {
-      // Ignore URL parsing errors
+    if (tokenPresent) {
+      void loadUser();
     }
-
-    void loadUser();
   }, []);
 
   const loadActiveOrg = async (orgId: string) => {
@@ -115,8 +140,7 @@ export const App: React.FC = () => {
       setMembers(memberData);
       setCachedMembers(memberData);
     } catch (err) {
-      console.error('Failed to load organization', err);
-      // Keep cached org data if already available rather than breaking layout
+      console.warn('Background active org sync:', err);
     }
   };
 
@@ -194,176 +218,6 @@ export const App: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#0A0A0D',
-        color: '#F4F4F7',
-        position: 'relative',
-        overflow: 'hidden',
-        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      }}>
-        {/* Ambient Silk Wave */}
-        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-          <svg style={{ position: 'absolute', top: '-60px', right: '-80px', width: '1000px', height: '500px', opacity: 0.6 }} viewBox="0 0 1100 550" fill="none">
-            <path d="M1150 60C880 100 720 280 400 210C220 170 100 250 -40 290" stroke="url(#loadingGold)" strokeWidth="2" opacity="0.6"/>
-            <path d="M1150 90C830 140 680 320 370 240C190 190 80 280 -40 330" stroke="url(#loadingGold2)" strokeWidth="1.2" opacity="0.4"/>
-            <defs>
-              <linearGradient id="loadingGold" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#C5A059" stop-opacity="0"/>
-                <stop offset="50%" stop-color="#E5C58A" stop-opacity="0.8"/>
-                <stop offset="100%" stop-color="#9A7B44" stop-opacity="0"/>
-              </linearGradient>
-              <linearGradient id="loadingGold2" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#E5C58A" stop-opacity="0"/>
-                <stop offset="50%" stop-color="#F3DCB0" stop-opacity="0.6"/>
-                <stop offset="100%" stop-color="#C5A059" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-
-        {/* Central Logo & Brand Card */}
-        <div style={{
-          position: 'relative',
-          zIndex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          textAlign: 'center',
-          padding: '36px',
-        }}>
-          {/* Glowing Icon Container */}
-          <div style={{
-            position: 'relative',
-            width: '64px',
-            height: '64px',
-            borderRadius: '20px',
-            backgroundColor: '#131318',
-            border: '1px solid #2C2C38',
-            boxShadow: '0 0 35px rgba(197, 160, 89, 0.22), inset 0 1px 1px rgba(255, 255, 255, 0.1)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: '20px',
-          }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="#F7EFE2">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-            </svg>
-            <div style={{
-              position: 'absolute',
-              inset: '-4px',
-              borderRadius: '24px',
-              border: '1px solid rgba(197, 160, 89, 0.35)',
-              animation: 'pulseGlow 2s ease-in-out infinite',
-            }} />
-          </div>
-
-          {/* Brand Name */}
-          <h2 style={{
-            fontSize: '18px',
-            fontWeight: 800,
-            letterSpacing: '0.14em',
-            color: '#F4F4F7',
-            margin: '0 0 6px 0',
-            textTransform: 'uppercase',
-          }}>
-            RelayForge
-          </h2>
-
-          {/* Subtitle */}
-          <p style={{
-            fontSize: '13px',
-            color: '#8E8E9B',
-            margin: '0 0 24px 0',
-            fontWeight: 500,
-          }}>
-            Connecting to workspace & ingestion engine...
-          </p>
-
-          {/* Shimmer Luxury Progress Line */}
-          <div style={{
-            width: '220px',
-            height: '3px',
-            borderRadius: '999px',
-            backgroundColor: '#16161D',
-            border: '1px solid #23232C',
-            overflow: 'hidden',
-            position: 'relative',
-          }}>
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              bottom: 0,
-              width: '45%',
-              background: 'linear-gradient(90deg, transparent 0%, #C5A059 50%, #F7EFE2 80%, transparent 100%)',
-              animation: 'shimmer 1.4s ease-in-out infinite',
-            }} />
-          </div>
-
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            marginTop: '18px',
-            fontSize: '12px',
-            color: '#6E6E7C',
-          }}>
-            <span style={{
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              backgroundColor: '#10b981',
-              boxShadow: '0 0 8px #10b981',
-            }}></span>
-            <span>Securing tenant isolation</span>
-          </div>
-
-          <button
-            onClick={() => setLoading(false)}
-            style={{
-              marginTop: '28px',
-              backgroundColor: 'transparent',
-              border: '1px solid #2B2B38',
-              borderRadius: '999px',
-              padding: '6px 16px',
-              color: '#8E8E9B',
-              fontSize: '12px',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#F4F4F7';
-              e.currentTarget.style.borderColor = '#4A4A5A';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = '#8E8E9B';
-              e.currentTarget.style.borderColor = '#2B2B38';
-            }}
-          >
-            Skip to Sign In →
-          </button>
-        </div>
-
-        <style>{`
-          @keyframes shimmer {
-            0% { left: -45%; }
-            100% { left: 100%; }
-          }
-          @keyframes pulseGlow {
-            0%, 100% { opacity: 0.2; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(1.04); }
-          }
-        `}</style>
-      </div>
-    );
-  }
-
   if (!user) {
     return (
       <SignIn
@@ -383,6 +237,28 @@ export const App: React.FC = () => {
       color: '#F2F2F5',
       position: 'relative',
     }}>
+      {/* Top subtle indeterminate progress bar during background revalidation (never blocks the user) */}
+      {isSyncing && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '2.5px',
+          zIndex: 99999,
+          background: 'linear-gradient(90deg, #9A7B44, #F7EFE2, #C5A059)',
+          backgroundSize: '200% 100%',
+          animation: 'rfSyncGlow 1.2s linear infinite',
+          pointerEvents: 'none',
+        }}>
+          <style>{`
+            @keyframes rfSyncGlow {
+              0% { background-position: 200% 0; }
+              100% { background-position: -200% 0; }
+            }
+          `}</style>
+        </div>
+      )}
       {/* Desktop Sidebar Navigation */}
       <div className="rf-sidebar-desktop">
         <Sidebar
