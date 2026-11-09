@@ -10,14 +10,20 @@ export class RedisService implements OnModuleInit, OnApplicationShutdown {
   private readonly logger = new Logger(RedisService.name);
   readonly connection: Redis;
 
-  constructor(config: RuntimeConfig) {
-    if (!config.values.redisUrl) throw new Error('Worker Redis configuration is missing');
-    const isTls = config.values.redisUrl.startsWith('rediss://');
-    this.connection = new Redis(config.values.redisUrl, {
+  constructor(private readonly config: RuntimeConfig) {
+    const rawUrl = config.values.redisUrl || 'redis://127.0.0.1:6379';
+    let hostname: string | undefined;
+    try {
+      hostname = new URL(rawUrl).hostname;
+    } catch {
+      // ignore
+    }
+    const isTls = rawUrl.startsWith('rediss://');
+    this.connection = new Redis(rawUrl, {
       lazyConnect: true,
       maxRetriesPerRequest: null,
       connectTimeout: 10000,
-      ...(isTls ? { tls: { rejectUnauthorized: false } } : {}),
+      ...(isTls ? { tls: { rejectUnauthorized: false, servername: hostname } } : {}),
       retryStrategy: (attempt) => Math.min(attempt * 250, 2000),
     });
     this.connection.on('error', (error: Error) => {
@@ -42,6 +48,13 @@ export class RedisService implements OnModuleInit, OnApplicationShutdown {
         this.logger.log({ event: 'redis_connected' });
       }
     } catch (error) {
+      if (this.config.values.role === 'api') {
+        this.logger.warn({
+          event: 'redis_connection_advisory',
+          message: 'API started without Redis connection. Outbox queuing and events will use in-memory fallback.',
+        });
+        return;
+      }
       this.connection.disconnect();
       throw error;
     }
