@@ -9,7 +9,7 @@ services:
     name: relayforge-staging-api
     runtime: node
     plan: free
-    buildCommand: npm ci && npm run db:generate && npm run build
+    buildCommand: npm ci && npm run db:generate && node scripts/staging-db-init.cjs && npx prisma migrate deploy && npm run build
     startCommand: npm run start:api
     healthCheckPath: /health/ready
     envVars:
@@ -91,7 +91,7 @@ services:
   - type: web
     name: relayforge-staging-web
     runtime: static
-    buildCommand: npm ci && npm run build:web
+    buildCommand: npm --prefix web ci && npm --prefix web run build
     staticPublishPath: ./web/dist
     headers:
       - path: /*

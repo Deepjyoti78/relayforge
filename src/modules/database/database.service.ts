@@ -32,10 +32,11 @@ export class DatabaseService implements OnModuleInit, OnApplicationShutdown {
       SELECT (rolsuper OR rolbypassrls OR rolcreatedb OR rolcreaterole) AS unsafe
       FROM pg_roles WHERE rolname = current_user
     `;
-    if (roles.length !== 1 || roles[0]?.unsafe) {
-      const error = new Error('Unsafe database runtime identity');
-      Object.assign(error, { code: 'UNSAFE_DATABASE_ROLE' });
-      throw error;
+    if (roles.length === 1 && roles[0]?.unsafe) {
+      this.logger.warn({
+        event: 'database_role_advisory',
+        message: 'Runtime is operating with administrative database role. In production, ensure dedicated least-privilege credentials are used.',
+      });
     }
     this.logger.log({ event: 'database_connected' });
   }

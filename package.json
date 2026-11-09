@@ -13,7 +13,7 @@
     "dev:worker": "node --watch -r ts-node/register src/worker/main.ts",
     "dev:web": "npm --prefix web run dev",
     "build": "tsc -p tsconfig.build.json",
-    "build:web": "npm --prefix web run build",
+    "build:web": "npm --prefix web ci && npm --prefix web run build",
     "start:api": "node dist/api/main.js",
     "start:worker": "node dist/worker/main.js",
     "db:generate": "prisma generate",
