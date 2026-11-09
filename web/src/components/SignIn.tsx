@@ -29,8 +29,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#0E0E10',
-      color: '#F2F2F5',
+      backgroundColor: '#000000',
+      color: '#FFFFFF',
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
@@ -39,12 +39,12 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       {/* Top Navbar */}
       <header className="rf-landing-header" style={{
         height: '68px',
-        borderBottom: '1px solid #232327',
+        borderBottom: '1px solid #202020',
         padding: '0 32px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#0E0E10',
+        backgroundColor: '#000000',
         zIndex: 10,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -52,9 +52,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             width: '34px',
             height: '34px',
             borderRadius: '9px',
-            backgroundColor: '#232327',
-            border: '1px solid #3E3E45',
-            color: '#F2F2F5',
+            backgroundColor: '#202020',
+            border: '1px solid #2A2A2A',
+            color: '#FFFFFF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -64,10 +64,10 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </svg>
           </div>
           <div>
-            <div style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '-0.02em', color: '#F2F2F5' }}>
+            <div style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
               RELAYFORGE
             </div>
-            <div style={{ fontSize: '10px', color: '#63636E', letterSpacing: '0.04em', fontWeight: 600 }}>
+            <div style={{ fontSize: '10px', color: '#737373', letterSpacing: '0.04em', fontWeight: 600 }}>
               ENTERPRISE WEBHOOK GATEWAY
             </div>
           </div>
@@ -79,13 +79,13 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             alignItems: 'center',
             gap: '6px',
             fontSize: '12px',
-            color: '#9A9AA6',
-            backgroundColor: '#18181B',
+            color: '#A3A3A3',
+            backgroundColor: '#111111',
             padding: '5px 12px',
             borderRadius: '999px',
-            border: '1px solid #232327',
+            border: '1px solid #202020',
           }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#F2F2F5' }}></span>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#FFFFFF' }}></span>
             Production Ready v1.0
           </span>
 
@@ -96,8 +96,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              backgroundColor: '#F2F2F5',
-              color: '#0E0E10',
+              backgroundColor: '#FFFFFF',
+              color: '#000000',
               border: 'none',
               borderRadius: '8px',
               padding: '9px 18px',
@@ -106,8 +106,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               cursor: 'pointer',
               transition: 'background-color 0.15s ease',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#C9C9D2'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#F2F2F5'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#E5E5E5'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#FFFFFF'; }}
           >
             Sign In
           </button>
@@ -133,13 +133,13 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           gap: '8px',
           padding: '6px 14px',
           borderRadius: '999px',
-          backgroundColor: '#18181B',
-          border: '1px solid #3E3E45',
+          backgroundColor: '#111111',
+          border: '1px solid #2A2A2A',
           fontSize: '12px',
-          color: '#9A9AA6',
+          color: '#A3A3A3',
           marginBottom: '28px',
         }}>
-          <span style={{ color: '#F2F2F5', fontWeight: 600 }}>Durable Systems Engine</span>
+          <span style={{ color: '#FFFFFF', fontWeight: 600 }}>Durable Systems Engine</span>
           <span>•</span>
           <span>SSRF DNS Pinning</span>
           <span>•</span>
@@ -151,7 +151,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           fontWeight: 900,
           lineHeight: 1.1,
           letterSpacing: '-0.04em',
-          color: '#F2F2F5',
+          color: '#FFFFFF',
           margin: '0 0 20px',
         }}>
           Durable Webhooks &amp; Sequential Workflow Engine
@@ -159,7 +159,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
         <p style={{
           fontSize: '17px',
-          color: '#9A9AA6',
+          color: '#A3A3A3',
           maxWidth: '680px',
           lineHeight: 1.6,
           margin: '0 0 36px',
@@ -175,8 +175,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '10px',
-              backgroundColor: '#F2F2F5',
-              color: '#0E0E10',
+              backgroundColor: '#FFFFFF',
+              color: '#000000',
               border: 'none',
               borderRadius: '10px',
               padding: '14px 28px',
@@ -186,8 +186,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               boxShadow: '0 4px 18px rgba(255, 255, 255, 0.12)',
               transition: 'all 0.15s ease',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#C9C9D2'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#F2F2F5'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#E5E5E5'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#FFFFFF'; }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
@@ -206,43 +206,43 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           textAlign: 'left',
         }}>
           <div style={{
-            backgroundColor: '#18181B',
-            border: '1px solid #232327',
+            backgroundColor: '#111111',
+            border: '1px solid #202020',
             borderRadius: '12px',
             padding: '24px',
           }}>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5', marginBottom: '8px' }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', marginBottom: '8px' }}>
               🛡️ Zero-Trust SSRF Defense
             </div>
-            <div style={{ fontSize: '13px', color: '#9A9AA6', lineHeight: 1.5 }}>
+            <div style={{ fontSize: '13px', color: '#A3A3A3', lineHeight: 1.5 }}>
               DNS rebinding and TOCTOU prevention with socket IP pinning and manual redirect rejection.
             </div>
           </div>
 
           <div style={{
-            backgroundColor: '#18181B',
-            border: '1px solid #232327',
+            backgroundColor: '#111111',
+            border: '1px solid #202020',
             borderRadius: '12px',
             padding: '24px',
           }}>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5', marginBottom: '8px' }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', marginBottom: '8px' }}>
               ⚡ Transactional Outbox
             </div>
-            <div style={{ fontSize: '13px', color: '#9A9AA6', lineHeight: 1.5 }}>
+            <div style={{ fontSize: '13px', color: '#A3A3A3', lineHeight: 1.5 }}>
               PostgreSQL ACID guarantees, lease tokens with fenced crash recovery, and zero message loss.
             </div>
           </div>
 
           <div style={{
-            backgroundColor: '#18181B',
-            border: '1px solid #232327',
+            backgroundColor: '#111111',
+            border: '1px solid #202020',
             borderRadius: '12px',
             padding: '24px',
           }}>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5', marginBottom: '8px' }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', marginBottom: '8px' }}>
               🔄 Sequential Orchestrator
             </div>
-            <div style={{ fontSize: '13px', color: '#9A9AA6', lineHeight: 1.5 }}>
+            <div style={{ fontSize: '13px', color: '#A3A3A3', lineHeight: 1.5 }}>
               Conditional branching, JSON transformations, rate limiting, and real-time SSE telemetry.
             </div>
           </div>
@@ -272,8 +272,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             className="rf-signin-modal"
             onClick={(e) => e.stopPropagation()}
             style={{
-              backgroundColor: '#18181B',
-              border: '1px solid #3E3E45',
+              backgroundColor: '#111111',
+              border: '1px solid #2A2A2A',
               borderRadius: '20px',
               maxWidth: '860px',
               width: '100%',
@@ -292,9 +292,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 position: 'absolute',
                 top: '16px',
                 right: '16px',
-                backgroundColor: '#232327',
-                border: '1px solid #3E3E45',
-                color: '#9A9AA6',
+                backgroundColor: '#202020',
+                border: '1px solid #2A2A2A',
+                color: '#A3A3A3',
                 borderRadius: '50%',
                 width: '32px',
                 height: '32px',
@@ -306,8 +306,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 fontSize: '18px',
                 lineHeight: 1,
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#F2F2F5'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#9A9AA6'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#A3A3A3'; }}
             >
               ×
             </button>
@@ -315,15 +315,15 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             {/* Left Side: Uploaded Image Visual Panel */}
             <div className="rf-signin-modal-graphic" style={{
               flex: '1 1 48%',
-              backgroundColor: '#0E0E10',
-              borderRight: '1px solid #232327',
+              backgroundColor: '#000000',
+              borderRight: '1px solid #202020',
               padding: '36px 28px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               position: 'relative',
-              background: 'radial-gradient(circle at center, #1F1F24 0%, #0E0E10 85%)',
+              background: 'radial-gradient(circle at center, #1F1F24 0%, #000000 85%)',
             }}>
               <div style={{
                 position: 'relative',
@@ -343,7 +343,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     objectFit: 'contain',
                     borderRadius: '16px',
                     filter: 'drop-shadow(0 14px 28px rgba(0,0,0,0.65))',
-                    border: '1px solid #232327',
+                    border: '1px solid #202020',
                   }}
                 />
                 <div style={{
@@ -355,11 +355,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     fontWeight: 700,
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase',
-                    color: '#C9C9D2',
+                    color: '#E5E5E5',
                   }}>
                     Monochromatic Precision
                   </div>
-                  <div style={{ fontSize: '11px', color: '#63636E', marginTop: '4px' }}>
+                  <div style={{ fontSize: '11px', color: '#737373', marginTop: '4px' }}>
                     Engineered for zero cognitive overload
                   </div>
                 </div>
@@ -382,14 +382,14 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 fontWeight: 700,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                color: '#9A9AA6',
+                color: '#A3A3A3',
                 marginBottom: '10px',
               }}>
                 <span style={{
                   width: '6px',
                   height: '6px',
                   borderRadius: '50%',
-                  backgroundColor: '#F2F2F5',
+                  backgroundColor: '#FFFFFF',
                 }}></span>
                 AUTHENTICATION PORTAL
               </div>
@@ -397,7 +397,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               <h2 style={{
                 fontSize: '24px',
                 fontWeight: 800,
-                color: '#F2F2F5',
+                color: '#FFFFFF',
                 letterSpacing: '-0.02em',
                 margin: '0 0 10px',
               }}>
@@ -406,7 +406,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
               <p style={{
                 fontSize: '13px',
-                color: '#9A9AA6',
+                color: '#A3A3A3',
                 lineHeight: 1.5,
                 margin: '0 0 28px',
               }}>
@@ -423,8 +423,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   justifyContent: 'center',
                   gap: '12px',
                   width: '100%',
-                  backgroundColor: '#F2F2F5',
-                  color: '#0E0E10',
+                  backgroundColor: '#FFFFFF',
+                  color: '#000000',
                   textDecoration: 'none',
                   padding: '13px 20px',
                   borderRadius: '10px',
@@ -434,8 +434,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   transition: 'background-color 0.15s ease',
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#C9C9D2'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#F2F2F5'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#E5E5E5'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#FFFFFF'; }}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
@@ -452,7 +452,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   style={{
                     background: 'none',
                     border: 'none',
-                    color: '#9A9AA6',
+                    color: '#A3A3A3',
                     fontSize: '12px',
                     cursor: 'pointer',
                     textDecoration: 'underline',
@@ -471,21 +471,21 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       onChange={(e) => setManualToken(e.target.value)}
                       style={{
                         flex: 1,
-                        backgroundColor: '#0E0E10',
-                        border: '1px solid #3E3E45',
+                        backgroundColor: '#000000',
+                        border: '1px solid #2A2A2A',
                         borderRadius: '6px',
                         padding: '8px 12px',
                         fontSize: '12px',
-                        color: '#F2F2F5',
+                        color: '#FFFFFF',
                         outline: 'none',
                       }}
                     />
                     <button
                       type="submit"
                       style={{
-                        backgroundColor: '#232327',
-                        border: '1px solid #3E3E45',
-                        color: '#F2F2F5',
+                        backgroundColor: '#202020',
+                        border: '1px solid #2A2A2A',
+                        color: '#FFFFFF',
                         borderRadius: '6px',
                         padding: '8px 14px',
                         fontSize: '12px',
@@ -504,11 +504,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               <div style={{
                 marginTop: '32px',
                 paddingTop: '20px',
-                borderTop: '1px solid #232327',
+                borderTop: '1px solid #202020',
                 display: 'flex',
                 justifyContent: 'space-between',
                 fontSize: '11px',
-                color: '#63636E',
+                color: '#737373',
               }}>
                 <span>PostgreSQL RLS</span>
                 <span>•</span>

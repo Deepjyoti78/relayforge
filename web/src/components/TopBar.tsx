@@ -54,8 +54,8 @@ export const TopBar: React.FC<TopBarProps> = ({
   return (
     <header style={{
       height: '64px',
-      backgroundColor: '#141419',
-      borderBottom: '1px solid #202028',
+      backgroundColor: '#0A0A0A',
+      borderBottom: '1px solid #202020',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -72,10 +72,10 @@ export const TopBar: React.FC<TopBarProps> = ({
           className="rf-mobile-menu-btn"
           aria-label="Open Navigation Menu"
           style={{
-            backgroundColor: '#1E1E26',
-      border: '1px solid #2B2B38',
+            backgroundColor: '#161616',
+      border: '1px solid #2A2A2A',
             borderRadius: '8px',
-            color: '#F2F2F5',
+            color: '#FFFFFF',
             padding: '7px 9px',
             cursor: 'pointer',
             alignItems: 'center',
@@ -95,18 +95,18 @@ export const TopBar: React.FC<TopBarProps> = ({
           alignItems: 'center',
           gap: '8px',
           fontSize: '13px',
-          color: '#9A9AA6',
+          color: '#A3A3A3',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
         }}>
-          <span style={{ color: '#9A9AA6' }}>Organizations</span>
-          <span style={{ color: '#63636E' }}>›</span>
-          <span style={{ fontWeight: 600, color: '#F2F2F5' }}>
+          <span style={{ color: '#A3A3A3' }}>Organizations</span>
+          <span style={{ color: '#737373' }}>›</span>
+          <span style={{ fontWeight: 600, color: '#FFFFFF' }}>
             {organization ? organization.name : 'Select Org'}
           </span>
-          <span style={{ color: '#63636E' }}>›</span>
-          <span style={{ color: '#C9C9D2' }}>
+          <span style={{ color: '#737373' }}>›</span>
+          <span style={{ color: '#E5E5E5' }}>
             {getTabLabel()}
           </span>
         </div>
@@ -119,13 +119,13 @@ export const TopBar: React.FC<TopBarProps> = ({
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
-          backgroundColor: '#1C1C24',
-      border: '1px solid #282834',
+          backgroundColor: '#161616',
+      border: '1px solid #2A2A2A',
           borderRadius: '999px',
           padding: '8px 16px',
           width: '280px',
         }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#63636E" strokeWidth="2.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#737373" strokeWidth="2.5">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
@@ -137,17 +137,17 @@ export const TopBar: React.FC<TopBarProps> = ({
               backgroundColor: 'transparent',
               outline: 'none',
               fontSize: '12px',
-              color: '#F4F4F7',
+              color: '#FFFFFF',
               width: '100%',
             }}
           />
           <kbd style={{
             fontSize: '10px',
-            backgroundColor: '#1A1A22',
-            border: '1px solid #2E2E3C',
+            backgroundColor: '#161616',
+            border: '1px solid #2A2A2A',
             borderRadius: '6px',
             padding: '2px 6px',
-            color: '#9A9AA6',
+            color: '#A3A3A3',
             fontFamily: 'monospace',
             whiteSpace: 'nowrap',
           }}>
@@ -162,22 +162,22 @@ export const TopBar: React.FC<TopBarProps> = ({
             width: '34px',
             height: '34px',
             borderRadius: '50%',
-            backgroundColor: '#1C1C24',
-      border: '1px solid #282834',
+            backgroundColor: '#161616',
+      border: '1px solid #2A2A2A',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#9A9AA6',
+            color: '#A3A3A3',
             cursor: 'pointer',
             transition: 'all 0.15s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#F4F4F7';
-            e.currentTarget.style.borderColor = '#3E3E4D';
+            e.currentTarget.style.color = '#FFFFFF';
+            e.currentTarget.style.borderColor = '#2A2A2A';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = '#9A9AA6';
-            e.currentTarget.style.borderColor = '#24242E';
+            e.currentTarget.style.color = '#A3A3A3';
+            e.currentTarget.style.borderColor = '#202020';
           }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -197,21 +197,21 @@ export const TopBar: React.FC<TopBarProps> = ({
             gap: '6px',
             padding: '7px 16px',
             borderRadius: '999px',
-            border: '1px solid #24242E',
-            backgroundColor: '#121216',
+            border: '1px solid #202020',
+            backgroundColor: '#0A0A0A',
             fontSize: '12px',
-            color: '#C9C9D2',
+            color: '#E5E5E5',
             textDecoration: 'none',
             fontWeight: 600,
             transition: 'all 0.15s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#F4F4F7';
-            e.currentTarget.style.borderColor = '#3E3E4D';
+            e.currentTarget.style.color = '#FFFFFF';
+            e.currentTarget.style.borderColor = '#2A2A2A';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = '#C9C9D2';
-            e.currentTarget.style.borderColor = '#24242E';
+            e.currentTarget.style.color = '#E5E5E5';
+            e.currentTarget.style.borderColor = '#202020';
           }}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -248,16 +248,16 @@ export const TopBar: React.FC<TopBarProps> = ({
             <img
               src={user.avatarUrl}
               alt=""
-              style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #3E3E45' }}
+              style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #2A2A2A' }}
             />
           ) : (
             <div style={{
               width: '30px',
               height: '30px',
               borderRadius: '50%',
-              backgroundColor: '#1E1E26',
-      border: '1px solid #2B2B38',
-              color: '#F2F2F5',
+              backgroundColor: '#161616',
+      border: '1px solid #2A2A2A',
+              color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

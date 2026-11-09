@@ -97,7 +97,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       fontSize: '13px',
       fontWeight: isActive ? 700 : 500,
       backgroundColor: isActive ? '#F7EFE2' : 'transparent',
-      color: isActive ? '#121214' : '#9A9AA6',
+      color: isActive ? '#0A0A0A' : '#A3A3A3',
       border: 'none',
       cursor: 'pointer',
       textAlign: 'left' as const,
@@ -114,19 +114,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return {
       fontSize: '10px',
       fontWeight: 700,
-      backgroundColor: isActive ? '#E5DAC8' : '#202028',
-      color: isActive ? '#121214' : '#8E8E9B',
+      backgroundColor: isActive ? '#E5DAC8' : '#202020',
+      color: isActive ? '#0A0A0A' : '#A3A3A3',
       padding: '2px 7px',
       borderRadius: '999px',
-      border: isActive ? '1px solid #D8CBB6' : '1px solid #2E2E38',
+      border: isActive ? '1px solid #D8CBB6' : '1px solid #2A2A2A',
     };
   };
 
   const sidebarContent = (
     <aside style={{
       width: isMobile ? '280px' : (isCollapsed ? '68px' : '260px'),
-      backgroundColor: '#141419',
-      borderRight: '1px solid #202028',
+      backgroundColor: '#0A0A0A',
+      borderRight: '1px solid #202020',
       display: 'flex',
       flexDirection: 'column',
       height: '100vh',
@@ -159,7 +159,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             borderRadius: '10px',
             border: '1px solid #E5DAC8',
             backgroundColor: '#F7EFE2',
-            color: '#121214',
+            color: '#0A0A0A',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -172,10 +172,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           {!isCollapsedMode && (
             <div>
-              <div style={{ fontSize: '14px', fontWeight: 800, color: '#F2F2F5', letterSpacing: '-0.02em', lineHeight: '1.2' }}>
+              <div style={{ fontSize: '14px', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: '1.2' }}>
                 RELAYFORGE
               </div>
-              <div style={{ fontSize: '11px', color: '#9A9AA6', fontWeight: 500 }}>
+              <div style={{ fontSize: '11px', color: '#A3A3A3', fontWeight: 500 }}>
                 Management Console
               </div>
             </div>
@@ -187,9 +187,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={onToggleCollapse}
             title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             style={{
-              background: '#1A1A22',
-              border: '1px solid #282834',
-              color: '#9A9AA6',
+              background: '#161616',
+              border: '1px solid #2A2A2A',
+              color: '#A3A3A3',
               borderRadius: '8px',
               width: '28px',
               height: '28px',
@@ -203,12 +203,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
               flexShrink: 0,
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#F2F2F5';
+              e.currentTarget.style.color = '#FFFFFF';
               e.currentTarget.style.borderColor = '#4A4A58';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.color = '#9A9AA6';
-              e.currentTarget.style.borderColor = '#282834';
+              e.currentTarget.style.color = '#A3A3A3';
+              e.currentTarget.style.borderColor = '#2A2A2A';
             }}
           >
             {isCollapsed ? (
@@ -231,7 +231,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             style={{
               background: 'transparent',
               border: 'none',
-              color: '#9A9AA6',
+              color: '#A3A3A3',
               fontSize: '18px',
               cursor: 'pointer',
               padding: '6px',
@@ -254,14 +254,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
               fontSize: '11px',
               fontWeight: 700,
               letterSpacing: '0.08em',
-              color: '#63636E',
+              color: '#737373',
               textTransform: 'uppercase',
               padding: '0 10px 10px',
             }}>
               Main
             </div>
           ) : (
-            <div style={{ height: '1px', backgroundColor: '#202028', margin: '4px 14px 12px' }} />
+            <div style={{ height: '1px', backgroundColor: '#202020', margin: '4px 14px 12px' }} />
           )}
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -466,7 +466,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 fontSize: '11px',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
-                color: '#63636E',
+                color: '#737373',
                 textTransform: 'uppercase',
               }}>
                 ORGANIZATIONS
@@ -474,9 +474,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 onClick={() => (onOpenCreateModal ? onOpenCreateModal() : setIsCreatingOrg((prev) => !prev))}
                 style={{
-                  backgroundColor: '#1C1C24',
-                  border: '1px solid #282834',
-                  color: '#F2F2F5',
+                  backgroundColor: '#161616',
+                  border: '1px solid #2A2A2A',
+                  color: '#FFFFFF',
                   fontSize: '11px',
                   fontWeight: 600,
                   borderRadius: '999px',
@@ -488,16 +488,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             </div>
           ) : (
-            <div style={{ height: '1px', backgroundColor: '#202028', margin: '4px 14px 12px' }} />
+            <div style={{ height: '1px', backgroundColor: '#202020', margin: '4px 14px 12px' }} />
           )}
 
           {/* Quick Create Organization Form (Only expanded) */}
           {!isCollapsedMode && isCreatingOrg && (
             <form onSubmit={handleCreateSubmit} style={{
               padding: '12px',
-              backgroundColor: '#1A1A22',
+              backgroundColor: '#161616',
               borderRadius: '12px',
-              border: '1px solid #2E2E3C',
+              border: '1px solid #2A2A2A',
               marginBottom: '10px',
             }}>
               <input
@@ -510,9 +510,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   width: '100%',
                   padding: '7px 10px',
                   borderRadius: '6px',
-                  border: '1px solid #3E3E45',
-                  backgroundColor: '#0E0E10',
-                  color: '#F2F2F5',
+                  border: '1px solid #2A2A2A',
+                  backgroundColor: '#000000',
+                  color: '#FFFFFF',
                   fontSize: '12px',
                   marginBottom: '6px',
                 }}
@@ -526,9 +526,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   width: '100%',
                   padding: '7px 10px',
                   borderRadius: '6px',
-                  border: '1px solid #3E3E45',
-                  backgroundColor: '#0E0E10',
-                  color: '#F2F2F5',
+                  border: '1px solid #2A2A2A',
+                  backgroundColor: '#000000',
+                  color: '#FFFFFF',
                   fontSize: '12px',
                   marginBottom: '8px',
                 }}
@@ -546,8 +546,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     padding: '4px 10px',
                     fontSize: '11px',
                     backgroundColor: 'transparent',
-                    border: '1px solid #3E3E45',
-                    color: '#9A9AA6',
+                    border: '1px solid #2A2A2A',
+                    color: '#A3A3A3',
                     borderRadius: '6px',
                     cursor: 'pointer',
                   }}
@@ -560,8 +560,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   style={{
                     padding: '4px 12px',
                     fontSize: '11px',
-                    backgroundColor: '#F2F2F5',
-                    color: '#0E0E10',
+                    backgroundColor: '#FFFFFF',
+                    color: '#000000',
                     fontWeight: 700,
                     border: 'none',
                     borderRadius: '6px',
@@ -578,7 +578,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             {organizations.length === 0 ? (
               !isCollapsedMode ? (
-                <div style={{ padding: '8px 10px', fontSize: '12px', color: '#63636E' }}>
+                <div style={{ padding: '8px 10px', fontSize: '12px', color: '#737373' }}>
                   No organizations yet.
                 </div>
               ) : null
@@ -600,7 +600,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         borderRadius: '12px',
                         backgroundColor: isSelected ? '#1E1E28' : 'transparent',
                         border: isSelected ? '1px solid #363648' : '1px solid transparent',
-                        color: isSelected ? '#D4AF78' : '#8E8E9B',
+                        color: isSelected ? '#D4AF78' : '#A3A3A3',
                         cursor: 'pointer',
                         margin: '0 auto',
                         transition: 'all 0.15s ease',
@@ -628,8 +628,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       borderRadius: '12px',
                       fontSize: '13px',
                       backgroundColor: isSelected ? '#191922' : 'transparent',
-                      color: '#F4F4F7',
-                      border: isSelected ? '1px solid #2B2B38' : '1px solid transparent',
+                      color: '#FFFFFF',
+                      border: isSelected ? '1px solid #2A2A2A' : '1px solid transparent',
                       cursor: 'pointer',
                       textAlign: 'left',
                       transition: 'all 0.15s ease',
@@ -637,7 +637,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-                      <div style={{ color: isSelected ? '#D4AF78' : '#63636E', flexShrink: 0 }}>
+                      <div style={{ color: isSelected ? '#D4AF78' : '#737373', flexShrink: 0 }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
                           <polyline points="2 17 12 22 22 17"></polyline>
@@ -645,8 +645,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         </svg>
                       </div>
                       <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        <div style={{ fontWeight: 700, color: '#F4F4F7', fontSize: '13px', lineHeight: 1.2 }}>{org.name}</div>
-                        <div style={{ fontSize: '11px', color: '#63636E', fontWeight: 400, marginTop: '2px' }}>
+                        <div style={{ fontWeight: 700, color: '#FFFFFF', fontSize: '13px', lineHeight: 1.2 }}>{org.name}</div>
+                        <div style={{ fontSize: '11px', color: '#737373', fontWeight: 400, marginTop: '2px' }}>
                           {org.slug}.rlf
                         </div>
                       </div>
@@ -655,15 +655,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <span style={{
                         fontSize: '10px',
                         fontWeight: 700,
-                        backgroundColor: '#202028',
-                        color: '#C9C9D2',
+                        backgroundColor: '#202020',
+                        color: '#E5E5E5',
                         padding: '2px 7px',
                         borderRadius: '999px',
-                        border: '1px solid #2E2E38',
+                        border: '1px solid #2A2A2A',
                       }}>
                         {org.role}
                       </span>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#63636E" strokeWidth="2.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#737373" strokeWidth="2.5">
                         <polyline points="6 9 12 15 18 9"></polyline>
                       </svg>
                     </div>
@@ -681,14 +681,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
               fontSize: '11px',
               fontWeight: 700,
               letterSpacing: '0.08em',
-              color: '#63636E',
+              color: '#737373',
               textTransform: 'uppercase',
               padding: '0 10px 10px',
             }}>
               Administration
             </div>
           ) : (
-            <div style={{ height: '1px', backgroundColor: '#202028', margin: '4px 14px 12px' }} />
+            <div style={{ height: '1px', backgroundColor: '#202020', margin: '4px 14px 12px' }} />
           )}
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -710,11 +710,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* User Footer Profile & Logout */}
       <div style={{
         padding: isCollapsedMode ? '14px 0' : '14px 16px',
-        borderTop: '1px solid #202028',
+        borderTop: '1px solid #202020',
         display: 'flex',
         alignItems: 'center',
         justifyContent: isCollapsedMode ? 'center' : 'space-between',
-        backgroundColor: '#141419',
+        backgroundColor: '#0A0A0A',
         width: '100%',
         boxSizing: 'border-box',
       }}>
@@ -733,16 +733,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <img
                 src={user.avatarUrl}
                 alt=""
-                style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #3E3E45' }}
+                style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #2A2A2A' }}
               />
             ) : (
               <div style={{
                 width: '36px',
                 height: '36px',
                 borderRadius: '50%',
-                backgroundColor: '#202028',
-                border: '1px solid #3E3E45',
-                color: '#F2F2F5',
+                backgroundColor: '#202020',
+                border: '1px solid #2A2A2A',
+                color: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -771,7 +771,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 minWidth: 0,
               }}
               onMouseEnter={(e) => {
-                if (onOpenProfile) e.currentTarget.style.backgroundColor = '#1C1C24';
+                if (onOpenProfile) e.currentTarget.style.backgroundColor = '#161616';
               }}
               onMouseLeave={(e) => {
                 if (onOpenProfile) e.currentTarget.style.backgroundColor = 'transparent';
@@ -781,16 +781,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <img
                   src={user.avatarUrl}
                   alt=""
-                  style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #3E3E45', flexShrink: 0 }}
+                  style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #2A2A2A', flexShrink: 0 }}
                 />
               ) : (
                 <div style={{
                   width: '32px',
                   height: '32px',
                   borderRadius: '50%',
-                  backgroundColor: '#202028',
-                  border: '1px solid #3E3E45',
-                  color: '#F2F2F5',
+                  backgroundColor: '#202020',
+                  border: '1px solid #2A2A2A',
+                  color: '#FFFFFF',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -802,10 +802,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               )}
               <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: '#F2F2F5', lineHeight: '1.2' }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#FFFFFF', lineHeight: '1.2' }}>
                   {user.displayName || 'Developer'}
                 </div>
-                <div style={{ fontSize: '11px', color: '#9A9AA6', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: '11px', color: '#A3A3A3', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {user.email || 'developer@relayforge'}
                 </div>
               </div>
@@ -817,7 +817,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               style={{
                 backgroundColor: 'transparent',
                 border: 'none',
-                color: '#9A9AA6',
+                color: '#A3A3A3',
                 cursor: 'pointer',
                 padding: '6px',
                 borderRadius: '6px',

@@ -129,10 +129,10 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
       {/* Eyebrow & Title */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px' }}>
         <div>
-          <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#F2F2F5', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
             Dead Letter Queue (DLQ) & Bulk Remediation
           </h2>
-          <p style={{ fontSize: '12px', color: '#9A9AA6', margin: '4px 0 0 0' }}>
+          <p style={{ fontSize: '12px', color: '#A3A3A3', margin: '4px 0 0 0' }}>
             Inspect undeliverable webhook dispatches, filter by failure classification, and trigger bulk atomic replay.
           </p>
         </div>
@@ -144,9 +144,9 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
             onClick={handleBulkReplayClick}
             style={{
               padding: '9px 18px',
-              backgroundColor: selectedIds.size > 0 ? '#F2F2F5' : '#232327',
-              color: selectedIds.size > 0 ? '#0E0E10' : '#63636E',
-              border: selectedIds.size > 0 ? 'none' : '1px solid #3E3E45',
+              backgroundColor: selectedIds.size > 0 ? '#FFFFFF' : '#202020',
+              color: selectedIds.size > 0 ? '#000000' : '#737373',
+              border: selectedIds.size > 0 ? 'none' : '1px solid #2A2A2A',
               borderRadius: '999px',
               fontSize: '12px',
               fontWeight: 700,
@@ -160,8 +160,8 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
             <span>↻ Bulk Replay</span>
             {selectedIds.size > 0 && (
               <span style={{
-                backgroundColor: '#0E0E10',
-                color: '#F2F2F5',
+                backgroundColor: '#000000',
+                color: '#FFFFFF',
                 borderRadius: '999px',
                 padding: '1px 6px',
                 fontSize: '10px',
@@ -175,9 +175,9 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
             onClick={() => void loadDlq()}
             style={{
               padding: '9px 16px',
-              backgroundColor: '#232327',
-              color: '#F2F2F5',
-              border: '1px solid #3E3E45',
+              backgroundColor: '#202020',
+              color: '#FFFFFF',
+              border: '1px solid #2A2A2A',
               borderRadius: '999px',
               fontSize: '12px',
               fontWeight: 600,
@@ -237,9 +237,9 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
                 fontSize: '11px',
                 fontWeight: 600,
                 cursor: 'pointer',
-                backgroundColor: activeCategory === cat.id ? '#F2F2F5' : '#1A1A1E',
-                color: activeCategory === cat.id ? '#0E0E10' : '#9A9AA6',
-                border: activeCategory === cat.id ? '1px solid transparent' : '1px solid #3E3E45',
+                backgroundColor: activeCategory === cat.id ? '#FFFFFF' : '#161616',
+                color: activeCategory === cat.id ? '#000000' : '#A3A3A3',
+                border: activeCategory === cat.id ? '1px solid transparent' : '1px solid #2A2A2A',
                 whiteSpace: 'nowrap',
               }}
             >
@@ -256,10 +256,10 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
               padding: '6px 14px',
-              backgroundColor: '#121215',
-              border: '1px solid #2C2C32',
+              backgroundColor: '#0A0A0A',
+              border: '1px solid #2A2A2A',
               borderRadius: '999px',
-              color: '#F2F2F5',
+              color: '#FFFFFF',
               fontSize: '12px',
               width: '260px',
             }}
@@ -268,10 +268,10 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
             type="submit"
             style={{
               padding: '6px 14px',
-              backgroundColor: '#232327',
-              border: '1px solid #3E3E45',
+              backgroundColor: '#202020',
+              border: '1px solid #2A2A2A',
               borderRadius: '999px',
-              color: '#F2F2F5',
+              color: '#FFFFFF',
               fontSize: '12px',
               cursor: 'pointer',
             }}
@@ -283,15 +283,15 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
 
       {/* Table Container */}
       <div style={{
-        backgroundColor: '#1E1E22',
-        border: '1px solid #3E3E45',
+        backgroundColor: '#161616',
+        border: '1px solid #2A2A2A',
         borderRadius: '16px',
         overflow: 'hidden',
       }}>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12px' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid #2C2C32', backgroundColor: '#141417' }}>
+              <tr style={{ borderBottom: '1px solid #2A2A2A', backgroundColor: '#0A0A0A' }}>
                 <th style={{ padding: '12px 16px', width: '36px' }}>
                   <input
                     type="checkbox"
@@ -300,22 +300,22 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
                     style={{ cursor: 'pointer' }}
                   />
                 </th>
-                <th style={{ padding: '12px 14px', color: '#9A9AA6', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }}>
+                <th style={{ padding: '12px 14px', color: '#A3A3A3', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }}>
                   Outbox ID / Event
                 </th>
-                <th style={{ padding: '12px 14px', color: '#9A9AA6', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }}>
+                <th style={{ padding: '12px 14px', color: '#A3A3A3', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }}>
                   Target Destination
                 </th>
-                <th style={{ padding: '12px 14px', color: '#9A9AA6', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }}>
+                <th style={{ padding: '12px 14px', color: '#A3A3A3', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }}>
                   Last Status / Error
                 </th>
-                <th style={{ padding: '12px 14px', color: '#9A9AA6', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }}>
+                <th style={{ padding: '12px 14px', color: '#A3A3A3', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }}>
                   Attempts
                 </th>
-                <th style={{ padding: '12px 14px', color: '#9A9AA6', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }}>
+                <th style={{ padding: '12px 14px', color: '#A3A3A3', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }}>
                   Dead-Lettered At
                 </th>
-                <th style={{ padding: '12px 16px', textAlign: 'right', color: '#9A9AA6', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }}>
+                <th style={{ padding: '12px 16px', textAlign: 'right', color: '#A3A3A3', fontWeight: 700, textTransform: 'uppercase', fontSize: '10px' }}>
                   Actions
                 </th>
               </tr>
@@ -323,13 +323,13 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: '40px 16px', textAlign: 'center', color: '#9A9AA6' }}>
+                  <td colSpan={7} style={{ padding: '40px 16px', textAlign: 'center', color: '#A3A3A3' }}>
                     Loading dead-letter queue records...
                   </td>
                 </tr>
               ) : records.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: '40px 16px', textAlign: 'center', color: '#63636E' }}>
+                  <td colSpan={7} style={{ padding: '40px 16px', textAlign: 'center', color: '#737373' }}>
                     No dead-letter messages found matching criteria. Total DLQ backlog: {total}
                   </td>
                 </tr>
@@ -338,7 +338,7 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
                   <tr
                     key={r.id}
                     style={{
-                      borderBottom: '1px solid #28282E',
+                      borderBottom: '1px solid #2A2A2A',
                       backgroundColor: selectedIds.has(r.id) ? 'rgba(255, 255, 255, 0.03)' : 'transparent',
                     }}
                   >
@@ -351,23 +351,23 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
                       />
                     </td>
                     <td style={{ padding: '12px 14px' }}>
-                      <div style={{ fontFamily: 'monospace', fontWeight: 700, color: '#F2F2F5' }}>
+                      <div style={{ fontFamily: 'monospace', fontWeight: 700, color: '#FFFFFF' }}>
                         {r.id.slice(0, 8)}...
                       </div>
-                      <div style={{ fontSize: '11px', color: '#63636E', fontFamily: 'monospace' }}>
+                      <div style={{ fontSize: '11px', color: '#737373', fontFamily: 'monospace' }}>
                         ev: {r.eventId.slice(0, 8)}...
                       </div>
                     </td>
                     <td style={{ padding: '12px 14px' }}>
                       {r.destinationName ? (
                         <>
-                          <div style={{ fontWeight: 600, color: '#F2F2F5' }}>{r.destinationName}</div>
-                          <div style={{ fontSize: '11px', color: '#9A9AA6', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <div style={{ fontWeight: 600, color: '#FFFFFF' }}>{r.destinationName}</div>
+                          <div style={{ fontSize: '11px', color: '#A3A3A3', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {r.destinationUrl}
                           </div>
                         </>
                       ) : (
-                        <span style={{ color: '#63636E' }}>Default Org Targets</span>
+                        <span style={{ color: '#737373' }}>Default Org Targets</span>
                       )}
                     </td>
                     <td style={{ padding: '12px 14px' }}>
@@ -383,14 +383,14 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
                           {r.lastStatusCode ? `HTTP ${r.lastStatusCode}` : 'DISPATCH FAILED'}
                         </span>
                       </div>
-                      <div style={{ fontSize: '11px', color: '#9A9AA6', maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '2px' }}>
+                      <div style={{ fontSize: '11px', color: '#A3A3A3', maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '2px' }}>
                         {r.lastErrorDescription || 'Max retry attempts exhausted'}
                       </div>
                     </td>
-                    <td style={{ padding: '12px 14px', color: '#C9C9D2' }}>
+                    <td style={{ padding: '12px 14px', color: '#E5E5E5' }}>
                       {r.attemptCount} / {r.maxRetries}
                     </td>
-                    <td style={{ padding: '12px 14px', color: '#9A9AA6', fontSize: '11px' }}>
+                    <td style={{ padding: '12px 14px', color: '#A3A3A3', fontSize: '11px' }}>
                       {new Date(r.createdAt).toLocaleString()}
                     </td>
                     <td style={{ padding: '12px 16px', textAlign: 'right' }}>
@@ -399,10 +399,10 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
                           onClick={() => setInspectRecord(r)}
                           style={{
                             padding: '4px 10px',
-                            backgroundColor: '#232327',
-                            border: '1px solid #3E3E45',
+                            backgroundColor: '#202020',
+                            border: '1px solid #2A2A2A',
                             borderRadius: '999px',
-                            color: '#F2F2F5',
+                            color: '#FFFFFF',
                             fontSize: '11px',
                             fontWeight: 600,
                             cursor: 'pointer',
@@ -452,9 +452,9 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
           padding: '16px',
         }}>
           <div style={{
-            backgroundColor: '#1E1E22',
+            backgroundColor: '#161616',
             borderRadius: '20px',
-            border: '1px solid #3E3E45',
+            border: '1px solid #2A2A2A',
             width: '100%',
             maxWidth: '640px',
             padding: '28px',
@@ -465,10 +465,10 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
               <div>
-                <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#F2F2F5' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#FFFFFF' }}>
                   Dead Letter Message Details
                 </h3>
-                <p style={{ fontSize: '12px', color: '#9A9AA6', margin: '4px 0 0 0', fontFamily: 'monospace' }}>
+                <p style={{ fontSize: '12px', color: '#A3A3A3', margin: '4px 0 0 0', fontFamily: 'monospace' }}>
                   ID: {inspectRecord.id}
                 </p>
               </div>
@@ -477,7 +477,7 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#9A9AA6',
+                  color: '#A3A3A3',
                   fontSize: '20px',
                   cursor: 'pointer',
                 }}
@@ -488,7 +488,7 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
 
             <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', textTransform: 'uppercase' }}>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase' }}>
                   Error Description
                 </label>
                 <div style={{
@@ -506,15 +506,15 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
               </div>
 
               <div>
-                <label style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', textTransform: 'uppercase' }}>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase' }}>
                   Payload Snapshot
                 </label>
                 <pre style={{
                   padding: '12px',
-                  backgroundColor: '#0E0E10',
-                  border: '1px solid #2C2C32',
+                  backgroundColor: '#000000',
+                  border: '1px solid #2A2A2A',
                   borderRadius: '8px',
-                  color: '#F2F2F5',
+                  color: '#FFFFFF',
                   fontSize: '11px',
                   overflowX: 'auto',
                   marginTop: '4px',
@@ -530,10 +530,10 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
                 onClick={() => setInspectRecord(null)}
                 style={{
                   padding: '8px 18px',
-                  backgroundColor: '#232327',
-                  border: '1px solid #3E3E45',
+                  backgroundColor: '#202020',
+                  border: '1px solid #2A2A2A',
                   borderRadius: '999px',
-                  color: '#F2F2F5',
+                  color: '#FFFFFF',
                   fontSize: '12px',
                   fontWeight: 600,
                   cursor: 'pointer',

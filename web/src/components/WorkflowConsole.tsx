@@ -363,9 +363,9 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
   });
 
   const renderStatusPill = (status: string) => {
-    let bg = '#232327';
-    let text = '#9A9AA6';
-    let dot = '#9A9AA6';
+    let bg = '#202020';
+    let text = '#A3A3A3';
+    let dot = '#A3A3A3';
 
     if (status === 'ACTIVE' || status === 'SUCCEEDED') {
       bg = '#14291E';
@@ -380,13 +380,13 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
       text = '#FBBF24';
       dot = '#F59E0B';
     } else if (status === 'RUNNING' || status === 'QUEUED') {
-      bg = '#1B2433';
-      text = '#60A5FA';
-      dot = '#3B82F6';
+      bg = '#1A1A1A';
+      text = '#E5E5E5';
+      dot = '#FFFFFF';
     } else if (status === 'FILTERED' || status === 'SKIPPED') {
-      bg = '#232327';
-      text = '#C9C9D2';
-      dot = '#63636E';
+      bg = '#202020';
+      text = '#E5E5E5';
+      dot = '#737373';
     }
 
     return (
@@ -417,7 +417,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
         flexWrap: 'wrap',
         gap: '12px',
         paddingBottom: '8px',
-        borderBottom: '1px solid #232327',
+        borderBottom: '1px solid #202020',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
@@ -428,8 +428,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
               fontSize: '13px',
               fontWeight: 600,
               cursor: 'pointer',
-              backgroundColor: subTab === 'workflows' ? '#F2F2F5' : '#232327',
-              color: subTab === 'workflows' ? '#0E0E10' : '#C9C9D2',
+              backgroundColor: subTab === 'workflows' ? '#FFFFFF' : '#202020',
+              color: subTab === 'workflows' ? '#000000' : '#E5E5E5',
               border: 'none',
               transition: 'all 0.15s ease',
             }}
@@ -444,8 +444,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
               fontSize: '13px',
               fontWeight: 600,
               cursor: 'pointer',
-              backgroundColor: subTab === 'executions' ? '#F2F2F5' : '#232327',
-              color: subTab === 'executions' ? '#0E0E10' : '#C9C9D2',
+              backgroundColor: subTab === 'executions' ? '#FFFFFF' : '#202020',
+              color: subTab === 'executions' ? '#000000' : '#E5E5E5',
               border: 'none',
               transition: 'all 0.15s ease',
             }}
@@ -461,8 +461,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                 fontSize: '13px',
                 fontWeight: 600,
                 cursor: 'pointer',
-                backgroundColor: subTab === 'builder' ? '#F2F2F5' : '#232327',
-                color: subTab === 'builder' ? '#0E0E10' : '#C9C9D2',
+                backgroundColor: subTab === 'builder' ? '#FFFFFF' : '#202020',
+                color: subTab === 'builder' ? '#000000' : '#E5E5E5',
                 border: 'none',
                 transition: 'all 0.15s ease',
               }}
@@ -480,9 +480,9 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
               borderRadius: '999px',
               fontSize: '12px',
               fontWeight: 600,
-              backgroundColor: '#232327',
-              color: '#F2F2F5',
-              border: '1px solid #3E3E45',
+              backgroundColor: '#202020',
+              color: '#FFFFFF',
+              border: '1px solid #2A2A2A',
               cursor: 'pointer',
             }}
           >
@@ -496,8 +496,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                 borderRadius: '999px',
                 fontSize: '13px',
                 fontWeight: 700,
-                backgroundColor: '#F2F2F5',
-                color: '#0E0E10',
+                backgroundColor: '#FFFFFF',
+                color: '#000000',
                 border: 'none',
                 cursor: 'pointer',
                 boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
@@ -529,12 +529,12 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
-          backgroundColor: '#232327',
-          border: '1px solid #3E3E45',
+          backgroundColor: '#202020',
+          border: '1px solid #2A2A2A',
           borderRadius: '999px',
           padding: '10px 20px',
         }}>
-          <span style={{ color: '#63636E', fontSize: '13px' }}>🔍</span>
+          <span style={{ color: '#737373', fontSize: '13px' }}>🔍</span>
           <input
             type="text"
             placeholder={subTab === 'workflows' ? 'Search workflows by name, description, ID...' : 'Search executions by ID, event ID, status...'}
@@ -545,7 +545,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
               backgroundColor: 'transparent',
               outline: 'none',
               fontSize: '13px',
-              color: '#F2F2F5',
+              color: '#FFFFFF',
               width: '100%',
             }}
           />
@@ -559,13 +559,13 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
             <div style={{
               textAlign: 'center',
               padding: '60px 20px',
-              backgroundColor: '#1E1E22',
-              border: '1px dashed #3E3E45',
+              backgroundColor: '#161616',
+              border: '1px dashed #2A2A2A',
               borderRadius: '16px',
-              color: '#9A9AA6',
+              color: '#A3A3A3',
             }}>
               <div style={{ fontSize: '32px', marginBottom: '12px' }}>⚡</div>
-              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#F2F2F5', margin: '0 0 6px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 6px' }}>
                 No Sequential Workflows Configured
               </h3>
               <p style={{ fontSize: '13px', margin: '0 0 18px', maxWidth: '420px', marginInline: 'auto' }}>
@@ -576,8 +576,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                   onClick={() => setShowCreateModal(true)}
                   style={{
                     padding: '8px 20px',
-                    backgroundColor: '#F2F2F5',
-                    color: '#0E0E10',
+                    backgroundColor: '#FFFFFF',
+                    color: '#000000',
                     fontWeight: 700,
                     borderRadius: '999px',
                     border: 'none',
@@ -598,8 +598,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                   <div
                     key={wf.id}
                     style={{
-                      backgroundColor: '#1E1E22',
-                      border: '1px solid #3E3E45',
+                      backgroundColor: '#161616',
+                      border: '1px solid #2A2A2A',
                       borderRadius: '16px',
                       padding: '20px',
                       display: 'flex',
@@ -611,10 +611,10 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                         <div>
-                          <h4 style={{ fontSize: '15px', fontWeight: 700, color: '#F2F2F5', margin: '0 0 4px' }}>
+                          <h4 style={{ fontSize: '15px', fontWeight: 700, color: '#FFFFFF', margin: '0 0 4px' }}>
                             {wf.name}
                           </h4>
-                          <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#63636E' }}>
+                          <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#737373' }}>
                             {wf.id.slice(0, 8)}...
                           </span>
                         </div>
@@ -622,7 +622,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                       </div>
 
                       {wf.description && (
-                        <p style={{ fontSize: '12px', color: '#9A9AA6', margin: '0 0 14px', lineHeight: 1.4 }}>
+                        <p style={{ fontSize: '12px', color: '#A3A3A3', margin: '0 0 14px', lineHeight: 1.4 }}>
                           {wf.description}
                         </p>
                       )}
@@ -639,20 +639,20 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                         marginBottom: '16px',
                       }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: '#63636E' }}>Trigger Endpoint:</span>
-                          <span style={{ color: '#C9C9D2', fontFamily: 'monospace' }}>
+                          <span style={{ color: '#737373' }}>Trigger Endpoint:</span>
+                          <span style={{ color: '#E5E5E5', fontFamily: 'monospace' }}>
                             {ep ? ep.name : (wf.endpointId ? wf.endpointId.slice(0, 8) : 'Any')}
                           </span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: '#63636E' }}>Active Version:</span>
+                          <span style={{ color: '#737373' }}>Active Version:</span>
                           <span style={{ color: hasActiveVersion ? '#34D399' : '#FBBF24', fontWeight: 600 }}>
                             {wf.activeVersion ? `v${wf.activeVersion.versionNumber}` : 'Draft (Unpublished)'}
                           </span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: '#63636E' }}>Sequential Actions:</span>
-                          <span style={{ color: '#C9C9D2' }}>
+                          <span style={{ color: '#737373' }}>Sequential Actions:</span>
+                          <span style={{ color: '#E5E5E5' }}>
                             {actionCount} configured
                           </span>
                         </div>
@@ -665,9 +665,9 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                         style={{
                           flex: 1,
                           padding: '8px 14px',
-                          backgroundColor: '#232327',
-                          color: '#F2F2F5',
-                          border: '1px solid #3E3E45',
+                          backgroundColor: '#202020',
+                          color: '#FFFFFF',
+                          border: '1px solid #2A2A2A',
                           borderRadius: '8px',
                           fontSize: '12px',
                           fontWeight: 600,
@@ -709,22 +709,22 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
             <div style={{
               textAlign: 'center',
               padding: '50px 20px',
-              backgroundColor: '#1E1E22',
+              backgroundColor: '#161616',
               borderRadius: '16px',
-              color: '#9A9AA6',
+              color: '#A3A3A3',
             }}>
               No workflow executions recorded yet. Send a test webhook to trigger execution.
             </div>
           ) : (
             <div style={{
-              backgroundColor: '#1E1E22',
-              border: '1px solid #3E3E45',
+              backgroundColor: '#161616',
+              border: '1px solid #2A2A2A',
               borderRadius: '16px',
               overflow: 'hidden',
             }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12px' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #232327', color: '#63636E', textTransform: 'uppercase', fontSize: '11px' }}>
+                  <tr style={{ borderBottom: '1px solid #202020', color: '#737373', textTransform: 'uppercase', fontSize: '11px' }}>
                     <th style={{ padding: '12px 16px' }}>Execution ID</th>
                     <th style={{ padding: '12px 16px' }}>Event ID</th>
                     <th style={{ padding: '12px 16px' }}>Status</th>
@@ -738,24 +738,24 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                   {filteredExecutions.map((ex) => (
                     <tr
                       key={ex.id}
-                      style={{ borderBottom: '1px solid #232327', color: '#F2F2F5' }}
+                      style={{ borderBottom: '1px solid #202020', color: '#FFFFFF' }}
                     >
                       <td style={{ padding: '12px 16px', fontFamily: 'monospace' }}>
                         {ex.id.slice(0, 8)}...
                       </td>
-                      <td style={{ padding: '12px 16px', fontFamily: 'monospace', color: '#9A9AA6' }}>
+                      <td style={{ padding: '12px 16px', fontFamily: 'monospace', color: '#A3A3A3' }}>
                         {ex.eventId.slice(0, 8)}...
                       </td>
                       <td style={{ padding: '12px 16px' }}>
                         {renderStatusPill(ex.status)}
                       </td>
-                      <td style={{ padding: '12px 16px', color: '#C9C9D2' }}>
+                      <td style={{ padding: '12px 16px', color: '#E5E5E5' }}>
                         Step {ex.currentStep}
                       </td>
-                      <td style={{ padding: '12px 16px', color: '#9A9AA6' }}>
+                      <td style={{ padding: '12px 16px', color: '#A3A3A3' }}>
                         {ex.startedAt ? new Date(ex.startedAt).toLocaleTimeString() : 'Queued'}
                       </td>
-                      <td style={{ padding: '12px 16px', color: '#9A9AA6' }}>
+                      <td style={{ padding: '12px 16px', color: '#A3A3A3' }}>
                         {ex.completedAt ? new Date(ex.completedAt).toLocaleTimeString() : '—'}
                       </td>
                       <td style={{ padding: '12px 16px', textAlign: 'right' }}>
@@ -764,10 +764,10 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                             onClick={() => void handleInspectExecution(ex.id)}
                             style={{
                               padding: '5px 10px',
-                              backgroundColor: '#232327',
-                              border: '1px solid #3E3E45',
+                              backgroundColor: '#202020',
+                              border: '1px solid #2A2A2A',
                               borderRadius: '6px',
-                              color: '#F2F2F5',
+                              color: '#FFFFFF',
                               fontSize: '11px',
                               fontWeight: 600,
                               cursor: 'pointer',
@@ -809,8 +809,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Builder Top Bar */}
           <div style={{
-            backgroundColor: '#1E1E22',
-            border: '1px solid #3E3E45',
+            backgroundColor: '#161616',
+            border: '1px solid #2A2A2A',
             borderRadius: '16px',
             padding: '18px 24px',
             display: 'flex',
@@ -821,12 +821,12 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
           }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#F2F2F5', margin: 0 }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#FFFFFF', margin: 0 }}>
                   {activeWorkflow.name}
                 </h3>
                 {renderStatusPill(activeWorkflow.status)}
               </div>
-              <p style={{ fontSize: '12px', color: '#9A9AA6', margin: '4px 0 0' }}>
+              <p style={{ fontSize: '12px', color: '#A3A3A3', margin: '4px 0 0' }}>
                 Sequential Pipeline DAG: Trigger → Conditions → JSON Transformer → Sequential HTTP Deliveries
               </p>
             </div>
@@ -837,10 +837,10 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                 disabled={isValidating}
                 style={{
                   padding: '9px 18px',
-                  backgroundColor: '#232327',
-                  border: '1px solid #3E3E45',
+                  backgroundColor: '#202020',
+                  border: '1px solid #2A2A2A',
                   borderRadius: '999px',
-                  color: '#F2F2F5',
+                  color: '#FFFFFF',
                   fontSize: '13px',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -855,10 +855,10 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                   disabled={isPublishing}
                   style={{
                     padding: '9px 20px',
-                    backgroundColor: '#F2F2F5',
+                    backgroundColor: '#FFFFFF',
                     border: 'none',
                     borderRadius: '999px',
-                    color: '#0E0E10',
+                    color: '#000000',
                     fontSize: '13px',
                     fontWeight: 700,
                     cursor: 'pointer',
@@ -937,8 +937,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
             <div style={{
               width: '100%',
               maxWidth: '680px',
-              backgroundColor: '#1E1E22',
-              border: '1px solid #3E3E45',
+              backgroundColor: '#161616',
+              border: '1px solid #2A2A2A',
               borderRadius: '16px',
               padding: '20px',
               boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
@@ -946,16 +946,16 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ fontSize: '18px' }}>⚡</span>
-                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5' }}>Step 0: Webhook Trigger</span>
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>Step 0: Webhook Trigger</span>
                 </div>
-                <span style={{ fontSize: '11px', color: '#9A9AA6', backgroundColor: '#141418', padding: '3px 8px', borderRadius: '6px' }}>
+                <span style={{ fontSize: '11px', color: '#A3A3A3', backgroundColor: '#141418', padding: '3px 8px', borderRadius: '6px' }}>
                   trigger_1
                 </span>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#9A9AA6', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#A3A3A3', marginBottom: '6px' }}>
                     Ingestion Endpoint
                   </label>
                   <select
@@ -965,9 +965,9 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                       width: '100%',
                       padding: '8px 12px',
                       backgroundColor: '#141418',
-                      border: '1px solid #3E3E45',
+                      border: '1px solid #2A2A2A',
                       borderRadius: '8px',
-                      color: '#F2F2F5',
+                      color: '#FFFFFF',
                       fontSize: '12px',
                     }}
                   >
@@ -981,7 +981,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#9A9AA6', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#A3A3A3', marginBottom: '6px' }}>
                     Matching Event Type (Optional)
                   </label>
                   <input
@@ -993,9 +993,9 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                       width: '100%',
                       padding: '8px 12px',
                       backgroundColor: '#141418',
-                      border: '1px solid #3E3E45',
+                      border: '1px solid #2A2A2A',
                       borderRadius: '8px',
-                      color: '#F2F2F5',
+                      color: '#FFFFFF',
                       fontSize: '12px',
                     }}
                   />
@@ -1004,8 +1004,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
             </div>
 
             {/* Downward Connector Arrow */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#63636E' }}>
-              <div style={{ width: '2px', height: '20px', backgroundColor: '#3E3E45' }}></div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#737373' }}>
+              <div style={{ width: '2px', height: '20px', backgroundColor: '#2A2A2A' }}></div>
               <span>▼</span>
             </div>
 
@@ -1013,8 +1013,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
             <div style={{
               width: '100%',
               maxWidth: '680px',
-              backgroundColor: '#1E1E22',
-              border: `1px solid ${hasCondition ? '#3E3E45' : '#232327'}`,
+              backgroundColor: '#161616',
+              border: `1px solid ${hasCondition ? '#2A2A2A' : '#202020'}`,
               borderRadius: '16px',
               padding: '20px',
               opacity: hasCondition ? 1 : 0.6,
@@ -1023,10 +1023,10 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ fontSize: '18px' }}>🔍</span>
-                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5' }}>Step 1: Condition Filter</span>
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>Step 1: Condition Filter</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <label style={{ fontSize: '12px', color: '#9A9AA6', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                  <label style={{ fontSize: '12px', color: '#A3A3A3', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
                     <input
                       type="checkbox"
                       checked={hasCondition}
@@ -1041,9 +1041,9 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                       style={{
                         padding: '4px 8px',
                         backgroundColor: '#141418',
-                        border: '1px solid #3E3E45',
+                        border: '1px solid #2A2A2A',
                         borderRadius: '6px',
-                        color: '#F2F2F5',
+                        color: '#FFFFFF',
                         fontSize: '11px',
                         fontWeight: 700,
                       }}
@@ -1072,9 +1072,9 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                           flex: 2,
                           padding: '7px 10px',
                           backgroundColor: '#141418',
-                          border: '1px solid #3E3E45',
+                          border: '1px solid #2A2A2A',
                           borderRadius: '6px',
-                          color: '#F2F2F5',
+                          color: '#FFFFFF',
                           fontSize: '12px',
                         }}
                       />
@@ -1089,9 +1089,9 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                           flex: 1.5,
                           padding: '7px 8px',
                           backgroundColor: '#141418',
-                          border: '1px solid #3E3E45',
+                          border: '1px solid #2A2A2A',
                           borderRadius: '6px',
-                          color: '#F2F2F5',
+                          color: '#FFFFFF',
                           fontSize: '11px',
                         }}
                       >
@@ -1117,9 +1117,9 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                             flex: 2,
                             padding: '7px 10px',
                             backgroundColor: '#141418',
-                            border: '1px solid #3E3E45',
+                            border: '1px solid #2A2A2A',
                             borderRadius: '6px',
-                            color: '#F2F2F5',
+                            color: '#FFFFFF',
                             fontSize: '12px',
                           }}
                         />
@@ -1128,8 +1128,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                         onClick={() => removeConditionRule(idx)}
                         style={{
                           padding: '6px 10px',
-                          backgroundColor: '#232327',
-                          border: '1px solid #3E3E45',
+                          backgroundColor: '#202020',
+                          border: '1px solid #2A2A2A',
                           borderRadius: '6px',
                           color: '#F87171',
                           cursor: 'pointer',
@@ -1143,10 +1143,10 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                     onClick={addConditionRule}
                     style={{
                       padding: '6px 12px',
-                      backgroundColor: '#232327',
-                      border: '1px dashed #3E3E45',
+                      backgroundColor: '#202020',
+                      border: '1px dashed #2A2A2A',
                       borderRadius: '6px',
-                      color: '#9A9AA6',
+                      color: '#A3A3A3',
                       fontSize: '11px',
                       fontWeight: 600,
                       cursor: 'pointer',
@@ -1160,8 +1160,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
             </div>
 
             {/* Downward Connector Arrow */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#63636E' }}>
-              <div style={{ width: '2px', height: '20px', backgroundColor: '#3E3E45' }}></div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#737373' }}>
+              <div style={{ width: '2px', height: '20px', backgroundColor: '#2A2A2A' }}></div>
               <span>▼</span>
             </div>
 
@@ -1169,8 +1169,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
             <div style={{
               width: '100%',
               maxWidth: '680px',
-              backgroundColor: '#1E1E22',
-              border: `1px solid ${hasTransform ? '#3E3E45' : '#232327'}`,
+              backgroundColor: '#161616',
+              border: `1px solid ${hasTransform ? '#2A2A2A' : '#202020'}`,
               borderRadius: '16px',
               padding: '20px',
               opacity: hasTransform ? 1 : 0.6,
@@ -1179,9 +1179,9 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ fontSize: '18px' }}>🔄</span>
-                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5' }}>Step 2: JSON Transformation</span>
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>Step 2: JSON Transformation</span>
                 </div>
-                <label style={{ fontSize: '12px', color: '#9A9AA6', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                <label style={{ fontSize: '12px', color: '#A3A3A3', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
                   <input
                     type="checkbox"
                     checked={hasTransform}
@@ -1193,7 +1193,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
 
               {hasTransform && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div style={{ fontSize: '11px', color: '#9A9AA6', marginBottom: '2px' }}>
+                  <div style={{ fontSize: '11px', color: '#A3A3A3', marginBottom: '2px' }}>
                     Map incoming payload fields to target payload keys:
                   </div>
                   {transformFields.map((tf, idx) => (
@@ -1211,13 +1211,13 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                           flex: 1,
                           padding: '7px 10px',
                           backgroundColor: '#141418',
-                          border: '1px solid #3E3E45',
+                          border: '1px solid #2A2A2A',
                           borderRadius: '6px',
-                          color: '#F2F2F5',
+                          color: '#FFFFFF',
                           fontSize: '12px',
                         }}
                       />
-                      <span style={{ color: '#63636E' }}>←</span>
+                      <span style={{ color: '#737373' }}>←</span>
                       <input
                         type="text"
                         placeholder="Source Path e.g. customer.email"
@@ -1231,9 +1231,9 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                           flex: 1,
                           padding: '7px 10px',
                           backgroundColor: '#141418',
-                          border: '1px solid #3E3E45',
+                          border: '1px solid #2A2A2A',
                           borderRadius: '6px',
-                          color: '#F2F2F5',
+                          color: '#FFFFFF',
                           fontSize: '12px',
                         }}
                       />
@@ -1241,8 +1241,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                         onClick={() => removeTransformField(idx)}
                         style={{
                           padding: '6px 10px',
-                          backgroundColor: '#232327',
-                          border: '1px solid #3E3E45',
+                          backgroundColor: '#202020',
+                          border: '1px solid #2A2A2A',
                           borderRadius: '6px',
                           color: '#F87171',
                           cursor: 'pointer',
@@ -1256,10 +1256,10 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                     onClick={addTransformField}
                     style={{
                       padding: '6px 12px',
-                      backgroundColor: '#232327',
-                      border: '1px dashed #3E3E45',
+                      backgroundColor: '#202020',
+                      border: '1px dashed #2A2A2A',
                       borderRadius: '6px',
-                      color: '#9A9AA6',
+                      color: '#A3A3A3',
                       fontSize: '11px',
                       fontWeight: 600,
                       cursor: 'pointer',
@@ -1273,8 +1273,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
             </div>
 
             {/* Downward Connector Arrow */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#63636E' }}>
-              <div style={{ width: '2px', height: '20px', backgroundColor: '#3E3E45' }}></div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#737373' }}>
+              <div style={{ width: '2px', height: '20px', backgroundColor: '#2A2A2A' }}></div>
               <span>▼</span>
             </div>
 
@@ -1282,8 +1282,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
             <div style={{
               width: '100%',
               maxWidth: '680px',
-              backgroundColor: '#1E1E22',
-              border: '1px solid #3E3E45',
+              backgroundColor: '#161616',
+              border: '1px solid #2A2A2A',
               borderRadius: '16px',
               padding: '20px',
               boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
@@ -1291,7 +1291,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ fontSize: '18px' }}>🚀</span>
-                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#F2F2F5' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>
                     Step 3: Sequential HTTP Deliveries ({actions.length}/5)
                   </span>
                 </div>
@@ -1300,10 +1300,10 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                     onClick={addActionStep}
                     style={{
                       padding: '5px 12px',
-                      backgroundColor: '#232327',
-                      border: '1px solid #3E3E45',
+                      backgroundColor: '#202020',
+                      border: '1px solid #2A2A2A',
                       borderRadius: '6px',
-                      color: '#F2F2F5',
+                      color: '#FFFFFF',
                       fontSize: '11px',
                       fontWeight: 600,
                       cursor: 'pointer',
@@ -1321,12 +1321,12 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                     style={{
                       padding: '14px 16px',
                       backgroundColor: '#141418',
-                      border: '1px solid #232327',
+                      border: '1px solid #202020',
                       borderRadius: '10px',
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#C9C9D2' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#E5E5E5' }}>
                         Action #{idx + 1} ({act.nodeId})
                       </span>
                       {actions.length > 1 && (
@@ -1347,7 +1347,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
 
                     <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '10px' }}>
                       <div>
-                        <label style={{ display: 'block', fontSize: '10px', color: '#9A9AA6', marginBottom: '4px' }}>
+                        <label style={{ display: 'block', fontSize: '10px', color: '#A3A3A3', marginBottom: '4px' }}>
                           SSRF-Protected Destination Target
                         </label>
                         <select
@@ -1360,10 +1360,10 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                           style={{
                             width: '100%',
                             padding: '6px 8px',
-                            backgroundColor: '#0E0E10',
-                            border: '1px solid #3E3E45',
+                            backgroundColor: '#000000',
+                            border: '1px solid #2A2A2A',
                             borderRadius: '6px',
-                            color: '#F2F2F5',
+                            color: '#FFFFFF',
                             fontSize: '11px',
                           }}
                         >
@@ -1377,7 +1377,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                       </div>
 
                       <div>
-                        <label style={{ display: 'block', fontSize: '10px', color: '#9A9AA6', marginBottom: '4px' }}>
+                        <label style={{ display: 'block', fontSize: '10px', color: '#A3A3A3', marginBottom: '4px' }}>
                           Method
                         </label>
                         <select
@@ -1390,10 +1390,10 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                           style={{
                             width: '100%',
                             padding: '6px 8px',
-                            backgroundColor: '#0E0E10',
-                            border: '1px solid #3E3E45',
+                            backgroundColor: '#000000',
+                            border: '1px solid #2A2A2A',
                             borderRadius: '6px',
-                            color: '#F2F2F5',
+                            color: '#FFFFFF',
                             fontSize: '11px',
                           }}
                         >
@@ -1404,7 +1404,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                       </div>
 
                       <div>
-                        <label style={{ display: 'block', fontSize: '10px', color: '#9A9AA6', marginBottom: '4px' }}>
+                        <label style={{ display: 'block', fontSize: '10px', color: '#A3A3A3', marginBottom: '4px' }}>
                           Max Retries
                         </label>
                         <input
@@ -1420,17 +1420,17 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                           style={{
                             width: '100%',
                             padding: '6px 8px',
-                            backgroundColor: '#0E0E10',
-                            border: '1px solid #3E3E45',
+                            backgroundColor: '#000000',
+                            border: '1px solid #2A2A2A',
                             borderRadius: '6px',
-                            color: '#F2F2F5',
+                            color: '#FFFFFF',
                             fontSize: '11px',
                           }}
                         />
                       </div>
 
                       <div>
-                        <label style={{ display: 'block', fontSize: '10px', color: '#9A9AA6', marginBottom: '4px' }}>
+                        <label style={{ display: 'block', fontSize: '10px', color: '#A3A3A3', marginBottom: '4px' }}>
                           Backoff (ms)
                         </label>
                         <input
@@ -1445,10 +1445,10 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                           style={{
                             width: '100%',
                             padding: '6px 8px',
-                            backgroundColor: '#0E0E10',
-                            border: '1px solid #3E3E45',
+                            backgroundColor: '#000000',
+                            border: '1px solid #2A2A2A',
                             borderRadius: '6px',
-                            color: '#F2F2F5',
+                            color: '#FFFFFF',
                             fontSize: '11px',
                           }}
                         />
@@ -1478,18 +1478,18 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
           padding: '20px',
         }}>
           <div style={{
-            backgroundColor: '#1E1E22',
-            border: '1px solid #3E3E45',
+            backgroundColor: '#161616',
+            border: '1px solid #2A2A2A',
             borderRadius: '16px',
             padding: '28px',
             width: '100%',
             maxWidth: '520px',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
           }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#F2F2F5', margin: '0 0 8px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#FFFFFF', margin: '0 0 8px' }}>
               Create Sequential Workflow
             </h3>
-            <p style={{ fontSize: '13px', color: '#9A9AA6', margin: '0 0 20px' }}>
+            <p style={{ fontSize: '13px', color: '#A3A3A3', margin: '0 0 20px' }}>
               Define an orchestrated multi-step workflow attached to your ingestion endpoints and destinations.
             </p>
 
@@ -1509,7 +1509,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
 
             <form onSubmit={handleCreateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#C9C9D2', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#E5E5E5', marginBottom: '6px' }}>
                   Workflow Name *
                 </label>
                 <input
@@ -1522,9 +1522,9 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                     width: '100%',
                     padding: '10px 14px',
                     backgroundColor: '#141418',
-                    border: '1px solid #3E3E45',
+                    border: '1px solid #2A2A2A',
                     borderRadius: '8px',
-                    color: '#F2F2F5',
+                    color: '#FFFFFF',
                     fontSize: '13px',
                     boxSizing: 'border-box',
                   }}
@@ -1532,7 +1532,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#C9C9D2', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#E5E5E5', marginBottom: '6px' }}>
                   Description (Optional)
                 </label>
                 <textarea
@@ -1544,9 +1544,9 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                     width: '100%',
                     padding: '10px 14px',
                     backgroundColor: '#141418',
-                    border: '1px solid #3E3E45',
+                    border: '1px solid #2A2A2A',
                     borderRadius: '8px',
-                    color: '#F2F2F5',
+                    color: '#FFFFFF',
                     fontSize: '13px',
                     boxSizing: 'border-box',
                     resize: 'none',
@@ -1555,7 +1555,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#C9C9D2', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#E5E5E5', marginBottom: '6px' }}>
                   Trigger Webhook Endpoint (Optional)
                 </label>
                 <select
@@ -1565,9 +1565,9 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                     width: '100%',
                     padding: '10px 14px',
                     backgroundColor: '#141418',
-                    border: '1px solid #3E3E45',
+                    border: '1px solid #2A2A2A',
                     borderRadius: '8px',
-                    color: '#F2F2F5',
+                    color: '#FFFFFF',
                     fontSize: '13px',
                     boxSizing: 'border-box',
                   }}
@@ -1588,8 +1588,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                   style={{
                     padding: '9px 18px',
                     backgroundColor: 'transparent',
-                    color: '#9A9AA6',
-                    border: '1px solid #3E3E45',
+                    color: '#A3A3A3',
+                    border: '1px solid #2A2A2A',
                     borderRadius: '8px',
                     fontSize: '13px',
                     cursor: 'pointer',
@@ -1602,8 +1602,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                   disabled={createLoading}
                   style={{
                     padding: '9px 20px',
-                    backgroundColor: '#F2F2F5',
-                    color: '#0E0E10',
+                    backgroundColor: '#FFFFFF',
+                    color: '#000000',
                     fontWeight: 700,
                     border: 'none',
                     borderRadius: '8px',
@@ -1635,8 +1635,8 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
           padding: '24px',
         }}>
           <div style={{
-            backgroundColor: '#1E1E22',
-            border: '1px solid #3E3E45',
+            backgroundColor: '#161616',
+            border: '1px solid #2A2A2A',
             borderRadius: '16px',
             padding: '28px',
             width: '100%',
@@ -1649,12 +1649,12 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#F2F2F5', margin: 0 }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#FFFFFF', margin: 0 }}>
                     Execution Lineage Inspector
                   </h3>
                   {renderStatusPill(selectedExecution.status)}
                 </div>
-                <div style={{ fontSize: '11px', fontFamily: 'monospace', color: '#9A9AA6', marginTop: '4px' }}>
+                <div style={{ fontSize: '11px', fontFamily: 'monospace', color: '#A3A3A3', marginTop: '4px' }}>
                   ID: {selectedExecution.id} | Event: {selectedExecution.eventId}
                 </div>
               </div>
@@ -1663,7 +1663,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  color: '#9A9AA6',
+                  color: '#A3A3A3',
                   fontSize: '20px',
                   cursor: 'pointer',
                   lineHeight: 1,
@@ -1688,18 +1688,18 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
             )}
 
             {executionDetailLoading && (
-              <div style={{ color: '#9A9AA6', fontSize: '12px', padding: '10px', textAlign: 'center' }}>
+              <div style={{ color: '#A3A3A3', fontSize: '12px', padding: '10px', textAlign: 'center' }}>
                 Fetching latest step checkpoints...
               </div>
             )}
 
             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '6px' }}>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: '#C9C9D2', marginBottom: '10px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: '#E5E5E5', marginBottom: '10px' }}>
                 Step Checkpoints & Execution Timeline:
               </div>
 
               {(!selectedExecution.steps || selectedExecution.steps.length === 0) ? (
-                <div style={{ color: '#9A9AA6', fontSize: '12px', padding: '16px', textAlign: 'center' }}>
+                <div style={{ color: '#A3A3A3', fontSize: '12px', padding: '16px', textAlign: 'center' }}>
                   No step checkpoints recorded yet for this execution.
                 </div>
               ) : (
@@ -1710,39 +1710,39 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                       style={{
                         padding: '12px 16px',
                         backgroundColor: '#141418',
-                        border: '1px solid #232327',
+                        border: '1px solid #202020',
                         borderRadius: '10px',
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ fontSize: '11px', fontWeight: 700, color: '#F2F2F5', backgroundColor: '#232327', padding: '2px 8px', borderRadius: '4px' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 700, color: '#FFFFFF', backgroundColor: '#202020', padding: '2px 8px', borderRadius: '4px' }}>
                             #{idx} {st.stepType}
                           </span>
-                          <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#9A9AA6' }}>
+                          <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#A3A3A3' }}>
                             {st.nodeId}
                           </span>
                         </div>
                         {renderStatusPill(st.status)}
                       </div>
 
-                      <div style={{ fontSize: '11px', color: '#9A9AA6', display: 'flex', gap: '16px', marginBottom: '8px' }}>
+                      <div style={{ fontSize: '11px', color: '#A3A3A3', display: 'flex', gap: '16px', marginBottom: '8px' }}>
                         <span>Attempts: {st.attemptCount}</span>
                         <span>Completed: {st.completedAt ? new Date(st.completedAt).toLocaleTimeString() : 'In Progress'}</span>
                       </div>
 
                       {st.outputSnapshot !== undefined && st.outputSnapshot !== null && (
                         <div>
-                          <span style={{ fontSize: '10px', color: '#63636E', textTransform: 'uppercase', fontWeight: 700 }}>
+                          <span style={{ fontSize: '10px', color: '#737373', textTransform: 'uppercase', fontWeight: 700 }}>
                             Output Snapshot:
                           </span>
                           <pre style={{
                             fontSize: '11px',
                             fontFamily: 'monospace',
-                            backgroundColor: '#0E0E10',
+                            backgroundColor: '#000000',
                             padding: '8px',
                             borderRadius: '6px',
-                            color: '#F2F2F5',
+                            color: '#FFFFFF',
                             margin: '4px 0 0',
                             overflowX: 'auto',
                           }}>
@@ -1776,7 +1776,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
               )}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #232327' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #202020' }}>
               {(selectedExecution.status === 'FAILED' || selectedExecution.status === 'RETRY_WAIT') && canManage ? (
                 <button
                   onClick={() => handleResume(selectedExecution.id)}
@@ -1802,10 +1802,10 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
                 onClick={() => setSelectedExecution(null)}
                 style={{
                   padding: '8px 18px',
-                  backgroundColor: '#232327',
-                  border: '1px solid #3E3E45',
+                  backgroundColor: '#202020',
+                  border: '1px solid #2A2A2A',
                   borderRadius: '8px',
-                  color: '#F2F2F5',
+                  color: '#FFFFFF',
                   fontSize: '12px',
                   fontWeight: 600,
                   cursor: 'pointer',

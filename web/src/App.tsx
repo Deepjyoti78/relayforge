@@ -250,8 +250,8 @@ export const App: React.FC = () => {
     <div style={{
       display: 'flex',
       minHeight: '100vh',
-      backgroundColor: '#0E0E10',
-      color: '#F2F2F5',
+      backgroundColor: '#000000',
+      color: '#FFFFFF',
       position: 'relative',
     }}>
       {/* Top subtle indeterminate progress bar during background revalidation (never blocks the user) */}
@@ -330,7 +330,7 @@ export const App: React.FC = () => {
           onOpenProfile={() => setProfileModalOpen(true)}
         />
 
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#0E0E10', minWidth: 0, width: '100%' }}>
+        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#000000', minWidth: 0, width: '100%' }}>
           {activeOrg ? (
             <OrgManagement
               organization={activeOrg}
@@ -351,22 +351,22 @@ export const App: React.FC = () => {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#9A9AA6',
+              color: '#A3A3A3',
               padding: '40px',
               textAlign: 'center',
-              backgroundColor: '#0E0E10',
+              backgroundColor: '#000000',
             }}>
               <div style={{
                 width: '48px',
                 height: '48px',
                 borderRadius: '12px',
-                backgroundColor: '#232327',
-                border: '1px solid #3E3E45',
+                backgroundColor: '#202020',
+                border: '1px solid #2A2A2A',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: '16px',
-                color: '#F2F2F5',
+                color: '#FFFFFF',
               }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -375,10 +375,10 @@ export const App: React.FC = () => {
                   <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
               </div>
-              <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#F2F2F5' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#FFFFFF' }}>
                 No Organization Selected
               </h2>
-              <p style={{ fontSize: '13px', margin: 0, maxWidth: '360px', color: '#9A9AA6' }}>
+              <p style={{ fontSize: '13px', margin: 0, maxWidth: '360px', color: '#A3A3A3' }}>
                 Create or select an organization from the sidebar to manage identity, roles, and API keys.
               </p>
               <button
@@ -389,8 +389,8 @@ export const App: React.FC = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  backgroundColor: '#F2F2F5',
-                  color: '#0E0E10',
+                  backgroundColor: '#FFFFFF',
+                  color: '#000000',
                   border: 'none',
                   borderRadius: '999px',
                   padding: '11px 26px',
@@ -430,8 +430,8 @@ export const App: React.FC = () => {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              backgroundColor: '#18181B',
-              border: '1px solid #3E3E45',
+              backgroundColor: '#111111',
+              border: '1px solid #2A2A2A',
               borderRadius: '16px',
               maxWidth: '440px',
               width: '100%',
@@ -440,13 +440,13 @@ export const App: React.FC = () => {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#F2F2F5' }}>Create Organization</h3>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#FFFFFF' }}>Create Organization</h3>
               <button
                 onClick={() => setCreateOrgModalOpen(false)}
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#9A9AA6',
+                  color: '#A3A3A3',
                   fontSize: '20px',
                   cursor: 'pointer',
                   padding: '4px',
@@ -455,7 +455,7 @@ export const App: React.FC = () => {
                 ×
               </button>
             </div>
-            <p style={{ margin: '0 0 20px', fontSize: '13px', color: '#9A9AA6', lineHeight: 1.5 }}>
+            <p style={{ margin: '0 0 20px', fontSize: '13px', color: '#A3A3A3', lineHeight: 1.5 }}>
               Organizations isolate tenant identities, API keys, webhook endpoints, and workflows.
             </p>
 
@@ -467,7 +467,7 @@ export const App: React.FC = () => {
 
             <form onSubmit={handleModalCreateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#C9C9D2', marginBottom: '6px' }}>Organization Name *</label>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#E5E5E5', marginBottom: '6px' }}>Organization Name *</label>
                 <input
                   type="text"
                   required
@@ -478,9 +478,9 @@ export const App: React.FC = () => {
                     width: '100%',
                     padding: '10px 12px',
                     borderRadius: '8px',
-                    backgroundColor: '#0E0E10',
-                    border: '1px solid #3E3E45',
-                    color: '#F2F2F5',
+                    backgroundColor: '#000000',
+                    border: '1px solid #2A2A2A',
+                    color: '#FFFFFF',
                     fontSize: '13px',
                     boxSizing: 'border-box',
                   }}
@@ -488,7 +488,7 @@ export const App: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#C9C9D2', marginBottom: '6px' }}>Custom Slug (Optional)</label>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#E5E5E5', marginBottom: '6px' }}>Custom Slug (Optional)</label>
                 <input
                   type="text"
                   placeholder="e.g. acme-corp"
@@ -498,9 +498,9 @@ export const App: React.FC = () => {
                     width: '100%',
                     padding: '10px 12px',
                     borderRadius: '8px',
-                    backgroundColor: '#0E0E10',
-                    border: '1px solid #3E3E45',
-                    color: '#F2F2F5',
+                    backgroundColor: '#000000',
+                    border: '1px solid #2A2A2A',
+                    color: '#FFFFFF',
                     fontSize: '13px',
                     boxSizing: 'border-box',
                   }}
@@ -513,10 +513,10 @@ export const App: React.FC = () => {
                   onClick={() => setCreateOrgModalOpen(false)}
                   style={{
                     padding: '9px 16px',
-                    backgroundColor: '#232327',
-                    border: '1px solid #3E3E45',
+                    backgroundColor: '#202020',
+                    border: '1px solid #2A2A2A',
                     borderRadius: '8px',
-                    color: '#C9C9D2',
+                    color: '#E5E5E5',
                     fontSize: '13px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -529,10 +529,10 @@ export const App: React.FC = () => {
                   disabled={modalOrgLoading}
                   style={{
                     padding: '9px 20px',
-                    backgroundColor: '#F2F2F5',
+                    backgroundColor: '#FFFFFF',
                     border: 'none',
                     borderRadius: '8px',
-                    color: '#0E0E10',
+                    color: '#000000',
                     fontSize: '13px',
                     fontWeight: 700,
                     cursor: 'pointer',

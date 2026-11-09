@@ -72,10 +72,10 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
       {/* Header & Window Controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#F2F2F5', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
             Operational Metrics & Real-Time Telemetry
           </h2>
-          <p style={{ fontSize: '12px', color: '#9A9AA6', margin: '4px 0 0 0' }}>
+          <p style={{ fontSize: '12px', color: '#A3A3A3', margin: '4px 0 0 0' }}>
             Quantile latencies, outbox processing rates, and live server-sent telemetry events.
           </p>
         </div>
@@ -93,9 +93,9 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
                 borderRadius: '999px',
                 fontSize: '11px',
                 fontWeight: 700,
-                border: windowHours === hours ? '1px solid transparent' : '1px solid #3E3E45',
-                backgroundColor: windowHours === hours ? '#F2F2F5' : '#1A1A1E',
-                color: windowHours === hours ? '#0E0E10' : '#9A9AA6',
+                border: windowHours === hours ? '1px solid transparent' : '1px solid #2A2A2A',
+                backgroundColor: windowHours === hours ? '#FFFFFF' : '#161616',
+                color: windowHours === hours ? '#000000' : '#A3A3A3',
                 cursor: 'pointer',
               }}
             >
@@ -109,9 +109,9 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
               borderRadius: '999px',
               fontSize: '11px',
               fontWeight: 600,
-              border: '1px solid #3E3E45',
-              backgroundColor: '#232327',
-              color: '#F2F2F5',
+              border: '1px solid #2A2A2A',
+              backgroundColor: '#202020',
+              color: '#FFFFFF',
               cursor: 'pointer',
             }}
           >
@@ -140,69 +140,69 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
         gap: '14px',
       }}>
         <div style={{
-          backgroundColor: '#1E1E22',
-          border: '1px solid #3E3E45',
+          backgroundColor: '#161616',
+          border: '1px solid #2A2A2A',
           borderRadius: '16px',
           padding: '18px 20px',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase' }}>
             p50 Latency (Median)
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 800, color: '#F2F2F5', marginTop: '6px' }}>
+          <div style={{ fontSize: '28px', fontWeight: 800, color: '#FFFFFF', marginTop: '6px' }}>
             {loading ? '...' : `${metrics?.delivery.latency.p50Ms ?? 0} ms`}
           </div>
-          <div style={{ fontSize: '11px', color: '#63636E', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', color: '#737373', marginTop: '4px' }}>
             Typical destination response time
           </div>
         </div>
 
         <div style={{
-          backgroundColor: '#1E1E22',
-          border: '1px solid #3E3E45',
+          backgroundColor: '#161616',
+          border: '1px solid #2A2A2A',
           borderRadius: '16px',
           padding: '18px 20px',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase' }}>
             p95 Latency
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 800, color: '#F2F2F5', marginTop: '6px' }}>
+          <div style={{ fontSize: '28px', fontWeight: 800, color: '#FFFFFF', marginTop: '6px' }}>
             {loading ? '...' : `${metrics?.delivery.latency.p95Ms ?? 0} ms`}
           </div>
-          <div style={{ fontSize: '11px', color: '#63636E', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', color: '#737373', marginTop: '4px' }}>
             95% of attempts completed within
           </div>
         </div>
 
         <div style={{
-          backgroundColor: '#1E1E22',
-          border: '1px solid #3E3E45',
+          backgroundColor: '#161616',
+          border: '1px solid #2A2A2A',
           borderRadius: '16px',
           padding: '18px 20px',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase' }}>
             p99 Latency
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 800, color: '#F2F2F5', marginTop: '6px' }}>
+          <div style={{ fontSize: '28px', fontWeight: 800, color: '#FFFFFF', marginTop: '6px' }}>
             {loading ? '...' : `${metrics?.delivery.latency.p99Ms ?? 0} ms`}
           </div>
-          <div style={{ fontSize: '11px', color: '#63636E', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', color: '#737373', marginTop: '4px' }}>
             Tail latency for slow destinations
           </div>
         </div>
 
         <div style={{
-          backgroundColor: '#1E1E22',
-          border: '1px solid #3E3E45',
+          backgroundColor: '#161616',
+          border: '1px solid #2A2A2A',
           borderRadius: '16px',
           padding: '18px 20px',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase' }}>
             Outbox Lag
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 800, color: '#F2F2F5', marginTop: '6px' }}>
+          <div style={{ fontSize: '28px', fontWeight: 800, color: '#FFFFFF', marginTop: '6px' }}>
             {loading ? '...' : `${metrics?.outbox.oldestPendingLagSeconds ?? 0} s`}
           </div>
-          <div style={{ fontSize: '11px', color: '#63636E', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', color: '#737373', marginTop: '4px' }}>
             Pending backlog: {metrics?.outbox.pendingBacklogCount ?? 0}
           </div>
         </div>
@@ -215,49 +215,49 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
         gap: '14px',
       }}>
         <div style={{
-          backgroundColor: '#1A1A1E',
-          border: '1px solid #2C2C32',
+          backgroundColor: '#161616',
+          border: '1px solid #2A2A2A',
           borderRadius: '16px',
           padding: '16px 18px',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6' }}>Ingested Webhooks</div>
-          <div style={{ fontSize: '22px', fontWeight: 800, color: '#F2F2F5', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3' }}>Ingested Webhooks</div>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: '#FFFFFF', marginTop: '4px' }}>
             {metrics?.ingestion.totalEvents ?? 0}
           </div>
         </div>
 
         <div style={{
-          backgroundColor: '#1A1A1E',
-          border: '1px solid #2C2C32',
+          backgroundColor: '#161616',
+          border: '1px solid #2A2A2A',
           borderRadius: '16px',
           padding: '16px 18px',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6' }}>Delivered Messages</div>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3' }}>Delivered Messages</div>
           <div style={{ fontSize: '22px', fontWeight: 800, color: '#4ade80', marginTop: '4px' }}>
             {metrics?.delivery.successCount ?? 0}
           </div>
         </div>
 
         <div style={{
-          backgroundColor: '#1A1A1E',
-          border: '1px solid #2C2C32',
+          backgroundColor: '#161616',
+          border: '1px solid #2A2A2A',
           borderRadius: '16px',
           padding: '16px 18px',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6' }}>Delivery Success Rate</div>
-          <div style={{ fontSize: '22px', fontWeight: 800, color: '#F2F2F5', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3' }}>Delivery Success Rate</div>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: '#FFFFFF', marginTop: '4px' }}>
             {metrics?.delivery.successRatePercentage ?? 100}%
           </div>
         </div>
 
         <div style={{
-          backgroundColor: '#1A1A1E',
-          border: '1px solid #2C2C32',
+          backgroundColor: '#161616',
+          border: '1px solid #2A2A2A',
           borderRadius: '16px',
           padding: '16px 18px',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#9A9AA6' }}>Dead Letter Messages</div>
-          <div style={{ fontSize: '22px', fontWeight: 800, color: (metrics?.outbox.dlqBacklogCount ?? 0) > 0 ? '#f87171' : '#F2F2F5', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3' }}>Dead Letter Messages</div>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: (metrics?.outbox.dlqBacklogCount ?? 0) > 0 ? '#f87171' : '#FFFFFF', marginTop: '4px' }}>
             {metrics?.outbox.dlqBacklogCount ?? 0}
           </div>
         </div>
@@ -265,8 +265,8 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
 
       {/* Real-time SSE Telemetry Event Console */}
       <div style={{
-        backgroundColor: '#121215',
-        border: '1px solid #2C2C32',
+        backgroundColor: '#0A0A0A',
+        border: '1px solid #2A2A2A',
         borderRadius: '16px',
         padding: '20px',
       }}>
@@ -279,10 +279,10 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
               backgroundColor: streamConnected ? '#10b981' : '#f59e0b',
               boxShadow: streamConnected ? '0 0 8px rgba(16, 185, 129, 0.6)' : 'none',
             }} />
-            <span style={{ fontSize: '13px', fontWeight: 700, color: '#F2F2F5' }}>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: '#FFFFFF' }}>
               Live Telemetry Stream
             </span>
-            <span style={{ fontSize: '11px', color: '#9A9AA6' }}>
+            <span style={{ fontSize: '11px', color: '#A3A3A3' }}>
               ({streamConnected ? 'Connected via Redis Pub/Sub SSE' : 'Connecting...'})
             </span>
           </div>
@@ -292,9 +292,9 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
               onClick={() => setStreamPaused(!streamPaused)}
               style={{
                 padding: '4px 10px',
-                backgroundColor: streamPaused ? '#F2F2F5' : '#232327',
-                color: streamPaused ? '#0E0E10' : '#9A9AA6',
-                border: '1px solid #3E3E45',
+                backgroundColor: streamPaused ? '#FFFFFF' : '#202020',
+                color: streamPaused ? '#000000' : '#A3A3A3',
+                border: '1px solid #2A2A2A',
                 borderRadius: '999px',
                 fontSize: '11px',
                 fontWeight: 600,
@@ -308,8 +308,8 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
               style={{
                 padding: '4px 10px',
                 backgroundColor: 'transparent',
-                color: '#63636E',
-                border: '1px solid #2C2C32',
+                color: '#737373',
+                border: '1px solid #2A2A2A',
                 borderRadius: '999px',
                 fontSize: '11px',
                 cursor: 'pointer',
@@ -323,7 +323,7 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
         {/* Console Log Terminal */}
         <div style={{
           backgroundColor: '#09090B',
-          border: '1px solid #232327',
+          border: '1px solid #202020',
           borderRadius: '10px',
           padding: '14px',
           height: '240px',
@@ -335,13 +335,13 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
           gap: '6px',
         }}>
           {streamEvents.length === 0 ? (
-            <div style={{ color: '#63636E', textAlign: 'center', padding: '40px 0' }}>
+            <div style={{ color: '#737373', textAlign: 'center', padding: '40px 0' }}>
               Listening for live pipeline events (webhooks, HTTP deliveries, workflow steps, DLQ routings)...
             </div>
           ) : (
             streamEvents.map((ev, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', lineHeight: 1.4 }}>
-                <span style={{ color: '#63636E', flexShrink: 0 }}>
+                <span style={{ color: '#737373', flexShrink: 0 }}>
                   {new Date(ev.timestamp).toLocaleTimeString()}
                 </span>
                 <span style={{
@@ -359,21 +359,21 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
                       ? '#2A2035'
                       : ev.type === 'dlq.routed'
                       ? '#2D1E1E'
-                      : '#232327',
+                      : '#202020',
                   color:
                     ev.type === 'webhook.ingested'
                       ? '#4ade80'
                       : ev.type === 'delivery.attempt'
-                      ? '#60a5fa'
+                      ? '#E5E5E5'
                       : ev.type === 'workflow.step'
-                      ? '#c084fc'
+                      ? '#E5E5E5'
                       : ev.type === 'dlq.routed'
                       ? '#f87171'
-                      : '#C9C9D2',
+                      : '#E5E5E5',
                 }}>
                   {ev.type}
                 </span>
-                <span style={{ color: '#C9C9D2', wordBreak: 'break-all' }}>
+                <span style={{ color: '#E5E5E5', wordBreak: 'break-all' }}>
                   {JSON.stringify(ev.payload)}
                 </span>
               </div>
