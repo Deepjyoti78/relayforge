@@ -713,7 +713,51 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
   });
 
   return (
-    <div className="rf-main-content">
+    <div className="rf-main-content" style={{ position: 'relative' }}>
+      {/* Ambient Golden Silk Waves (Matching Reference Image) */}
+      <svg
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: '780px',
+          height: '380px',
+          pointerEvents: 'none',
+          zIndex: 0,
+          opacity: 0.65,
+        }}
+        viewBox="0 0 780 380"
+        fill="none"
+      >
+        <path
+          d="M780 50 C 580 80, 480 220, 260 140 C 140 90, 60 190, 0 240"
+          stroke="url(#ambientGoldWave1)"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M780 90 C 600 120, 490 250, 290 170 C 160 120, 90 210, 30 260"
+          stroke="url(#ambientGoldWave2)"
+          strokeWidth="1"
+        />
+        <path
+          d="M780 20 C 540 50, 420 180, 220 110 C 100 70, 30 160, 0 200"
+          stroke="url(#ambientGoldWave1)"
+          strokeWidth="2"
+          opacity="0.45"
+        />
+        <defs>
+          <linearGradient id="ambientGoldWave1" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#DFC394" stopOpacity="0.5" />
+            <stop offset="50%" stopColor="#C5A059" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#8A6B34" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="ambientGoldWave2" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#F5E4C3" stopOpacity="0.4" />
+            <stop offset="60%" stopColor="#C5A059" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#9A7B44" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+      </svg>
       {/* Eyebrow and Page Title */}
       <div className="rf-header-row">
         <div>

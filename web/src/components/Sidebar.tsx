@@ -81,6 +81,40 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return 'RF';
   };
 
+  const getNavItemStyle = (tab: string) => {
+    const isActive = activeTab === tab;
+    return {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      width: '100%',
+      padding: '9px 14px',
+      borderRadius: '999px',
+      fontSize: '13px',
+      fontWeight: isActive ? 700 : 500,
+      backgroundColor: isActive ? '#F7EFE2' : 'transparent',
+      color: isActive ? '#121214' : '#9A9AA6',
+      border: 'none',
+      cursor: 'pointer',
+      textAlign: 'left' as const,
+      transition: 'all 0.15s ease',
+      boxShadow: isActive ? '0 2px 10px rgba(0, 0, 0, 0.25)' : 'none',
+    };
+  };
+
+  const getBadgeStyle = (tab: string) => {
+    const isActive = activeTab === tab;
+    return {
+      fontSize: '10px',
+      fontWeight: 700,
+      backgroundColor: isActive ? '#E5DAC8' : '#202028',
+      color: isActive ? '#121214' : '#8E8E9B',
+      padding: '2px 7px',
+      borderRadius: '999px',
+      border: isActive ? '1px solid #D8CBB6' : '1px solid #2E2E38',
+    };
+  };
+
   const sidebarContent = (
     <aside style={{
       width: isMobile ? '280px' : (isCollapsed ? '68px' : '260px'),
@@ -97,6 +131,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       zIndex: isMobile ? 100 : 1,
       boxShadow: isMobile ? '0 0 35px rgba(0, 0, 0, 0.7)' : 'none',
       transition: 'transform 0.25s ease-in-out',
+      overflow: 'hidden',
     }}>
       {/* Brand Header */}
       <div style={{
@@ -113,16 +148,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             width: '36px',
             height: '36px',
             borderRadius: '10px',
-            border: '1px solid #3E3E45',
-            backgroundColor: '#0E0E10',
-            color: '#F2F2F5',
+            border: '1px solid #E5DAC8',
+            backgroundColor: '#F7EFE2',
+            color: '#121214',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
             flexShrink: 0,
           }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
             </svg>
           </div>
@@ -211,22 +246,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Overview / Dashboard */}
             <button
               onClick={() => handleTabClick('dashboard')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                width: '100%',
-                padding: '9px 14px',
-                borderRadius: '999px',
-                fontSize: '13px',
-                fontWeight: activeTab === 'dashboard' ? 700 : 500,
-                backgroundColor: activeTab === 'dashboard' ? '#F2F2F5' : 'transparent',
-                color: activeTab === 'dashboard' ? '#0E0E10' : '#9A9AA6',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'all 0.15s ease',
-              }}
+              style={getNavItemStyle('dashboard')}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="3" y="3" width="7" height="7"></rect>
@@ -240,22 +260,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Members Directory */}
             <button
               onClick={() => handleTabClick('members')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                width: '100%',
-                padding: '9px 14px',
-                borderRadius: '999px',
-                fontSize: '13px',
-                fontWeight: activeTab === 'members' ? 700 : 500,
-                backgroundColor: activeTab === 'members' ? '#F2F2F5' : 'transparent',
-                color: activeTab === 'members' ? '#0E0E10' : '#9A9AA6',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'all 0.15s ease',
-              }}
+              style={getNavItemStyle('members')}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -270,20 +275,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={() => handleTabClick('api-keys')}
               style={{
-                display: 'flex',
-                alignItems: 'center',
+                ...getNavItemStyle('api-keys'),
                 justifyContent: 'space-between',
-                width: '100%',
-                padding: '9px 14px',
-                borderRadius: '999px',
-                fontSize: '13px',
-                fontWeight: activeTab === 'api-keys' ? 700 : 500,
-                backgroundColor: activeTab === 'api-keys' ? '#F2F2F5' : 'transparent',
-                color: activeTab === 'api-keys' ? '#0E0E10' : '#9A9AA6',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'all 0.15s ease',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -292,15 +285,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </svg>
                 <span>API Keys</span>
               </div>
-              <span style={{
-                fontSize: '10px',
-                fontWeight: 700,
-                backgroundColor: activeTab === 'api-keys' ? '#232327' : '#232327',
-                color: activeTab === 'api-keys' ? '#F2F2F5' : '#9A9AA6',
-                padding: '2px 7px',
-                borderRadius: '999px',
-                border: '1px solid #3E3E45',
-              }}>
+              <span style={getBadgeStyle('api-keys')}>
                 M3
               </span>
             </button>
@@ -308,22 +293,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Ingestion Endpoints */}
             <button
               onClick={() => handleTabClick('endpoints')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                width: '100%',
-                padding: '9px 14px',
-                borderRadius: '999px',
-                fontSize: '13px',
-                fontWeight: activeTab === 'endpoints' ? 700 : 500,
-                backgroundColor: activeTab === 'endpoints' ? '#F2F2F5' : 'transparent',
-                color: activeTab === 'endpoints' ? '#0E0E10' : '#9A9AA6',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'all 0.15s ease',
-              }}
+              style={getNavItemStyle('endpoints')}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
@@ -336,20 +306,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={() => handleTabClick('destinations')}
               style={{
-                display: 'flex',
-                alignItems: 'center',
+                ...getNavItemStyle('destinations'),
                 justifyContent: 'space-between',
-                width: '100%',
-                padding: '9px 14px',
-                borderRadius: '999px',
-                fontSize: '13px',
-                fontWeight: activeTab === 'destinations' ? 700 : 500,
-                backgroundColor: activeTab === 'destinations' ? '#F2F2F5' : 'transparent',
-                color: activeTab === 'destinations' ? '#0E0E10' : '#9A9AA6',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'all 0.15s ease',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -362,15 +320,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </svg>
                 <span>Destinations</span>
               </div>
-              <span style={{
-                fontSize: '10px',
-                fontWeight: 700,
-                backgroundColor: activeTab === 'destinations' ? '#232327' : '#232327',
-                color: activeTab === 'destinations' ? '#F2F2F5' : '#9A9AA6',
-                padding: '2px 7px',
-                borderRadius: '999px',
-                border: '1px solid #3E3E45',
-              }}>
+              <span style={getBadgeStyle('destinations')}>
                 M3
               </span>
             </button>
@@ -379,20 +329,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={() => handleTabClick('deliveries')}
               style={{
-                display: 'flex',
-                alignItems: 'center',
+                ...getNavItemStyle('deliveries'),
                 justifyContent: 'space-between',
-                width: '100%',
-                padding: '9px 14px',
-                borderRadius: '999px',
-                fontSize: '13px',
-                fontWeight: activeTab === 'deliveries' ? 700 : 500,
-                backgroundColor: activeTab === 'deliveries' ? '#F2F2F5' : 'transparent',
-                color: activeTab === 'deliveries' ? '#0E0E10' : '#9A9AA6',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'all 0.15s ease',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -401,15 +339,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </svg>
                 <span>Delivery History</span>
               </div>
-              <span style={{
-                fontSize: '10px',
-                fontWeight: 700,
-                backgroundColor: activeTab === 'deliveries' ? '#232327' : '#232327',
-                color: activeTab === 'deliveries' ? '#F2F2F5' : '#9A9AA6',
-                padding: '2px 7px',
-                borderRadius: '999px',
-                border: '1px solid #3E3E45',
-              }}>
+              <span style={getBadgeStyle('deliveries')}>
                 M3
               </span>
             </button>
@@ -418,20 +348,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={() => handleTabClick('workflows')}
               style={{
-                display: 'flex',
-                alignItems: 'center',
+                ...getNavItemStyle('workflows'),
                 justifyContent: 'space-between',
-                width: '100%',
-                padding: '9px 14px',
-                borderRadius: '999px',
-                fontSize: '13px',
-                fontWeight: activeTab === 'workflows' ? 700 : 500,
-                backgroundColor: activeTab === 'workflows' ? '#F2F2F5' : 'transparent',
-                color: activeTab === 'workflows' ? '#0E0E10' : '#9A9AA6',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'all 0.15s ease',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -443,15 +361,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </svg>
                 <span>Workflows</span>
               </div>
-              <span style={{
-                fontSize: '10px',
-                fontWeight: 700,
-                backgroundColor: activeTab === 'workflows' ? '#232327' : '#232327',
-                color: activeTab === 'workflows' ? '#F2F2F5' : '#9A9AA6',
-                padding: '2px 7px',
-                borderRadius: '999px',
-                border: '1px solid #3E3E45',
-              }}>
+              <span style={getBadgeStyle('workflows')}>
                 M4
               </span>
             </button>
@@ -460,20 +370,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={() => handleTabClick('metrics')}
               style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
+                ...getNavItemStyle('metrics'),
                 justifyContent: 'space-between',
-                padding: '9px 12px',
-                borderRadius: '999px',
-                fontSize: '13px',
-                fontWeight: activeTab === 'metrics' ? 700 : 500,
-                backgroundColor: activeTab === 'metrics' ? '#F2F2F5' : 'transparent',
-                color: activeTab === 'metrics' ? '#0E0E10' : '#9A9AA6',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'all 0.15s ease',
+                padding: '9px 14px',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -484,15 +383,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </svg>
                 <span>Metrics & Streams</span>
               </div>
-              <span style={{
-                fontSize: '10px',
-                fontWeight: 700,
-                backgroundColor: activeTab === 'metrics' ? '#232327' : '#232327',
-                color: activeTab === 'metrics' ? '#F2F2F5' : '#9A9AA6',
-                padding: '2px 7px',
-                borderRadius: '999px',
-                border: '1px solid #3E3E45',
-              }}>
+              <span style={getBadgeStyle('metrics')}>
                 M5
               </span>
             </button>
@@ -501,20 +392,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={() => handleTabClick('dlq')}
               style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
+                ...getNavItemStyle('dlq'),
                 justifyContent: 'space-between',
-                padding: '9px 12px',
-                borderRadius: '999px',
-                fontSize: '13px',
-                fontWeight: activeTab === 'dlq' ? 700 : 500,
-                backgroundColor: activeTab === 'dlq' ? '#F2F2F5' : 'transparent',
-                color: activeTab === 'dlq' ? '#0E0E10' : '#9A9AA6',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'all 0.15s ease',
+                padding: '9px 14px',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -525,15 +405,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </svg>
                 <span>Dead Letter Queue</span>
               </div>
-              <span style={{
-                fontSize: '10px',
-                fontWeight: 700,
-                backgroundColor: activeTab === 'dlq' ? '#232327' : '#232327',
-                color: activeTab === 'dlq' ? '#F2F2F5' : '#9A9AA6',
-                padding: '2px 7px',
-                borderRadius: '999px',
-                border: '1px solid #3E3E45',
-              }}>
+              <span style={getBadgeStyle('dlq')}>
                 M5
               </span>
             </button>
@@ -741,22 +613,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <button
               onClick={() => handleTabClick('settings')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                width: '100%',
-                padding: '9px 14px',
-                borderRadius: '999px',
-                fontSize: '13px',
-                fontWeight: activeTab === 'settings' ? 700 : 500,
-                backgroundColor: activeTab === 'settings' ? '#F2F2F5' : 'transparent',
-                color: activeTab === 'settings' ? '#0E0E10' : '#9A9AA6',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'all 0.15s ease',
-              }}
+              style={getNavItemStyle('settings')}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="3"></circle>
@@ -855,6 +712,45 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </svg>
         </button>
       </div>
+
+      {/* Ambient Golden Silk Wave - Bottom Left (Matching Reference) */}
+      <svg
+        style={{
+          position: 'absolute',
+          bottom: '50px',
+          left: 0,
+          width: '260px',
+          height: '220px',
+          pointerEvents: 'none',
+          zIndex: 0,
+          opacity: 0.45,
+        }}
+        viewBox="0 0 260 220"
+        fill="none"
+      >
+        <path
+          d="M0 210 C 60 190, 140 120, 260 80"
+          stroke="url(#ambientSidebarGold1)"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M0 230 C 80 205, 160 140, 260 105"
+          stroke="url(#ambientSidebarGold2)"
+          strokeWidth="1"
+        />
+        <defs>
+          <linearGradient id="ambientSidebarGold1" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#DFC394" stopOpacity="0.5" />
+            <stop offset="60%" stopColor="#C5A059" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#8A6B34" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="ambientSidebarGold2" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#F5E4C3" stopOpacity="0.4" />
+            <stop offset="70%" stopColor="#C5A059" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#9A7B44" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+      </svg>
     </aside>
   );
 
