@@ -8,6 +8,6 @@ export default defineConfig({
   migrations: { path: 'prisma/migrations' },
   datasource: {
     // Generation works without a live database; migrations require this variable.
-    url: process.env.MIGRATION_DATABASE_URL ?? '',
+    url: process.env.MIGRATION_DATABASE_URL ?? process.env.DATABASE_URL ?? '',
   },
 });
