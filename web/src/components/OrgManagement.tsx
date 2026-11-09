@@ -714,6 +714,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
   return (
     <div className="rf-main-content" style={{ position: 'relative' }}>
+      <div key={activeTab} className="rf-page-animate" style={{ width: '100%' }}>
       
       {/* Eyebrow and Page Title */}
       <div className="rf-header-row">
@@ -1390,47 +1391,47 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               flex: 1,
             }}
           >
-            <button onClick={() => onTabChange('members')} style={getTabButtonStyle(activeTab === 'members')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('members')} style={getTabButtonStyle(activeTab === 'members')}>
               <span>All Members</span>
               <span style={getTabBadgeStyle(activeTab === 'members')}>{members.length}</span>
             </button>
 
-            <button onClick={() => onTabChange('api-keys')} style={getTabButtonStyle(activeTab === 'api-keys')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('api-keys')} style={getTabButtonStyle(activeTab === 'api-keys')}>
               <span>API Keys</span>
               <span style={getTabBadgeStyle(activeTab === 'api-keys')}>{apiKeys.length}</span>
             </button>
 
-            <button onClick={() => onTabChange('endpoints')} style={getTabButtonStyle(activeTab === 'endpoints')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('endpoints')} style={getTabButtonStyle(activeTab === 'endpoints')}>
               <span>Endpoints</span>
               <span style={getTabBadgeStyle(activeTab === 'endpoints')}>{endpoints.length}</span>
             </button>
 
-            <button onClick={() => onTabChange('destinations')} style={getTabButtonStyle(activeTab === 'destinations')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('destinations')} style={getTabButtonStyle(activeTab === 'destinations')}>
               <span>Destinations</span>
               <span style={getTabBadgeStyle(activeTab === 'destinations')}>{destinations.length}</span>
             </button>
 
-            <button onClick={() => onTabChange('deliveries')} style={getTabButtonStyle(activeTab === 'deliveries')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('deliveries')} style={getTabButtonStyle(activeTab === 'deliveries')}>
               <span>Deliveries</span>
               <span style={getTabBadgeStyle(activeTab === 'deliveries')}>{deliveries.length}</span>
             </button>
 
-            <button onClick={() => onTabChange('workflows')} style={getTabButtonStyle(activeTab === 'workflows')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('workflows')} style={getTabButtonStyle(activeTab === 'workflows')}>
               <span>Workflows (M4)</span>
               <span style={getTabBadgeStyle(activeTab === 'workflows')}>{workflows.length}</span>
             </button>
 
-            <button onClick={() => onTabChange('metrics')} style={getTabButtonStyle(activeTab === 'metrics')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('metrics')} style={getTabButtonStyle(activeTab === 'metrics')}>
               <span>Metrics (M5)</span>
               <span style={getTabBadgeStyle(activeTab === 'metrics')}>0</span>
             </button>
 
-            <button onClick={() => onTabChange('dlq')} style={getTabButtonStyle(activeTab === 'dlq')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('dlq')} style={getTabButtonStyle(activeTab === 'dlq')}>
               <span>Dead Letter Queue (M5)</span>
               <span style={getTabBadgeStyle(activeTab === 'dlq')}>0</span>
             </button>
 
-            <button onClick={() => onTabChange('settings')} style={getTabButtonStyle(activeTab === 'settings')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('settings')} style={getTabButtonStyle(activeTab === 'settings')}>
               <span>Settings</span>
             </button>
           </div>
@@ -3497,6 +3498,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             </div>
           </div>
         )}
+
+      </div>
 
       {/* MODAL: ADD MEMBER */}
       {showAddMemberModal && (

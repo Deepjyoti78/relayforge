@@ -247,6 +247,104 @@
       .rf-sidebar-collapsed {
         width: 68px !important;
       }
+    
+      /* --- Smooth Page Transitions & Micro-Animations --- */
+      @keyframes rfPageEnter {
+        0% {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .rf-page-animate {
+        animation: rfPageEnter 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+        will-change: transform, opacity;
+      }
+
+      /* Global Smooth Button Micro-interactions */
+      button, a[role="button"], .rf-interactive-btn {
+        transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+                    background-color 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+                    color 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+        user-select: none;
+      }
+      button:hover:not(:disabled), a[role="button"]:hover:not(:disabled), .rf-interactive-btn:hover:not(:disabled) {
+        transform: translateY(-1.5px);
+      }
+      button:active:not(:disabled), a[role="button"]:active:not(:disabled), .rf-interactive-btn:active:not(:disabled) {
+        transform: translateY(0px) scale(0.975);
+      }
+
+      /* Smooth Card Hover & Interactions */
+      .rf-card-hover {
+        transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        will-change: transform, box-shadow;
+      }
+      .rf-card-hover:hover {
+        transform: translateY(-3px);
+        border-color: #383838 !important;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important;
+      }
+      .rf-card-hover:active {
+        transform: translateY(-1px) scale(0.995);
+      }
+
+      /* Smooth Filter Pills */
+      .rf-pill-btn {
+        transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+                    background-color 0.18s ease,
+                    color 0.18s ease,
+                    border-color 0.18s ease !important;
+      }
+      .rf-pill-btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.08);
+      }
+      .rf-pill-btn:active {
+        transform: scale(0.96);
+      }
+
+      /* Sidebar Navigation Items */
+      .rf-nav-item {
+        transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      }
+      .rf-nav-item:hover:not(.rf-nav-item-active) {
+        background-color: #161616 !important;
+        color: #FFFFFF !important;
+        transform: translateX(3px);
+      }
+      .rf-nav-item:active {
+        transform: scale(0.97);
+      }
+
+      /* Modals */
+      @keyframes rfModalIn {
+        0% {
+          opacity: 0;
+          transform: scale(0.96) translateY(8px);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      @keyframes rfFadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+      }
+      .rf-modal-animate {
+        animation: rfModalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+      .rf-backdrop-animate {
+        animation: rfFadeIn 0.2s ease both;
+      }
     </style>
   </head>
   <body>

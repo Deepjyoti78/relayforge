@@ -101,7 +101,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       border: 'none',
       cursor: 'pointer',
       textAlign: 'left' as const,
-      transition: 'all 0.15s ease',
+      transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
       boxShadow: isActive ? '0 2px 10px rgba(0, 0, 0, 0.25)' : 'none',
       margin: isCollapsedMode ? '0 auto' : '0',
       flexShrink: 0,
@@ -198,7 +198,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               justifyContent: 'center',
               cursor: 'pointer',
               fontSize: '12px',
-              transition: 'all 0.15s ease',
+              transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
               padding: 0,
               flexShrink: 0,
             }}
@@ -268,6 +268,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Overview / Dashboard */}
             <button
               onClick={() => handleTabClick('dashboard')}
+              className={`rf-nav-item ${activeTab === 'dashboard' ? "rf-nav-item-active" : ""} ${isCollapsedMode ? "rf-nav-collapsed" : ""}`}
               style={getNavItemStyle('dashboard')}
               title="Overview"
             >
@@ -283,6 +284,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Members Directory */}
             <button
               onClick={() => handleTabClick('members')}
+              className={`rf-nav-item ${activeTab === 'members' ? "rf-nav-item-active" : ""} ${isCollapsedMode ? "rf-nav-collapsed" : ""}`}
               style={getNavItemStyle('members')}
               title="Members Directory"
             >
@@ -298,6 +300,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* API Keys */}
             <button
               onClick={() => handleTabClick('api-keys')}
+              className={`rf-nav-item ${activeTab === 'api-keys' ? "rf-nav-item-active" : ""} ${isCollapsedMode ? "rf-nav-collapsed" : ""}`}
               style={{
                 ...getNavItemStyle('api-keys'),
                 justifyContent: isCollapsedMode ? 'center' : 'space-between',
@@ -320,6 +323,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Ingestion Endpoints */}
             <button
               onClick={() => handleTabClick('endpoints')}
+              className={`rf-nav-item ${activeTab === 'endpoints' ? "rf-nav-item-active" : ""} ${isCollapsedMode ? "rf-nav-collapsed" : ""}`}
               style={getNavItemStyle('endpoints')}
               title="Ingestion Endpoints"
             >
@@ -333,6 +337,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Destinations & SSRF Registry (Milestone 3 Option 1) */}
             <button
               onClick={() => handleTabClick('destinations')}
+              className={`rf-nav-item ${activeTab === 'destinations' ? "rf-nav-item-active" : ""} ${isCollapsedMode ? "rf-nav-collapsed" : ""}`}
               style={{
                 ...getNavItemStyle('destinations'),
                 justifyContent: isCollapsedMode ? 'center' : 'space-between',
@@ -359,6 +364,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Deliveries & Outbox Pipeline (Milestone 3 Option 2) */}
             <button
               onClick={() => handleTabClick('deliveries')}
+              className={`rf-nav-item ${activeTab === 'deliveries' ? "rf-nav-item-active" : ""} ${isCollapsedMode ? "rf-nav-collapsed" : ""}`}
               style={{
                 ...getNavItemStyle('deliveries'),
                 justifyContent: isCollapsedMode ? 'center' : 'space-between',
@@ -381,6 +387,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Sequential Workflows Engine (Milestone 4) */}
             <button
               onClick={() => handleTabClick('workflows')}
+              className={`rf-nav-item ${activeTab === 'workflows' ? "rf-nav-item-active" : ""} ${isCollapsedMode ? "rf-nav-collapsed" : ""}`}
               style={{
                 ...getNavItemStyle('workflows'),
                 justifyContent: isCollapsedMode ? 'center' : 'space-between',
@@ -406,6 +413,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Metrics (M5) */}
             <button
               onClick={() => handleTabClick('metrics')}
+              className={`rf-nav-item ${activeTab === 'metrics' ? "rf-nav-item-active" : ""} ${isCollapsedMode ? "rf-nav-collapsed" : ""}`}
               style={{
                 ...getNavItemStyle('metrics'),
                 justifyContent: isCollapsedMode ? 'center' : 'space-between',
@@ -430,6 +438,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Dead Letter Queue (M5) */}
             <button
               onClick={() => handleTabClick('dlq')}
+              className={`rf-nav-item ${activeTab === 'dlq' ? "rf-nav-item-active" : ""} ${isCollapsedMode ? "rf-nav-collapsed" : ""}`}
               style={{
                 ...getNavItemStyle('dlq'),
                 justifyContent: isCollapsedMode ? 'center' : 'space-between',
@@ -603,7 +612,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         color: isSelected ? '#D4AF78' : '#A3A3A3',
                         cursor: 'pointer',
                         margin: '0 auto',
-                        transition: 'all 0.15s ease',
+                        transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                       }}
                     >
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -632,7 +641,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       border: isSelected ? '1px solid #2A2A2A' : '1px solid transparent',
                       cursor: 'pointer',
                       textAlign: 'left',
-                      transition: 'all 0.15s ease',
+                      transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                       boxShadow: isSelected ? '0 2px 10px rgba(0,0,0,0.35)' : 'none',
                     }}
                   >
@@ -694,6 +703,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <button
               onClick={() => handleTabClick('settings')}
+              className={`rf-nav-item ${activeTab === 'settings' ? "rf-nav-item-active" : ""} ${isCollapsedMode ? "rf-nav-collapsed" : ""}`}
               style={getNavItemStyle('settings')}
               title="Settings"
             >
