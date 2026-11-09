@@ -153,3 +153,24 @@ npx prisma migrate deploy
 ```bash
 STAGING_API_URL=https://relayforge-staging-api.onrender.com node scripts/staging-e2e-verify.cjs
 ```
+
+
+---
+
+## 6. Live Staging Acceptance Status
+
+| Component | Target URL | Status | Health Verdict |
+| :--- | :--- | :--- | :--- |
+| **API Web Service** | `https://relayforge-staging-api.onrender.com` | **Live** | HTTP 200 (`/health/ready`, Postgres OK) |
+| **Web Console SPA** | `https://relayforge-staging-web.onrender.com` | **Live** | HTTP 200 (Static CDN) |
+| **Worker Service** | `https://relayforge-staging-worker.onrender.com` | **Provisioned** | Free HTTP Web Service |
+| **Cloud PostgreSQL** | Supabase Session Pooler (`ap-northeast-2`) | **Live** | 12 Migrations Applied |
+| **Cloud Redis** | Upstash TLS Redis (`us-west-2`) | **Live** | TLS `rediss://` Compatible |
+
+**Automated Synthetic Verification Run:**
+```
+[PASSED] API Liveness Probe (/health/live) - {"status":"ok","service":"relayforge-api","version":"1.0.0-staging"}
+[PASSED] API Readiness Probe (/health/ready) - {"status":"ok","checks":{"postgres":"ok"}}
+[PASSED] Direct Session Bypass Prevention (Server-side) - HTTP 401 (expected 401 Unauthorized)
+[PASSED] OAuth PKCE State Generation & Redirect Protection - State nonce generated, external open redirect disallowed
+```
