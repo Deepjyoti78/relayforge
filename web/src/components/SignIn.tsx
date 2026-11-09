@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from '../api.ts';
 import React, { useState } from 'react';
 import brandGraphic from '../assets/brand-graphic.png';
 
@@ -11,7 +12,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
   const [showManualInput, setShowManualInput] = useState(false);
   const isDev = import.meta.env.DEV || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
 
-  const startUrl = `/auth/github/start?redirect_uri=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : '')}`;
+  const apiBase = getApiBaseUrl();
+  const startUrl = `${apiBase}/auth/github/start?redirect_uri=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : '')}`;
 
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +37,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       overflowX: 'hidden',
     }}>
       {/* Top Navbar */}
-      <header style={{
+      <header className="rf-landing-header" style={{
         height: '68px',
         borderBottom: '1px solid #232327',
         padding: '0 32px',
@@ -72,7 +74,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <span style={{
+          <span className="rf-landing-badge" style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '6px',
@@ -267,6 +269,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         >
           <div
             id="signin-modal-container"
+            className="rf-signin-modal"
             onClick={(e) => e.stopPropagation()}
             style={{
               backgroundColor: '#18181B',
@@ -310,7 +313,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </button>
 
             {/* Left Side: Uploaded Image Visual Panel */}
-            <div style={{
+            <div className="rf-signin-modal-graphic" style={{
               flex: '1 1 48%',
               backgroundColor: '#0E0E10',
               borderRight: '1px solid #232327',
@@ -364,7 +367,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </div>
 
             {/* Right Side: Main Content */}
-            <div style={{
+            <div className="rf-signin-modal-content" style={{
               flex: '1 1 52%',
               padding: '44px 36px',
               display: 'flex',

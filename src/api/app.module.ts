@@ -11,6 +11,7 @@ import { IngestionModule } from '../modules/ingestion/ingestion.module';
 import { ObservabilityModule } from '../modules/observability/observability.module';
 import { OrganizationModule } from '../modules/organizations/organization.module';
 import { WorkflowsModule } from '../modules/workflows/workflows.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -26,6 +27,6 @@ import { WorkflowsModule } from '../modules/workflows/workflows.module';
     IngestionModule,
     WorkflowsModule,
   ],
-  controllers: [HealthController],
+  controllers: [AppController, HealthController],
 })
 export class ApiModule {}

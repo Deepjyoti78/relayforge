@@ -51,7 +51,7 @@ export class AuthController {
     const cookieHeader = serializeCookie(this.config.values.sessionCookieName, token, {
       httpOnly: true,
       secure: this.config.values.environment === 'production',
-      sameSite: 'Lax',
+      sameSite: this.config.values.environment === 'production' ? 'None' : 'Lax',
       path: '/',
       maxAge,
       expires: session.expiresAt,
@@ -59,16 +59,14 @@ export class AuthController {
 
     res.setHeader('Set-Cookie', cookieHeader);
 
-    // Pass token in redirect URL ONLY for local development
+    // Pass token in redirect URL for SPAs across subdomains (e.g. onrender.com)
     let destination = redirectUri;
-    if (this.config.values.environment !== 'production') {
-      try {
-        const redirectUrl = new URL(redirectUri);
-        redirectUrl.searchParams.set('token', token);
-        destination = redirectUrl.toString();
-      } catch {
-        destination = redirectUri;
-      }
+    try {
+      const redirectUrl = new URL(redirectUri);
+      redirectUrl.searchParams.set('token', token);
+      destination = redirectUrl.toString();
+    } catch {
+      destination = redirectUri;
     }
 
     res.redirect(302, destination);

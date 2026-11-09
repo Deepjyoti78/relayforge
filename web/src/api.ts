@@ -38,6 +38,20 @@ export function setSessionToken(token: string | null): void {
   }
 }
 
+export function getApiBaseUrl(): string {
+  const envUrl = (import.meta as unknown as { env?: { VITE_API_URL?: string } }).env?.VITE_API_URL;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim()) {
+    return envUrl.trim().replace(/\/+$/, '');
+  }
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host.includes('relayforge-staging-web.onrender.com') || host.includes('onrender.com')) {
+      return 'https://relayforge-staging-api.onrender.com';
+    }
+  }
+  return '';
+}
+
 async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   const token = getSessionToken();
   const headers = new Headers(init?.headers);
@@ -46,7 +60,13 @@ async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Promise<R
     headers.set('Authorization', `Bearer ${token}`);
   }
 
-  const res = await fetch(input, {
+  const baseUrl = getApiBaseUrl();
+  let url = input;
+  if (typeof input === 'string' && input.startsWith('/')) {
+    url = `${baseUrl}${input}`;
+  }
+
+  const res = await fetch(url, {
     ...init,
     credentials: 'include',
     headers,

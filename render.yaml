@@ -93,6 +93,9 @@ services:
     runtime: static
     buildCommand: npm --prefix web ci && npm --prefix web run build
     staticPublishPath: ./web/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://relayforge-staging-api.onrender.com
     headers:
       - path: /*
         name: X-Frame-Options

@@ -201,6 +201,46 @@
       .rf-filter-pills::-webkit-scrollbar {
         display: none;
       }
+    
+      /* Mobile & Touch Responsiveness for Landing & Modal */
+      .rf-landing-header {
+        height: 68px;
+        transition: padding 0.2s ease;
+      }
+      @media (max-width: 640px) {
+        .rf-landing-header {
+          padding: 0 16px !important;
+          height: 60px !important;
+        }
+        .rf-landing-badge {
+          display: none !important;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .rf-signin-modal {
+          flex-direction: column !important;
+          max-width: 94vw !important;
+          max-height: 92vh !important;
+          overflow-y: auto !important;
+          border-radius: 16px !important;
+        }
+        .rf-signin-modal-graphic {
+          display: none !important;
+        }
+        .rf-signin-modal-content {
+          flex: 1 1 100% !important;
+          padding: 28px 20px !important;
+        }
+      }
+
+      /* Mobile touch target minimums */
+      @media (hover: none) and (pointer: coarse), (max-width: 640px) {
+        button, a[role="button"], input[type="button"], input[type="submit"] {
+          min-height: 44px;
+        }
+      }
+
     </style>
   </head>
   <body>

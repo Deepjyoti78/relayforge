@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { fetchMetrics } from '../api.ts';
+import { fetchMetrics, getApiBaseUrl } from '../api.ts';
 import type { RealtimeTelemetryEvent, TelemetryMetrics } from '../types.ts';
 
 interface MetricsDashboardProps {
@@ -39,7 +39,7 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
 
   // Connect to SSE Real-time Telemetry Stream
   useEffect(() => {
-    const sseUrl = `/v1/organizations/${organizationId}/telemetry/events/stream`;
+    const sseUrl = `${getApiBaseUrl()}/v1/organizations/${organizationId}/telemetry/events/stream`;
     const eventSource = new EventSource(sseUrl, { withCredentials: true });
 
     eventSource.onopen = () => {

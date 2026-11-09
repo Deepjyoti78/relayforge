@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  getApiBaseUrl,
   createApiKey,
   createDestination,
   createEndpoint,
@@ -179,7 +180,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
     setSimulatorError(null);
 
     try {
-      const res = await fetch(`/v1/ingest/simulate/${simulatorEndpointId}`, {
+      const res = await fetch(`${getApiBaseUrl()}/v1/ingest/simulate/${simulatorEndpointId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
