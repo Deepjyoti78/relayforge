@@ -414,9 +414,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       {/* 3. TRUSTED TECHNOLOGY SECTION */}
       <section style={{
         width: '100%',
-        maxWidth: '1080px',
+        maxWidth: '1480px',
         margin: 'clamp(36px, 4vw, 56px) auto 24px',
-        padding: '0 clamp(16px, 3vw, 24px)',
+        padding: '0 clamp(24px, 4vw, 56px)',
         boxSizing: 'border-box',
       }}>
         {/* Horizontal Divider Line with Centered Label */}
@@ -541,9 +541,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       {/* 4. MAIN COMPARISON SECTION: RAW EVENTS TO RELIABLE WORKFLOWS */}
       <section id="rf-metrics-section" style={{
         width: '100%',
-        maxWidth: '1080px',
+        maxWidth: '1480px',
         margin: '0 auto',
-        padding: '48px clamp(16px, 3vw, 24px) 64px',
+        padding: '48px clamp(24px, 4vw, 56px) 64px',
         boxSizing: 'border-box',
       }}>
         {/* Centered Introductory Section */}
@@ -618,7 +618,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         <div className="rf-comparison-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-          gap: '24px',
+          gap: '28px',
           maxWidth: '100%',
           margin: '48px auto 0',
           width: '100%',
@@ -629,7 +629,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             backgroundColor: '#141311',
             border: '1px solid rgba(235, 225, 208, 0.1)',
             borderRadius: '20px',
-            padding: '32px 28px',
+            padding: '36px 32px',
             textAlign: 'left',
             display: 'flex',
             flexDirection: 'column',
@@ -652,9 +652,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: '6px',
-                height: '76px',
-                padding: '0 12px',
+                gap: '8px',
+                height: '80px',
+                padding: '0 clamp(16px, 2vw, 24px)',
                 backgroundColor: '#0D0C0B',
                 borderRadius: '12px',
                 border: '1px solid rgba(235, 225, 208, 0.08)',
@@ -664,8 +664,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 {/* Event */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '46px' }}>
                   <div style={{
-                    width: '30px',
-                    height: '30px',
+                    width: '32px',
+                    height: '32px',
                     borderRadius: '8px',
                     backgroundColor: '#1A1917',
                     border: '1px solid rgba(235, 225, 208, 0.08)',
@@ -674,7 +674,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     justifyContent: 'center',
                     color: '#858078',
                   }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                       <polyline points="14 2 14 8 20 8" />
                     </svg>
@@ -687,8 +687,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 {/* Custom Code */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '68px' }}>
                   <div style={{
-                    width: '30px',
-                    height: '30px',
+                    width: '32px',
+                    height: '32px',
                     borderRadius: '8px',
                     backgroundColor: '#1A1917',
                     border: '1px solid rgba(235, 225, 208, 0.08)',
@@ -697,7 +697,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     justifyContent: 'center',
                     color: '#858078',
                   }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="16 18 22 12 16 6" />
                       <polyline points="8 6 2 12 8 18" />
                     </svg>
@@ -710,8 +710,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 {/* Queues */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '46px' }}>
                   <div style={{
-                    width: '30px',
-                    height: '30px',
+                    width: '32px',
+                    height: '32px',
                     borderRadius: '8px',
                     backgroundColor: '#1A1917',
                     border: '1px solid rgba(235, 225, 208, 0.08)',
@@ -720,7 +720,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     justifyContent: 'center',
                     color: '#858078',
                   }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <ellipse cx="12" cy="5" rx="9" ry="3" />
                       <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
                       <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
@@ -734,8 +734,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 {/* Manual Retry */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '68px' }}>
                   <div style={{
-                    width: '30px',
-                    height: '30px',
+                    width: '32px',
+                    height: '32px',
                     borderRadius: '8px',
                     backgroundColor: '#1A1917',
                     border: '1px solid rgba(235, 225, 208, 0.08)',
@@ -744,7 +744,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     justifyContent: 'center',
                     color: '#858078',
                   }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
                     </svg>
                   </div>
@@ -778,7 +778,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             backgroundColor: '#151412',
             border: '1px solid rgba(233, 216, 185, 0.32)',
             borderRadius: '20px',
-            padding: '32px 28px',
+            padding: '36px 32px',
             textAlign: 'left',
             display: 'flex',
             flexDirection: 'column',
@@ -802,9 +802,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: '8px',
-                height: '76px',
-                padding: '0 16px',
+                gap: '12px',
+                height: '80px',
+                padding: '0 clamp(20px, 2.5vw, 36px)',
                 backgroundColor: '#0D0C0B',
                 borderRadius: '12px',
                 border: '1px solid rgba(235, 225, 208, 0.08)',
@@ -814,8 +814,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 {/* Event */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '46px' }}>
                   <div style={{
-                    width: '30px',
-                    height: '30px',
+                    width: '32px',
+                    height: '32px',
                     borderRadius: '8px',
                     backgroundColor: '#1A1917',
                     border: '1px solid rgba(235, 225, 208, 0.08)',
@@ -824,7 +824,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     justifyContent: 'center',
                     color: '#858078',
                   }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                       <polyline points="14 2 14 8 20 8" />
                     </svg>
@@ -843,15 +843,15 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   backgroundColor: '#1C1A17',
                   border: '1px solid #E9D8B9',
                   borderRadius: '10px',
-                  padding: '6px 20px',
+                  padding: '6px 28px',
                   boxShadow: '0 0 16px rgba(233, 216, 185, 0.16)',
                 }}>
                   <div style={{ color: '#E9D8B9', display: 'flex', alignItems: 'center' }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                     </svg>
                   </div>
-                  <span style={{ fontSize: '11px', color: '#F5F0E7', fontWeight: 700, letterSpacing: '0.01em' }}>RelayForge</span>
+                  <span style={{ fontSize: '11.5px', color: '#F5F0E7', fontWeight: 700, letterSpacing: '0.01em' }}>RelayForge</span>
                 </div>
 
                 <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px' }}>→</span>
@@ -859,8 +859,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 {/* Your Systems */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '68px' }}>
                   <div style={{
-                    width: '30px',
-                    height: '30px',
+                    width: '32px',
+                    height: '32px',
                     borderRadius: '8px',
                     backgroundColor: '#1A1917',
                     border: '1px solid rgba(235, 225, 208, 0.08)',
@@ -869,7 +869,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     justifyContent: 'center',
                     color: '#858078',
                   }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <ellipse cx="12" cy="5" rx="9" ry="3" />
                       <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
                       <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
@@ -902,7 +902,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         </div>
 
         {/* Impact Section: Better insights. Bigger impact. */}
-        <div style={{ textAlign: 'center', margin: '80px auto 0', width: '100%', boxSizing: 'border-box' }}>
+        <div style={{ textAlign: 'center', margin: '88px auto 0', width: '100%', boxSizing: 'border-box' }}>
           <h2 style={{
             fontSize: 'clamp(28px, 2.8vw, 38px)',
             fontWeight: 700,
@@ -927,7 +927,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           <div className="rf-impact-metrics-row" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '16px',
+            gap: '20px',
             width: '100%',
           }}>
             {[
@@ -940,15 +940,15 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 backgroundColor: '#141311',
                 border: '1px solid rgba(235, 225, 208, 0.1)',
                 borderRadius: '16px',
-                padding: '22px 20px',
+                padding: '24px 22px',
                 textAlign: 'left',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                height: '112px',
+                height: '118px',
                 boxSizing: 'border-box',
               }}>
-                <div style={{ fontSize: '28px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
+                <div style={{ fontSize: '30px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
                   {metric.value}
                 </div>
                 <div style={{ fontSize: '13px', color: '#858078', fontWeight: 500, lineHeight: 1.4 }}>
@@ -962,14 +962,14 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         {/* Live Demo Section: See RelayForge in Action */}
         <div className="rf-demo-panel" style={{
           width: '100%',
-          margin: '80px auto 0',
+          margin: '88px auto 0',
           backgroundColor: '#141311',
           border: '1px solid rgba(235, 225, 208, 0.12)',
           borderRadius: '24px',
-          padding: '48px 56px',
+          padding: '52px clamp(36px, 4.5vw, 68px)',
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.05fr) minmax(0, 1.15fr)',
-          gap: '32px',
+          gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.25fr)',
+          gap: '40px',
           alignItems: 'center',
           boxSizing: 'border-box',
           position: 'relative',
@@ -1135,9 +1135,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           <div className="rf-footer-grid" style={{
             display: 'grid',
             gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
-            gap: '36px',
+            gap: 'clamp(28px, 3.5vw, 56px)',
             textAlign: 'left',
-            marginBottom: '40px',
+            marginBottom: '44px',
           }}>
             {/* Brand Column */}
             <div>
@@ -1161,7 +1161,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   RELAYFORGE
                 </span>
               </div>
-              <p style={{ fontSize: '13px', color: '#858078', lineHeight: 1.55, marginTop: '14px', maxWidth: '240px' }}>
+              <p style={{ fontSize: '13.5px', color: '#858078', lineHeight: 1.55, marginTop: '14px', maxWidth: '300px' }}>
                 A durable event processing platform for reliable, scalable systems.
               </p>
             </div>
