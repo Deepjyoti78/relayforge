@@ -966,10 +966,10 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           backgroundColor: '#141311',
           border: '1px solid rgba(235, 225, 208, 0.12)',
           borderRadius: '24px',
-          padding: '44px 48px',
+          padding: '48px 56px',
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.15fr) minmax(0, 1fr)',
-          gap: '36px',
+          gridTemplateColumns: 'minmax(0, 1.05fr) minmax(0, 1.15fr)',
+          gap: '32px',
           alignItems: 'center',
           boxSizing: 'border-box',
           position: 'relative',
@@ -980,32 +980,32 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             <div style={{
               fontSize: '11px',
               fontWeight: 700,
-              letterSpacing: '0.08em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: '#858078',
-              marginBottom: '10px',
+              marginBottom: '14px',
             }}>
               SEE IT IN ACTION
             </div>
 
             <h3 style={{
-              fontSize: 'clamp(28px, 2.5vw, 36px)',
-              fontWeight: 700,
-              lineHeight: 1.18,
-              letterSpacing: '-0.02em',
+              fontSize: 'clamp(32px, 3.2vw, 42px)',
+              fontWeight: 800,
+              lineHeight: 1.15,
+              letterSpacing: '-0.025em',
               color: '#F5F0E7',
-              margin: '0 0 16px',
+              margin: '0 0 18px',
             }}>
               See RelayForge<br />
               in action
             </h3>
 
             <p style={{
-              fontSize: '14.5px',
+              fontSize: '15px',
               color: '#B5AEA3',
               lineHeight: 1.6,
-              maxWidth: '420px',
-              margin: '0 0 28px',
+              maxWidth: '430px',
+              margin: '0 0 32px',
             }}>
               Explore a live demo to see how events flow through workflows, retries, and delivery with full visibility.
             </p>
@@ -1016,7 +1016,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#F5F0E7',
+                backgroundColor: '#EFE4D0',
                 color: '#0D0C0B',
                 border: 'none',
                 borderRadius: '999px',
@@ -1024,7 +1024,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 fontSize: '14px',
                 fontWeight: 600,
                 cursor: 'pointer',
-                boxShadow: '0 4px 18px rgba(245, 240, 231, 0.14)',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.25)',
                 transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
               onMouseEnter={(e) => {
@@ -1032,7 +1032,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#F5F0E7';
+                e.currentTarget.style.backgroundColor = '#EFE4D0';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
@@ -1040,57 +1040,95 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </button>
           </div>
 
-          {/* Right Geometric Illustration: 3D Isometric Cube */}
+          {/* Right Geometric Illustration: 3D Isometric Cube Matching Reference */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
-            height: '270px',
+            height: '330px',
             width: '100%',
           }}>
-            <svg width="380" height="270" viewBox="0 0 380 270" fill="none" style={{ maxWidth: '100%', height: 'auto', overflow: 'visible' }}>
+            <svg width="460" height="330" viewBox="0 0 460 330" fill="none" style={{ width: '100%', maxWidth: '460px', height: 'auto', overflow: 'visible' }}>
               <defs>
-                <radialGradient id="rfBoltGlow" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#E9D8B9" stopOpacity="0.45" />
-                  <stop offset="60%" stopColor="#E9D8B9" stopOpacity="0.12" />
+                {/* Radial Glow on Top Surface */}
+                <radialGradient id="rfCubeGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#EFE1C6" stopOpacity="0.45" />
+                  <stop offset="45%" stopColor="#E9D8B9" stopOpacity="0.18" />
                   <stop offset="100%" stopColor="#E9D8B9" stopOpacity="0" />
                 </radialGradient>
               </defs>
 
-              {/* Background Isometric Perspective Floor Lines */}
-              <line x1="30" y1="210" x2="190" y2="260" stroke="rgba(235, 225, 208, 0.08)" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="190" y1="260" x2="350" y2="210" stroke="rgba(235, 225, 208, 0.08)" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="20" y1="50" x2="360" y2="210" stroke="rgba(235, 225, 208, 0.04)" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="20" y1="210" x2="360" y2="50" stroke="rgba(235, 225, 208, 0.04)" strokeWidth="1" strokeDasharray="3 3" />
+              {/* Background Isometric Perspective Floor Grid Lines (Slope = +0.5) */}
+              <line x1="120" y1="0" x2="480" y2="180" stroke="rgba(235, 225, 208, 0.06)" strokeWidth="1" />
+              <line x1="-20" y1="0" x2="480" y2="250" stroke="rgba(235, 225, 208, 0.08)" strokeWidth="1" />
+              <line x1="-20" y1="65" x2="480" y2="315" stroke="rgba(235, 225, 208, 0.08)" strokeWidth="1" />
+              <line x1="-20" y1="130" x2="380" y2="330" stroke="rgba(235, 225, 208, 0.07)" strokeWidth="1" />
+              <line x1="-20" y1="195" x2="250" y2="330" stroke="rgba(235, 225, 208, 0.05)" strokeWidth="1" />
 
-              {/* 3D Isometric Cube / Prism */}
+              {/* Background Isometric Perspective Floor Grid Lines (Slope = -0.5) */}
+              <line x1="-20" y1="180" x2="340" y2="0" stroke="rgba(235, 225, 208, 0.06)" strokeWidth="1" />
+              <line x1="-20" y1="245" x2="480" y2="-5" stroke="rgba(235, 225, 208, 0.08)" strokeWidth="1" />
+              <line x1="-20" y1="310" x2="480" y2="60" stroke="rgba(235, 225, 208, 0.08)" strokeWidth="1" />
+              <line x1="80" y1="330" x2="480" y2="130" stroke="rgba(235, 225, 208, 0.07)" strokeWidth="1" />
+              <line x1="210" y1="330" x2="480" y2="195" stroke="rgba(235, 225, 208, 0.05)" strokeWidth="1" />
+
+              {/* 3D Isometric Cube */}
               {/* Front Left Face */}
-              <polygon points="190,135 85,85 85,185 190,235" fill="#12110F" stroke="rgba(235, 225, 208, 0.2)" strokeWidth="1.2" />
+              <polygon
+                points="100,120 230,185 230,290 100,225"
+                fill="#12110F"
+                stroke="rgba(235, 225, 208, 0.22)"
+                strokeWidth="1.2"
+              />
+
               {/* Front Right Face */}
-              <polygon points="190,135 295,85 295,185 190,235" fill="#0E0D0B" stroke="rgba(235, 225, 208, 0.2)" strokeWidth="1.2" />
-              {/* Top Rhombus Face */}
-              <polygon points="190,35 295,85 190,135 85,85" fill="#171613" stroke="rgba(235, 225, 208, 0.35)" strokeWidth="1.4" />
+              <polygon
+                points="230,185 360,120 360,225 230,290"
+                fill="#0E0D0B"
+                stroke="rgba(235, 225, 208, 0.22)"
+                strokeWidth="1.2"
+              />
 
-              {/* Top Face Isometric Internal Grid Lines */}
-              <line x1="137.5" y1="60" x2="242.5" y2="110" stroke="rgba(235, 225, 208, 0.16)" strokeWidth="1" />
-              <line x1="242.5" y1="60" x2="137.5" y2="110" stroke="rgba(235, 225, 208, 0.16)" strokeWidth="1" />
+              {/* Top Rhombus Face (Glowing Champagne Stroke) */}
+              <polygon
+                points="230,55 360,120 230,185 100,120"
+                fill="#171613"
+                stroke="#EFE1C6"
+                strokeWidth="2"
+                style={{ filter: 'drop-shadow(0 0 8px rgba(239, 225, 198, 0.6))' }}
+              />
 
-              {/* Subtle Center Radial Glow */}
-              <circle cx="190" cy="85" r="56" fill="url(#rfBoltGlow)" />
+              {/* Top Face Isometric Internal Cross Lines (connecting midpoints) */}
+              <line x1="165" y1="87.5" x2="295" y2="152.5" stroke="rgba(239, 225, 198, 0.28)" strokeWidth="1.2" />
+              <line x1="295" y1="87.5" x2="165" y2="152.5" stroke="rgba(239, 225, 198, 0.28)" strokeWidth="1.2" />
 
-              {/* Floating Glowing Lightning Symbol */}
-              <g filter="drop-shadow(0 0 10px rgba(233, 216, 185, 0.75))">
-                <polygon points="194,68 183,87 189,87 186,102 197,83 191,83" fill="#F5E8D0" />
+              {/* Ambient Isometric Radial Glow on Top Surface */}
+              <ellipse cx="230" cy="120" rx="80" ry="40" fill="url(#rfCubeGlow)" />
+
+              {/* Floating Glowing Lightning Symbol (Tilted in 3D Perspective matching Reference) */}
+              <g style={{ filter: 'drop-shadow(0 0 12px rgba(239, 225, 198, 0.95)) drop-shadow(0 0 24px rgba(233, 216, 185, 0.5))' }}>
+                <polygon
+                  points="248,88 225,119 237,119 225,150 250,114 238,114"
+                  fill="#F6EEDF"
+                />
               </g>
             </svg>
           </div>
         </div>
 
+        {/* Full-width Horizontal Divider Line above Footer matching Reference */}
+        <div style={{
+          width: '100%',
+          height: '1px',
+          backgroundColor: 'rgba(235, 225, 208, 0.12)',
+          margin: '64px auto 44px',
+        }} />
+
         {/* Minimal Compact Footer */}
         <footer style={{
           width: '100%',
-          margin: '72px auto 0',
+          margin: '0 auto',
           padding: '0 4px 28px',
           boxSizing: 'border-box',
         }}>
