@@ -18,13 +18,13 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // Live Statistics
-  const [ingestedCount, setIngestedCount] = useState(248320);
-  const [processedCount, setProcessedCount] = useState(246891);
-  const [failedCount, setFailedCount] = useState(1429);
+  const [ingestedCount, setIngestedCount] = useState(248326);
+  const [processedCount, setProcessedCount] = useState(246896);
+  const [failedCount, setFailedCount] = useState(1430);
 
   // Currently highlighted left-side module:
   // 'webhooks' | 'event-sources' | 'workflows' | 'executions' | 'retries' | 'dead-letter' | null
-  const [activeModule, setActiveModule] = useState<string | null>('webhooks');
+  const [activeModule, setActiveModule] = useState<string | null>('executions');
 
   // Pipeline stage: 'idle' | 'receive' | 'process' | 'deliver' | 'deliver-retry-warn' | 'deliver-dlq-warn' | 'deliver-success'
   const [pipelineStage, setPipelineStage] = useState<'idle' | 'receive' | 'process' | 'deliver' | 'deliver-retry-warn' | 'deliver-dlq-warn' | 'deliver-success'>('deliver');
@@ -273,79 +273,55 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
     return () => cancelAnimationFrame(animId);
   }, [prefersReducedMotion]);
 
-  // Coordinate interpolator along paths:
-  // Junction Node is at (32, 172)
-  // Webhooks departs (0, 41) -> (32, 172) -> (44, 172)
-  // Event Sources departs (0, 81) -> (32, 172) -> (44, 172)
-  // Retry routes from (44, 172) -> (32, 172) -> (0, 258)
-  // Dead Letter routes from (44, 172) -> (32, 172) -> (0, 298)
+  // Coordinate interpolator along straight-line orthogonal bus architecture:
+  // Bus line is at x = 24
+  // Main Entry to card is at y = 188
   const getParticleCoords = (type: EventParticle['type'], progress: number) => {
     const t = Math.max(0, Math.min(1, progress));
 
     if (type === 'webhook') {
-      if (t <= 0.7) {
-        const u = t / 0.7;
-        // Cubic bezier: (0, 41) -> (18, 41) -> (32, 110) -> (32, 172)
-        const p0 = { x: 0, y: 41 };
-        const p1 = { x: 18, y: 41 };
-        const p2 = { x: 32, y: 110 };
-        const p3 = { x: 32, y: 172 };
-        const x = (1 - u) ** 3 * p0.x + 3 * (1 - u) ** 2 * u * p1.x + 3 * (1 - u) * u ** 2 * p2.x + u ** 3 * p3.x;
-        const y = (1 - u) ** 3 * p0.y + 3 * (1 - u) ** 2 * u * p1.y + 3 * (1 - u) * u ** 2 * p2.y + u ** 3 * p3.y;
-        return { x, y };
+      if (t <= 0.25) {
+        const u = t / 0.25;
+        return { x: u * 24, y: 44 };
+      } else if (t <= 0.75) {
+        const u = (t - 0.25) / 0.5;
+        return { x: 24, y: 44 + u * (188 - 44) };
       } else {
-        const u = (t - 0.7) / 0.3;
-        const x = 32 + u * 12;
-        const y = 172;
-        return { x, y };
+        const u = (t - 0.75) / 0.25;
+        return { x: 24 + u * 20, y: 188 };
       }
     } else if (type === 'event-source') {
-      if (t <= 0.7) {
-        const u = t / 0.7;
-        const p0 = { x: 0, y: 81 };
-        const p1 = { x: 14, y: 81 };
-        const p2 = { x: 32, y: 125 };
-        const p3 = { x: 32, y: 172 };
-        const x = (1 - u) ** 3 * p0.x + 3 * (1 - u) ** 2 * u * p1.x + 3 * (1 - u) * u ** 2 * p2.x + u ** 3 * p3.x;
-        const y = (1 - u) ** 3 * p0.y + 3 * (1 - u) ** 2 * u * p1.y + 3 * (1 - u) * u ** 2 * p2.y + u ** 3 * p3.y;
-        return { x, y };
+      if (t <= 0.25) {
+        const u = t / 0.25;
+        return { x: u * 24, y: 82 };
+      } else if (t <= 0.75) {
+        const u = (t - 0.25) / 0.5;
+        return { x: 24, y: 82 + u * (188 - 82) };
       } else {
-        const u = (t - 0.7) / 0.3;
-        const x = 32 + u * 12;
-        const y = 172;
-        return { x, y };
+        const u = (t - 0.75) / 0.25;
+        return { x: 24 + u * 20, y: 188 };
       }
     } else if (type === 'retry') {
-      if (t <= 0.35) {
-        const u = t / 0.35;
-        const x = 44 - u * 12;
-        const y = 172;
-        return { x, y };
+      if (t <= 0.25) {
+        const u = t / 0.25;
+        return { x: 44 - u * 20, y: 188 };
+      } else if (t <= 0.75) {
+        const u = (t - 0.25) / 0.5;
+        return { x: 24, y: 188 + u * (256 - 188) };
       } else {
-        const u = (t - 0.35) / 0.65;
-        const p0 = { x: 32, y: 172 };
-        const p1 = { x: 32, y: 215 };
-        const p2 = { x: 16, y: 258 };
-        const p3 = { x: 0, y: 258 };
-        const x = (1 - u) ** 3 * p0.x + 3 * (1 - u) ** 2 * u * p1.x + 3 * (1 - u) * u ** 2 * p2.x + u ** 3 * p3.x;
-        const y = (1 - u) ** 3 * p0.y + 3 * (1 - u) ** 2 * u * p1.y + 3 * (1 - u) * u ** 2 * p2.y + u ** 3 * p3.y;
-        return { x, y };
+        const u = (t - 0.75) / 0.25;
+        return { x: 24 - u * 24, y: 256 };
       }
     } else {
-      if (t <= 0.35) {
-        const u = t / 0.35;
-        const x = 44 - u * 12;
-        const y = 172;
-        return { x, y };
+      if (t <= 0.25) {
+        const u = t / 0.25;
+        return { x: 44 - u * 20, y: 188 };
+      } else if (t <= 0.75) {
+        const u = (t - 0.25) / 0.5;
+        return { x: 24, y: 188 + u * (294 - 188) };
       } else {
-        const u = (t - 0.35) / 0.65;
-        const p0 = { x: 32, y: 172 };
-        const p1 = { x: 32, y: 235 };
-        const p2 = { x: 18, y: 298 };
-        const p3 = { x: 0, y: 298 };
-        const x = (1 - u) ** 3 * p0.x + 3 * (1 - u) ** 2 * u * p1.x + 3 * (1 - u) * u ** 2 * p2.x + u ** 3 * p3.x;
-        const y = (1 - u) ** 3 * p0.y + 3 * (1 - u) ** 2 * u * p1.y + 3 * (1 - u) * u ** 2 * p2.y + u ** 3 * p3.y;
-        return { x, y };
+        const u = (t - 0.75) / 0.25;
+        return { x: 24 - u * 24, y: 294 };
       }
     }
   };
@@ -441,10 +417,10 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
     isAmberAccent = false
   ) => {
     const isActive = activeModule === key;
-    const isWebhooksDefault = key === 'webhooks' && (!activeModule || activeModule === 'webhooks');
+    const isWebhooksActive = key === 'webhooks' && activeModule === 'webhooks';
 
-    // Webhooks resting style is the prominent warm ivory pill
-    if (isWebhooksDefault) {
+    // Webhooks active style is the prominent warm ivory pill
+    if (isWebhooksActive) {
       return (
         <button
           type="button"
@@ -463,8 +439,8 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
             fontWeight: 600,
             cursor: 'pointer',
             marginBottom: '6px',
-            boxShadow: isActive ? '0 0 18px rgba(245, 232, 208, 0.65)' : '0 2px 8px rgba(245, 232, 208, 0.15)',
-            transform: isActive ? 'scale(1.02)' : 'scale(1)',
+            boxShadow: '0 0 18px rgba(245, 232, 208, 0.65)',
+            transform: 'scale(1.02)',
             transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         >
@@ -475,10 +451,11 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
     }
 
     // Dynamic styling when another module participates in the animation
-    const activeBg = isAmberAccent ? 'rgba(245, 158, 11, 0.16)' : 'rgba(235, 225, 208, 0.15)';
-    const activeBorder = isAmberAccent ? '1px solid #F59E0B' : '1px solid #E9D8B9';
+    const isExecutionsActive = key === 'executions' && isActive;
+    const activeBg = isAmberAccent ? 'rgba(245, 158, 11, 0.16)' : isExecutionsActive ? '#161513' : 'rgba(235, 225, 208, 0.15)';
+    const activeBorder = isAmberAccent ? '1px solid #F59E0B' : isExecutionsActive ? '1px solid rgba(235, 225, 208, 0.55)' : '1px solid #E9D8B9';
     const activeColor = isAmberAccent ? '#FDE68A' : '#F5F0E7';
-    const activeShadow = isAmberAccent ? '0 0 16px rgba(245, 158, 11, 0.45)' : '0 0 14px rgba(233, 216, 185, 0.35)';
+    const activeShadow = isAmberAccent ? '0 0 16px rgba(245, 158, 11, 0.45)' : isExecutionsActive ? '0 0 16px rgba(233, 216, 185, 0.3)' : '0 0 14px rgba(233, 216, 185, 0.35)';
 
     return (
       <button
@@ -656,7 +633,7 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
         </div>
 
         {/* ============================================================== */}
-        {/* 2. DASHED CONNECTOR BUS & COORDINATED ROUTING PARTICLES        */}
+        {/* 2. DOTTED CIRCUIT CONNECTOR BUS & EVENT PARTICLES             */}
         {/* ============================================================== */}
         <div style={{
           width: '44px',
@@ -673,56 +650,142 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
             fill="none"
             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
           >
-            {/* Upper Connector Branch from Webhooks to Junction */}
-            <path
-              d="M 0 41 C 18 41, 32 110, 32 172"
+            {/* Main Straight Vertical Dashed Bus Line from Webhooks to Dead Letter */}
+            <line
+              x1="24"
+              y1="44"
+              x2="24"
+              y2="294"
               stroke="rgba(235, 225, 208, 0.28)"
               strokeWidth="1.5"
-              strokeDasharray="3 3"
-              fill="none"
+              strokeDasharray="2.5 2.5"
             />
 
-            {/* Middle Branch from Event Sources to Junction */}
-            <path
-              d="M 0 81 C 14 81, 32 125, 32 172"
-              stroke="rgba(235, 225, 208, 0.18)"
+            {/* Tap 1: Webhooks -> Bus */}
+            <line
+              x1="0"
+              y1="44"
+              x2="24"
+              y2="44"
+              stroke={activeModule === 'webhooks' ? 'rgba(245, 232, 208, 0.65)' : 'rgba(235, 225, 208, 0.22)'}
               strokeWidth="1.5"
-              strokeDasharray="3 3"
-              fill="none"
+              strokeDasharray="2.5 2.5"
             />
 
-            {/* Main Horizontal Entry into Orders Workflow Dashboard */}
-            <path
-              d="M 32 172 L 44 172"
-              stroke="rgba(235, 225, 208, 0.35)"
+            {/* Tap 2: Event Sources -> Bus */}
+            <line
+              x1="0"
+              y1="82"
+              x2="24"
+              y2="82"
+              stroke={activeModule === 'event-sources' ? 'rgba(233, 216, 185, 0.65)' : 'rgba(235, 225, 208, 0.22)'}
               strokeWidth="1.5"
-              strokeDasharray="3 3"
-              fill="none"
+              strokeDasharray="2.5 2.5"
             />
 
-            {/* Lower Connector Branch to Retries */}
-            <path
-              d="M 32 172 C 32 215, 16 258, 0 258"
-              stroke={activeModule === 'retries' ? 'rgba(245, 158, 11, 0.65)' : 'rgba(235, 225, 208, 0.18)'}
+            {/* Tap 3: Workflows -> Bus */}
+            <line
+              x1="0"
+              y1="150"
+              x2="24"
+              y2="150"
+              stroke={activeModule === 'workflows' ? 'rgba(233, 216, 185, 0.65)' : 'rgba(235, 225, 208, 0.22)'}
               strokeWidth="1.5"
-              strokeDasharray="3 3"
-              fill="none"
-              style={{ transition: 'stroke 0.3s ease' }}
+              strokeDasharray="2.5 2.5"
             />
 
-            {/* Lower Connector Branch to Dead Letter Queue */}
-            <path
-              d="M 32 172 C 32 235, 18 298, 0 298"
+            {/* Tap 4: Executions -> Bus -> Orders Workflow Card Entry */}
+            <line
+              x1="0"
+              y1="188"
+              x2="44"
+              y2="188"
+              stroke={activeModule === 'executions' || pipelineStage !== 'idle' ? 'rgba(235, 225, 208, 0.55)' : 'rgba(235, 225, 208, 0.28)'}
+              strokeWidth="1.5"
+              strokeDasharray="2.5 2.5"
+            />
+
+            {/* Tap 5: Bus -> Retries */}
+            <line
+              x1="0"
+              y1="256"
+              x2="24"
+              y2="256"
+              stroke={activeModule === 'retries' ? 'rgba(245, 158, 11, 0.7)' : 'rgba(235, 225, 208, 0.22)'}
+              strokeWidth="1.5"
+              strokeDasharray="2.5 2.5"
+            />
+
+            {/* Tap 6: Bus -> Dead Letter */}
+            <line
+              x1="0"
+              y1="294"
+              x2="24"
+              y2="294"
               stroke={activeModule === 'dead-letter' ? 'rgba(245, 158, 11, 0.7)' : 'rgba(235, 225, 208, 0.22)'}
               strokeWidth="1.5"
-              strokeDasharray="3 3"
-              fill="none"
-              style={{ transition: 'stroke 0.3s ease' }}
+              strokeDasharray="2.5 2.5"
             />
 
-            {/* Central Junction Node with Ambient Pulse */}
-            <circle cx="32" cy="172" r="7" fill="rgba(233, 216, 185, 0.16)" />
-            <circle cx="32" cy="172" r="3.5" fill="#E9D8B9" />
+            {/* Node 1: Webhooks */}
+            {activeModule === 'webhooks' ? (
+              <g>
+                <circle cx="24" cy="44" r="7" fill="rgba(245, 232, 208, 0.2)" />
+                <circle cx="24" cy="44" r="3.5" fill="#F5E8D0" />
+              </g>
+            ) : (
+              <circle cx="24" cy="44" r="2.5" fill="#141311" stroke="rgba(235, 225, 208, 0.45)" strokeWidth="1.2" />
+            )}
+
+            {/* Node 2: Event Sources */}
+            {activeModule === 'event-sources' ? (
+              <g>
+                <circle cx="24" cy="82" r="7" fill="rgba(233, 216, 185, 0.2)" />
+                <circle cx="24" cy="82" r="3.5" fill="#E9D8B9" />
+              </g>
+            ) : (
+              <circle cx="24" cy="82" r="2.5" fill="#141311" stroke="rgba(235, 225, 208, 0.45)" strokeWidth="1.2" />
+            )}
+
+            {/* Node 3: Workflows */}
+            {activeModule === 'workflows' ? (
+              <g>
+                <circle cx="24" cy="150" r="7" fill="rgba(233, 216, 185, 0.2)" />
+                <circle cx="24" cy="150" r="3.5" fill="#E9D8B9" />
+              </g>
+            ) : (
+              <circle cx="24" cy="150" r="2.5" fill="#141311" stroke="rgba(235, 225, 208, 0.45)" strokeWidth="1.2" />
+            )}
+
+            {/* Node 4: Executions / Main Entry (Glowing active junction) */}
+            {activeModule === 'executions' || pipelineStage !== 'idle' ? (
+              <g>
+                <circle cx="24" cy="188" r="9" fill="rgba(233, 216, 185, 0.22)" />
+                <circle cx="24" cy="188" r="4.2" fill="#F5E8D0" />
+              </g>
+            ) : (
+              <circle cx="24" cy="188" r="2.8" fill="#141311" stroke="rgba(235, 225, 208, 0.5)" strokeWidth="1.2" />
+            )}
+
+            {/* Node 5: Retries */}
+            {activeModule === 'retries' ? (
+              <g>
+                <circle cx="24" cy="256" r="7" fill="rgba(245, 158, 11, 0.25)" />
+                <circle cx="24" cy="256" r="3.5" fill="#F59E0B" />
+              </g>
+            ) : (
+              <circle cx="24" cy="256" r="2.5" fill="#141311" stroke="rgba(235, 225, 208, 0.45)" strokeWidth="1.2" />
+            )}
+
+            {/* Node 6: Dead Letter */}
+            {activeModule === 'dead-letter' ? (
+              <g>
+                <circle cx="24" cy="294" r="7" fill="rgba(245, 158, 11, 0.25)" />
+                <circle cx="24" cy="294" r="3.5" fill="#F59E0B" />
+              </g>
+            ) : (
+              <circle cx="24" cy="294" r="2.5" fill="#141311" stroke="rgba(235, 225, 208, 0.45)" strokeWidth="1.2" />
+            )}
 
             {/* Traveling Event Particles */}
             {particles.map(p => {
@@ -937,7 +1000,7 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
             {/* Card 2: Processed */}
             <div style={{
               backgroundColor: '#161513',
-              border: pipelineStage === 'deliver-success' ? '1px solid rgba(163, 230, 53, 0.4)' : '1px solid rgba(235, 225, 208, 0.08)',
+              border: (pipelineStage === 'deliver-success' || pipelineStage === 'deliver') ? '1px solid rgba(132, 204, 22, 0.45)' : '1px solid rgba(235, 225, 208, 0.08)',
               borderRadius: '10px',
               padding: '10px 12px',
               textAlign: 'left',
@@ -949,7 +1012,7 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
               <div style={{
                 fontSize: '18px',
                 fontWeight: 700,
-                color: pipelineStage === 'deliver-success' ? '#A3E635' : '#F5F0E7',
+                color: (pipelineStage === 'deliver-success' || pipelineStage === 'deliver') ? '#84CC16' : '#F5F0E7',
                 marginTop: '4px',
                 lineHeight: 1,
                 transition: 'color 0.2s ease',
@@ -1131,28 +1194,22 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
             <div style={{
               flex: 1,
               backgroundColor:
-                pipelineStage === 'deliver-success'
-                  ? 'rgba(163, 230, 53, 0.14)'
+                pipelineStage === 'deliver-success' || pipelineStage === 'deliver'
+                  ? 'rgba(132, 204, 22, 0.08)'
                   : pipelineStage === 'deliver-retry-warn' || pipelineStage === 'deliver-dlq-warn'
                   ? 'rgba(245, 158, 11, 0.14)'
-                  : pipelineStage === 'deliver'
-                  ? '#161513'
                   : '#161513',
               border:
-                pipelineStage === 'deliver-success'
-                  ? '1px solid #A3E635'
+                pipelineStage === 'deliver-success' || pipelineStage === 'deliver'
+                  ? '1px solid #84CC16'
                   : pipelineStage === 'deliver-retry-warn' || pipelineStage === 'deliver-dlq-warn'
                   ? '1px solid #F59E0B'
-                  : pipelineStage === 'deliver'
-                  ? '1px solid rgba(235, 225, 208, 0.35)'
                   : '1px solid rgba(235, 225, 208, 0.08)',
               boxShadow:
-                pipelineStage === 'deliver-success'
-                  ? '0 0 18px rgba(163, 230, 53, 0.4)'
+                pipelineStage === 'deliver-success' || pipelineStage === 'deliver'
+                  ? '0 0 16px rgba(132, 204, 22, 0.28)'
                   : pipelineStage === 'deliver-retry-warn' || pipelineStage === 'deliver-dlq-warn'
                   ? '0 0 18px rgba(245, 158, 11, 0.4)'
-                  : pipelineStage === 'deliver'
-                  ? '0 0 14px rgba(233, 216, 185, 0.25)'
                   : 'none',
               borderRadius: '10px',
               padding: '10px 8px',
@@ -1165,14 +1222,12 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
             }}>
               <div style={{
                 color:
-                  pipelineStage === 'deliver-success'
-                    ? '#A3E635'
+                  pipelineStage === 'deliver-success' || pipelineStage === 'deliver'
+                    ? '#84CC16'
                     : pipelineStage === 'deliver-retry-warn' || pipelineStage === 'deliver-dlq-warn'
                     ? '#FBBF24'
-                    : pipelineStage === 'deliver'
-                    ? '#F5F0E7'
                     : '#C2BCB2',
-                transform: pipelineStage === 'deliver-success' ? 'scale(1.15)' : 'scale(1)',
+                transform: pipelineStage === 'deliver-success' || pipelineStage === 'deliver' ? 'scale(1.12)' : 'scale(1)',
                 transition: 'transform 0.2s ease, color 0.2s ease',
                 display: 'flex',
                 alignItems: 'center',
@@ -1186,12 +1241,10 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
                 fontSize: '11.5px',
                 fontWeight: pipelineStage === 'deliver' || pipelineStage === 'deliver-success' ? 600 : 500,
                 color:
-                  pipelineStage === 'deliver-success'
-                    ? '#A3E635'
+                  pipelineStage === 'deliver-success' || pipelineStage === 'deliver'
+                    ? '#84CC16'
                     : pipelineStage === 'deliver-retry-warn' || pipelineStage === 'deliver-dlq-warn'
                     ? '#FDE68A'
-                    : pipelineStage === 'deliver'
-                    ? '#F5F0E7'
                     : '#B5AEA3',
               }}>
                 Deliver
