@@ -9,6 +9,7 @@ interface SignInProps {
 
 export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
   const [modalOpen, setModalOpen] = useState(false);
+  const [overviewModalOpen, setOverviewModalOpen] = useState(false);
   const [manualToken, setManualToken] = useState('');
   const [showManualInput, setShowManualInput] = useState(false);
   const isDev = import.meta.env.DEV || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
@@ -537,127 +538,659 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         </div>
       </section>
 
-      {/* 4. VALUE PROPOSITION & METRICS GRID */}
+      {/* 4. MAIN COMPARISON SECTION: RAW EVENTS TO RELIABLE WORKFLOWS */}
       <section id="rf-metrics-section" style={{
         width: '100%',
-        maxWidth: '1480px',
+        maxWidth: '1200px',
         margin: '0 auto',
-        padding: '0 clamp(24px, 4vw, 56px) clamp(64px, 7vw, 96px)',
+        padding: 'clamp(48px, 6vw, 84px) clamp(24px, 4vw, 48px) clamp(64px, 7vw, 96px)',
         boxSizing: 'border-box',
       }}>
-        <div className="rf-value-props-grid" style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 3.4fr)',
-          gap: '44px',
-          alignItems: 'center',
-        }}>
-          {/* Left Title: 3 lines (32–36px) */}
-          <div style={{ textAlign: 'left' }}>
-            <h2 style={{
-              fontSize: 'clamp(28px, 2.5vw, 36px)',
-              fontWeight: 700,
-              lineHeight: 1.15,
-              letterSpacing: '-0.025em',
-              color: '#F5F0E7',
-              margin: 0,
-            }}>
-              <span style={{ display: 'block' }}>Better delivery</span>
-              <span style={{ display: 'block' }}>for event-driven</span>
-              <span style={{ display: 'block' }}>systems</span>
-            </h2>
+        {/* Centered Introductory Section */}
+        <div style={{ textAlign: 'center', margin: '0 auto', maxWidth: '780px', padding: '0 12px' }}>
+          <div style={{
+            fontSize: '11.5px',
+            fontWeight: 700,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: '#B5AEA3',
+            marginBottom: '16px',
+          }}>
+            EVENT PROCESSING PLATFORM
           </div>
 
-          {/* Right 4 Metric Value Cards */}
-          <div className="rf-metric-cards-row" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '18px',
+          <h2 style={{
+            fontSize: 'clamp(34px, 3.8vw, 52px)',
+            fontWeight: 800,
+            lineHeight: 1.15,
+            letterSpacing: '-0.025em',
+            color: '#F5F0E7',
+            margin: '0 0 20px',
           }}>
-            {/* Card 1: 8–12× */}
-            <div className="rf-card-hover" style={{
-              backgroundColor: '#151412',
-              border: '1px solid rgba(235, 225, 208, 0.12)',
-              borderRadius: '16px',
-              padding: '30px 24px',
-              textAlign: 'left',
-              minHeight: '144px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              boxSizing: 'border-box',
+            Go from &ldquo;Raw events&rdquo; to<br />
+            &ldquo;Reliable workflows&rdquo;
+          </h2>
+
+          <p style={{
+            fontSize: 'clamp(15px, 1.2vw, 17px)',
+            color: '#B5AEA3',
+            lineHeight: 1.6,
+            maxWidth: '620px',
+            margin: '0 auto 32px',
+          }}>
+            Ingest, process, and deliver events at scale with durable workflows, intelligent retries, and reliable delivery.
+          </p>
+
+          <button
+            onClick={() => setOverviewModalOpen(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              backgroundColor: '#F5F0E7',
+              color: '#0D0C0B',
+              border: 'none',
+              borderRadius: '999px',
+              padding: '12px 26px',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              boxShadow: '0 4px 20px rgba(245, 240, 231, 0.16)',
+              transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#FFFFFF';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#F5F0E7';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <span>Watch a 90s Overview</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </button>
+        </div>
+
+        {/* Side-by-Side Comparison Panels */}
+        <div className="rf-comparison-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+          gap: '24px',
+          maxWidth: '1060px',
+          margin: '52px auto 0',
+          width: '100%',
+          boxSizing: 'border-box',
+        }}>
+          {/* Left Panel: The usual approach */}
+          <div style={{
+            backgroundColor: '#141311',
+            border: '1px solid rgba(235, 225, 208, 0.1)',
+            borderRadius: '20px',
+            padding: '36px 32px',
+            textAlign: 'left',
+            display: 'flex',
+            flexDirection: 'column',
+          }}>
+            <h3 style={{
+              fontSize: '18px',
+              fontWeight: 600,
+              color: '#F5F0E7',
+              margin: '0 0 24px',
+              letterSpacing: '-0.01em',
             }}>
-              <div style={{ fontSize: '34px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
-                8–12×
+              The usual approach
+            </h3>
+
+            {/* Horizontal flow: Event → Custom Code → Queues → Manual Retry */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '6px',
+              padding: '16px 12px',
+              backgroundColor: '#0D0C0B',
+              borderRadius: '12px',
+              border: '1px solid rgba(235, 225, 208, 0.06)',
+              marginBottom: '32px',
+            }}>
+              {/* Event */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', minWidth: '50px' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  backgroundColor: '#1A1917',
+                  border: '1px solid rgba(235, 225, 208, 0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#858078',
+                }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                </div>
+                <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 500 }}>Event</span>
               </div>
-              <div style={{ fontSize: '13.5px', color: '#858078', marginTop: '14px', lineHeight: 1.45, fontWeight: 500 }}>
-                Higher processing reliability
+
+              <span style={{ color: 'rgba(235, 225, 208, 0.25)', fontSize: '13px' }}>→</span>
+
+              {/* Custom Code */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', minWidth: '68px' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  backgroundColor: '#1A1917',
+                  border: '1px solid rgba(235, 225, 208, 0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#858078',
+                }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="16 18 22 12 16 6" />
+                    <polyline points="8 6 2 12 8 18" />
+                  </svg>
+                </div>
+                <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 500, whiteSpace: 'nowrap' }}>Custom Code</span>
+              </div>
+
+              <span style={{ color: 'rgba(235, 225, 208, 0.25)', fontSize: '13px' }}>→</span>
+
+              {/* Queues */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', minWidth: '50px' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  backgroundColor: '#1A1917',
+                  border: '1px solid rgba(235, 225, 208, 0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#858078',
+                }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <ellipse cx="12" cy="5" rx="9" ry="3" />
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                  </svg>
+                </div>
+                <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 500 }}>Queues</span>
+              </div>
+
+              <span style={{ color: 'rgba(235, 225, 208, 0.25)', fontSize: '13px' }}>→</span>
+
+              {/* Manual Retry */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', minWidth: '68px' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  backgroundColor: '#1A1917',
+                  border: '1px solid rgba(235, 225, 208, 0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#858078',
+                }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="9" />
+                  </svg>
+                </div>
+                <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 500, whiteSpace: 'nowrap' }}>Manual Retry</span>
               </div>
             </div>
 
-            {/* Card 2: < 300 ms */}
-            <div className="rf-card-hover" style={{
-              backgroundColor: '#151412',
-              border: '1px solid rgba(235, 225, 208, 0.12)',
-              borderRadius: '16px',
-              padding: '30px 24px',
-              textAlign: 'left',
-              minHeight: '144px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              boxSizing: 'border-box',
+            {/* 4 Problems */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {[
+                'Build and maintain the infrastructure yourself',
+                'Handle retries and failures manually',
+                'Limited visibility into event processing',
+                'Difficult to scale and maintain reliability',
+              ].map((text, idx) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <div style={{ color: '#E06C55', fontSize: '14px', lineHeight: '20px', fontWeight: 700, flexShrink: 0 }}>
+                    ✕
+                  </div>
+                  <span style={{ fontSize: '13.5px', color: '#B5AEA3', lineHeight: '20px' }}>
+                    {text}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Panel: With RelayForge */}
+          <div style={{
+            backgroundColor: '#151412',
+            border: '1px solid rgba(233, 216, 185, 0.35)',
+            borderRadius: '20px',
+            padding: '36px 32px',
+            textAlign: 'left',
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45), 0 0 20px rgba(233, 216, 185, 0.06)',
+            position: 'relative',
+          }}>
+            <h3 style={{
+              fontSize: '18px',
+              fontWeight: 600,
+              color: '#F5F0E7',
+              margin: '0 0 24px',
+              letterSpacing: '-0.01em',
             }}>
-              <div style={{ fontSize: '34px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
-                &lt; 300 ms
+              With RelayForge
+            </h3>
+
+            {/* Horizontal flow: Event → RelayForge → Your Systems */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '8px',
+              padding: '16px 14px',
+              backgroundColor: '#0D0C0B',
+              borderRadius: '12px',
+              border: '1px solid rgba(235, 225, 208, 0.08)',
+              marginBottom: '32px',
+            }}>
+              {/* Event */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', minWidth: '54px' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  backgroundColor: '#1A1917',
+                  border: '1px solid rgba(235, 225, 208, 0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#858078',
+                }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                </div>
+                <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 500 }}>Event</span>
               </div>
-              <div style={{ fontSize: '13.5px', color: '#858078', marginTop: '14px', lineHeight: 1.45, fontWeight: 500 }}>
-                P99 pipeline latency
+
+              <span style={{ color: 'rgba(235, 225, 208, 0.25)', fontSize: '13px' }}>→</span>
+
+              {/* RelayForge (Central Highlighted Element) */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '6px',
+                backgroundColor: '#1C1A17',
+                border: '1px solid #E9D8B9',
+                borderRadius: '10px',
+                padding: '6px 18px',
+                boxShadow: '0 0 16px rgba(233, 216, 185, 0.16)',
+              }}>
+                <div style={{ color: '#E9D8B9', display: 'flex', alignItems: 'center' }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                </div>
+                <span style={{ fontSize: '11px', color: '#F5F0E7', fontWeight: 700, letterSpacing: '0.01em' }}>RelayForge</span>
+              </div>
+
+              <span style={{ color: 'rgba(235, 225, 208, 0.25)', fontSize: '13px' }}>→</span>
+
+              {/* Your Systems */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', minWidth: '68px' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  backgroundColor: '#1A1917',
+                  border: '1px solid rgba(235, 225, 208, 0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#858078',
+                }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <ellipse cx="12" cy="5" rx="9" ry="3" />
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                  </svg>
+                </div>
+                <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 500, whiteSpace: 'nowrap' }}>Your Systems</span>
               </div>
             </div>
 
-            {/* Card 3: 99.9% */}
-            <div className="rf-card-hover" style={{
-              backgroundColor: '#151412',
-              border: '1px solid rgba(235, 225, 208, 0.12)',
-              borderRadius: '16px',
-              padding: '30px 24px',
-              textAlign: 'left',
-              minHeight: '144px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              boxSizing: 'border-box',
-            }}>
-              <div style={{ fontSize: '34px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
-                99.9%
-              </div>
-              <div style={{ fontSize: '13.5px', color: '#858078', marginTop: '14px', lineHeight: 1.45, fontWeight: 500 }}>
-                At-least-once delivery
-              </div>
-            </div>
-
-            {/* Card 4: 0 */}
-            <div className="rf-card-hover" style={{
-              backgroundColor: '#151412',
-              border: '1px solid rgba(235, 225, 208, 0.12)',
-              borderRadius: '16px',
-              padding: '30px 24px',
-              textAlign: 'left',
-              minHeight: '144px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              boxSizing: 'border-box',
-            }}>
-              <div style={{ fontSize: '34px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
-                0
-              </div>
-              <div style={{ fontSize: '13.5px', color: '#858078', marginTop: '14px', lineHeight: 1.45, fontWeight: 500 }}>
-                Event loss under retries
-              </div>
+            {/* 4 Advantages */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {[
+                'Durable multi-step workflows',
+                'Built-in retries and dead-letter handling',
+                'End-to-end visibility and telemetry',
+                'Reliable processing at scale',
+              ].map((text, idx) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <div style={{ color: '#A3E635', fontSize: '14px', lineHeight: '20px', fontWeight: 700, flexShrink: 0 }}>
+                    ✓
+                  </div>
+                  <span style={{ fontSize: '13.5px', color: '#F5F0E7', fontWeight: 500, lineHeight: '20px' }}>
+                    {text}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
+
+        {/* Impact Section: Better insights. Bigger impact. */}
+        <div style={{ textAlign: 'center', margin: '76px auto 0', maxWidth: '1060px', width: '100%', boxSizing: 'border-box' }}>
+          <h2 style={{
+            fontSize: 'clamp(28px, 3vw, 40px)',
+            fontWeight: 700,
+            letterSpacing: '-0.02em',
+            color: '#F5F0E7',
+            margin: '0 0 14px',
+          }}>
+            Better insights. Bigger impact.
+          </h2>
+
+          <p style={{
+            fontSize: '15.5px',
+            color: '#B5AEA3',
+            lineHeight: 1.6,
+            maxWidth: '600px',
+            margin: '0 auto 40px',
+          }}>
+            RelayForge provides the reliability and visibility needed to turn incoming events into dependable business operations.
+          </p>
+
+          {/* 4 Metric Blocks */}
+          <div className="rf-impact-metrics-row" style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '16px',
+            width: '100%',
+          }}>
+            {[
+              { value: '8–12×', label: 'Higher processing reliability' },
+              { value: '< 300 ms', label: 'P99 pipeline latency' },
+              { value: '99.9%', label: 'At-least-once delivery' },
+              { value: '0', label: 'Event loss under retries' },
+            ].map((metric, idx) => (
+              <div key={idx} style={{
+                backgroundColor: '#151412',
+                border: '1px solid rgba(235, 225, 208, 0.1)',
+                borderRadius: '16px',
+                padding: '24px 20px',
+                textAlign: 'left',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                minHeight: '124px',
+                boxSizing: 'border-box',
+              }}>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
+                  {metric.value}
+                </div>
+                <div style={{ fontSize: '13px', color: '#858078', fontWeight: 500, lineHeight: 1.45, marginTop: '12px' }}>
+                  {metric.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Live Demo Section: See RelayForge in Action */}
+        <div className="rf-demo-panel" style={{
+          maxWidth: '1060px',
+          margin: '72px auto 0',
+          width: '100%',
+          backgroundColor: '#141311',
+          border: '1px solid rgba(235, 225, 208, 0.12)',
+          borderRadius: '24px',
+          padding: '44px 48px',
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1.15fr) minmax(0, 1fr)',
+          gap: '36px',
+          alignItems: 'center',
+          boxSizing: 'border-box',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Left Content */}
+          <div style={{ textAlign: 'left', zIndex: 2 }}>
+            <div style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: '#858078',
+              marginBottom: '10px',
+            }}>
+              SEE IT IN ACTION
+            </div>
+
+            <h3 style={{
+              fontSize: 'clamp(28px, 2.5vw, 36px)',
+              fontWeight: 700,
+              lineHeight: 1.18,
+              letterSpacing: '-0.02em',
+              color: '#F5F0E7',
+              margin: '0 0 16px',
+            }}>
+              See RelayForge in action
+            </h3>
+
+            <p style={{
+              fontSize: '14.5px',
+              color: '#B5AEA3',
+              lineHeight: 1.6,
+              maxWidth: '420px',
+              margin: '0 0 28px',
+            }}>
+              Explore how events flow through ingestion, execution, retries, and delivery with complete visibility.
+            </p>
+
+            <button
+              onClick={() => setModalOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#F5F0E7',
+                color: '#0D0C0B',
+                border: 'none',
+                borderRadius: '999px',
+                padding: '12px 28px',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                boxShadow: '0 4px 18px rgba(245, 240, 231, 0.14)',
+                transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#FFFFFF';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#F5F0E7';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              Get Demo
+            </button>
+          </div>
+
+          {/* Right Geometric Illustration */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            height: '240px',
+            width: '100%',
+          }}>
+            <svg width="340" height="240" viewBox="0 0 340 240" fill="none" style={{ maxWidth: '100%', height: 'auto', overflow: 'visible' }}>
+              <defs>
+                <radialGradient id="rfBoltGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#E9D8B9" stopOpacity="0.5" />
+                  <stop offset="50%" stopColor="#E9D8B9" stopOpacity="0.15" />
+                  <stop offset="100%" stopColor="#E9D8B9" stopOpacity="0" />
+                </radialGradient>
+              </defs>
+
+              {/* Background Isometric Floor Grid Lines */}
+              <line x1="20" y1="180" x2="170" y2="240" stroke="rgba(235, 225, 208, 0.06)" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="170" y1="240" x2="320" y2="180" stroke="rgba(235, 225, 208, 0.06)" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="50" y1="70" x2="290" y2="170" stroke="rgba(235, 225, 208, 0.04)" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="50" y1="170" x2="290" y2="70" stroke="rgba(235, 225, 208, 0.04)" strokeWidth="1" strokeDasharray="3 3" />
+
+              {/* 3D Isometric Cube / Prism */}
+              {/* Front Left Face */}
+              <polygon points="170,120 70,75 70,165 170,210" fill="#12110F" stroke="rgba(235, 225, 208, 0.2)" strokeWidth="1.2" />
+              {/* Front Right Face */}
+              <polygon points="170,120 270,75 270,165 170,210" fill="#0F0E0C" stroke="rgba(235, 225, 208, 0.2)" strokeWidth="1.2" />
+              {/* Top Rhombus Face */}
+              <polygon points="170,30 270,75 170,120 70,75" fill="#181714" stroke="rgba(235, 225, 208, 0.35)" strokeWidth="1.5" />
+
+              {/* Top Face Isometric Grid Lines */}
+              <line x1="120" y1="52.5" x2="220" y2="97.5" stroke="rgba(235, 225, 208, 0.15)" strokeWidth="1" />
+              <line x1="120" y1="97.5" x2="220" y2="52.5" stroke="rgba(235, 225, 208, 0.15)" strokeWidth="1" />
+
+              {/* Floating Radial Glow */}
+              <circle cx="170" cy="75" r="48" fill="url(#rfBoltGlow)" />
+
+              {/* Glowing Floating Lightning Symbol */}
+              <g filter="drop-shadow(0 0 12px rgba(233, 216, 185, 0.8))">
+                <polygon points="174,58 163,77 169,77 166,92 177,73 171,73" fill="#E9D8B9" />
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        {/* Minimal Compact Footer */}
+        <footer style={{
+          width: '100%',
+          maxWidth: '1060px',
+          margin: '96px auto 0',
+          padding: '0 12px 12px',
+          boxSizing: 'border-box',
+        }}>
+          <div className="rf-footer-grid" style={{
+            display: 'grid',
+            gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
+            gap: '36px',
+            textAlign: 'left',
+            marginBottom: '44px',
+          }}>
+            {/* Brand Column */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '8px',
+                  backgroundColor: '#F5F0E7',
+                  color: '#0D0C0B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                </div>
+                <span style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '0.02em', color: '#F5F0E7' }}>
+                  RELAYFORGE
+                </span>
+              </div>
+              <p style={{ fontSize: '13px', color: '#858078', lineHeight: 1.55, marginTop: '14px', maxWidth: '240px' }}>
+                A durable event processing platform for reliable, scalable systems.
+              </p>
+            </div>
+
+            {/* Product Column */}
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px' }}>
+                Product
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
+                <a href="#rf-metrics-section" style={{ color: '#858078', textDecoration: 'none', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Features</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Integrations</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Changelog</a>
+              </div>
+            </div>
+
+            {/* Solutions Column */}
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px' }}>
+                Solutions
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Order Processing</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Notifications</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Data Sync</a>
+              </div>
+            </div>
+
+            {/* Resources Column */}
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px' }}>
+                Resources
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
+                <a href="https://github.com" target="_blank" rel="noreferrer" style={{ color: '#858078', textDecoration: 'none', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Docs</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Guides</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>API Reference</a>
+              </div>
+            </div>
+
+            {/* Company Column */}
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px' }}>
+                Company
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>About</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Pricing</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Contact</a>
+              </div>
+            </div>
+          </div>
+
+          {/* Divider & Copyright */}
+          <div style={{
+            borderTop: '1px solid rgba(235, 225, 208, 0.08)',
+            paddingTop: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '16px',
+            fontSize: '12px',
+            color: '#666159',
+          }}>
+            <div>
+              &copy; {new Date().getFullYear()} RelayForge. All rights reserved.
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <span style={{ cursor: 'pointer' }} onClick={() => setModalOpen(true)}>Privacy Policy</span>
+              <span>•</span>
+              <span style={{ cursor: 'pointer' }} onClick={() => setModalOpen(true)}>Terms of Service</span>
+              <span>•</span>
+              <span style={{ cursor: 'pointer' }} onClick={() => setModalOpen(true)}>System Status</span>
+            </div>
+          </div>
+        </footer>
       </section>
 
       {/* 5. SPLIT-PANE SIGN-IN MODAL (AUTHENTICATION PORTAL) */}
@@ -938,6 +1471,136 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         </div>
       )}
 
+      {/* 6. 90s ARCHITECTURE OVERVIEW MODAL */}
+      {overviewModalOpen && (
+        <div
+          onClick={() => setOverviewModalOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(13, 12, 11, 0.88)',
+            backdropFilter: 'blur(12px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            zIndex: 1000,
+            animation: 'fadeIn 0.2s ease',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#151412',
+              border: '1px solid rgba(235, 225, 208, 0.16)',
+              borderRadius: '20px',
+              maxWidth: '660px',
+              width: '100%',
+              padding: '36px 32px',
+              boxShadow: '0 28px 72px rgba(0, 0, 0, 0.85)',
+              position: 'relative',
+              textAlign: 'left',
+            }}
+          >
+            <button
+              onClick={() => setOverviewModalOpen(false)}
+              aria-label="Close overview"
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                backgroundColor: 'rgba(235, 225, 208, 0.08)',
+                border: '1px solid rgba(235, 225, 208, 0.16)',
+                color: '#B5AEA3',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontSize: '18px',
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#F5F0E7';
+                e.currentTarget.style.backgroundColor = 'rgba(235, 225, 208, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#B5AEA3';
+                e.currentTarget.style.backgroundColor = 'rgba(235, 225, 208, 0.08)';
+              }}
+            >
+              ×
+            </button>
+
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '11px',
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              color: '#E9D8B9',
+              textTransform: 'uppercase',
+              marginBottom: '12px',
+            }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#E9D8B9' }}></span>
+              SYSTEM ARCHITECTURE WALKTHROUGH
+            </div>
+
+            <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#F5F0E7', margin: '0 0 10px', letterSpacing: '-0.02em' }}>
+              RelayForge in 90 Seconds
+            </h3>
+
+            <p style={{ fontSize: '13.5px', color: '#B5AEA3', lineHeight: 1.6, margin: '0 0 24px' }}>
+              How RelayForge eliminates event loss, prevents cascading outages, and delivers deterministic event-driven workflows.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '28px' }}>
+              <div style={{ backgroundColor: '#100F0D', border: '1px solid rgba(235, 225, 208, 0.08)', borderRadius: '12px', padding: '14px 16px', display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                <div style={{ backgroundColor: 'rgba(233, 216, 185, 0.12)', color: '#E9D8B9', borderRadius: '8px', padding: '4px 8px', fontSize: '11.5px', fontWeight: 700, flexShrink: 0 }}>01</div>
+                <div>
+                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#F5F0E7' }}>Sub-millisecond Ingestion Persistence</div>
+                  <div style={{ fontSize: '12.5px', color: '#858078', marginTop: '2px', lineHeight: 1.45 }}>Payloads land in transactional PostgreSQL outboxes before network ACK, preventing data loss under burst spikes.</div>
+                </div>
+              </div>
+
+              <div style={{ backgroundColor: '#100F0D', border: '1px solid rgba(235, 225, 208, 0.08)', borderRadius: '12px', padding: '14px 16px', display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                <div style={{ backgroundColor: 'rgba(233, 216, 185, 0.12)', color: '#E9D8B9', borderRadius: '8px', padding: '4px 8px', fontSize: '11.5px', fontWeight: 700, flexShrink: 0 }}>02</div>
+                <div>
+                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#F5F0E7' }}>Isolated Multi-Step Orchestration</div>
+                  <div style={{ fontSize: '12.5px', color: '#858078', marginTop: '2px', lineHeight: 1.45 }}>Sequential pipeline steps execute with tenant sandboxing, token leasing, and zero cross-tenant contamination.</div>
+                </div>
+              </div>
+
+              <div style={{ backgroundColor: '#100F0D', border: '1px solid rgba(235, 225, 208, 0.08)', borderRadius: '12px', padding: '14px 16px', display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                <div style={{ backgroundColor: 'rgba(233, 216, 185, 0.12)', color: '#E9D8B9', borderRadius: '8px', padding: '4px 8px', fontSize: '11.5px', fontWeight: 700, flexShrink: 0 }}>03</div>
+                <div>
+                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#F5F0E7' }}>Jittered Retries &amp; DLQ Circuit Breakers</div>
+                  <div style={{ fontSize: '12.5px', color: '#858078', marginTop: '2px', lineHeight: 1.45 }}>Exhausted deliveries divert safely into Dead Letter Queues with manual replay inspection, zero message drops.</div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setOverviewModalOpen(false)}
+                style={{ backgroundColor: 'transparent', border: '1px solid rgba(235, 225, 208, 0.16)', color: '#B5AEA3', borderRadius: '999px', padding: '10px 20px', fontSize: '13px', cursor: 'pointer' }}
+              >
+                Close
+              </button>
+              <button
+                onClick={() => { setOverviewModalOpen(false); setModalOpen(true); }}
+                style={{ backgroundColor: '#F5F0E7', color: '#0D0C0B', border: 'none', borderRadius: '999px', padding: '10px 22px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+              >
+                Open Developer Console
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Responsive Styles for Landing Page */}
       <style>{`
         @keyframes fadeIn {
@@ -952,16 +1615,27 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           .rf-landing-nav-center {
             display: none !important;
           }
-          .rf-value-props-grid {
-            grid-template-columns: 1fr !important;
-            gap: 32px !important;
-          }
-          .rf-metric-cards-row {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
           .rf-landing-logos {
             justifyContent: center !important;
             gap: 36px !important;
+          }
+        }
+        @media (max-width: 900px) {
+          .rf-comparison-grid {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+          }
+          .rf-impact-metrics-row {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .rf-demo-panel {
+            grid-template-columns: 1fr !important;
+            padding: 36px 28px !important;
+            text-align: center !important;
+          }
+          .rf-footer-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 32px !important;
           }
         }
         @media (max-width: 640px) {
@@ -971,8 +1645,12 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           .rf-landing-badge {
             display: none !important;
           }
-          .rf-metric-cards-row {
+          .rf-impact-metrics-row {
             grid-template-columns: 1fr !important;
+          }
+          .rf-footer-grid {
+            grid-template-columns: 1fr !important;
+            gap: 28px !important;
           }
           .rf-headline-line-1, .rf-headline-line-2 {
             white-space: normal !important;
