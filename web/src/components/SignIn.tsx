@@ -38,11 +38,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       overflowX: 'hidden',
       fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     }}>
-      {/* 1. TOP NAVBAR (MATCHING REFERENCE IMAGE) */}
+      {/* 1. TOP NAVBAR (MATCHING REFERENCE IMAGE 2) */}
       <header className="rf-landing-header" style={{
-        height: '74px',
-        borderBottom: '1px solid #18181D',
-        padding: '0 44px',
+        height: '66px',
+        borderBottom: '1px solid #141418',
+        padding: '0 40px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -247,18 +247,18 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         </div>
       </header>
 
-      {/* 2. HERO SPLIT SECTION (EXACTLY MATCHING IMAGE 1) */}
+      {/* 2. HERO SPLIT SECTION (EXACTLY MATCHING IMAGE 2) */}
       <section style={{
-        maxWidth: '1360px',
+        maxWidth: '1280px',
         margin: '0 auto',
-        padding: '54px 44px 44px',
+        padding: '48px 40px 36px',
         width: '100%',
         boxSizing: 'border-box',
       }}>
         <div className="rf-hero-split-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.25fr)',
-          gap: '52px',
+          gap: '48px',
           alignItems: 'center',
         }}>
           {/* Left Column: Pill, Two-Line Heading, Description, & Two Action Buttons */}
@@ -268,14 +268,14 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '7px',
-              padding: '6px 14px',
+              padding: '5px 13px',
               borderRadius: '999px',
               backgroundColor: '#111115',
-              border: '1px solid #282830',
+              border: '1px solid #26262E',
               fontSize: '12px',
-              fontWeight: 600,
-              color: '#E4E4E7',
-              marginBottom: '24px',
+              fontWeight: 500,
+              color: '#D4D4D8',
+              marginBottom: '20px',
             }}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5">
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
@@ -283,26 +283,26 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               <span>Durable Systems Engine</span>
             </div>
 
-            {/* Heading IN EXACTLY TWO LINES */}
+            {/* Heading IN EXACTLY TWO LINES - MATCHING IMAGE 2 */}
             <h1 style={{
-              fontSize: 'clamp(38px, 4.3vw, 54px)',
-              fontWeight: 800,
-              lineHeight: 1.12,
-              letterSpacing: '-0.03em',
+              fontSize: 'clamp(28px, 2.7vw, 40px)',
+              fontWeight: 700,
+              lineHeight: 1.15,
+              letterSpacing: '-0.025em',
               color: '#FFFFFF',
-              margin: '0 0 22px',
+              margin: '0 0 18px',
             }}>
-              <span style={{ display: 'block' }}>Reliable Webhooks &amp;</span>
-              <span style={{ display: 'block' }}>Sequential Workflows</span>
+              <span style={{ display: 'block', whiteSpace: 'nowrap' }}>Reliable Webhooks &amp;</span>
+              <span style={{ display: 'block', whiteSpace: 'nowrap' }}>Sequential Workflows</span>
             </h1>
 
             {/* Subtitle */}
             <p style={{
-              fontSize: '15px',
-              color: '#A1A1AA',
-              maxWidth: '470px',
-              lineHeight: 1.6,
-              margin: '0 0 34px',
+              fontSize: '14.5px',
+              color: '#9CA3AF',
+              maxWidth: '430px',
+              lineHeight: 1.58,
+              margin: '0 0 28px',
             }}>
               Ingest high-throughput events, execute durable multi-step pipelines, and guarantee at-least-once delivery with jittered exponential retries.
             </p>
@@ -321,15 +321,15 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   color: '#000000',
                   border: 'none',
                   borderRadius: '999px',
-                  padding: '13px 28px',
-                  fontSize: '14px',
-                  fontWeight: 700,
+                  padding: '12px 26px',
+                  fontSize: '13.5px',
+                  fontWeight: 600,
                   cursor: 'pointer',
-                  boxShadow: '0 4px 18px rgba(255, 255, 255, 0.16)',
+                  boxShadow: '0 2px 14px rgba(255, 255, 255, 0.16)',
                   transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#F2F2F2';
+                  e.currentTarget.style.backgroundColor = '#F0F0F0';
                   e.currentTarget.style.transform = 'translateY(-1.5px)';
                 }}
                 onMouseLeave={(e) => {
@@ -352,25 +352,25 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                  color: '#E4E4E7',
-                  border: '1px solid #2E2E36',
+                  color: '#D4D4D8',
+                  border: '1px solid #27272F',
                   borderRadius: '999px',
-                  padding: '13px 26px',
-                  fontSize: '14px',
-                  fontWeight: 600,
+                  padding: '12px 24px',
+                  fontSize: '13.5px',
+                  fontWeight: 500,
                   cursor: 'pointer',
                   transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#15151A';
-                  e.currentTarget.style.borderColor = '#42424E';
+                  e.currentTarget.style.borderColor = '#3E3E48';
                   e.currentTarget.style.color = '#FFFFFF';
                   e.currentTarget.style.transform = 'translateY(-1.5px)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
-                  e.currentTarget.style.borderColor = '#2E2E36';
-                  e.currentTarget.style.color = '#E4E4E7';
+                  e.currentTarget.style.borderColor = '#27272F';
+                  e.currentTarget.style.color = '#D4D4D8';
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
@@ -379,7 +379,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </div>
           </div>
 
-          {/* Right Column: High-Res Uploaded Dashboard Image */}
+          {/* Right Column: Uploaded Dashboard Card (NO OUTER BOUNDARY) */}
           <div style={{
             position: 'relative',
             width: '100%',
@@ -393,32 +393,30 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               style={{
                 width: '100%',
                 height: 'auto',
-                borderRadius: '18px',
-                border: '1px solid #222228',
-                boxShadow: '0 24px 60px rgba(0, 0, 0, 0.85), 0 0 1px rgba(255, 255, 255, 0.1)',
                 display: 'block',
+                border: 'none',
+                outline: 'none',
+                boxShadow: 'none',
                 cursor: 'pointer',
-                transition: 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
+                transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
               onClick={() => setModalOpen(true)}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0 30px 70px rgba(0, 0, 0, 0.95), 0 0 16px rgba(226, 193, 133, 0.12)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 24px 60px rgba(0, 0, 0, 0.85), 0 0 1px rgba(255, 255, 255, 0.1)';
               }}
             />
           </div>
         </div>
       </section>
 
-      {/* 3. SOCIAL PROOF / LOGOS BAR WITH CENTERED DIVIDER (MATCHING IMAGE 1) */}
+      {/* 3. SOCIAL PROOF / LOGOS BAR WITH CENTERED DIVIDER (MATCHING IMAGE 2) */}
       <section style={{
-        maxWidth: '1360px',
-        margin: '28px auto 44px',
-        padding: '0 44px',
+        maxWidth: '1280px',
+        margin: '20px auto 36px',
+        padding: '0 40px',
         width: '100%',
         boxSizing: 'border-box',
       }}>
@@ -433,7 +431,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         }}>
           <div style={{ flex: 1, height: '1px', backgroundColor: '#1C1C22' }} />
           <span style={{
-            fontSize: '13px',
+            fontSize: '12.5px',
             color: '#71717A',
             fontWeight: 500,
             whiteSpace: 'nowrap',
@@ -451,10 +449,10 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           justifyContent: 'center',
           gap: 'clamp(28px, 5.5vw, 76px)',
           flexWrap: 'wrap',
-          color: '#D4D4D8',
+          color: '#A1A1AA',
         }}>
           {/* Vercel */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '15px', fontWeight: 700, color: '#D4D4D8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14.5px', fontWeight: 600, color: '#A1A1AA' }}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
               <polygon points="12 2 22 20 2 20"></polygon>
             </svg>
@@ -462,7 +460,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           {/* Render */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '15px', fontWeight: 700, color: '#D4D4D8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14.5px', fontWeight: 600, color: '#A1A1AA' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="M3 4h7v7H3z M14 4h7v7h-7z M3 13h7v7H3z"></path>
             </svg>
@@ -470,7 +468,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           {/* PostgreSQL */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '15px', fontWeight: 700, color: '#D4D4D8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14.5px', fontWeight: 600, color: '#A1A1AA' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
               <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
@@ -480,7 +478,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           {/* Redis */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '15px', fontWeight: 700, color: '#D4D4D8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14.5px', fontWeight: 600, color: '#A1A1AA' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
               <polyline points="2 17 12 22 22 17"></polyline>
@@ -490,7 +488,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           {/* Docker */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '15px', fontWeight: 700, color: '#D4D4D8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14.5px', fontWeight: 600, color: '#A1A1AA' }}>
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="4" y="9" width="3" height="3"></rect>
               <rect x="8" y="9" width="3" height="3"></rect>
@@ -502,7 +500,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           {/* Kubernetes */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '15px', fontWeight: 700, color: '#D4D4D8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14.5px', fontWeight: 600, color: '#A1A1AA' }}>
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="9"></circle>
               <circle cx="12" cy="12" r="3"></circle>
@@ -516,11 +514,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         </div>
       </section>
 
-      {/* 4. VALUE PROPOSITION & METRICS GRID (MATCHING IMAGE 1) */}
+      {/* 4. VALUE PROPOSITION & METRICS GRID (MATCHING IMAGE 2) */}
       <section id="rf-metrics-section" style={{
-        maxWidth: '1360px',
+        maxWidth: '1280px',
         margin: '0 auto',
-        padding: '24px 44px 72px',
+        padding: '16px 40px 64px',
         width: '100%',
         boxSizing: 'border-box',
       }}>
@@ -533,9 +531,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           {/* Left Title: 3 lines */}
           <div style={{ textAlign: 'left' }}>
             <h2 style={{
-              fontSize: 'clamp(28px, 2.8vw, 36px)',
-              fontWeight: 800,
-              lineHeight: 1.18,
+              fontSize: 'clamp(24px, 2.4vw, 32px)',
+              fontWeight: 700,
+              lineHeight: 1.15,
               letterSpacing: '-0.025em',
               color: '#FFFFFF',
               margin: 0,
@@ -550,68 +548,68 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           <div className="rf-metric-cards-row" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '16px',
+            gap: '14px',
           }}>
             {/* Card 1: 8–12× */}
             <div className="rf-card-hover" style={{
-              backgroundColor: '#0F0F12',
-              border: '1px solid #1E1E24',
-              borderRadius: '16px',
-              padding: '28px 22px',
+              backgroundColor: '#0C0C0F',
+              border: '1px solid #1C1C22',
+              borderRadius: '14px',
+              padding: '24px 20px',
               textAlign: 'left',
             }}>
-              <div style={{ fontSize: '32px', fontWeight: 800, color: '#FFFFFF', lineHeight: 1 }}>
+              <div style={{ fontSize: '28px', fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
                 8–12×
               </div>
-              <div style={{ fontSize: '13px', color: '#71717A', marginTop: '14px', lineHeight: 1.4, fontWeight: 500 }}>
+              <div style={{ fontSize: '12.5px', color: '#71717A', marginTop: '12px', lineHeight: 1.4, fontWeight: 500 }}>
                 Higher processing reliability
               </div>
             </div>
 
             {/* Card 2: < 300 ms */}
             <div className="rf-card-hover" style={{
-              backgroundColor: '#0F0F12',
+              backgroundColor: '#0C0C0F',
               border: '1px solid #1E1E24',
-              borderRadius: '16px',
-              padding: '28px 22px',
+              borderRadius: '14px',
+              padding: '24px 20px',
               textAlign: 'left',
             }}>
-              <div style={{ fontSize: '32px', fontWeight: 800, color: '#FFFFFF', lineHeight: 1 }}>
+              <div style={{ fontSize: '28px', fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
                 &lt; 300 ms
               </div>
-              <div style={{ fontSize: '13px', color: '#71717A', marginTop: '14px', lineHeight: 1.4, fontWeight: 500 }}>
+              <div style={{ fontSize: '12.5px', color: '#71717A', marginTop: '12px', lineHeight: 1.4, fontWeight: 500 }}>
                 P99 pipeline latency
               </div>
             </div>
 
             {/* Card 3: 99.9% */}
             <div className="rf-card-hover" style={{
-              backgroundColor: '#0F0F12',
-              border: '1px solid #1E1E24',
-              borderRadius: '16px',
-              padding: '28px 22px',
+              backgroundColor: '#0C0C0F',
+              border: '1px solid #1C1C22',
+              borderRadius: '14px',
+              padding: '24px 20px',
               textAlign: 'left',
             }}>
-              <div style={{ fontSize: '32px', fontWeight: 800, color: '#FFFFFF', lineHeight: 1 }}>
+              <div style={{ fontSize: '28px', fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
                 99.9%
               </div>
-              <div style={{ fontSize: '13px', color: '#71717A', marginTop: '14px', lineHeight: 1.4, fontWeight: 500 }}>
+              <div style={{ fontSize: '12.5px', color: '#71717A', marginTop: '12px', lineHeight: 1.4, fontWeight: 500 }}>
                 At-least-once delivery
               </div>
             </div>
 
             {/* Card 4: 0 */}
             <div className="rf-card-hover" style={{
-              backgroundColor: '#0F0F12',
-              border: '1px solid #1E1E24',
-              borderRadius: '16px',
-              padding: '28px 22px',
+              backgroundColor: '#0C0C0F',
+              border: '1px solid #1C1C22',
+              borderRadius: '14px',
+              padding: '24px 20px',
               textAlign: 'left',
             }}>
-              <div style={{ fontSize: '32px', fontWeight: 800, color: '#FFFFFF', lineHeight: 1 }}>
+              <div style={{ fontSize: '28px', fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
                 0
               </div>
-              <div style={{ fontSize: '13px', color: '#71717A', marginTop: '14px', lineHeight: 1.4, fontWeight: 500 }}>
+              <div style={{ fontSize: '12.5px', color: '#71717A', marginTop: '12px', lineHeight: 1.4, fontWeight: 500 }}>
                 Event loss under retries
               </div>
             </div>
