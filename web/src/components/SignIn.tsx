@@ -1,7 +1,7 @@
 import { getApiBaseUrl, setSessionToken } from '../api.ts';
 import React, { useState } from 'react';
 import brandGraphic from '../assets/brand-graphic.png';
-import dashboardGraphic from '../assets/orders-workflow-dashboard.png';
+import dashboardGraphic from '../assets/relayforge_workflow_dashboard_right.png';
 
 interface SignInProps {
   onTokenSignIn?: (token: string) => void;
