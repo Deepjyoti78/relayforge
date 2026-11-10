@@ -30,235 +30,251 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#000000',
-      color: '#FFFFFF',
+      backgroundColor: '#0D0C0B',
+      color: '#F5F0E7',
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
       overflowX: 'hidden',
       fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      WebkitFontSmoothing: 'antialiased',
+      MozOsxFontSmoothing: 'grayscale',
     }}>
-      {/* 1. TOP NAVBAR (MATCHING REFERENCE IMAGE 2) */}
+      {/* 1. TOP NAVBAR */}
       <header className="rf-landing-header" style={{
-        height: '66px',
-        borderBottom: '1px solid #141418',
-        padding: '0 40px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: '#000000',
+        width: '100%',
+        backgroundColor: '#0D0C0B',
+        borderBottom: '1px solid rgba(235, 225, 208, 0.1)',
         position: 'sticky',
         top: 0,
         zIndex: 50,
       }}>
-        {/* Brand Logo & Name */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '10px',
-            backgroundColor: '#FFFFFF',
-            color: '#000000',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 2px 10px rgba(255, 255, 255, 0.15)',
-            flexShrink: 0,
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-            </svg>
-          </div>
-          <span style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
-            RELAYFORGE
-          </span>
-        </div>
-
-        {/* Center Navigation Links (Product, Solutions, Docs, Pricing, Resources) */}
-        <nav className="rf-landing-nav-center" style={{
+        <div className="rf-landing-container" style={{
+          maxWidth: '1480px',
+          margin: '0 auto',
+          padding: '0 clamp(24px, 4vw, 56px)',
+          height: '74px',
           display: 'flex',
           alignItems: 'center',
-          gap: '32px',
-          fontSize: '13px',
-          fontWeight: 500,
-          color: '#A1A1AA',
+          justifyContent: 'space-between',
+          boxSizing: 'border-box',
+          width: '100%',
         }}>
-          <button
-            onClick={() => setModalOpen(true)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#A1A1AA',
-              fontSize: '13px',
-              fontWeight: 500,
-              cursor: 'pointer',
+          {/* Brand Logo & Name */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              backgroundColor: '#F5F0E7',
+              color: '#0D0C0B',
               display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              padding: '6px 0',
-              transition: 'color 0.15s ease',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
-          >
-            Product <span style={{ fontSize: '10px', opacity: 0.7 }}>⌄</span>
-          </button>
-          <button
-            onClick={() => setModalOpen(true)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#A1A1AA',
-              fontSize: '13px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              padding: '6px 0',
-              transition: 'color 0.15s ease',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
-          >
-            Solutions <span style={{ fontSize: '10px', opacity: 0.7 }}>⌄</span>
-          </button>
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              color: '#A1A1AA',
-              textDecoration: 'none',
-              fontSize: '13px',
-              fontWeight: 500,
-              transition: 'color 0.15s ease',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
-          >
-            Docs
-          </a>
-          <button
-            onClick={() => setModalOpen(true)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#A1A1AA',
-              fontSize: '13px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              padding: '6px 0',
-              transition: 'color 0.15s ease',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
-          >
-            Pricing
-          </button>
-          <button
-            onClick={() => setModalOpen(true)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#A1A1AA',
-              fontSize: '13px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              padding: '6px 0',
-              transition: 'color 0.15s ease',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
-          >
-            Resources <span style={{ fontSize: '10px', opacity: 0.7 }}>⌄</span>
-          </button>
-        </nav>
-
-        {/* Right Action Buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <span className="rf-landing-badge" style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '7px',
-            fontSize: '12px',
-            color: '#A1A1AA',
-            backgroundColor: '#0E0E12',
-            padding: '6px 14px',
-            borderRadius: '999px',
-            border: '1px solid #222228',
-            fontWeight: 500,
-          }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#FFFFFF', boxShadow: '0 0 6px rgba(255, 255, 255, 0.8)' }}></span>
-            Production Ready v1.0
-          </span>
-
-          <button
-            onClick={() => setModalOpen(true)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#D4D4D8',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              padding: '8px 14px',
-              borderRadius: '8px',
-              transition: 'color 0.15s ease',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = '#D4D4D8'; }}
-          >
-            Sign In
-          </button>
-
-          <button
-            id="open-signin-button"
-            onClick={() => setModalOpen(true)}
-            style={{
-              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: '#FFFFFF',
-              color: '#000000',
-              border: 'none',
-              borderRadius: '999px',
-              padding: '10px 22px',
+              boxShadow: '0 2px 10px rgba(245, 240, 231, 0.15)',
+              flexShrink: 0,
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <span style={{ fontSize: '16px', fontWeight: 800, letterSpacing: '0.02em', color: '#F5F0E7' }}>
+              RELAYFORGE
+            </span>
+          </div>
+
+          {/* Center Navigation Links (Product, Solutions, Docs, Pricing, Resources) */}
+          <nav className="rf-landing-nav-center" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '36px',
+            fontSize: '15px',
+            fontWeight: 500,
+            color: '#B5AEA3',
+          }}>
+            <button
+              onClick={() => setModalOpen(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#B5AEA3',
+                fontSize: '15px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '6px 0',
+                transition: 'color 0.15s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+            >
+              Product <span style={{ fontSize: '11px', opacity: 0.7 }}>⌄</span>
+            </button>
+            <button
+              onClick={() => setModalOpen(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#B5AEA3',
+                fontSize: '15px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '6px 0',
+                transition: 'color 0.15s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+            >
+              Solutions <span style={{ fontSize: '11px', opacity: 0.7 }}>⌄</span>
+            </button>
+            <a
+              href="https://github.com"
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                color: '#B5AEA3',
+                textDecoration: 'none',
+                fontSize: '15px',
+                fontWeight: 500,
+                transition: 'color 0.15s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+            >
+              Docs
+            </a>
+            <button
+              onClick={() => setModalOpen(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#B5AEA3',
+                fontSize: '15px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                padding: '6px 0',
+                transition: 'color 0.15s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+            >
+              Pricing
+            </button>
+            <button
+              onClick={() => setModalOpen(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#B5AEA3',
+                fontSize: '15px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '6px 0',
+                transition: 'color 0.15s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+            >
+              Resources <span style={{ fontSize: '11px', opacity: 0.7 }}>⌄</span>
+            </button>
+          </nav>
+
+          {/* Right Action Buttons */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <span className="rf-landing-badge" style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
               fontSize: '13px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              boxShadow: '0 2px 12px rgba(255, 255, 255, 0.18)',
-              transition: 'all 0.16s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#F0F0F0';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#FFFFFF';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            Get Started
-          </button>
+              color: '#B5AEA3',
+              backgroundColor: 'rgba(235, 225, 208, 0.05)',
+              padding: '7px 16px',
+              borderRadius: '999px',
+              border: '1px solid rgba(235, 225, 208, 0.14)',
+              fontWeight: 500,
+            }}>
+              <span style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: '#E9D8B9',
+                boxShadow: '0 0 8px rgba(233, 216, 185, 0.8)',
+              }}></span>
+              Production Ready v1.0
+            </span>
+
+            <button
+              onClick={() => setModalOpen(true)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#F5F0E7',
+                fontSize: '15px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                transition: 'color 0.15s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#E9D8B9'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
+            >
+              Sign In
+            </button>
+
+            <button
+              id="open-signin-button"
+              onClick={() => setModalOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#F5F0E7',
+                color: '#0D0C0B',
+                border: 'none',
+                borderRadius: '999px',
+                padding: '10px 22px',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                boxShadow: '0 2px 12px rgba(245, 240, 231, 0.12)',
+                transition: 'all 0.16s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#FFFFFF';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#F5F0E7';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              Get Started
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* 2. HERO SPLIT SECTION (EXACTLY MATCHING IMAGE 2) */}
+      {/* 2. HERO SPLIT SECTION */}
       <section style={{
-        maxWidth: '1280px',
-        margin: '0 auto',
-        padding: '48px 40px 36px',
         width: '100%',
+        maxWidth: '1480px',
+        margin: '0 auto',
+        padding: 'clamp(48px, 5.5vw, 76px) clamp(24px, 4vw, 56px) clamp(36px, 4vw, 52px)',
         boxSizing: 'border-box',
       }}>
         <div className="rf-hero-split-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.25fr)',
-          gap: '48px',
+          gap: 'clamp(40px, 4.5vw, 68px)',
           alignItems: 'center',
         }}>
           {/* Left Column: Pill, Two-Line Heading, Description, & Two Action Buttons */}
@@ -267,78 +283,80 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '7px',
-              padding: '5px 13px',
+              gap: '8px',
+              padding: '6px 14px',
               borderRadius: '999px',
-              backgroundColor: '#111115',
-              border: '1px solid #26262E',
-              fontSize: '12px',
-              fontWeight: 500,
-              color: '#D4D4D8',
-              marginBottom: '20px',
+              backgroundColor: 'rgba(235, 225, 208, 0.05)',
+              border: '1px solid rgba(235, 225, 208, 0.16)',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#E9D8B9',
+              marginBottom: '24px',
             }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E9D8B9" strokeWidth="2.5">
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
               </svg>
               <span>Durable Systems Engine</span>
             </div>
 
-            {/* Heading IN EXACTLY TWO LINES - MATCHING IMAGE 2 */}
-            <h1 style={{
-              fontSize: 'clamp(28px, 2.7vw, 40px)',
-              fontWeight: 700,
-              lineHeight: 1.15,
-              letterSpacing: '-0.025em',
-              color: '#FFFFFF',
-              margin: '0 0 18px',
+            {/* Dominant Heading in Exactly Two Lines (52–58px on Large Desktop) */}
+            <h1 className="rf-hero-headline" style={{
+              fontSize: 'clamp(36px, 3.8vw, 56px)',
+              fontWeight: 800,
+              lineHeight: 1.12,
+              letterSpacing: '-0.03em',
+              color: '#F5F0E7',
+              margin: '0 0 24px',
             }}>
-              <span style={{ display: 'block', whiteSpace: 'nowrap' }}>Reliable Webhooks &amp;</span>
-              <span style={{ display: 'block', whiteSpace: 'nowrap' }}>Sequential Workflows</span>
+              <span className="rf-headline-line-1" style={{ display: 'block', whiteSpace: 'nowrap' }}>Reliable Webhooks &amp;</span>
+              <span className="rf-headline-line-2" style={{ display: 'block', whiteSpace: 'nowrap' }}>Sequential Workflows</span>
             </h1>
 
-            {/* Subtitle */}
+            {/* Supporting Description (18–20px) */}
             <p style={{
-              fontSize: '14.5px',
-              color: '#9CA3AF',
-              maxWidth: '430px',
+              fontSize: 'clamp(16px, 1.25vw, 19px)',
+              color: '#B5AEA3',
+              maxWidth: '520px',
               lineHeight: 1.58,
-              margin: '0 0 28px',
+              margin: '0 0 36px',
             }}>
               Ingest high-throughput events, execute durable multi-step pipelines, and guarantee at-least-once delivery with jittered exponential retries.
             </p>
 
             {/* Two Action Buttons side-by-side with exact theme */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-              {/* Primary White Button: Get Started → */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+              {/* Primary Warm Ivory Button: Get Started → */}
               <button
                 id="hero-signin-btn"
                 onClick={() => setModalOpen(true)}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  backgroundColor: '#FFFFFF',
-                  color: '#000000',
+                  gap: '10px',
+                  backgroundColor: '#F5F0E7',
+                  color: '#0D0C0B',
                   border: 'none',
                   borderRadius: '999px',
-                  padding: '12px 26px',
-                  fontSize: '13.5px',
+                  padding: '14px 30px',
+                  fontSize: '15px',
                   fontWeight: 600,
                   cursor: 'pointer',
-                  boxShadow: '0 2px 14px rgba(255, 255, 255, 0.16)',
+                  boxShadow: '0 4px 20px rgba(245, 240, 231, 0.16)',
                   transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#F0F0F0';
-                  e.currentTarget.style.transform = 'translateY(-1.5px)';
+                  e.currentTarget.style.backgroundColor = '#FFFFFF';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 24px rgba(245, 240, 231, 0.28)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#FFFFFF';
+                  e.currentTarget.style.backgroundColor = '#F5F0E7';
                   e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(245, 240, 231, 0.16)';
                 }}
               >
                 <span>Get Started</span>
-                <span style={{ fontSize: '15px' }}>→</span>
+                <span style={{ fontSize: '16px' }}>→</span>
               </button>
 
               {/* Secondary Dark Bordered Button: Explore Features */}
@@ -351,26 +369,26 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                  color: '#D4D4D8',
-                  border: '1px solid #27272F',
+                  backgroundColor: 'rgba(235, 225, 208, 0.04)',
+                  color: '#F5F0E7',
+                  border: '1px solid rgba(235, 225, 208, 0.18)',
                   borderRadius: '999px',
-                  padding: '12px 24px',
-                  fontSize: '13.5px',
+                  padding: '14px 28px',
+                  fontSize: '15px',
                   fontWeight: 500,
                   cursor: 'pointer',
                   transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#15151A';
-                  e.currentTarget.style.borderColor = '#3E3E48';
+                  e.currentTarget.style.backgroundColor = 'rgba(235, 225, 208, 0.08)';
+                  e.currentTarget.style.borderColor = 'rgba(235, 225, 208, 0.32)';
                   e.currentTarget.style.color = '#FFFFFF';
-                  e.currentTarget.style.transform = 'translateY(-1.5px)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
-                  e.currentTarget.style.borderColor = '#27272F';
-                  e.currentTarget.style.color = '#D4D4D8';
+                  e.currentTarget.style.backgroundColor = 'rgba(235, 225, 208, 0.04)';
+                  e.currentTarget.style.borderColor = 'rgba(235, 225, 208, 0.18)';
+                  e.currentTarget.style.color = '#F5F0E7';
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
@@ -379,7 +397,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </div>
           </div>
 
-          {/* Right Column: Uploaded Dashboard Card (NO OUTER BOUNDARY) */}
+          {/* Right Column: Workflow Dashboard Visual (Crisp Native Border, No Double Boundary) */}
           <div style={{
             position: 'relative',
             width: '100%',
@@ -392,32 +410,36 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               alt="RelayForge Orders Workflow Dashboard"
               style={{
                 width: '100%',
+                maxWidth: '780px',
                 height: 'auto',
                 display: 'block',
                 border: 'none',
                 outline: 'none',
-                boxShadow: 'none',
+                boxShadow: '0 24px 64px rgba(0, 0, 0, 0.7), 0 0 1px rgba(235, 225, 208, 0.12)',
+                borderRadius: '20px',
                 cursor: 'pointer',
-                transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                transition: 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
               onClick={() => setModalOpen(true)}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 32px 76px rgba(0, 0, 0, 0.85), 0 0 16px rgba(233, 216, 185, 0.14)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 24px 64px rgba(0, 0, 0, 0.7), 0 0 1px rgba(235, 225, 208, 0.12)';
               }}
             />
           </div>
         </div>
       </section>
 
-      {/* 3. SOCIAL PROOF / LOGOS BAR WITH CENTERED DIVIDER (MATCHING IMAGE 2) */}
+      {/* 3. TRUSTED TECHNOLOGY SECTION */}
       <section style={{
-        maxWidth: '1280px',
-        margin: '20px auto 36px',
-        padding: '0 40px',
         width: '100%',
+        maxWidth: '1480px',
+        margin: 'clamp(40px, 4.5vw, 64px) auto clamp(48px, 5vw, 72px)',
+        padding: '0 clamp(24px, 4vw, 56px)',
         boxSizing: 'border-box',
       }}>
         {/* Horizontal Divider Line with Centered Label */}
@@ -425,51 +447,64 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '20px',
-          marginBottom: '32px',
+          gap: '24px',
+          marginBottom: '40px',
           width: '100%',
         }}>
-          <div style={{ flex: 1, height: '1px', backgroundColor: '#1C1C22' }} />
+          <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(235, 225, 208, 0.12)' }} />
           <span style={{
-            fontSize: '12.5px',
-            color: '#71717A',
+            fontSize: '13.5px',
+            color: '#858078',
             fontWeight: 500,
             whiteSpace: 'nowrap',
-            letterSpacing: '-0.01em',
+            letterSpacing: '0.01em',
           }}>
             Trusted by engineering teams building reliable systems
           </span>
-          <div style={{ flex: 1, height: '1px', backgroundColor: '#1C1C22' }} />
+          <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(235, 225, 208, 0.12)' }} />
         </div>
 
         {/* 6 Logos Row: Vercel, Render, PostgreSQL, Redis, Docker, Kubernetes */}
         <div className="rf-landing-logos" style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          gap: 'clamp(28px, 5.5vw, 76px)',
+          justifyContent: 'space-between',
           flexWrap: 'wrap',
-          color: '#A1A1AA',
+          gap: '28px',
+          width: '100%',
+          color: '#B5AEA3',
         }}>
           {/* Vercel */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14.5px', fontWeight: 600, color: '#A1A1AA' }}>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <polygon points="12 2 22 20 2 20"></polygon>
             </svg>
             <span>Vercel</span>
           </div>
 
           {/* Render */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14.5px', fontWeight: 600, color: '#A1A1AA' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
               <path d="M3 4h7v7H3z M14 4h7v7h-7z M3 13h7v7H3z"></path>
             </svg>
             <span>Render</span>
           </div>
 
           {/* PostgreSQL */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14.5px', fontWeight: 600, color: '#A1A1AA' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
               <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
               <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
@@ -478,8 +513,12 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           {/* Redis */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14.5px', fontWeight: 600, color: '#A1A1AA' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
               <polyline points="2 17 12 22 22 17"></polyline>
               <polyline points="2 12 12 17 22 12"></polyline>
@@ -488,8 +527,12 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           {/* Docker */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14.5px', fontWeight: 600, color: '#A1A1AA' }}>
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="4" y="9" width="3" height="3"></rect>
               <rect x="8" y="9" width="3" height="3"></rect>
               <rect x="12" y="9" width="3" height="3"></rect>
@@ -500,8 +543,12 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           {/* Kubernetes */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14.5px', fontWeight: 600, color: '#A1A1AA' }}>
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="9"></circle>
               <circle cx="12" cy="12" r="3"></circle>
               <line x1="12" y1="3" x2="12" y2="9"></line>
@@ -514,28 +561,28 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         </div>
       </section>
 
-      {/* 4. VALUE PROPOSITION & METRICS GRID (MATCHING IMAGE 2) */}
+      {/* 4. VALUE PROPOSITION & METRICS GRID */}
       <section id="rf-metrics-section" style={{
-        maxWidth: '1280px',
-        margin: '0 auto',
-        padding: '16px 40px 64px',
         width: '100%',
+        maxWidth: '1480px',
+        margin: '0 auto',
+        padding: '0 clamp(24px, 4vw, 56px) clamp(64px, 7vw, 96px)',
         boxSizing: 'border-box',
       }}>
         <div className="rf-value-props-grid" style={{
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.15fr) minmax(0, 3.2fr)',
-          gap: '36px',
+          gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 3.4fr)',
+          gap: '44px',
           alignItems: 'center',
         }}>
-          {/* Left Title: 3 lines */}
+          {/* Left Title: 3 lines (32–36px) */}
           <div style={{ textAlign: 'left' }}>
             <h2 style={{
-              fontSize: 'clamp(24px, 2.4vw, 32px)',
+              fontSize: 'clamp(28px, 2.5vw, 36px)',
               fontWeight: 700,
               lineHeight: 1.15,
               letterSpacing: '-0.025em',
-              color: '#FFFFFF',
+              color: '#F5F0E7',
               margin: 0,
             }}>
               <span style={{ display: 'block' }}>Better delivery</span>
@@ -548,68 +595,88 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           <div className="rf-metric-cards-row" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '14px',
+            gap: '18px',
           }}>
             {/* Card 1: 8–12× */}
             <div className="rf-card-hover" style={{
-              backgroundColor: '#0C0C0F',
-              border: '1px solid #1C1C22',
-              borderRadius: '14px',
-              padding: '24px 20px',
+              backgroundColor: '#151412',
+              border: '1px solid rgba(235, 225, 208, 0.12)',
+              borderRadius: '16px',
+              padding: '30px 24px',
               textAlign: 'left',
+              minHeight: '144px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              boxSizing: 'border-box',
             }}>
-              <div style={{ fontSize: '28px', fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
+              <div style={{ fontSize: '34px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
                 8–12×
               </div>
-              <div style={{ fontSize: '12.5px', color: '#71717A', marginTop: '12px', lineHeight: 1.4, fontWeight: 500 }}>
+              <div style={{ fontSize: '13.5px', color: '#858078', marginTop: '14px', lineHeight: 1.45, fontWeight: 500 }}>
                 Higher processing reliability
               </div>
             </div>
 
             {/* Card 2: < 300 ms */}
             <div className="rf-card-hover" style={{
-              backgroundColor: '#0C0C0F',
-              border: '1px solid #1E1E24',
-              borderRadius: '14px',
-              padding: '24px 20px',
+              backgroundColor: '#151412',
+              border: '1px solid rgba(235, 225, 208, 0.12)',
+              borderRadius: '16px',
+              padding: '30px 24px',
               textAlign: 'left',
+              minHeight: '144px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              boxSizing: 'border-box',
             }}>
-              <div style={{ fontSize: '28px', fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
+              <div style={{ fontSize: '34px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
                 &lt; 300 ms
               </div>
-              <div style={{ fontSize: '12.5px', color: '#71717A', marginTop: '12px', lineHeight: 1.4, fontWeight: 500 }}>
+              <div style={{ fontSize: '13.5px', color: '#858078', marginTop: '14px', lineHeight: 1.45, fontWeight: 500 }}>
                 P99 pipeline latency
               </div>
             </div>
 
             {/* Card 3: 99.9% */}
             <div className="rf-card-hover" style={{
-              backgroundColor: '#0C0C0F',
-              border: '1px solid #1C1C22',
-              borderRadius: '14px',
-              padding: '24px 20px',
+              backgroundColor: '#151412',
+              border: '1px solid rgba(235, 225, 208, 0.12)',
+              borderRadius: '16px',
+              padding: '30px 24px',
               textAlign: 'left',
+              minHeight: '144px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              boxSizing: 'border-box',
             }}>
-              <div style={{ fontSize: '28px', fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
+              <div style={{ fontSize: '34px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
                 99.9%
               </div>
-              <div style={{ fontSize: '12.5px', color: '#71717A', marginTop: '12px', lineHeight: 1.4, fontWeight: 500 }}>
+              <div style={{ fontSize: '13.5px', color: '#858078', marginTop: '14px', lineHeight: 1.45, fontWeight: 500 }}>
                 At-least-once delivery
               </div>
             </div>
 
             {/* Card 4: 0 */}
             <div className="rf-card-hover" style={{
-              backgroundColor: '#0C0C0F',
-              border: '1px solid #1C1C22',
-              borderRadius: '14px',
-              padding: '24px 20px',
+              backgroundColor: '#151412',
+              border: '1px solid rgba(235, 225, 208, 0.12)',
+              borderRadius: '16px',
+              padding: '30px 24px',
               textAlign: 'left',
+              minHeight: '144px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              boxSizing: 'border-box',
             }}>
-              <div style={{ fontSize: '28px', fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
+              <div style={{ fontSize: '34px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
                 0
               </div>
-              <div style={{ fontSize: '12.5px', color: '#71717A', marginTop: '12px', lineHeight: 1.4, fontWeight: 500 }}>
+              <div style={{ fontSize: '13.5px', color: '#858078', marginTop: '14px', lineHeight: 1.45, fontWeight: 500 }}>
                 Event loss under retries
               </div>
             </div>
@@ -625,8 +692,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.82)',
-            backdropFilter: 'blur(8px)',
+            backgroundColor: 'rgba(13, 12, 11, 0.85)',
+            backdropFilter: 'blur(10px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -640,14 +707,14 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             className="rf-signin-modal"
             onClick={(e) => e.stopPropagation()}
             style={{
-              backgroundColor: '#0E0E12',
-              border: '1px solid #26262E',
+              backgroundColor: '#151412',
+              border: '1px solid rgba(235, 225, 208, 0.16)',
               borderRadius: '20px',
               maxWidth: '860px',
               width: '100%',
               display: 'flex',
               overflow: 'hidden',
-              boxShadow: '0 24px 60px rgba(0, 0, 0, 0.85)',
+              boxShadow: '0 28px 72px rgba(0, 0, 0, 0.85)',
               position: 'relative',
               flexDirection: 'row',
             }}
@@ -660,9 +727,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 position: 'absolute',
                 top: '16px',
                 right: '16px',
-                backgroundColor: '#1E1E24',
-                border: '1px solid #2E2E38',
-                color: '#A3A3A3',
+                backgroundColor: 'rgba(235, 225, 208, 0.08)',
+                border: '1px solid rgba(235, 225, 208, 0.16)',
+                color: '#B5AEA3',
                 borderRadius: '50%',
                 width: '32px',
                 height: '32px',
@@ -673,9 +740,16 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 zIndex: 20,
                 fontSize: '18px',
                 lineHeight: 1,
+                transition: 'all 0.15s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#A3A3A3'; }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#F5F0E7';
+                e.currentTarget.style.backgroundColor = 'rgba(235, 225, 208, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#B5AEA3';
+                e.currentTarget.style.backgroundColor = 'rgba(235, 225, 208, 0.08)';
+              }}
             >
               ×
             </button>
@@ -683,15 +757,15 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             {/* Left Side: Uploaded Image Visual Panel */}
             <div className="rf-signin-modal-graphic" style={{
               flex: '1 1 48%',
-              backgroundColor: '#000000',
-              borderRight: '1px solid #1E1E24',
+              backgroundColor: '#0D0C0B',
+              borderRight: '1px solid rgba(235, 225, 208, 0.1)',
               padding: '36px 28px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               position: 'relative',
-              background: 'radial-gradient(circle at center, #1B1B20 0%, #000000 85%)',
+              background: 'radial-gradient(circle at center, #1C1A17 0%, #0D0C0B 85%)',
             }}>
               <div style={{
                 position: 'relative',
@@ -711,7 +785,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     objectFit: 'contain',
                     borderRadius: '16px',
                     filter: 'drop-shadow(0 14px 28px rgba(0,0,0,0.65))',
-                    border: '1px solid #202020',
+                    border: '1px solid rgba(235, 225, 208, 0.12)',
                   }}
                 />
                 <div style={{
@@ -723,11 +797,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     fontWeight: 700,
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase',
-                    color: '#E5E5E5',
+                    color: '#F5F0E7',
                   }}>
                     Monochromatic Precision
                   </div>
-                  <div style={{ fontSize: '11px', color: '#737373', marginTop: '4px' }}>
+                  <div style={{ fontSize: '11px', color: '#858078', marginTop: '4px' }}>
                     Engineered for zero cognitive overload
                   </div>
                 </div>
@@ -749,113 +823,111 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 gap: '8px',
                 fontSize: '11px',
                 fontWeight: 700,
-                letterSpacing: '0.08em',
+                letterSpacing: '0.06em',
+                color: '#E9D8B9',
                 textTransform: 'uppercase',
-                color: '#A3A3A3',
                 marginBottom: '10px',
               }}>
-                <span style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  backgroundColor: '#FFFFFF',
-                }}></span>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#E9D8B9' }}></span>
                 AUTHENTICATION PORTAL
               </div>
 
               <h2 style={{
                 fontSize: '24px',
                 fontWeight: 800,
-                color: '#FFFFFF',
-                letterSpacing: '-0.02em',
+                color: '#F5F0E7',
                 margin: '0 0 10px',
+                letterSpacing: '-0.02em',
               }}>
                 Welcome to RelayForge
               </h2>
 
               <p style={{
                 fontSize: '13px',
-                color: '#A3A3A3',
+                color: '#B5AEA3',
                 lineHeight: 1.5,
-                margin: '0 0 28px',
+                margin: '0 0 24px',
               }}>
                 Sign in with GitHub to access tenant isolation, encrypted API keys, workflow orchestrations, and the Dead Letter Queue.
               </p>
 
-              {/* GitHub OAuth Button */}
+              {/* GitHub OAuth Primary Button */}
               <a
-                id="github-oauth-button"
+                id="github-signin-link"
                 href={startUrl}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '12px',
-                  width: '100%',
-                  backgroundColor: '#FFFFFF',
-                  color: '#000000',
+                  gap: '10px',
+                  backgroundColor: '#F5F0E7',
+                  color: '#0D0C0B',
                   textDecoration: 'none',
-                  padding: '13px 20px',
+                  padding: '12px 20px',
                   borderRadius: '10px',
                   fontSize: '14px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  transition: 'background-color 0.15s ease',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+                  fontWeight: 600,
+                  boxShadow: '0 4px 14px rgba(245, 240, 231, 0.12)',
+                  transition: 'all 0.16s ease',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#E5E5E5'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#FFFFFF'; }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#FFFFFF';
+                  e.currentTarget.style.transform = 'translateY(-1.5px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#F5F0E7';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path>
                 </svg>
-                Continue with GitHub
+                <span>Continue with GitHub</span>
               </a>
 
-              {/* Developer Test Mode Session Input */}
+              {/* Dev Mode Session Token Fallback */}
               {isDev && (
                 <div style={{ marginTop: '20px', textAlign: 'center' }}>
                   <button
-                    type="button"
                     onClick={() => setShowManualInput(!showManualInput)}
                     style={{
                       background: 'none',
                       border: 'none',
-                      color: '#A3A3A3',
+                      color: '#858078',
                       fontSize: '12px',
                       cursor: 'pointer',
                       textDecoration: 'underline',
                       padding: '4px',
                     }}
                   >
-                    {showManualInput ? 'Hide developer token entry' : 'Direct Session Token Entry'}
+                    Direct Session Token Entry
                   </button>
 
                   {showManualInput && (
                     <form onSubmit={handleManualSubmit} style={{ marginTop: '12px', display: 'flex', gap: '8px' }}>
                       <input
                         type="text"
-                        placeholder="Paste session token..."
+                        placeholder="Paste developer JWT token"
                         value={manualToken}
                         onChange={(e) => setManualToken(e.target.value)}
                         style={{
                           flex: 1,
-                          backgroundColor: '#000000',
-                          border: '1px solid #2A2A2A',
-                          borderRadius: '6px',
+                          backgroundColor: '#0D0C0B',
+                          border: '1px solid rgba(235, 225, 208, 0.2)',
+                          borderRadius: '8px',
                           padding: '8px 12px',
                           fontSize: '12px',
-                          color: '#FFFFFF',
+                          color: '#F5F0E7',
                           outline: 'none',
                         }}
                       />
                       <button
                         type="submit"
                         style={{
-                          backgroundColor: '#202020',
-                          border: '1px solid #2A2A2A',
-                          color: '#FFFFFF',
-                          borderRadius: '6px',
+                          backgroundColor: '#1C1A17',
+                          border: '1px solid rgba(235, 225, 208, 0.2)',
+                          color: '#F5F0E7',
+                          borderRadius: '8px',
                           padding: '8px 14px',
                           fontSize: '12px',
                           fontWeight: 600,
@@ -873,11 +945,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               <div style={{
                 marginTop: '32px',
                 paddingTop: '20px',
-                borderTop: '1px solid #202020',
+                borderTop: '1px solid rgba(235, 225, 208, 0.1)',
                 display: 'flex',
                 justifyContent: 'space-between',
                 fontSize: '11px',
-                color: '#737373',
+                color: '#858078',
               }}>
                 <span>PostgreSQL RLS</span>
                 <span>•</span>
@@ -896,31 +968,38 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           from { opacity: 0; transform: scale(0.98); }
           to { opacity: 1; transform: scale(1); }
         }
-        @media (max-width: 1080px) {
+        @media (max-width: 1100px) {
           .rf-hero-split-grid {
             grid-template-columns: 1fr !important;
-            gap: 40px !important;
+            gap: 48px !important;
           }
           .rf-landing-nav-center {
             display: none !important;
           }
           .rf-value-props-grid {
             grid-template-columns: 1fr !important;
-            gap: 28px !important;
+            gap: 32px !important;
           }
           .rf-metric-cards-row {
             grid-template-columns: repeat(2, 1fr) !important;
           }
+          .rf-landing-logos {
+            justifyContent: center !important;
+            gap: 36px !important;
+          }
         }
         @media (max-width: 640px) {
-          .rf-landing-header {
-            padding: 0 18px !important;
+          .rf-landing-container {
+            padding: 0 20px !important;
           }
           .rf-landing-badge {
             display: none !important;
           }
           .rf-metric-cards-row {
             grid-template-columns: 1fr !important;
+          }
+          .rf-headline-line-1, .rf-headline-line-2 {
+            white-space: normal !important;
           }
           #signin-modal-container {
             flex-direction: column !important;
