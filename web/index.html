@@ -249,10 +249,24 @@
       }
     
       /* --- Smooth Page Transitions & Micro-Animations --- */
+      @keyframes rfAppEnter {
+        0% {
+          opacity: 0;
+          transform: scale(0.995);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      .rf-app-enter {
+        animation: rfAppEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+
       @keyframes rfPageEnter {
         0% {
           opacity: 0;
-          transform: translateY(8px);
+          transform: translateY(14px);
         }
         100% {
           opacity: 1;
@@ -260,21 +274,51 @@
         }
       }
       .rf-page-animate {
-        animation: rfPageEnter 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+        animation: rfPageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+        will-change: transform, opacity;
+      }
+
+      /* Staggered Orchestration for Deep Fluidity */
+      @keyframes rfFadeSlideUp {
+        0% {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .rf-stagger-1 {
+        animation: rfFadeSlideUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.04s both;
+        will-change: transform, opacity;
+      }
+      .rf-stagger-2 {
+        animation: rfFadeSlideUp 0.46s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+        will-change: transform, opacity;
+      }
+      .rf-stagger-3 {
+        animation: rfFadeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.13s both;
+        will-change: transform, opacity;
+      }
+      .rf-stagger-4 {
+        animation: rfFadeSlideUp 0.54s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both;
         will-change: transform, opacity;
       }
 
       /* Global Smooth Button Micro-interactions */
       button, a[role="button"], .rf-interactive-btn {
-        transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
-                    box-shadow 0.16s cubic-bezier(0.16, 1, 0.3, 1),
-                    background-color 0.16s cubic-bezier(0.16, 1, 0.3, 1),
-                    border-color 0.16s cubic-bezier(0.16, 1, 0.3, 1),
-                    color 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                    background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                    color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                    opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         user-select: none;
       }
       button:hover:not(:disabled), a[role="button"]:hover:not(:disabled), .rf-interactive-btn:hover:not(:disabled) {
-        transform: translateY(-1.5px);
+        transform: translateY(-2px);
       }
       button:active:not(:disabled), a[role="button"]:active:not(:disabled), .rf-interactive-btn:active:not(:disabled) {
         transform: translateY(0px) scale(0.975);
@@ -282,29 +326,29 @@
 
       /* Smooth Card Hover & Interactions */
       .rf-card-hover {
-        transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-                    box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-                    border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 0.26s cubic-bezier(0.16, 1, 0.3, 1) !important;
         will-change: transform, box-shadow;
       }
       .rf-card-hover:hover {
-        transform: translateY(-3px);
+        transform: translateY(-3.5px);
         border-color: #383838 !important;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important;
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.65) !important;
       }
       .rf-card-hover:active {
-        transform: translateY(-1px) scale(0.995);
+        transform: translateY(-1px) scale(0.992);
       }
 
       /* Smooth Filter Pills */
       .rf-pill-btn {
-        transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
-                    background-color 0.18s ease,
-                    color 0.18s ease,
-                    border-color 0.18s ease !important;
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                    background-color 0.2s ease,
+                    color 0.2s ease,
+                    border-color 0.2s ease !important;
       }
       .rf-pill-btn:hover {
-        transform: translateY(-1px);
+        transform: translateY(-1.5px);
         filter: brightness(1.08);
       }
       .rf-pill-btn:active {
@@ -313,15 +357,33 @@
 
       /* Sidebar Navigation Items */
       .rf-nav-item {
-        transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
       }
       .rf-nav-item:hover:not(.rf-nav-item-active) {
         background-color: #161616 !important;
         color: #FFFFFF !important;
-        transform: translateX(3px);
+        transform: translateX(4px);
+      }
+      .rf-nav-collapsed:hover:not(.rf-nav-item-active) {
+        transform: scale(1.06) !important;
       }
       .rf-nav-item:active {
-        transform: scale(0.97);
+        transform: scale(0.96) !important;
+      }
+
+      /* Initial Loader Pulse */
+      @keyframes rfLoaderPulse {
+        0%, 100% {
+          transform: scale(1);
+          opacity: 0.88;
+        }
+        50% {
+          transform: scale(1.06);
+          opacity: 1;
+        }
+      }
+      .rf-loader-icon {
+        animation: rfLoaderPulse 1.8s ease-in-out infinite;
       }
 
       /* Modals */
@@ -351,7 +413,7 @@
     <div id="root" style="position: relative; z-index: 1;">
       <div style="min-height: 100vh; background-color: #000000; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;">
         <div style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
-          <div style="width: 44px; height: 44px; border-radius: 12px; background-color: #F7EFE2; color: #121214; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(247, 239, 226, 0.18);">
+          <div className="rf-loader-icon" class="rf-loader-icon" style="width: 44px; height: 44px; border-radius: 12px; background-color: #F7EFE2; color: #121214; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(247, 239, 226, 0.18);">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
             </svg>

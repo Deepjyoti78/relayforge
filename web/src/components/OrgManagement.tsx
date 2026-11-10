@@ -717,7 +717,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       <div key={activeTab} className="rf-page-animate" style={{ width: '100%' }}>
       
       {/* Eyebrow and Page Title */}
-      <div className="rf-header-row">
+      <div className="rf-header-row rf-stagger-1">
         <div>
           <div style={{
             fontSize: '11px',
@@ -1021,7 +1021,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
       {/* 4 SUMMARY STAT CARDS FOR MEMBERS DIRECTORY */}
       {activeTab === 'members' && (
-        <div style={{
+        <div className="rf-stagger-2" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
           gap: '16px',
@@ -1208,7 +1208,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
       {/* STATS CARDS ROW (SHOWN ONLY IN OVERVIEW SECTION - EXACTLY MATCHING IMAGE 2) */}
       {activeTab === 'dashboard' && (
-        <div className="rf-stats-grid">
+        <div className="rf-stats-grid rf-stagger-2">
           {/* Card 1: TOTAL MEMBERS (Active Highlight Surface: Warm Ivory Cream #F7EFE2) */}
           <div
             onClick={() => onTabChange('members')}
@@ -1376,7 +1376,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
       {/* FILTER PILLS ROW (ROUNDED PILLS - SHOWN IN TAB VIEWS) */}
       {activeTab !== 'dashboard' && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '22px' }}>
+        <div className="rf-stagger-3" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '22px' }}>
           <div
             id="rf-tab-strip-container"
             className="rf-filter-pills"
@@ -1467,7 +1467,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
       {/* SEARCH & FILTER ACTION BAR (MATCHING REFERENCE IMAGE) */}
       {activeTab !== 'dashboard' && activeTab !== 'settings' && activeTab !== 'workflows' && activeTab !== 'metrics' && activeTab !== 'dlq' && (
-        <div style={{
+        <div className="rf-stagger-3" style={{
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
@@ -1771,7 +1771,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
       {/* TABLE CONTAINER FOR DIRECTORY / LOG VIEWS */}
       {activeTab !== 'dashboard' && activeTab !== 'settings' && activeTab !== 'workflows' && (
-        <div className="rf-table-responsive">
+        <div className="rf-table-responsive rf-stagger-4">
           {/* MEMBERS VIEW (MATCHING PIXEL REFERENCE) */}
           {activeTab === 'members' && (
             <div style={{
@@ -3030,6 +3030,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
       {/* SEQUENTIAL WORKFLOWS VIEW (MILESTONE 4) */}
       {activeTab === 'workflows' && (
+        <div className="rf-stagger-4" style={{ width: '100%' }}>
         <WorkflowConsole
           organization={organization}
           workflows={workflows}
@@ -3041,11 +3042,14 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           onRefreshExecutions={loadExecutions}
           onRequestConfirm={(opts) => setConfirmModal({ ...opts, isOpen: true })}
         />
+        </div>
       )}
 
       {/* OPERATIONAL METRICS & REAL-TIME TELEMETRY (MILESTONE 5) */}
       {activeTab === 'metrics' && (
-        <MetricsDashboard organizationId={organization.id} />
+        <div className="rf-stagger-4" style={{ width: '100%' }}>
+          <MetricsDashboard organizationId={organization.id} />
+        </div>
       )}
 
       {/* DEAD LETTER QUEUE & BULK REMEDIATION (MILESTONE 5) */}
@@ -3058,7 +3062,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
       {/* OVERVIEW DASHBOARD VIEW (ACTIVE WHEN activeTab === 'dashboard' - EXACTLY MATCHING IMAGE 2) */}
       {activeTab === 'dashboard' && (
-        <div style={{ padding: '8px 0 24px', width: '100%', boxSizing: 'border-box' }}>
+        <div className="rf-stagger-4" style={{ padding: '8px 0 24px', width: '100%', boxSizing: 'border-box' }}>
           {/* Header Row: Tenant Operations & Quick Actions */}
           <div style={{
             display: 'flex',
@@ -3384,7 +3388,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
         {/* SETTINGS VIEW (ACTIVE WHEN activeTab === 'settings') */}
         {activeTab === 'settings' && (
-          <div style={{ padding: '40px 20px', maxWidth: '640px', margin: '0 auto', textAlign: 'left' }}>
+          <div className="rf-stagger-4" style={{ padding: '40px 20px', maxWidth: '640px', margin: '0 auto', textAlign: 'left' }}>
             <div style={{
               backgroundColor: '#161616',
               border: '1px solid #2A2A2A',

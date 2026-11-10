@@ -265,7 +265,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div style={{
+    <div className="rf-app-enter" style={{
       display: 'flex',
       minHeight: '100vh',
       backgroundColor: '#000000',
