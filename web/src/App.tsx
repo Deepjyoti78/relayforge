@@ -235,7 +235,9 @@ export const App: React.FC = () => {
     }
   };
 
-  if (!user) {
+  const isLandingPreview = typeof window !== 'undefined' && (new URLSearchParams(window.location.search).get('view') === 'landing' || new URLSearchParams(window.location.search).has('landing'));
+
+  if (!user || isLandingPreview) {
     return (
       <SignIn
         onTokenSignIn={async (token) => {
