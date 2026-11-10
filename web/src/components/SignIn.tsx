@@ -1,7 +1,7 @@
 import { getApiBaseUrl, setSessionToken } from '../api.ts';
 import React, { useState } from 'react';
 import brandGraphic from '../assets/brand-graphic.png';
-import dashboardGraphic from '../assets/relayforge_workflow_dashboard_right.png';
+import { InteractiveWorkflowDashboard } from './InteractiveWorkflowDashboard.tsx';
 
 interface SignInProps {
   onTokenSignIn?: (token: string) => void;
@@ -397,7 +397,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </div>
           </div>
 
-          {/* Right Column: Workflow Dashboard Visual (Crisp Native Border, No Double Boundary) */}
+          {/* Right Column: Live Interactive Animated Workflow Dashboard */}
           <div style={{
             position: 'relative',
             width: '100%',
@@ -405,31 +405,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-            <img
-              src={dashboardGraphic}
-              alt="RelayForge Orders Workflow Dashboard"
-              style={{
-                width: '100%',
-                maxWidth: '780px',
-                height: 'auto',
-                display: 'block',
-                border: 'none',
-                outline: 'none',
-                boxShadow: '0 24px 64px rgba(0, 0, 0, 0.7), 0 0 1px rgba(235, 225, 208, 0.12)',
-                borderRadius: '20px',
-                cursor: 'pointer',
-                transition: 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
-              }}
-              onClick={() => setModalOpen(true)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0 32px 76px rgba(0, 0, 0, 0.85), 0 0 16px rgba(233, 216, 185, 0.14)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 24px 64px rgba(0, 0, 0, 0.7), 0 0 1px rgba(235, 225, 208, 0.12)';
-              }}
-            />
+            <InteractiveWorkflowDashboard onCardClick={() => setModalOpen(true)} />
           </div>
         </div>
       </section>
