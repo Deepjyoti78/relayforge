@@ -414,9 +414,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       {/* 3. TRUSTED TECHNOLOGY SECTION */}
       <section style={{
         width: '100%',
-        maxWidth: '1480px',
-        margin: 'clamp(40px, 4.5vw, 64px) auto clamp(48px, 5vw, 72px)',
-        padding: '0 clamp(24px, 4vw, 56px)',
+        maxWidth: '1080px',
+        margin: 'clamp(36px, 4vw, 56px) auto 24px',
+        padding: '0 clamp(16px, 3vw, 24px)',
         boxSizing: 'border-box',
       }}>
         {/* Horizontal Divider Line with Centered Label */}
@@ -425,12 +425,12 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           alignItems: 'center',
           justifyContent: 'center',
           gap: '24px',
-          marginBottom: '40px',
+          marginBottom: '32px',
           width: '100%',
         }}>
           <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(235, 225, 208, 0.12)' }} />
           <span style={{
-            fontSize: '13.5px',
+            fontSize: '13px',
             color: '#858078',
             fontWeight: 500,
             whiteSpace: 'nowrap',
@@ -447,13 +447,13 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           alignItems: 'center',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
-          gap: '28px',
+          gap: '24px',
           width: '100%',
           color: '#B5AEA3',
         }}>
           {/* Vercel */}
           <div
-            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '15px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
             onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
           >
@@ -465,11 +465,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
           {/* Render */}
           <div
-            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '15px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
             onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M3 4h7v7H3z M14 4h7v7h-7z M3 13h7v7H3z"></path>
             </svg>
             <span>Render</span>
@@ -477,11 +477,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
           {/* PostgreSQL */}
           <div
-            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '15px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
             onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
               <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
               <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
@@ -491,11 +491,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
           {/* Redis */}
           <div
-            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '15px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
             onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
               <polyline points="2 17 12 22 22 17"></polyline>
               <polyline points="2 12 12 17 22 12"></polyline>
@@ -505,11 +505,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
           {/* Docker */}
           <div
-            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '15px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
             onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="4" y="9" width="3" height="3"></rect>
               <rect x="8" y="9" width="3" height="3"></rect>
               <rect x="12" y="9" width="3" height="3"></rect>
@@ -521,11 +521,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
           {/* Kubernetes */}
           <div
-            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '15px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
             onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="9"></circle>
               <circle cx="12" cy="12" r="3"></circle>
               <line x1="12" y1="3" x2="12" y2="9"></line>
@@ -541,15 +541,15 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       {/* 4. MAIN COMPARISON SECTION: RAW EVENTS TO RELIABLE WORKFLOWS */}
       <section id="rf-metrics-section" style={{
         width: '100%',
-        maxWidth: '1200px',
+        maxWidth: '1080px',
         margin: '0 auto',
-        padding: 'clamp(48px, 6vw, 84px) clamp(24px, 4vw, 48px) clamp(64px, 7vw, 96px)',
+        padding: '48px clamp(16px, 3vw, 24px) 64px',
         boxSizing: 'border-box',
       }}>
         {/* Centered Introductory Section */}
         <div style={{ textAlign: 'center', margin: '0 auto', maxWidth: '780px', padding: '0 12px' }}>
           <div style={{
-            fontSize: '11.5px',
+            fontSize: '11px',
             fontWeight: 700,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
@@ -560,25 +560,25 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           <h2 style={{
-            fontSize: 'clamp(34px, 3.8vw, 52px)',
+            fontSize: 'clamp(32px, 3.6vw, 48px)',
             fontWeight: 800,
             lineHeight: 1.15,
             letterSpacing: '-0.025em',
             color: '#F5F0E7',
-            margin: '0 0 20px',
+            margin: '0 0 18px',
           }}>
             Go from &ldquo;Raw events&rdquo; to<br />
             &ldquo;Reliable workflows&rdquo;
           </h2>
 
           <p style={{
-            fontSize: 'clamp(15px, 1.2vw, 17px)',
+            fontSize: 'clamp(14.5px, 1.15vw, 16.5px)',
             color: '#B5AEA3',
             lineHeight: 1.6,
             maxWidth: '620px',
-            margin: '0 auto 32px',
+            margin: '0 auto 28px',
           }}>
-            Ingest, process, and deliver events at scale with durable workflows, intelligent retries, and reliable delivery.
+            Ingest, process, and deliver events at scale with durable workflows, retries, and guaranteed delivery.
           </p>
 
           <button
@@ -619,8 +619,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           display: 'grid',
           gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
           gap: '24px',
-          maxWidth: '1060px',
-          margin: '52px auto 0',
+          maxWidth: '100%',
+          margin: '48px auto 0',
           width: '100%',
           boxSizing: 'border-box',
         }}>
@@ -629,287 +629,298 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             backgroundColor: '#141311',
             border: '1px solid rgba(235, 225, 208, 0.1)',
             borderRadius: '20px',
-            padding: '36px 32px',
+            padding: '32px 28px',
             textAlign: 'left',
             display: 'flex',
             flexDirection: 'column',
+            justifyContent: 'space-between',
+            boxSizing: 'border-box',
           }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: 600,
-              color: '#F5F0E7',
-              margin: '0 0 24px',
-              letterSpacing: '-0.01em',
-            }}>
-              The usual approach
-            </h3>
+            <div>
+              <h3 style={{
+                fontSize: '18px',
+                fontWeight: 600,
+                color: '#F5F0E7',
+                margin: '0 0 20px',
+                letterSpacing: '-0.01em',
+              }}>
+                The usual approach
+              </h3>
 
-            {/* Horizontal flow: Event → Custom Code → Queues → Manual Retry */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '6px',
-              padding: '16px 12px',
-              backgroundColor: '#0D0C0B',
-              borderRadius: '12px',
-              border: '1px solid rgba(235, 225, 208, 0.06)',
-              marginBottom: '32px',
-            }}>
-              {/* Event */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', minWidth: '50px' }}>
-                <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '8px',
-                  backgroundColor: '#1A1917',
-                  border: '1px solid rgba(235, 225, 208, 0.08)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#858078',
-                }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                  </svg>
-                </div>
-                <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 500 }}>Event</span>
-              </div>
-
-              <span style={{ color: 'rgba(235, 225, 208, 0.25)', fontSize: '13px' }}>→</span>
-
-              {/* Custom Code */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', minWidth: '68px' }}>
-                <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '8px',
-                  backgroundColor: '#1A1917',
-                  border: '1px solid rgba(235, 225, 208, 0.08)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#858078',
-                }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="16 18 22 12 16 6" />
-                    <polyline points="8 6 2 12 8 18" />
-                  </svg>
-                </div>
-                <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 500, whiteSpace: 'nowrap' }}>Custom Code</span>
-              </div>
-
-              <span style={{ color: 'rgba(235, 225, 208, 0.25)', fontSize: '13px' }}>→</span>
-
-              {/* Queues */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', minWidth: '50px' }}>
-                <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '8px',
-                  backgroundColor: '#1A1917',
-                  border: '1px solid rgba(235, 225, 208, 0.08)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#858078',
-                }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <ellipse cx="12" cy="5" rx="9" ry="3" />
-                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
-                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
-                  </svg>
-                </div>
-                <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 500 }}>Queues</span>
-              </div>
-
-              <span style={{ color: 'rgba(235, 225, 208, 0.25)', fontSize: '13px' }}>→</span>
-
-              {/* Manual Retry */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', minWidth: '68px' }}>
-                <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '8px',
-                  backgroundColor: '#1A1917',
-                  border: '1px solid rgba(235, 225, 208, 0.08)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#858078',
-                }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="9" />
-                  </svg>
-                </div>
-                <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 500, whiteSpace: 'nowrap' }}>Manual Retry</span>
-              </div>
-            </div>
-
-            {/* 4 Problems */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {[
-                'Build and maintain the infrastructure yourself',
-                'Handle retries and failures manually',
-                'Limited visibility into event processing',
-                'Difficult to scale and maintain reliability',
-              ].map((text, idx) => (
-                <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                  <div style={{ color: '#E06C55', fontSize: '14px', lineHeight: '20px', fontWeight: 700, flexShrink: 0 }}>
-                    ✕
+              {/* Horizontal flow: Event → Custom Code → Queues → Manual Retry */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '6px',
+                height: '76px',
+                padding: '0 12px',
+                backgroundColor: '#0D0C0B',
+                borderRadius: '12px',
+                border: '1px solid rgba(235, 225, 208, 0.08)',
+                marginBottom: '28px',
+                boxSizing: 'border-box',
+              }}>
+                {/* Event */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '46px' }}>
+                  <div style={{
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '8px',
+                    backgroundColor: '#1A1917',
+                    border: '1px solid rgba(235, 225, 208, 0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#858078',
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
                   </div>
-                  <span style={{ fontSize: '13.5px', color: '#B5AEA3', lineHeight: '20px' }}>
-                    {text}
-                  </span>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 500 }}>Event</span>
                 </div>
-              ))}
+
+                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px' }}>→</span>
+
+                {/* Custom Code */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '68px' }}>
+                  <div style={{
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '8px',
+                    backgroundColor: '#1A1917',
+                    border: '1px solid rgba(235, 225, 208, 0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#858078',
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="16 18 22 12 16 6" />
+                      <polyline points="8 6 2 12 8 18" />
+                    </svg>
+                  </div>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 500, whiteSpace: 'nowrap' }}>Custom Code</span>
+                </div>
+
+                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px' }}>→</span>
+
+                {/* Queues */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '46px' }}>
+                  <div style={{
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '8px',
+                    backgroundColor: '#1A1917',
+                    border: '1px solid rgba(235, 225, 208, 0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#858078',
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <ellipse cx="12" cy="5" rx="9" ry="3" />
+                      <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                    </svg>
+                  </div>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 500 }}>Queues</span>
+                </div>
+
+                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px' }}>→</span>
+
+                {/* Manual Retry */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '68px' }}>
+                  <div style={{
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '8px',
+                    backgroundColor: '#1A1917',
+                    border: '1px solid rgba(235, 225, 208, 0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#858078',
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                    </svg>
+                  </div>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 500, whiteSpace: 'nowrap' }}>Manual Retry</span>
+                </div>
+              </div>
+
+              {/* 4 Problems */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {[
+                  'Build and maintain the plumbing',
+                  'Handle retries and failures yourself',
+                  'Limited visibility and tracing',
+                  'Harder to scale and keep reliable',
+                ].map((text, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                    <div style={{ color: '#E06C55', fontSize: '13px', lineHeight: '20px', fontWeight: 700, flexShrink: 0 }}>
+                      ✕
+                    </div>
+                    <span style={{ fontSize: '13.5px', color: '#B5AEA3', lineHeight: '20px' }}>
+                      {text}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Right Panel: With RelayForge */}
           <div style={{
             backgroundColor: '#151412',
-            border: '1px solid rgba(233, 216, 185, 0.35)',
+            border: '1px solid rgba(233, 216, 185, 0.32)',
             borderRadius: '20px',
-            padding: '36px 32px',
+            padding: '32px 28px',
             textAlign: 'left',
             display: 'flex',
             flexDirection: 'column',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45), 0 0 20px rgba(233, 216, 185, 0.06)',
-            position: 'relative',
+            justifyContent: 'space-between',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(233, 216, 185, 0.05)',
+            boxSizing: 'border-box',
           }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: 600,
-              color: '#F5F0E7',
-              margin: '0 0 24px',
-              letterSpacing: '-0.01em',
-            }}>
-              With RelayForge
-            </h3>
+            <div>
+              <h3 style={{
+                fontSize: '18px',
+                fontWeight: 600,
+                color: '#F5F0E7',
+                margin: '0 0 20px',
+                letterSpacing: '-0.01em',
+              }}>
+                With RelayForge
+              </h3>
 
-            {/* Horizontal flow: Event → RelayForge → Your Systems */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '8px',
-              padding: '16px 14px',
-              backgroundColor: '#0D0C0B',
-              borderRadius: '12px',
-              border: '1px solid rgba(235, 225, 208, 0.08)',
-              marginBottom: '32px',
-            }}>
-              {/* Event */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', minWidth: '54px' }}>
-                <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '8px',
-                  backgroundColor: '#1A1917',
-                  border: '1px solid rgba(235, 225, 208, 0.08)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#858078',
-                }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                  </svg>
-                </div>
-                <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 500 }}>Event</span>
-              </div>
-
-              <span style={{ color: 'rgba(235, 225, 208, 0.25)', fontSize: '13px' }}>→</span>
-
-              {/* RelayForge (Central Highlighted Element) */}
+              {/* Horizontal flow: Event → RelayForge → Your Systems */}
               <div style={{
                 display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
-                gap: '6px',
-                backgroundColor: '#1C1A17',
-                border: '1px solid #E9D8B9',
-                borderRadius: '10px',
-                padding: '6px 18px',
-                boxShadow: '0 0 16px rgba(233, 216, 185, 0.16)',
+                justifyContent: 'space-between',
+                gap: '8px',
+                height: '76px',
+                padding: '0 16px',
+                backgroundColor: '#0D0C0B',
+                borderRadius: '12px',
+                border: '1px solid rgba(235, 225, 208, 0.08)',
+                marginBottom: '28px',
+                boxSizing: 'border-box',
               }}>
-                <div style={{ color: '#E9D8B9', display: 'flex', alignItems: 'center' }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                  </svg>
-                </div>
-                <span style={{ fontSize: '11px', color: '#F5F0E7', fontWeight: 700, letterSpacing: '0.01em' }}>RelayForge</span>
-              </div>
-
-              <span style={{ color: 'rgba(235, 225, 208, 0.25)', fontSize: '13px' }}>→</span>
-
-              {/* Your Systems */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', minWidth: '68px' }}>
-                <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '8px',
-                  backgroundColor: '#1A1917',
-                  border: '1px solid rgba(235, 225, 208, 0.08)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#858078',
-                }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <ellipse cx="12" cy="5" rx="9" ry="3" />
-                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
-                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
-                  </svg>
-                </div>
-                <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 500, whiteSpace: 'nowrap' }}>Your Systems</span>
-              </div>
-            </div>
-
-            {/* 4 Advantages */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {[
-                'Durable multi-step workflows',
-                'Built-in retries and dead-letter handling',
-                'End-to-end visibility and telemetry',
-                'Reliable processing at scale',
-              ].map((text, idx) => (
-                <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                  <div style={{ color: '#A3E635', fontSize: '14px', lineHeight: '20px', fontWeight: 700, flexShrink: 0 }}>
-                    ✓
+                {/* Event */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '46px' }}>
+                  <div style={{
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '8px',
+                    backgroundColor: '#1A1917',
+                    border: '1px solid rgba(235, 225, 208, 0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#858078',
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
                   </div>
-                  <span style={{ fontSize: '13.5px', color: '#F5F0E7', fontWeight: 500, lineHeight: '20px' }}>
-                    {text}
-                  </span>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 500 }}>Event</span>
                 </div>
-              ))}
+
+                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px' }}>→</span>
+
+                {/* RelayForge (Central Highlighted Element) */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '3px',
+                  backgroundColor: '#1C1A17',
+                  border: '1px solid #E9D8B9',
+                  borderRadius: '10px',
+                  padding: '6px 20px',
+                  boxShadow: '0 0 16px rgba(233, 216, 185, 0.16)',
+                }}>
+                  <div style={{ color: '#E9D8B9', display: 'flex', alignItems: 'center' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                  </div>
+                  <span style={{ fontSize: '11px', color: '#F5F0E7', fontWeight: 700, letterSpacing: '0.01em' }}>RelayForge</span>
+                </div>
+
+                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px' }}>→</span>
+
+                {/* Your Systems */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '68px' }}>
+                  <div style={{
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '8px',
+                    backgroundColor: '#1A1917',
+                    border: '1px solid rgba(235, 225, 208, 0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#858078',
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <ellipse cx="12" cy="5" rx="9" ry="3" />
+                      <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                    </svg>
+                  </div>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 500, whiteSpace: 'nowrap' }}>Your System</span>
+                </div>
+              </div>
+
+              {/* 4 Advantages */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {[
+                  'Durable, multi-step workflows',
+                  'Built-in retries and dead letter handling',
+                  'End-to-end visibility and telemetry',
+                  'Scales reliably with your workload',
+                ].map((text, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                    <div style={{ color: '#84CC16', fontSize: '14px', lineHeight: '20px', fontWeight: 700, flexShrink: 0 }}>
+                      ✓
+                    </div>
+                    <span style={{ fontSize: '13.5px', color: '#F5F0E7', fontWeight: 500, lineHeight: '20px' }}>
+                      {text}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Impact Section: Better insights. Bigger impact. */}
-        <div style={{ textAlign: 'center', margin: '76px auto 0', maxWidth: '1060px', width: '100%', boxSizing: 'border-box' }}>
+        <div style={{ textAlign: 'center', margin: '80px auto 0', width: '100%', boxSizing: 'border-box' }}>
           <h2 style={{
-            fontSize: 'clamp(28px, 3vw, 40px)',
+            fontSize: 'clamp(28px, 2.8vw, 38px)',
             fontWeight: 700,
             letterSpacing: '-0.02em',
             color: '#F5F0E7',
-            margin: '0 0 14px',
+            margin: '0 0 12px',
           }}>
             Better insights. Bigger impact.
           </h2>
 
           <p style={{
-            fontSize: '15.5px',
+            fontSize: '15px',
             color: '#B5AEA3',
             lineHeight: 1.6,
-            maxWidth: '600px',
-            margin: '0 auto 40px',
+            maxWidth: '580px',
+            margin: '0 auto 36px',
           }}>
-            RelayForge provides the reliability and visibility needed to turn incoming events into dependable business operations.
+            RelayForge gives you the reliability and visibility to turn events into measurable business outcomes.
           </p>
 
           {/* 4 Metric Blocks */}
@@ -926,21 +937,21 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               { value: '0', label: 'Event loss under retries' },
             ].map((metric, idx) => (
               <div key={idx} style={{
-                backgroundColor: '#151412',
+                backgroundColor: '#141311',
                 border: '1px solid rgba(235, 225, 208, 0.1)',
                 borderRadius: '16px',
-                padding: '24px 20px',
+                padding: '22px 20px',
                 textAlign: 'left',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                minHeight: '124px',
+                height: '112px',
                 boxSizing: 'border-box',
               }}>
                 <div style={{ fontSize: '28px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
                   {metric.value}
                 </div>
-                <div style={{ fontSize: '13px', color: '#858078', fontWeight: 500, lineHeight: 1.45, marginTop: '12px' }}>
+                <div style={{ fontSize: '13px', color: '#858078', fontWeight: 500, lineHeight: 1.4 }}>
                   {metric.label}
                 </div>
               </div>
@@ -950,9 +961,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
         {/* Live Demo Section: See RelayForge in Action */}
         <div className="rf-demo-panel" style={{
-          maxWidth: '1060px',
-          margin: '72px auto 0',
           width: '100%',
+          margin: '80px auto 0',
           backgroundColor: '#141311',
           border: '1px solid rgba(235, 225, 208, 0.12)',
           borderRadius: '24px',
@@ -986,7 +996,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               color: '#F5F0E7',
               margin: '0 0 16px',
             }}>
-              See RelayForge in action
+              See RelayForge<br />
+              in action
             </h3>
 
             <p style={{
@@ -996,7 +1007,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               maxWidth: '420px',
               margin: '0 0 28px',
             }}>
-              Explore how events flow through ingestion, execution, retries, and delivery with complete visibility.
+              Explore a live demo to see how events flow through workflows, retries, and delivery with full visibility.
             </p>
 
             <button
@@ -1029,48 +1040,48 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </button>
           </div>
 
-          {/* Right Geometric Illustration */}
+          {/* Right Geometric Illustration: 3D Isometric Cube */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
-            height: '240px',
+            height: '270px',
             width: '100%',
           }}>
-            <svg width="340" height="240" viewBox="0 0 340 240" fill="none" style={{ maxWidth: '100%', height: 'auto', overflow: 'visible' }}>
+            <svg width="380" height="270" viewBox="0 0 380 270" fill="none" style={{ maxWidth: '100%', height: 'auto', overflow: 'visible' }}>
               <defs>
                 <radialGradient id="rfBoltGlow" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#E9D8B9" stopOpacity="0.5" />
-                  <stop offset="50%" stopColor="#E9D8B9" stopOpacity="0.15" />
+                  <stop offset="0%" stopColor="#E9D8B9" stopOpacity="0.45" />
+                  <stop offset="60%" stopColor="#E9D8B9" stopOpacity="0.12" />
                   <stop offset="100%" stopColor="#E9D8B9" stopOpacity="0" />
                 </radialGradient>
               </defs>
 
-              {/* Background Isometric Floor Grid Lines */}
-              <line x1="20" y1="180" x2="170" y2="240" stroke="rgba(235, 225, 208, 0.06)" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="170" y1="240" x2="320" y2="180" stroke="rgba(235, 225, 208, 0.06)" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="50" y1="70" x2="290" y2="170" stroke="rgba(235, 225, 208, 0.04)" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="50" y1="170" x2="290" y2="70" stroke="rgba(235, 225, 208, 0.04)" strokeWidth="1" strokeDasharray="3 3" />
+              {/* Background Isometric Perspective Floor Lines */}
+              <line x1="30" y1="210" x2="190" y2="260" stroke="rgba(235, 225, 208, 0.08)" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="190" y1="260" x2="350" y2="210" stroke="rgba(235, 225, 208, 0.08)" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="20" y1="50" x2="360" y2="210" stroke="rgba(235, 225, 208, 0.04)" strokeWidth="1" strokeDasharray="3 3" />
+              <line x1="20" y1="210" x2="360" y2="50" stroke="rgba(235, 225, 208, 0.04)" strokeWidth="1" strokeDasharray="3 3" />
 
               {/* 3D Isometric Cube / Prism */}
               {/* Front Left Face */}
-              <polygon points="170,120 70,75 70,165 170,210" fill="#12110F" stroke="rgba(235, 225, 208, 0.2)" strokeWidth="1.2" />
+              <polygon points="190,135 85,85 85,185 190,235" fill="#12110F" stroke="rgba(235, 225, 208, 0.2)" strokeWidth="1.2" />
               {/* Front Right Face */}
-              <polygon points="170,120 270,75 270,165 170,210" fill="#0F0E0C" stroke="rgba(235, 225, 208, 0.2)" strokeWidth="1.2" />
+              <polygon points="190,135 295,85 295,185 190,235" fill="#0E0D0B" stroke="rgba(235, 225, 208, 0.2)" strokeWidth="1.2" />
               {/* Top Rhombus Face */}
-              <polygon points="170,30 270,75 170,120 70,75" fill="#181714" stroke="rgba(235, 225, 208, 0.35)" strokeWidth="1.5" />
+              <polygon points="190,35 295,85 190,135 85,85" fill="#171613" stroke="rgba(235, 225, 208, 0.35)" strokeWidth="1.4" />
 
-              {/* Top Face Isometric Grid Lines */}
-              <line x1="120" y1="52.5" x2="220" y2="97.5" stroke="rgba(235, 225, 208, 0.15)" strokeWidth="1" />
-              <line x1="120" y1="97.5" x2="220" y2="52.5" stroke="rgba(235, 225, 208, 0.15)" strokeWidth="1" />
+              {/* Top Face Isometric Internal Grid Lines */}
+              <line x1="137.5" y1="60" x2="242.5" y2="110" stroke="rgba(235, 225, 208, 0.16)" strokeWidth="1" />
+              <line x1="242.5" y1="60" x2="137.5" y2="110" stroke="rgba(235, 225, 208, 0.16)" strokeWidth="1" />
 
-              {/* Floating Radial Glow */}
-              <circle cx="170" cy="75" r="48" fill="url(#rfBoltGlow)" />
+              {/* Subtle Center Radial Glow */}
+              <circle cx="190" cy="85" r="56" fill="url(#rfBoltGlow)" />
 
-              {/* Glowing Floating Lightning Symbol */}
-              <g filter="drop-shadow(0 0 12px rgba(233, 216, 185, 0.8))">
-                <polygon points="174,58 163,77 169,77 166,92 177,73 171,73" fill="#E9D8B9" />
+              {/* Floating Glowing Lightning Symbol */}
+              <g filter="drop-shadow(0 0 10px rgba(233, 216, 185, 0.75))">
+                <polygon points="194,68 183,87 189,87 186,102 197,83 191,83" fill="#F5E8D0" />
               </g>
             </svg>
           </div>
@@ -1079,9 +1090,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         {/* Minimal Compact Footer */}
         <footer style={{
           width: '100%',
-          maxWidth: '1060px',
-          margin: '96px auto 0',
-          padding: '0 12px 12px',
+          margin: '72px auto 0',
+          padding: '0 4px 28px',
           boxSizing: 'border-box',
         }}>
           <div className="rf-footer-grid" style={{
@@ -1089,7 +1099,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
             gap: '36px',
             textAlign: 'left',
-            marginBottom: '44px',
+            marginBottom: '40px',
           }}>
             {/* Brand Column */}
             <div>
