@@ -1,5 +1,5 @@
 import { getApiBaseUrl, setSessionToken } from '../api.ts';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import brandGraphic from '../assets/brand-graphic.png';
 import { InteractiveWorkflowDashboard } from './InteractiveWorkflowDashboard.tsx';
 
@@ -28,6 +28,38 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       window.location.reload();
     }
   };
+
+  // Scroll Reveal Observer for landing page cards and elements
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('rf-in-view');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: '0px 0px -40px 0px',
+        threshold: 0.08,
+      }
+    );
+
+    const elements = document.querySelectorAll('.rf-scroll-reveal, .rf-scroll-card');
+    elements.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.classList.add('rf-in-view');
+      } else {
+        observer.observe(el);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div style={{
@@ -406,7 +438,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           alignItems: 'center',
         }}>
           {/* Left Column: Pill, Two-Line Heading, Description, & Two Action Buttons */}
-          <div style={{ textAlign: 'left', minWidth: 0 }}>
+          <div className="rf-scroll-reveal" style={{ textAlign: 'left', minWidth: 0 }}>
             {/* Pill: Durable Systems Engine */}
             <div style={{
               display: 'inline-flex',
@@ -526,7 +558,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           {/* Right Column: Live Interactive Animated Workflow Dashboard */}
-          <div className="rf-hero-dashboard-col" style={{
+          <div className="rf-hero-dashboard-col rf-scroll-card rf-stagger-1" style={{
             position: 'relative',
             width: '100%',
             minWidth: 0,
@@ -550,7 +582,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         boxSizing: 'border-box',
       }}>
         {/* Horizontal Divider Line with Centered Label */}
-        <div style={{
+        <div className="rf-scroll-reveal" style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -573,7 +605,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         </div>
 
         {/* 6 Logos Row: Vercel, Render, PostgreSQL, Redis, Docker, Kubernetes */}
-        <div className="rf-landing-logos" style={{
+        <div className="rf-landing-logos rf-scroll-reveal rf-stagger-1" style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -678,7 +710,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         boxSizing: 'border-box',
       }}>
         {/* Centered Introductory Section */}
-        <div style={{ textAlign: 'center', margin: '0 auto', maxWidth: '780px', padding: '0 12px' }}>
+        <div className="rf-scroll-reveal" style={{ textAlign: 'center', margin: '0 auto', maxWidth: '780px', padding: '0 12px' }}>
           <div style={{
             fontSize: '11px',
             fontWeight: 700,
@@ -756,7 +788,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           boxSizing: 'border-box',
         }}>
           {/* Left Panel: The usual approach */}
-          <div style={{
+          <div className="rf-scroll-card rf-comparison-card" style={{
             backgroundColor: '#141311',
             border: '1px solid rgba(235, 225, 208, 0.1)',
             borderRadius: '20px',
@@ -908,7 +940,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           {/* Right Panel: With RelayForge */}
-          <div style={{
+          <div className="rf-scroll-card rf-comparison-card rf-stagger-2" style={{
             backgroundColor: '#151412',
             border: '1px solid rgba(233, 216, 185, 0.32)',
             borderRadius: '20px',
@@ -1040,7 +1072,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         </div>
 
         {/* Impact Section: Better insights. Bigger impact. */}
-        <div className="rf-impact-container" style={{ textAlign: 'center', margin: '76px auto 0', width: '100%', boxSizing: 'border-box' }}>
+        <div className="rf-impact-container rf-scroll-reveal" style={{ textAlign: 'center', margin: '76px auto 0', width: '100%', boxSizing: 'border-box' }}>
           <h2 style={{
             fontSize: 'clamp(26px, 2.8vw, 38px)',
             fontWeight: 700,
@@ -1074,7 +1106,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               { value: '99.9%', label: 'At-least-once delivery' },
               { value: '0', label: 'Event loss under retries' },
             ].map((metric, idx) => (
-              <div key={idx} style={{
+              <div key={idx} className={`rf-scroll-card rf-impact-card rf-stagger-${idx + 1}`} style={{
                 backgroundColor: '#141311',
                 border: '1px solid rgba(235, 225, 208, 0.1)',
                 borderRadius: '16px',
@@ -1098,7 +1130,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         </div>
 
         {/* Live Demo Section: See RelayForge in Action */}
-        <div className="rf-demo-panel" style={{
+        <div className="rf-demo-panel rf-scroll-card" style={{
           width: '100%',
           margin: '76px auto 0',
           backgroundColor: '#141311',
@@ -1114,7 +1146,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           overflow: 'hidden',
         }}>
           {/* Left Content */}
-          <div className="rf-demo-content-col" style={{ textAlign: 'left', zIndex: 2 }}>
+          <div className="rf-demo-content-col rf-scroll-reveal" style={{ textAlign: 'left', zIndex: 2 }}>
             <div style={{
               fontSize: '11px',
               fontWeight: 700,
@@ -1179,7 +1211,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           {/* Right Geometric Illustration: 3D Isometric Cube Matching Reference */}
-          <div className="rf-demo-illustration-col" style={{
+          <div className="rf-demo-illustration-col rf-scroll-reveal rf-stagger-2" style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -1256,7 +1288,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         </div>
 
         {/* Full-width Horizontal Divider Line above Footer matching Reference */}
-        <div className="rf-footer-divider" style={{
+        <div className="rf-footer-divider rf-scroll-reveal" style={{
           width: '100%',
           height: '1px',
           backgroundColor: 'rgba(235, 225, 208, 0.12)',
@@ -1264,7 +1296,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         }} />
 
         {/* Minimal Compact Footer */}
-        <footer className="rf-footer" style={{
+        <footer className="rf-footer rf-scroll-reveal rf-stagger-1" style={{
           width: '100%',
           margin: '0 auto',
           padding: '0 4px 28px',
@@ -1796,6 +1828,109 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         @keyframes slideDown {
           from { opacity: 0; transform: translateY(-10px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Scroll Reveal & Coming-Up Entrance Animations */
+        .rf-scroll-reveal {
+          opacity: 0;
+          transform: translateY(28px);
+          transition: opacity 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 0.72s cubic-bezier(0.16, 1, 0.3, 1);
+          will-change: opacity, transform;
+        }
+
+        .rf-scroll-reveal.rf-in-view {
+          opacity: 1 !important;
+          transform: translateY(0) !important;
+        }
+
+        .rf-scroll-card {
+          opacity: 0;
+          transform: translateY(38px) scale(0.985);
+          transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                      box-shadow 0.28s ease,
+                      border-color 0.28s ease;
+          will-change: opacity, transform;
+        }
+
+        .rf-scroll-card.rf-in-view {
+          opacity: 1 !important;
+          transform: translateY(0) scale(1) !important;
+        }
+
+        /* Elevated Card Hover Responses Once Revealed */
+        .rf-comparison-card.rf-in-view {
+          transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                      box-shadow 0.25s ease,
+                      border-color 0.25s ease !important;
+        }
+        .rf-comparison-card.rf-in-view:hover {
+          transform: translateY(-4px) scale(1) !important;
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), 0 0 24px rgba(235, 225, 208, 0.08) !important;
+          border-color: rgba(233, 216, 185, 0.45) !important;
+        }
+
+        .rf-impact-card.rf-in-view {
+          transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                      box-shadow 0.25s ease,
+                      border-color 0.25s ease !important;
+        }
+        .rf-impact-card.rf-in-view:hover {
+          transform: translateY(-3px) scale(1) !important;
+          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5) !important;
+          border-color: rgba(235, 225, 208, 0.25) !important;
+        }
+
+        .rf-demo-panel.rf-in-view {
+          transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                      box-shadow 0.25s ease,
+                      border-color 0.25s ease !important;
+        }
+        .rf-demo-panel.rf-in-view:hover {
+          box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 32px rgba(235, 225, 208, 0.08) !important;
+          border-color: rgba(235, 225, 208, 0.24) !important;
+        }
+
+        /* Stagger Delay Utility Classes */
+        .rf-stagger-1 { transition-delay: 0.08s !important; }
+        .rf-stagger-2 { transition-delay: 0.16s !important; }
+        .rf-stagger-3 { transition-delay: 0.24s !important; }
+        .rf-stagger-4 { transition-delay: 0.32s !important; }
+        .rf-stagger-5 { transition-delay: 0.40s !important; }
+        .rf-stagger-6 { transition-delay: 0.48s !important; }
+
+        /* Flow nodes flourish when comparison card enters view */
+        .rf-scroll-card.rf-in-view .rf-flow-container > div {
+          animation: rfNodePop 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .rf-scroll-card.rf-in-view .rf-flow-container > div:nth-child(1) { animation-delay: 0.12s; }
+        .rf-scroll-card.rf-in-view .rf-flow-container > div:nth-child(3) { animation-delay: 0.20s; }
+        .rf-scroll-card.rf-in-view .rf-flow-container > div:nth-child(5) { animation-delay: 0.28s; }
+        .rf-scroll-card.rf-in-view .rf-flow-container > div:nth-child(7) { animation-delay: 0.36s; }
+
+        @keyframes rfNodePop {
+          0% {
+            opacity: 0.2;
+            transform: scale(0.92);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        /* Accessible reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+          .rf-scroll-reveal,
+          .rf-scroll-card {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+          }
         }
 
         /* 1. Global Viewport Safety */
