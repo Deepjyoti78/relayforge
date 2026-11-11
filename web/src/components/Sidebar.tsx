@@ -89,12 +89,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       display: 'flex',
       alignItems: 'center',
       justifyContent: isCollapsedMode ? 'center' : 'flex-start',
-      gap: isCollapsedMode ? '0' : '12px',
-      width: isCollapsedMode ? '42px' : '100%',
-      height: isCollapsedMode ? '42px' : 'auto',
-      padding: isCollapsedMode ? '0' : '9px 14px',
-      borderRadius: isCollapsedMode ? '12px' : '999px',
-      fontSize: '13px',
+      gap: isCollapsedMode ? '0' : '10px',
+      width: isCollapsedMode ? '36px' : '100%',
+      height: isCollapsedMode ? '36px' : 'auto',
+      padding: isCollapsedMode ? '0' : '7px 12px',
+      borderRadius: isCollapsedMode ? '10px' : '999px',
+      fontSize: '12.5px',
       fontWeight: isActive ? 700 : 500,
       backgroundColor: isActive ? '#F7EFE2' : 'transparent',
       color: isActive ? '#0A0A0A' : '#A3A3A3',
@@ -102,7 +102,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       cursor: 'pointer',
       textAlign: 'left' as const,
       transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-      boxShadow: isActive ? '0 2px 10px rgba(0, 0, 0, 0.25)' : 'none',
+      boxShadow: isActive ? '0 2px 8px rgba(0, 0, 0, 0.25)' : 'none',
       margin: isCollapsedMode ? '0 auto' : '0',
       flexShrink: 0,
       position: 'relative' as const,
@@ -112,11 +112,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const getBadgeStyle = (tab: string) => {
     const isActive = activeTab === tab;
     return {
-      fontSize: '10px',
+      fontSize: '9.5px',
       fontWeight: 700,
       backgroundColor: isActive ? '#E5DAC8' : '#202020',
       color: isActive ? '#0A0A0A' : '#A3A3A3',
-      padding: '2px 7px',
+      padding: '1.5px 6px',
       borderRadius: '999px',
       border: isActive ? '1px solid #D8CBB6' : '1px solid #2A2A2A',
     };
@@ -246,9 +246,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Navigation Sections */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: isCollapsedMode ? '10px 0' : '14px 12px', width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: isCollapsedMode ? '8px 0' : '10px 10px', width: '100%', boxSizing: 'border-box' }}>
         {/* Section: MAIN MENU */}
-        <div style={{ marginBottom: '20px' }}>
+        <div style={{ marginBottom: '14px' }}>
           {!isCollapsedMode ? (
             <div style={{
               fontSize: '11px',
@@ -256,15 +256,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
               letterSpacing: '0.08em',
               color: '#737373',
               textTransform: 'uppercase',
-              padding: '0 10px 10px',
+              padding: '0 8px 8px',
             }}>
               Main
             </div>
           ) : (
-            <div style={{ height: '1px', backgroundColor: '#202020', margin: '4px 14px 12px' }} />
+            <div style={{ height: '1px', backgroundColor: '#202020', margin: '4px 14px 10px' }} />
           )}
 
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             {/* Overview / Dashboard */}
             <button
               onClick={() => handleTabClick('dashboard')}
@@ -463,13 +463,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Section: ORGANIZATIONS */}
-        <div style={{ marginBottom: '20px' }}>
+        <div style={{ marginBottom: '14px' }}>
           {!isCollapsedMode ? (
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              padding: '0 10px 10px',
+              padding: '0 8px 8px',
             }}>
               <span style={{
                 fontSize: '11px',
@@ -486,10 +486,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   backgroundColor: '#161616',
                   border: '1px solid #2A2A2A',
                   color: '#FFFFFF',
-                  fontSize: '11px',
+                  fontSize: '10.5px',
                   fontWeight: 600,
                   borderRadius: '999px',
-                  padding: '2px 8px',
+                  padding: '2px 7px',
                   cursor: 'pointer',
                 }}
               >
@@ -497,7 +497,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             </div>
           ) : (
-            <div style={{ height: '1px', backgroundColor: '#202020', margin: '4px 14px 12px' }} />
+            <div style={{ height: '1px', backgroundColor: '#202020', margin: '4px 14px 10px' }} />
           )}
 
           {/* Quick Create Organization Form (Only expanded) */}
@@ -584,7 +584,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
 
           {/* Organization list */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
             {organizations.length === 0 ? (
               !isCollapsedMode ? (
                 <div style={{ padding: '8px 10px', fontSize: '12px', color: '#737373' }}>
@@ -604,9 +604,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: '42px',
-                        height: '42px',
-                        borderRadius: '12px',
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '10px',
                         backgroundColor: isSelected ? '#1E1E28' : 'transparent',
                         border: isSelected ? '1px solid #363648' : '1px solid transparent',
                         color: isSelected ? '#D4AF78' : '#A3A3A3',
@@ -615,7 +615,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                       }}
                     >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
                         <polyline points="2 17 12 22 22 17"></polyline>
                         <polyline points="2 12 12 17 22 12"></polyline>
@@ -633,9 +633,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       width: '100%',
-                      padding: '10px 12px',
-                      borderRadius: '12px',
-                      fontSize: '13px',
+                      padding: '7px 10px',
+                      borderRadius: '10px',
+                      fontSize: '12px',
                       backgroundColor: isSelected ? '#191922' : 'transparent',
                       color: '#FFFFFF',
                       border: isSelected ? '1px solid #2A2A2A' : '1px solid transparent',
@@ -647,26 +647,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
                       <div style={{ color: isSelected ? '#D4AF78' : '#737373', flexShrink: 0 }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
                           <polyline points="2 17 12 22 22 17"></polyline>
                           <polyline points="2 12 12 17 22 12"></polyline>
                         </svg>
                       </div>
                       <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        <div style={{ fontWeight: 700, color: '#FFFFFF', fontSize: '13px', lineHeight: 1.2 }}>{org.name}</div>
-                        <div style={{ fontSize: '11px', color: '#737373', fontWeight: 400, marginTop: '2px' }}>
+                        <div style={{ fontWeight: 700, color: '#FFFFFF', fontSize: '12.5px', lineHeight: 1.2 }}>{org.name}</div>
+                        <div style={{ fontSize: '10.5px', color: '#737373', fontWeight: 400, marginTop: '1px' }}>
                           {org.slug}.rlf
                         </div>
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
                       <span style={{
-                        fontSize: '10px',
+                        fontSize: '9.5px',
                         fontWeight: 700,
                         backgroundColor: '#202020',
                         color: '#E5E5E5',
-                        padding: '2px 7px',
+                        padding: '1.5px 6px',
                         borderRadius: '999px',
                         border: '1px solid #2A2A2A',
                       }}>
@@ -692,15 +692,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
               letterSpacing: '0.08em',
               color: '#737373',
               textTransform: 'uppercase',
-              padding: '0 10px 10px',
+              padding: '0 8px 8px',
             }}>
               Administration
             </div>
           ) : (
-            <div style={{ height: '1px', backgroundColor: '#202020', margin: '4px 14px 12px' }} />
+            <div style={{ height: '1px', backgroundColor: '#202020', margin: '4px 14px 10px' }} />
           )}
 
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <button
               onClick={() => handleTabClick('settings')}
               className={`rf-nav-item ${activeTab === 'settings' ? "rf-nav-item-active" : ""} ${isCollapsedMode ? "rf-nav-collapsed" : ""}`}

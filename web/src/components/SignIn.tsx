@@ -63,8 +63,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           width: '100%',
         }}>
           {/* Brand Logo & Name */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
+          <div className="rf-header-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="rf-brand-icon" style={{
               width: '36px',
               height: '36px',
               borderRadius: '10px',
@@ -80,7 +80,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
               </svg>
             </div>
-            <span style={{ fontSize: '16px', fontWeight: 800, letterSpacing: '0.02em', color: '#F5F0E7' }}>
+            <span className="rf-brand-title" style={{ fontSize: '16px', fontWeight: 800, letterSpacing: '0.02em', color: '#F5F0E7' }}>
               RELAYFORGE
             </span>
           </div>
@@ -190,7 +190,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </nav>
 
           {/* Right Action Buttons & Mobile Hamburger */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="rf-header-right-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span className="rf-landing-badge" style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -690,7 +690,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             EVENT PROCESSING PLATFORM
           </div>
 
-          <h2 style={{
+          <h2 className="rf-comparison-heading" style={{
             fontSize: 'clamp(30px, 3.6vw, 48px)',
             fontWeight: 800,
             lineHeight: 1.15,
@@ -698,8 +698,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             color: '#F5F0E7',
             margin: '0 0 18px',
           }}>
-            Go from &ldquo;Raw events&rdquo; to<br />
-            &ldquo;Reliable workflows&rdquo;
+            <span className="rf-go-from-line-1" style={{ display: 'block' }}>Go from &ldquo;Raw events&rdquo; to</span>
+            <span className="rf-go-from-line-2" style={{ display: 'block' }}>&ldquo;Reliable workflows&rdquo;</span>
           </h2>
 
           <p style={{
@@ -1040,7 +1040,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         </div>
 
         {/* Impact Section: Better insights. Bigger impact. */}
-        <div style={{ textAlign: 'center', margin: '76px auto 0', width: '100%', boxSizing: 'border-box' }}>
+        <div className="rf-impact-container" style={{ textAlign: 'center', margin: '76px auto 0', width: '100%', boxSizing: 'border-box' }}>
           <h2 style={{
             fontSize: 'clamp(26px, 2.8vw, 38px)',
             fontWeight: 700,
@@ -1256,7 +1256,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         </div>
 
         {/* Full-width Horizontal Divider Line above Footer matching Reference */}
-        <div style={{
+        <div className="rf-footer-divider" style={{
           width: '100%',
           height: '1px',
           backgroundColor: 'rgba(235, 225, 208, 0.12)',
@@ -1264,7 +1264,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         }} />
 
         {/* Minimal Compact Footer */}
-        <footer style={{
+        <footer className="rf-footer" style={{
           width: '100%',
           margin: '0 auto',
           padding: '0 4px 28px',
@@ -1873,18 +1873,50 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
         /* 5. Mobile Devices (<= 768px) */
         @media (max-width: 768px) {
+          .rf-landing-header {
+            height: 56px !important;
+          }
           .rf-landing-container {
-            padding: 0 16px !important;
-            height: 64px !important;
+            padding: 0 12px !important;
+            height: 56px !important;
           }
-          .rf-mobile-drawer {
-            top: 64px !important;
+          .rf-header-brand {
+            gap: 8px !important;
           }
-          .rf-landing-badge {
+          .rf-brand-icon {
+            width: 30px !important;
+            height: 30px !important;
+            border-radius: 8px !important;
+          }
+          .rf-brand-icon svg {
+            width: 16px !important;
+            height: 16px !important;
+          }
+          .rf-brand-title {
+            font-size: 14.5px !important;
+            letter-spacing: 0.01em !important;
+          }
+          .rf-header-get-started-btn {
             display: none !important;
           }
           .rf-header-signin-btn {
             display: none !important;
+          }
+          .rf-landing-badge {
+            display: none !important;
+          }
+          .rf-header-right-actions {
+            gap: 0 !important;
+          }
+          .rf-mobile-menu-btn {
+            display: inline-flex !important;
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 8px !important;
+            margin-right: 2px !important;
+          }
+          .rf-mobile-drawer {
+            top: 56px !important;
           }
           .rf-hero-headline {
             font-size: clamp(28px, 7.5vw, 40px) !important;
@@ -1900,44 +1932,144 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             line-height: 1.55 !important;
             margin-bottom: 28px !important;
           }
+
+          /* Technology logos in one single row */
           .rf-landing-logos {
-            display: grid !important;
-            grid-template-columns: repeat(3, 1fr) !important;
-            gap: 20px 12px !important;
-            justify-items: center !important;
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            justify-content: flex-start !important;
+            align-items: center !important;
+            gap: 16px !important;
+            padding: 6px 4px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .rf-landing-logos::-webkit-scrollbar {
+            display: none !important;
           }
           .rf-landing-logos > div {
-            font-size: 14px !important;
+            flex-shrink: 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            font-size: 12.5px !important;
+            white-space: nowrap !important;
           }
+          .rf-landing-logos > div svg {
+            width: 16px !important;
+            height: 16px !important;
+          }
+
+          /* Comparison Section: Go from text in two lines */
+          .rf-comparison-heading {
+            font-size: clamp(20px, 5.8vw, 28px) !important;
+            line-height: 1.25 !important;
+            margin-bottom: 12px !important;
+          }
+          .rf-go-from-line-1, .rf-go-from-line-2 {
+            display: block !important;
+            white-space: nowrap !important;
+          }
+
           .rf-flow-container {
             padding: 0 10px !important;
             gap: 6px !important;
           }
+
+          /* Reduced Spacing in Impact & Comparison */
+          #rf-metrics-section {
+            padding: 24px 14px 20px !important;
+          }
+          .rf-comparison-grid {
+            margin-top: 24px !important;
+            gap: 16px !important;
+          }
+          .rf-impact-container {
+            margin: 32px auto 0 !important;
+          }
+          .rf-impact-container p {
+            margin-bottom: 20px !important;
+          }
           .rf-impact-metrics-row {
             grid-template-columns: repeat(2, 1fr) !important;
-            gap: 12px !important;
+            gap: 10px !important;
           }
           .rf-impact-metrics-row > div {
             height: auto !important;
-            min-height: 96px !important;
-            padding: 16px 14px !important;
+            min-height: 84px !important;
+            padding: 14px 12px !important;
           }
           .rf-impact-metrics-row > div > div:first-child {
-            font-size: 24px !important;
+            font-size: 22px !important;
+          }
+          .rf-impact-metrics-row > div > div:last-child {
+            font-size: 11.5px !important;
+          }
+
+          /* Mobile responsive See RelayForge in Action panel */
+          .rf-demo-panel {
+            grid-template-columns: 1fr !important;
+            margin: 28px auto 0 !important;
+            padding: 24px 16px 20px !important;
+            border-radius: 18px !important;
+            text-align: center !important;
+            gap: 18px !important;
+          }
+          .rf-demo-content-col {
+            text-align: center !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+          }
+          .rf-demo-content-col h3 {
+            font-size: clamp(22px, 5.5vw, 26px) !important;
+            line-height: 1.2 !important;
+            margin-bottom: 10px !important;
+          }
+          .rf-demo-content-col p {
+            font-size: 13.5px !important;
+            line-height: 1.5 !important;
+            margin: 0 auto 18px !important;
+            max-width: 100% !important;
+          }
+          .rf-demo-illustration-col {
+            height: 170px !important;
+            max-width: 270px !important;
+            margin: 6px auto 0 !important;
+          }
+          .rf-demo-illustration-col svg {
+            width: 100% !important;
+            height: auto !important;
+            max-height: 170px !important;
+          }
+
+          /* Reduced Footer Spacing */
+          .rf-footer-divider {
+            margin: 24px auto 16px !important;
+          }
+          .rf-footer {
+            padding: 0 4px 14px !important;
           }
           .rf-footer-grid {
             grid-template-columns: repeat(2, 1fr) !important;
-            gap: 28px 16px !important;
+            gap: 20px 14px !important;
+            margin-bottom: 20px !important;
           }
           .rf-footer-brand-col {
             grid-column: 1 / -1 !important;
-            margin-bottom: 12px !important;
+            margin-bottom: 8px !important;
           }
           .rf-footer-bottom-bar {
             flex-direction: column !important;
             align-items: center !important;
             text-align: center !important;
-            gap: 14px !important;
+            padding-top: 14px !important;
+            gap: 10px !important;
           }
           #signin-modal-container {
             flex-direction: column !important;
@@ -1964,23 +2096,19 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             width: 100% !important;
             justify-content: center !important;
           }
-          .rf-landing-logos {
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 16px 10px !important;
-          }
           .rf-demo-panel {
-            padding: 32px 16px !important;
-            border-radius: 18px !important;
+            padding: 20px 14px 18px !important;
+            border-radius: 16px !important;
           }
           .rf-demo-illustration-col {
-            height: 190px !important;
-            max-width: 290px !important;
+            height: 150px !important;
+            max-width: 240px !important;
           }
           .rf-impact-metrics-row > div > div:first-child {
-            font-size: 22px !important;
+            font-size: 20px !important;
           }
           .rf-impact-metrics-row > div > div:last-child {
-            font-size: 11.5px !important;
+            font-size: 11px !important;
           }
         }
       `}</style>
