@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { AnimatedCounter } from './AnimatedCounter.tsx';
 
 interface InteractiveWorkflowDashboardProps {
   onCardClick?: () => void;
@@ -265,8 +266,8 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
       }, 16500);
     };
 
-    // Kick off master sequence after subtle initial delay
-    const initialId = setTimeout(runMasterSequence, 600);
+    // Kick off master sequence after initial count-up completes
+    const initialId = setTimeout(runMasterSequence, 1600);
     timeouts.push(initialId);
 
     return () => {
@@ -972,7 +973,23 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
                   {(['Last 1 hour', 'Last 24 hours', 'Last 7 days'] as const).map(option => (
                     <div
                       key={option}
-                      onClick={() => { setTimeframe(option); setDropdownOpen(false); }}
+                      onClick={() => {
+                        setTimeframe(option);
+                        setDropdownOpen(false);
+                        if (option === 'Last 1 hour') {
+                          setIngestedCount(18450);
+                          setProcessedCount(18392);
+                          setFailedCount(58);
+                        } else if (option === 'Last 24 hours') {
+                          setIngestedCount(248326);
+                          setProcessedCount(246896);
+                          setFailedCount(1430);
+                        } else if (option === 'Last 7 days') {
+                          setIngestedCount(1842600);
+                          setProcessedCount(1832110);
+                          setFailedCount(10490);
+                        }
+                      }}
                       style={{
                         padding: '8px 12px',
                         fontSize: '11px',
@@ -1021,7 +1038,7 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
                 lineHeight: 1,
                 transition: 'color 0.2s ease',
               }}>
-                {ingestedCount.toLocaleString()}
+                <AnimatedCounter value={ingestedCount} duration={1400} />
               </div>
               <div style={{
                 fontSize: '11px',
@@ -1056,7 +1073,7 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
                 lineHeight: 1,
                 transition: 'color 0.2s ease',
               }}>
-                {processedCount.toLocaleString()}
+                <AnimatedCounter value={processedCount} duration={1400} />
               </div>
               <div style={{
                 fontSize: '11px',
@@ -1091,7 +1108,7 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
                 lineHeight: 1,
                 transition: 'color 0.2s ease',
               }}>
-                {failedCount.toLocaleString()}
+                <AnimatedCounter value={failedCount} duration={1400} />
               </div>
               <div style={{
                 fontSize: '11px',

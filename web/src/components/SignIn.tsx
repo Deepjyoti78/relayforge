@@ -2,6 +2,7 @@ import { getApiBaseUrl, setSessionToken } from '../api.ts';
 import React, { useState, useEffect } from 'react';
 import brandGraphic from '../assets/brand-graphic.png';
 import { InteractiveWorkflowDashboard } from './InteractiveWorkflowDashboard.tsx';
+import { AnimatedCounter } from './AnimatedCounter.tsx';
 
 interface SignInProps {
   onTokenSignIn?: (token: string) => void;
@@ -1101,10 +1102,36 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             width: '100%',
           }}>
             {[
-              { value: '8–12×', label: 'Higher processing reliability' },
-              { value: '< 300 ms', label: 'P99 pipeline latency' },
-              { value: '99.9%', label: 'At-least-once delivery' },
-              { value: '0', label: 'Event loss under retries' },
+              {
+                renderValue: () => (
+                  <>
+                    <AnimatedCounter value={8} duration={1000} />–<AnimatedCounter value={12} duration={1400} />×
+                  </>
+                ),
+                label: 'Higher processing reliability',
+              },
+              {
+                renderValue: () => (
+                  <>
+                    &lt; <AnimatedCounter value={300} duration={1400} /> ms
+                  </>
+                ),
+                label: 'P99 pipeline latency',
+              },
+              {
+                renderValue: () => (
+                  <>
+                    <AnimatedCounter value={99.9} decimals={1} duration={1400} />%
+                  </>
+                ),
+                label: 'At-least-once delivery',
+              },
+              {
+                renderValue: () => (
+                  <AnimatedCounter value={0} duration={1000} />
+                ),
+                label: 'Event loss under retries',
+              },
             ].map((metric, idx) => (
               <div key={idx} className={`rf-scroll-card rf-impact-card rf-stagger-${idx + 1}`} style={{
                 backgroundColor: '#141311',
@@ -1119,7 +1146,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 boxSizing: 'border-box',
               }}>
                 <div style={{ fontSize: '28px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
-                  {metric.value}
+                  {metric.renderValue()}
                 </div>
                 <div style={{ fontSize: '13px', color: '#858078', fontWeight: 500, lineHeight: 1.4 }}>
                   {metric.label}

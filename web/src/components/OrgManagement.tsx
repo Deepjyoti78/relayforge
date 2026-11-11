@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { AnimatedCounter } from './AnimatedCounter.tsx';
 import {
   getApiBaseUrl,
   createApiKey,
@@ -1240,7 +1241,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 </span>
               </div>
               <div style={{ fontSize: '34px', fontWeight: 800, color: '#121214', lineHeight: '1.1' }}>
-                {members.length}
+                <AnimatedCounter value={members.length} duration={1200} />
               </div>
               <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{
@@ -1254,7 +1255,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   alignItems: 'center',
                   gap: '4px',
                 }}>
-                  ↑ {members.length} active
+                  ↑ <AnimatedCounter value={members.length} duration={1200} /> active
                 </span>
                 <span style={{ fontSize: '11px', color: '#737373', fontWeight: 600 }}>Enrolled</span>
               </div>
@@ -1301,7 +1302,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               </span>
             </div>
             <div style={{ fontSize: '34px', fontWeight: 800, color: '#FFFFFF', lineHeight: '1.1' }}>
-              {activeKeyCount}
+              <AnimatedCounter value={activeKeyCount} duration={1200} />
             </div>
             <div style={{ marginTop: '12px', fontSize: '11px', color: '#737373', fontWeight: 500 }}>
               SHA-256 hashed live keys
@@ -1333,7 +1334,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               </span>
             </div>
             <div style={{ fontSize: '34px', fontWeight: 800, color: '#FFFFFF', lineHeight: '1.1' }}>
-              {endpoints.length}
+              <AnimatedCounter value={endpoints.length} duration={1200} />
             </div>
             <div style={{ marginTop: '12px', fontSize: '11px', color: '#737373', fontWeight: 500 }}>
               AES-256-GCM signed
@@ -3102,7 +3103,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>Members Directory</span>
                   </div>
                   <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#181818', border: '1px solid #262626', color: '#A3A3A3', fontWeight: 600 }}>
-                    {members.length} enrolled
+                    <AnimatedCounter value={members.length} duration={1200} /> enrolled
                   </span>
                 </div>
                 <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
@@ -3149,7 +3150,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>API Keys & Credentials</span>
                   </div>
                   <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#181818', border: '1px solid #262626', color: '#A3A3A3', fontWeight: 600 }}>
-                    {activeKeyCount} active
+                    <AnimatedCounter value={activeKeyCount} duration={1200} /> active
                   </span>
                 </div>
                 <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
@@ -3197,7 +3198,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>Webhook Ingestion</span>
                   </div>
                   <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#181818', border: '1px solid #262626', color: '#A3A3A3', fontWeight: 600 }}>
-                    {endpoints.length} endpoints
+                    <AnimatedCounter value={endpoints.length} duration={1200} /> endpoints
                   </span>
                 </div>
                 <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
