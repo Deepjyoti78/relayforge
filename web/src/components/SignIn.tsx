@@ -10,6 +10,7 @@ interface SignInProps {
 export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [overviewModalOpen, setOverviewModalOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [manualToken, setManualToken] = useState('');
   const [showManualInput, setShowManualInput] = useState(false);
   const isDev = import.meta.env.DEV || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
@@ -188,8 +189,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </button>
           </nav>
 
-          {/* Right Action Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Right Action Buttons & Mobile Hamburger */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span className="rf-landing-badge" style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -213,6 +214,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </span>
 
             <button
+              className="rf-header-signin-btn"
               onClick={() => setModalOpen(true)}
               style={{
                 background: 'transparent',
@@ -233,6 +235,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
             <button
               id="open-signin-button"
+              className="rf-header-get-started-btn"
               onClick={() => setModalOpen(true)}
               style={{
                 display: 'inline-flex',
@@ -260,26 +263,150 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             >
               Get Started
             </button>
+
+            {/* Mobile Hamburger Toggle Button */}
+            <button
+              className="rf-mobile-menu-btn"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              style={{
+                display: 'none',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '40px',
+                height: '40px',
+                borderRadius: '10px',
+                backgroundColor: 'rgba(235, 225, 208, 0.06)',
+                border: '1px solid rgba(235, 225, 208, 0.16)',
+                color: '#F5F0E7',
+                cursor: 'pointer',
+                padding: 0,
+                transition: 'all 0.15s ease',
+              }}
+            >
+              {mobileMenuOpen ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="4" y1="6" x2="20" y2="6"></line>
+                  <line x1="4" y1="12" x2="20" y2="12"></line>
+                  <line x1="4" y1="18" x2="20" y2="18"></line>
+                </svg>
+              )}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Dropdown Drawer Menu */}
+        {mobileMenuOpen && (
+          <div className="rf-mobile-drawer" style={{
+            position: 'absolute',
+            top: '74px',
+            left: 0,
+            right: 0,
+            backgroundColor: '#12110F',
+            borderBottom: '1px solid rgba(235, 225, 208, 0.16)',
+            padding: '20px 24px 28px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            zIndex: 49,
+            boxShadow: '0 20px 48px rgba(0, 0, 0, 0.85)',
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <button
+                onClick={() => { setMobileMenuOpen(false); setModalOpen(true); }}
+                style={{ background: 'none', border: 'none', color: '#F5F0E7', textAlign: 'left', padding: '10px 4px', fontSize: '16px', fontWeight: 600, cursor: 'pointer' }}
+              >
+                Product
+              </button>
+              <button
+                onClick={() => { setMobileMenuOpen(false); setModalOpen(true); }}
+                style={{ background: 'none', border: 'none', color: '#F5F0E7', textAlign: 'left', padding: '10px 4px', fontSize: '16px', fontWeight: 600, cursor: 'pointer' }}
+              >
+                Solutions
+              </button>
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ color: '#F5F0E7', textDecoration: 'none', padding: '10px 4px', fontSize: '16px', fontWeight: 600 }}
+              >
+                Docs
+              </a>
+              <button
+                onClick={() => { setMobileMenuOpen(false); setModalOpen(true); }}
+                style={{ background: 'none', border: 'none', color: '#F5F0E7', textAlign: 'left', padding: '10px 4px', fontSize: '16px', fontWeight: 600, cursor: 'pointer' }}
+              >
+                Pricing
+              </button>
+              <button
+                onClick={() => { setMobileMenuOpen(false); setOverviewModalOpen(true); }}
+                style={{ background: 'none', border: 'none', color: '#E9D8B9', textAlign: 'left', padding: '10px 4px', fontSize: '16px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                <span>Watch 90s Overview</span>
+                <span style={{ fontSize: '12px' }}>▶</span>
+              </button>
+            </div>
+            <div style={{ height: '1px', backgroundColor: 'rgba(235, 225, 208, 0.12)', margin: '4px 0' }} />
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => { setMobileMenuOpen(false); setModalOpen(true); }}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  borderRadius: '999px',
+                  backgroundColor: 'rgba(235, 225, 208, 0.06)',
+                  border: '1px solid rgba(235, 225, 208, 0.2)',
+                  color: '#F5F0E7',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => { setMobileMenuOpen(false); setModalOpen(true); }}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  borderRadius: '999px',
+                  backgroundColor: '#F5F0E7',
+                  border: 'none',
+                  color: '#0D0C0B',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                Get Started
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* 2. HERO SPLIT SECTION */}
       <section style={{
         width: '100%',
-        maxWidth: '1480px',
+        maxWidth: '1400px',
         margin: '0 auto',
-        padding: 'clamp(48px, 5.5vw, 76px) clamp(24px, 4vw, 56px) clamp(36px, 4vw, 52px)',
+        padding: 'clamp(40px, 5vw, 68px) clamp(20px, 4vw, 52px) clamp(30px, 3.5vw, 48px)',
         boxSizing: 'border-box',
       }}>
         <div className="rf-hero-split-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.25fr)',
-          gap: 'clamp(40px, 4.5vw, 68px)',
+          gap: 'clamp(36px, 4vw, 64px)',
           alignItems: 'center',
         }}>
           {/* Left Column: Pill, Two-Line Heading, Description, & Two Action Buttons */}
-          <div style={{ textAlign: 'left' }}>
+          <div style={{ textAlign: 'left', minWidth: 0 }}>
             {/* Pill: Durable Systems Engine */}
             <div style={{
               display: 'inline-flex',
@@ -302,20 +429,20 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
             {/* Dominant Heading in Exactly Two Lines (52–58px on Large Desktop) */}
             <h1 className="rf-hero-headline" style={{
-              fontSize: 'clamp(36px, 3.8vw, 56px)',
+              fontSize: 'clamp(34px, 3.8vw, 54px)',
               fontWeight: 800,
               lineHeight: 1.12,
               letterSpacing: '-0.03em',
               color: '#F5F0E7',
               margin: '0 0 24px',
             }}>
-              <span className="rf-headline-line-1" style={{ display: 'block', whiteSpace: 'nowrap' }}>Reliable Webhooks &amp;</span>
-              <span className="rf-headline-line-2" style={{ display: 'block', whiteSpace: 'nowrap' }}>Sequential Workflows</span>
+              <span className="rf-headline-line-1" style={{ display: 'block' }}>Reliable Webhooks &amp;</span>
+              <span className="rf-headline-line-2" style={{ display: 'block' }}>Sequential Workflows</span>
             </h1>
 
             {/* Supporting Description (18–20px) */}
-            <p style={{
-              fontSize: 'clamp(16px, 1.25vw, 19px)',
+            <p className="rf-hero-desc" style={{
+              fontSize: 'clamp(15px, 1.25vw, 18px)',
               color: '#B5AEA3',
               maxWidth: '520px',
               lineHeight: 1.58,
@@ -325,7 +452,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </p>
 
             {/* Two Action Buttons side-by-side with exact theme */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            <div className="rf-hero-buttons" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
               {/* Primary Warm Ivory Button: Get Started → */}
               <button
                 id="hero-signin-btn"
@@ -399,9 +526,12 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           {/* Right Column: Live Interactive Animated Workflow Dashboard */}
-          <div style={{
+          <div className="rf-hero-dashboard-col" style={{
             position: 'relative',
             width: '100%',
+            minWidth: 0,
+            maxWidth: '100%',
+            overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -414,9 +544,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       {/* 3. TRUSTED TECHNOLOGY SECTION */}
       <section style={{
         width: '100%',
-        maxWidth: '1480px',
-        margin: 'clamp(36px, 4vw, 56px) auto 24px',
-        padding: '0 clamp(24px, 4vw, 56px)',
+        maxWidth: '1400px',
+        margin: 'clamp(28px, 3.5vw, 48px) auto 20px',
+        padding: '0 clamp(20px, 4vw, 52px)',
         boxSizing: 'border-box',
       }}>
         {/* Horizontal Divider Line with Centered Label */}
@@ -433,8 +563,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             fontSize: '13px',
             color: '#858078',
             fontWeight: 500,
-            whiteSpace: 'nowrap',
+            textAlign: 'center',
             letterSpacing: '0.01em',
+            padding: '0 8px',
           }}>
             Trusted by engineering teams building reliable systems
           </span>
@@ -541,9 +672,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       {/* 4. MAIN COMPARISON SECTION: RAW EVENTS TO RELIABLE WORKFLOWS */}
       <section id="rf-metrics-section" style={{
         width: '100%',
-        maxWidth: '1480px',
+        maxWidth: '1400px',
         margin: '0 auto',
-        padding: '48px clamp(24px, 4vw, 56px) 64px',
+        padding: '36px clamp(20px, 4vw, 52px) 56px',
         boxSizing: 'border-box',
       }}>
         {/* Centered Introductory Section */}
@@ -560,7 +691,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           <h2 style={{
-            fontSize: 'clamp(32px, 3.6vw, 48px)',
+            fontSize: 'clamp(30px, 3.6vw, 48px)',
             fontWeight: 800,
             lineHeight: 1.15,
             letterSpacing: '-0.025em',
@@ -618,9 +749,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         <div className="rf-comparison-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-          gap: '28px',
+          gap: '24px',
           maxWidth: '100%',
-          margin: '48px auto 0',
+          margin: '40px auto 0',
           width: '100%',
           boxSizing: 'border-box',
         }}>
@@ -629,7 +760,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             backgroundColor: '#141311',
             border: '1px solid rgba(235, 225, 208, 0.1)',
             borderRadius: '20px',
-            padding: '36px 32px',
+            padding: '32px 28px',
             textAlign: 'left',
             display: 'flex',
             flexDirection: 'column',
@@ -648,21 +779,24 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               </h3>
 
               {/* Horizontal flow: Event → Custom Code → Queues → Manual Retry */}
-              <div style={{
+              <div className="rf-flow-container" style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: '8px',
-                height: '80px',
-                padding: '0 clamp(16px, 2vw, 24px)',
+                minHeight: '76px',
+                padding: '0 clamp(12px, 2vw, 22px)',
                 backgroundColor: '#0D0C0B',
                 borderRadius: '12px',
                 border: '1px solid rgba(235, 225, 208, 0.08)',
                 marginBottom: '28px',
                 boxSizing: 'border-box',
+                overflowX: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'none',
               }}>
                 {/* Event */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '46px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '42px', flexShrink: 0 }}>
                   <div style={{
                     width: '32px',
                     height: '32px',
@@ -682,10 +816,10 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   <span style={{ fontSize: '11px', color: '#858078', fontWeight: 500 }}>Event</span>
                 </div>
 
-                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px' }}>→</span>
+                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
 
                 {/* Custom Code */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '68px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '64px', flexShrink: 0 }}>
                   <div style={{
                     width: '32px',
                     height: '32px',
@@ -705,10 +839,10 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   <span style={{ fontSize: '11px', color: '#858078', fontWeight: 500, whiteSpace: 'nowrap' }}>Custom Code</span>
                 </div>
 
-                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px' }}>→</span>
+                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
 
                 {/* Queues */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '46px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '42px', flexShrink: 0 }}>
                   <div style={{
                     width: '32px',
                     height: '32px',
@@ -729,10 +863,10 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   <span style={{ fontSize: '11px', color: '#858078', fontWeight: 500 }}>Queues</span>
                 </div>
 
-                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px' }}>→</span>
+                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
 
                 {/* Manual Retry */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '68px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '64px', flexShrink: 0 }}>
                   <div style={{
                     width: '32px',
                     height: '32px',
@@ -778,7 +912,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             backgroundColor: '#151412',
             border: '1px solid rgba(233, 216, 185, 0.32)',
             borderRadius: '20px',
-            padding: '36px 32px',
+            padding: '32px 28px',
             textAlign: 'left',
             display: 'flex',
             flexDirection: 'column',
@@ -798,21 +932,24 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               </h3>
 
               {/* Horizontal flow: Event → RelayForge → Your Systems */}
-              <div style={{
+              <div className="rf-flow-container" style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: '12px',
-                height: '80px',
-                padding: '0 clamp(20px, 2.5vw, 36px)',
+                gap: '10px',
+                minHeight: '76px',
+                padding: '0 clamp(14px, 2vw, 30px)',
                 backgroundColor: '#0D0C0B',
                 borderRadius: '12px',
                 border: '1px solid rgba(235, 225, 208, 0.08)',
                 marginBottom: '28px',
                 boxSizing: 'border-box',
+                overflowX: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'none',
               }}>
                 {/* Event */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '46px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '42px', flexShrink: 0 }}>
                   <div style={{
                     width: '32px',
                     height: '32px',
@@ -832,7 +969,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   <span style={{ fontSize: '11px', color: '#858078', fontWeight: 500 }}>Event</span>
                 </div>
 
-                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px' }}>→</span>
+                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
 
                 {/* RelayForge (Central Highlighted Element) */}
                 <div style={{
@@ -843,8 +980,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   backgroundColor: '#1C1A17',
                   border: '1px solid #E9D8B9',
                   borderRadius: '10px',
-                  padding: '6px 28px',
+                  padding: '6px 20px',
                   boxShadow: '0 0 16px rgba(233, 216, 185, 0.16)',
+                  flexShrink: 0,
                 }}>
                   <div style={{ color: '#E9D8B9', display: 'flex', alignItems: 'center' }}>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
@@ -854,10 +992,10 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   <span style={{ fontSize: '11.5px', color: '#F5F0E7', fontWeight: 700, letterSpacing: '0.01em' }}>RelayForge</span>
                 </div>
 
-                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px' }}>→</span>
+                <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
 
                 {/* Your Systems */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '68px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '64px', flexShrink: 0 }}>
                   <div style={{
                     width: '32px',
                     height: '32px',
@@ -902,9 +1040,9 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         </div>
 
         {/* Impact Section: Better insights. Bigger impact. */}
-        <div style={{ textAlign: 'center', margin: '88px auto 0', width: '100%', boxSizing: 'border-box' }}>
+        <div style={{ textAlign: 'center', margin: '76px auto 0', width: '100%', boxSizing: 'border-box' }}>
           <h2 style={{
-            fontSize: 'clamp(28px, 2.8vw, 38px)',
+            fontSize: 'clamp(26px, 2.8vw, 38px)',
             fontWeight: 700,
             letterSpacing: '-0.02em',
             color: '#F5F0E7',
@@ -927,7 +1065,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           <div className="rf-impact-metrics-row" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '20px',
+            gap: '18px',
             width: '100%',
           }}>
             {[
@@ -948,7 +1086,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 height: '118px',
                 boxSizing: 'border-box',
               }}>
-                <div style={{ fontSize: '30px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1 }}>
                   {metric.value}
                 </div>
                 <div style={{ fontSize: '13px', color: '#858078', fontWeight: 500, lineHeight: 1.4 }}>
@@ -962,21 +1100,21 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         {/* Live Demo Section: See RelayForge in Action */}
         <div className="rf-demo-panel" style={{
           width: '100%',
-          margin: '88px auto 0',
+          margin: '76px auto 0',
           backgroundColor: '#141311',
           border: '1px solid rgba(235, 225, 208, 0.12)',
           borderRadius: '24px',
-          padding: '52px clamp(36px, 4.5vw, 68px)',
+          padding: '48px clamp(28px, 4vw, 64px)',
           display: 'grid',
           gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.25fr)',
-          gap: '40px',
+          gap: '36px',
           alignItems: 'center',
           boxSizing: 'border-box',
           position: 'relative',
           overflow: 'hidden',
         }}>
           {/* Left Content */}
-          <div style={{ textAlign: 'left', zIndex: 2 }}>
+          <div className="rf-demo-content-col" style={{ textAlign: 'left', zIndex: 2 }}>
             <div style={{
               fontSize: '11px',
               fontWeight: 700,
@@ -989,7 +1127,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </div>
 
             <h3 style={{
-              fontSize: 'clamp(32px, 3.2vw, 42px)',
+              fontSize: 'clamp(28px, 3.2vw, 42px)',
               fontWeight: 800,
               lineHeight: 1.15,
               letterSpacing: '-0.025em',
@@ -1041,7 +1179,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           {/* Right Geometric Illustration: 3D Isometric Cube Matching Reference */}
-          <div style={{
+          <div className="rf-demo-illustration-col" style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -1122,7 +1260,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           width: '100%',
           height: '1px',
           backgroundColor: 'rgba(235, 225, 208, 0.12)',
-          margin: '64px auto 44px',
+          margin: '56px auto 40px',
         }} />
 
         {/* Minimal Compact Footer */}
@@ -1140,7 +1278,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             marginBottom: '44px',
           }}>
             {/* Brand Column */}
-            <div>
+            <div className="rf-footer-brand-col">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{
                   width: '28px',
@@ -1216,7 +1354,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           </div>
 
           {/* Divider & Copyright */}
-          <div style={{
+          <div className="rf-footer-bottom-bar" style={{
             borderTop: '1px solid rgba(235, 225, 208, 0.08)',
             paddingTop: '24px',
             display: 'flex',
@@ -1655,19 +1793,46 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           from { opacity: 0; transform: scale(0.98); }
           to { opacity: 1; transform: scale(1); }
         }
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 1. Global Viewport Safety */
+        html, body {
+          max-width: 100vw;
+          overflow-x: hidden;
+        }
+
+        /* 2. Desktop Navigation & Interactions */
+        .rf-mobile-menu-btn {
+          display: none !important;
+        }
+
+        /* 3. Medium Screens / Laptops / Tablets Landscape (<= 1100px) */
         @media (max-width: 1100px) {
           .rf-hero-split-grid {
             grid-template-columns: 1fr !important;
-            gap: 48px !important;
+            gap: 44px !important;
+          }
+          .rf-hero-dashboard-col {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 auto !important;
           }
           .rf-landing-nav-center {
             display: none !important;
           }
+          .rf-mobile-menu-btn {
+            display: inline-flex !important;
+          }
           .rf-landing-logos {
-            justifyContent: center !important;
-            gap: 36px !important;
+            justify-content: center !important;
+            gap: 32px !important;
           }
         }
+
+        /* 4. Tablets Portrait (<= 900px) */
         @media (max-width: 900px) {
           .rf-comparison-grid {
             grid-template-columns: 1fr !important;
@@ -1675,36 +1840,147 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           }
           .rf-impact-metrics-row {
             grid-template-columns: repeat(2, 1fr) !important;
+            gap: 14px !important;
           }
           .rf-demo-panel {
             grid-template-columns: 1fr !important;
-            padding: 36px 28px !important;
+            padding: 40px 24px !important;
             text-align: center !important;
+            gap: 32px !important;
+          }
+          .rf-demo-content-col {
+            text-align: center !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+          }
+          .rf-demo-content-col p {
+            margin: 0 auto 28px !important;
+          }
+          .rf-demo-illustration-col {
+            height: 240px !important;
+            max-width: 360px !important;
+            margin: 0 auto !important;
           }
           .rf-footer-grid {
             grid-template-columns: repeat(2, 1fr) !important;
             gap: 32px !important;
           }
+          .rf-footer-brand-col {
+            grid-column: 1 / -1 !important;
+          }
         }
-        @media (max-width: 640px) {
+
+        /* 5. Mobile Devices (<= 768px) */
+        @media (max-width: 768px) {
           .rf-landing-container {
-            padding: 0 20px !important;
+            padding: 0 16px !important;
+            height: 64px !important;
+          }
+          .rf-mobile-drawer {
+            top: 64px !important;
           }
           .rf-landing-badge {
             display: none !important;
           }
-          .rf-impact-metrics-row {
-            grid-template-columns: 1fr !important;
+          .rf-header-signin-btn {
+            display: none !important;
           }
-          .rf-footer-grid {
-            grid-template-columns: 1fr !important;
-            gap: 28px !important;
+          .rf-hero-headline {
+            font-size: clamp(28px, 7.5vw, 40px) !important;
+            line-height: 1.15 !important;
+            margin-bottom: 18px !important;
           }
           .rf-headline-line-1, .rf-headline-line-2 {
+            display: inline !important;
             white-space: normal !important;
+          }
+          .rf-hero-desc {
+            font-size: 15px !important;
+            line-height: 1.55 !important;
+            margin-bottom: 28px !important;
+          }
+          .rf-landing-logos {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 20px 12px !important;
+            justify-items: center !important;
+          }
+          .rf-landing-logos > div {
+            font-size: 14px !important;
+          }
+          .rf-flow-container {
+            padding: 0 10px !important;
+            gap: 6px !important;
+          }
+          .rf-impact-metrics-row {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
+          }
+          .rf-impact-metrics-row > div {
+            height: auto !important;
+            min-height: 96px !important;
+            padding: 16px 14px !important;
+          }
+          .rf-impact-metrics-row > div > div:first-child {
+            font-size: 24px !important;
+          }
+          .rf-footer-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 28px 16px !important;
+          }
+          .rf-footer-brand-col {
+            grid-column: 1 / -1 !important;
+            margin-bottom: 12px !important;
+          }
+          .rf-footer-bottom-bar {
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+            gap: 14px !important;
           }
           #signin-modal-container {
             flex-direction: column !important;
+            width: 94% !important;
+            max-height: 90vh !important;
+            overflow-y: auto !important;
+          }
+          .rf-signin-modal-graphic {
+            display: none !important;
+          }
+          .rf-signin-modal-content {
+            padding: 32px 20px !important;
+          }
+        }
+
+        /* 6. Narrow Mobile Devices (<= 480px) */
+        @media (max-width: 480px) {
+          .rf-hero-buttons {
+            flex-direction: column !important;
+            width: 100% !important;
+            gap: 12px !important;
+          }
+          .rf-hero-buttons button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          .rf-landing-logos {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 16px 10px !important;
+          }
+          .rf-demo-panel {
+            padding: 32px 16px !important;
+            border-radius: 18px !important;
+          }
+          .rf-demo-illustration-col {
+            height: 190px !important;
+            max-width: 290px !important;
+          }
+          .rf-impact-metrics-row > div > div:first-child {
+            font-size: 22px !important;
+          }
+          .rf-impact-metrics-row > div > div:last-child {
+            font-size: 11.5px !important;
           }
         }
       `}</style>

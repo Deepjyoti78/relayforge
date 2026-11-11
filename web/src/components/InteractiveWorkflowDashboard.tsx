@@ -39,6 +39,28 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
 
   // Canvas ref for animated throughput chart
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  // Outer container ref for responsive mobile auto-scaling
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = useState(1);
+
+  // Responsive mobile scaling effect
+  useEffect(() => {
+    const updateScale = () => {
+      if (containerRef.current) {
+        const parentWidth = containerRef.current.parentElement ? containerRef.current.parentElement.clientWidth : window.innerWidth;
+        const availableWidth = Math.min(containerRef.current.clientWidth || window.innerWidth, parentWidth || window.innerWidth, (typeof window !== 'undefined' ? window.innerWidth - 32 : 720));
+        if (availableWidth < 720) {
+          const newScale = Math.max(0.34, Math.min(1, (availableWidth - 4) / 710));
+          setScale(newScale);
+        } else {
+          setScale(1);
+        }
+      }
+    };
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
 
   // Respect prefers-reduced-motion
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -490,19 +512,36 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
 
   return (
     <div
-      onClick={onCardClick}
-      className="rf-interactive-dashboard-wrapper"
+      ref={containerRef}
+      className="rf-dashboard-outer-container"
       style={{
         position: 'relative',
         width: '100%',
-        maxWidth: '750px',
+        maxWidth: '720px',
+        margin: '0 auto',
         display: 'flex',
-        alignItems: 'center',
         justifyContent: 'center',
-        userSelect: 'none',
-        fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+        alignItems: 'flex-start',
+        overflow: 'hidden',
+        height: scale < 1 ? `${Math.round(376 * scale)}px` : 'auto',
       }}
     >
+      <div
+        onClick={onCardClick}
+        className="rf-interactive-dashboard-wrapper"
+        style={{
+          position: 'relative',
+          width: '710px',
+          minWidth: '710px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          userSelect: 'none',
+          fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+          transform: scale < 1 ? `scale(${scale})` : undefined,
+          transformOrigin: 'top center',
+        }}
+      >
       <div style={{
         display: 'flex',
         alignItems: 'stretch',
@@ -1325,19 +1364,8 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
             transform: rotate(360deg);
           }
         }
-        @media (max-width: 680px) {
-          .rf-interactive-dashboard-wrapper {
-            max-width: 100% !important;
-          }
-          .rf-interactive-dashboard-wrapper > div {
-            flex-direction: column !important;
-            gap: 12px !important;
-          }
-          .rf-interactive-dashboard-wrapper svg {
-            display: none !important;
-          }
-        }
       `}</style>
+      </div>
     </div>
   );
 };
