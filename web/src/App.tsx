@@ -240,12 +240,15 @@ export const App: React.FC = () => {
   if (!user || isLandingPreview) {
     return (
       <SignIn
-        onTokenSignIn={async (token) => {
+        onTokenSignIn={async (token, email) => {
           setSessionToken(token);
+          const emailToUse = email || 'deepjyoti478@gmail.com';
+          const namePart = emailToUse.split('@')[0];
+          const displayName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
           const fallbackUser: UserProfile = {
             id: 'current-user',
-            email: 'deepjyoti478@gmail.com',
-            displayName: 'Deepjyoti',
+            email: emailToUse,
+            displayName,
             avatarUrl: null,
             createdAt: new Date().toISOString(),
             organizations: [

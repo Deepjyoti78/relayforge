@@ -7,7 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F2F2F5'><path d='M13 10V3L4 14h7v7l9-11h-7z'/></svg>" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
     <style>
       :root {
         --color-0: #000000;
@@ -21,9 +21,12 @@
       *, *::before, *::after {
         box-sizing: border-box;
       }
+      html, body, button, input, select, textarea, span, p, a, div, h1, h2, h3, h4, h5, h6, table, th, td {
+        font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Roboto Mono', monospace, -apple-system, sans-serif !important;
+      }
       body {
         margin: 0;
-        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Roboto Mono', monospace, -apple-system, sans-serif !important;
         background-color: #000000;
         color: #FFFFFF;
         min-height: 100vh;
@@ -31,7 +34,7 @@
         -moz-osx-font-smoothing: grayscale;
       }
       code, pre {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Roboto Mono', monospace !important;
       }
       /* Custom scrollbar matching monochromatic palette */
       ::-webkit-scrollbar {
@@ -155,27 +158,51 @@
         }
       }
 
-      .rf-topbar-search {
+      /* TopBar styles & mobile responsiveness */
+      .rf-topbar {
+        height: 64px;
+        transition: padding 0.2s ease;
+      }
+      .rf-topbar-notification-btn,
+      .rf-topbar-docs-btn {
         display: flex;
-        align-items: center;
-        gap: 8px;
-        background-color: #0A0A0A;
-        border: 1px solid #2A2A2A;
-        border-radius: 999px;
-        padding: 7px 14px;
-        width: 250px;
       }
       @media (max-width: 900px) {
         .rf-topbar-search {
-          width: 180px;
+          width: 220px;
         }
       }
-      @media (max-width: 680px) {
-        .rf-topbar-search {
-          display: none;
+      @media (max-width: 768px) {
+        .rf-topbar {
+          padding: 0 12px !important;
+          height: 56px !important;
+          gap: 8px !important;
         }
-        .rf-topbar-pill-text {
-          display: none;
+        .rf-topbar-left {
+          flex-shrink: 0 !important;
+        }
+        .rf-topbar-breadcrumbs {
+          display: none !important;
+        }
+        .rf-topbar-tools {
+          flex: 1 !important;
+          min-width: 0 !important;
+          gap: 8px !important;
+          justify-content: flex-end !important;
+        }
+        .rf-topbar-search {
+          flex: 1 !important;
+          width: 100% !important;
+          min-width: 0 !important;
+          max-width: none !important;
+          padding: 6px 12px !important;
+        }
+        .rf-topbar-kbd {
+          display: none !important;
+        }
+        .rf-topbar-notification-btn,
+        .rf-topbar-docs-btn {
+          display: none !important;
         }
       }
 
@@ -411,7 +438,7 @@
   </head>
   <body>
     <div id="root" style="position: relative; z-index: 1;">
-      <div style="min-height: 100vh; background-color: #000000; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;">
+      <div style="min-height: 100vh; background-color: #000000; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace;">
         <div style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
           <div className="rf-loader-icon" class="rf-loader-icon" style="width: 44px; height: 44px; border-radius: 12px; background-color: #F7EFE2; color: #121214; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(247, 239, 226, 0.18);">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">

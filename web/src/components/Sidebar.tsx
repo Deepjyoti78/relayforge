@@ -92,7 +92,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       gap: isCollapsedMode ? '0' : '10px',
       width: isCollapsedMode ? '36px' : '100%',
       height: isCollapsedMode ? '36px' : 'auto',
-      padding: isCollapsedMode ? '0' : '7px 12px',
+      padding: isCollapsedMode ? '0' : '8.5px 14px',
       borderRadius: isCollapsedMode ? '10px' : '999px',
       fontSize: '12.5px',
       fontWeight: isActive ? 700 : 500,
@@ -106,6 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       margin: isCollapsedMode ? '0 auto' : '0',
       flexShrink: 0,
       position: 'relative' as const,
+      fontFamily: "'JetBrains Mono', monospace",
     };
   };
 
@@ -116,9 +117,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       fontWeight: 700,
       backgroundColor: isActive ? '#E5DAC8' : '#202020',
       color: isActive ? '#0A0A0A' : '#A3A3A3',
-      padding: '1.5px 6px',
+      padding: '2px 7px',
       borderRadius: '999px',
       border: isActive ? '1px solid #D8CBB6' : '1px solid #2A2A2A',
+      fontFamily: "'JetBrains Mono', monospace",
     };
   };
 
@@ -246,9 +248,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Navigation Sections */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: isCollapsedMode ? '8px 0' : '10px 10px', width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: isCollapsedMode ? '8px 0' : '12px 12px', width: '100%', boxSizing: 'border-box' }}>
         {/* Section: MAIN MENU */}
-        <div style={{ marginBottom: '14px' }}>
+        <div style={{ marginBottom: '22px' }}>
           {!isCollapsedMode ? (
             <div style={{
               fontSize: '11px',
@@ -256,7 +258,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               letterSpacing: '0.08em',
               color: '#737373',
               textTransform: 'uppercase',
-              padding: '0 8px 8px',
+              padding: '0 10px 10px',
+              fontFamily: "'JetBrains Mono', monospace",
             }}>
               Main
             </div>
@@ -264,7 +267,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div style={{ height: '1px', backgroundColor: '#202020', margin: '4px 14px 10px' }} />
           )}
 
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             {/* Overview / Dashboard */}
             <button
               onClick={() => handleTabClick('dashboard')}
@@ -463,13 +466,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Section: ORGANIZATIONS */}
-        <div style={{ marginBottom: '14px' }}>
+        <div style={{ marginBottom: '22px' }}>
           {!isCollapsedMode ? (
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              padding: '0 8px 8px',
+              padding: '0 10px 10px',
             }}>
               <span style={{
                 fontSize: '11px',
@@ -477,6 +480,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 letterSpacing: '0.08em',
                 color: '#737373',
                 textTransform: 'uppercase',
+                fontFamily: "'JetBrains Mono', monospace",
               }}>
                 ORGANIZATIONS
               </span>
@@ -491,6 +495,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   borderRadius: '999px',
                   padding: '2px 7px',
                   cursor: 'pointer',
+                  fontFamily: "'JetBrains Mono', monospace",
                 }}
               >
                 + New
@@ -584,10 +589,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
 
           {/* Organization list */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             {organizations.length === 0 ? (
               !isCollapsedMode ? (
-                <div style={{ padding: '8px 10px', fontSize: '12px', color: '#737373' }}>
+                <div style={{ padding: '8px 10px', fontSize: '12px', color: '#737373', fontFamily: "'JetBrains Mono', monospace" }}>
                   No organizations yet.
                 </div>
               ) : null
@@ -633,8 +638,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       width: '100%',
-                      padding: '7px 10px',
-                      borderRadius: '10px',
+                      padding: '8.5px 12px',
+                      borderRadius: '12px',
                       fontSize: '12px',
                       backgroundColor: isSelected ? '#191922' : 'transparent',
                       color: '#FFFFFF',
@@ -643,6 +648,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       textAlign: 'left',
                       transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                       boxShadow: isSelected ? '0 2px 10px rgba(0,0,0,0.35)' : 'none',
+                      fontFamily: "'JetBrains Mono', monospace",
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
@@ -692,7 +698,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               letterSpacing: '0.08em',
               color: '#737373',
               textTransform: 'uppercase',
-              padding: '0 8px 8px',
+              padding: '0 10px 10px',
+              fontFamily: "'JetBrains Mono', monospace",
             }}>
               Administration
             </div>
@@ -700,7 +707,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div style={{ height: '1px', backgroundColor: '#202020', margin: '4px 14px 10px' }} />
           )}
 
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <button
               onClick={() => handleTabClick('settings')}
               className={`rf-nav-item ${activeTab === 'settings' ? "rf-nav-item-active" : ""} ${isCollapsedMode ? "rf-nav-collapsed" : ""}`}

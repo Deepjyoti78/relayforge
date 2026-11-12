@@ -52,20 +52,68 @@ export const TopBar: React.FC<TopBarProps> = ({
   };
 
   return (
-    <header style={{
-      height: '64px',
-      backgroundColor: '#0A0A0A',
-      borderBottom: '1px solid #202020',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '0 24px',
-      position: 'sticky',
-      top: 0,
-      zIndex: 20,
-    }}>
+    <header
+      className="rf-topbar"
+      style={{
+        height: '64px',
+        backgroundColor: '#0A0A0A',
+        borderBottom: '1px solid #202020',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 24px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 20,
+        boxSizing: 'border-box',
+        width: '100%',
+      }}
+    >
+      <style>{`
+        .rf-topbar-notification-btn,
+        .rf-topbar-docs-btn {
+          display: flex !important;
+        }
+        @media (max-width: 768px) {
+          .rf-topbar {
+            padding: 0 12px !important;
+            height: 56px !important;
+            gap: 10px !important;
+          }
+          .rf-topbar-left {
+            flex-shrink: 0 !important;
+          }
+          .rf-topbar-breadcrumbs {
+            display: none !important;
+          }
+          .rf-topbar-tools {
+            flex: 1 !important;
+            min-width: 0 !important;
+            gap: 10px !important;
+            justify-content: flex-end !important;
+          }
+          .rf-topbar-search {
+            flex: 1 !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            padding: 6px 12px !important;
+          }
+          .rf-topbar-kbd {
+            display: none !important;
+          }
+          .rf-topbar-notification-btn,
+          .rf-topbar-docs-btn {
+            display: none !important;
+          }
+          .rf-topbar-avatar-btn {
+            flex-shrink: 0 !important;
+          }
+        }
+      `}</style>
+
       {/* Left: Mobile Toggle + Breadcrumbs */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
+      <div className="rf-topbar-left" style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0, flexShrink: 0 }}>
         {/* Mobile Hamburger Button */}
         <button
           onClick={onOpenMobileMenu}
@@ -73,13 +121,14 @@ export const TopBar: React.FC<TopBarProps> = ({
           aria-label="Open Navigation Menu"
           style={{
             backgroundColor: '#161616',
-      border: '1px solid #2A2A2A',
+            border: '1px solid #2A2A2A',
             borderRadius: '8px',
             color: '#FFFFFF',
             padding: '7px 9px',
             cursor: 'pointer',
             alignItems: 'center',
             justifyContent: 'center',
+            flexShrink: 0,
           }}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
@@ -90,16 +139,19 @@ export const TopBar: React.FC<TopBarProps> = ({
         </button>
 
         {/* Breadcrumbs */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontSize: '13px',
-          color: '#A3A3A3',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}>
+        <div
+          className="rf-topbar-breadcrumbs"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '13px',
+            color: '#A3A3A3',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
           <span style={{ color: '#A3A3A3' }}>Organizations</span>
           <span style={{ color: '#737373' }}>›</span>
           <span style={{ fontWeight: 600, color: '#FFFFFF' }}>
@@ -113,18 +165,30 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* Right Tools */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
-        {/* Search bar */}
-        <div style={{
+      <div
+        className="rf-topbar-tools"
+        style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
-          backgroundColor: '#161616',
-      border: '1px solid #2A2A2A',
-          borderRadius: '999px',
-          padding: '8px 16px',
-          width: '280px',
-        }}>
+          gap: '12px',
+          flexShrink: 0,
+        }}
+      >
+        {/* Search bar */}
+        <div
+          className="rf-topbar-search"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            backgroundColor: '#161616',
+            border: '1px solid #2A2A2A',
+            borderRadius: '999px',
+            padding: '8px 16px',
+            width: '280px',
+            boxSizing: 'border-box',
+          }}
+        >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#737373" strokeWidth="2.5">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -139,37 +203,42 @@ export const TopBar: React.FC<TopBarProps> = ({
               fontSize: '12px',
               color: '#FFFFFF',
               width: '100%',
+              minWidth: 0,
             }}
           />
-          <kbd style={{
-            fontSize: '10px',
-            backgroundColor: '#161616',
-            border: '1px solid #2A2A2A',
-            borderRadius: '6px',
-            padding: '2px 6px',
-            color: '#A3A3A3',
-            fontFamily: 'monospace',
-            whiteSpace: 'nowrap',
-          }}>
+          <kbd
+            className="rf-topbar-kbd"
+            style={{
+              fontSize: '10px',
+              backgroundColor: '#161616',
+              border: '1px solid #2A2A2A',
+              borderRadius: '6px',
+              padding: '2px 6px',
+              color: '#A3A3A3',
+              fontFamily: 'monospace',
+              whiteSpace: 'nowrap',
+            }}
+          >
             ⌘ K
           </kbd>
         </div>
 
         {/* Notification Bell Button */}
         <button
+          className="rf-topbar-notification-btn"
           title="Notifications"
           style={{
             width: '34px',
             height: '34px',
             borderRadius: '50%',
             backgroundColor: '#161616',
-      border: '1px solid #2A2A2A',
-            display: 'flex',
+            border: '1px solid #2A2A2A',
             alignItems: 'center',
             justifyContent: 'center',
             color: '#A3A3A3',
             cursor: 'pointer',
             transition: 'all 0.15s ease',
+            flexShrink: 0,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = '#FFFFFF';
@@ -191,8 +260,8 @@ export const TopBar: React.FC<TopBarProps> = ({
           href="https://github.com"
           target="_blank"
           rel="noreferrer"
+          className="rf-topbar-docs-btn"
           style={{
-            display: 'flex',
             alignItems: 'center',
             gap: '6px',
             padding: '7px 16px',
@@ -204,6 +273,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             textDecoration: 'none',
             fontWeight: 600,
             transition: 'all 0.15s ease',
+            flexShrink: 0,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = '#FFFFFF';
@@ -224,6 +294,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
         {/* User avatar */}
         <button
+          className="rf-topbar-avatar-btn"
           onClick={onOpenProfile}
           title="View profile details"
           style={{
@@ -236,6 +307,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             justifyContent: 'center',
             borderRadius: '50%',
             transition: 'transform 0.15s ease',
+            flexShrink: 0,
           }}
           onMouseEnter={(e) => {
             if (onOpenProfile) e.currentTarget.style.transform = 'scale(1.05)';

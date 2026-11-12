@@ -475,10 +475,10 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
 
     // Dynamic styling when another module participates in the animation
     const isExecutionsActive = key === 'executions' && isActive;
-    const activeBg = isAmberAccent ? 'rgba(245, 158, 11, 0.16)' : isExecutionsActive ? '#161513' : 'rgba(235, 225, 208, 0.15)';
-    const activeBorder = isAmberAccent ? '1px solid #F59E0B' : isExecutionsActive ? '1px solid rgba(235, 225, 208, 0.55)' : '1px solid #E9D8B9';
-    const activeColor = isAmberAccent ? '#FDE68A' : '#F5F0E7';
-    const activeShadow = isAmberAccent ? '0 0 16px rgba(245, 158, 11, 0.45)' : isExecutionsActive ? '0 0 16px rgba(233, 216, 185, 0.3)' : '0 0 14px rgba(233, 216, 185, 0.35)';
+    const activeBg = isWebhooksActive ? '#F5E8D0' : isAmberAccent ? 'rgba(245, 158, 11, 0.16)' : isExecutionsActive ? '#161513' : 'rgba(235, 225, 208, 0.15)';
+    const activeBorder = isWebhooksActive ? '1px solid #F5E8D0' : isAmberAccent ? '1px solid #F59E0B' : isExecutionsActive ? '1px solid rgba(235, 225, 208, 0.55)' : '1px solid #E9D8B9';
+    const activeColor = isWebhooksActive ? '#161513' : isAmberAccent ? '#FDE68A' : '#F5F0E7';
+    const activeShadow = isWebhooksActive ? '0 0 16px rgba(245, 232, 208, 0.45)' : isAmberAccent ? '0 0 16px rgba(245, 158, 11, 0.45)' : isExecutionsActive ? '0 0 16px rgba(233, 216, 185, 0.3)' : '0 0 14px rgba(233, 216, 185, 0.35)';
 
     return (
       <button
@@ -494,8 +494,11 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
           border: isActive ? activeBorder : '1px solid rgba(235, 225, 208, 0.06)',
           borderRadius: '999px',
           padding: '7px 14px',
-          fontSize: '12px',
-          fontWeight: isActive ? 600 : 500,
+          fontSize: '11px',
+          fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
+          textTransform: 'uppercase',
+          letterSpacing: '0.04em',
+          fontWeight: isActive ? 700 : 500,
           cursor: 'pointer',
           marginBottom: '6px',
           boxShadow: isActive ? activeShadow : 'none',
@@ -538,7 +541,7 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
           alignItems: 'center',
           justifyContent: 'center',
           userSelect: 'none',
-          fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+          fontFamily: "'JetBrains Mono', 'SF Mono', 'Fira Code', 'Roboto Mono', monospace",
           transform: scale < 1 ? `scale(${scale})` : undefined,
           transformOrigin: 'top center',
         }}
@@ -565,20 +568,21 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
           {/* GROUP 1: INGEST */}
           <div>
             <div style={{
-              fontSize: '12px',
-              fontWeight: 600,
+              fontSize: '11px',
+              fontWeight: 700,
               color: '#858078',
-              letterSpacing: '0.02em',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
               marginBottom: '6px',
               paddingLeft: '4px',
             }}>
-              Ingest
+              INGEST
             </div>
 
             {/* Module 1: Webhooks */}
             {renderModuleButton(
               'webhooks',
-              'Webhooks',
+              'WEBHOOKS',
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="6" cy="18" r="2.8" />
                 <circle cx="18" cy="18" r="2.8" />
@@ -591,7 +595,7 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
             {/* Module 2: Event Sources */}
             {renderModuleButton(
               'event-sources',
-              'Event Sources',
+              'EVENT SOURCES',
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="18" cy="6" r="2.5" />
                 <circle cx="6" cy="18" r="2.5" />
@@ -603,20 +607,21 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
           {/* GROUP 2: PROCESS */}
           <div style={{ marginTop: '12px' }}>
             <div style={{
-              fontSize: '12px',
-              fontWeight: 600,
+              fontSize: '11px',
+              fontWeight: 700,
               color: '#858078',
-              letterSpacing: '0.02em',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
               marginBottom: '6px',
               paddingLeft: '4px',
             }}>
-              Process
+              PROCESS
             </div>
 
             {/* Module 3: Workflows */}
             {renderModuleButton(
               'workflows',
-              'Workflows',
+              'WORKFLOWS',
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 11a9 9 0 0 1 9 9" />
                 <path d="M4 4a16 16 0 0 1 16 16" />
@@ -627,7 +632,7 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
             {/* Module 4: Executions */}
             {renderModuleButton(
               'executions',
-              'Executions',
+              'EXECUTIONS',
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="9.5" />
                 <polygon points="10 8 16 12 10 16" fill="currentColor" stroke="none" />
@@ -638,20 +643,21 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
           {/* GROUP 3: DELIVER */}
           <div style={{ marginTop: '12px' }}>
             <div style={{
-              fontSize: '12px',
-              fontWeight: 600,
+              fontSize: '11px',
+              fontWeight: 700,
               color: '#858078',
-              letterSpacing: '0.02em',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
               marginBottom: '6px',
               paddingLeft: '4px',
             }}>
-              Deliver
+              DELIVER
             </div>
 
             {/* Module 5: Retries */}
             {renderModuleButton(
               'retries',
-              'Retries',
+              'RETRIES',
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.8 1.04 6.44 2.73" />
                 <polyline points="21 3 21 8 16 8" />
@@ -662,7 +668,7 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
             {/* Module 6: Dead Letter */}
             {renderModuleButton(
               'dead-letter',
-              'Dead Letter',
+              'DEAD LETTER',
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect width="18" height="13" x="3" y="5.5" rx="2" />
                 <path d="m3 7 9 6 9-6" />
@@ -893,12 +899,13 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
                   </svg>
                 </div>
                 <span style={{
-                  fontSize: '14px',
-                  fontWeight: 600,
+                  fontSize: '13px',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontWeight: 700,
                   color: '#F5F0E7',
-                  letterSpacing: '-0.01em',
+                  letterSpacing: '0.04em',
                 }}>
-                  Orders Workflow
+                  ORDERS WORKFLOW
                 </span>
               </div>
 
@@ -911,9 +918,12 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
                 border: '1px solid rgba(132, 204, 22, 0.28)',
                 borderRadius: '999px',
                 padding: '3px 10px',
-                fontSize: '11px',
-                fontWeight: 600,
+                fontSize: '10.5px',
+                fontFamily: "'JetBrains Mono', monospace",
+                fontWeight: 700,
                 color: '#A3E635',
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
               }}>
                 <span style={{
                   width: '6px',
@@ -923,7 +933,7 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
                   boxShadow: '0 0 8px #84CC16',
                   animation: prefersReducedMotion ? 'none' : 'rfPulseDot 1.8s ease-in-out infinite',
                 }}></span>
-                <span>Running</span>
+                <span>RUNNING</span>
               </div>
             </div>
 
@@ -940,16 +950,19 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
                   border: '1px solid rgba(235, 225, 208, 0.12)',
                   borderRadius: '6px',
                   padding: '4px 10px',
-                  fontSize: '11.5px',
+                  fontSize: '10.5px',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
                   color: '#B5AEA3',
                   cursor: 'pointer',
-                  fontWeight: 500,
+                  fontWeight: 600,
                   transition: 'all 0.15s ease',
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
               >
-                <span>{timeframe}</span>
+                <span>{timeframe.toUpperCase()}</span>
                 <span style={{ fontSize: '9px', opacity: 0.7 }}>⌄</span>
               </button>
 
@@ -1027,8 +1040,8 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
               textAlign: 'left',
               transition: 'border-color 0.25s ease',
             }}>
-              <div style={{ fontSize: '11px', color: '#858078', fontWeight: 500 }}>
-                Ingested
+              <div style={{ fontSize: '10.5px', fontFamily: "'JetBrains Mono', monospace", color: '#858078', fontWeight: 600, letterSpacing: '0.05em' }}>
+                INGESTED
               </div>
               <div style={{
                 fontSize: '18px',
@@ -1062,8 +1075,8 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
               textAlign: 'left',
               transition: 'border-color 0.25s ease',
             }}>
-              <div style={{ fontSize: '11px', color: '#858078', fontWeight: 500 }}>
-                Processed
+              <div style={{ fontSize: '10.5px', fontFamily: "'JetBrains Mono', monospace", color: '#858078', fontWeight: 600, letterSpacing: '0.05em' }}>
+                PROCESSED
               </div>
               <div style={{
                 fontSize: '18px',
@@ -1097,8 +1110,8 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
               textAlign: 'left',
               transition: 'border-color 0.25s ease',
             }}>
-              <div style={{ fontSize: '11px', color: '#858078', fontWeight: 500 }}>
-                Failed
+              <div style={{ fontSize: '10.5px', fontFamily: "'JetBrains Mono', monospace", color: '#858078', fontWeight: 600, letterSpacing: '0.05em' }}>
+                FAILED
               </div>
               <div style={{
                 fontSize: '18px',
@@ -1160,11 +1173,13 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
                 </svg>
               </div>
               <span style={{
-                fontSize: '11.5px',
-                fontWeight: pipelineStage === 'receive' ? 600 : 500,
+                fontSize: '11px',
+                fontFamily: "'JetBrains Mono', monospace",
+                fontWeight: pipelineStage === 'receive' ? 700 : 600,
                 color: pipelineStage === 'receive' ? '#F5F0E7' : '#B5AEA3',
+                letterSpacing: '0.05em',
               }}>
-                Receive
+                RECEIVE
               </span>
             </div>
 
@@ -1222,11 +1237,13 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
                 </svg>
               </div>
               <span style={{
-                fontSize: '11.5px',
-                fontWeight: pipelineStage === 'process' ? 600 : 500,
+                fontSize: '11px',
+                fontFamily: "'JetBrains Mono', monospace",
+                fontWeight: pipelineStage === 'process' ? 700 : 600,
                 color: pipelineStage === 'process' ? '#F5F0E7' : '#B5AEA3',
+                letterSpacing: '0.05em',
               }}>
-                Process
+                PROCESS
               </span>
             </div>
 
@@ -1246,7 +1263,7 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
               </svg>
             </div>
 
-            {/* Stage 3: Deliver (Handles Idle, Active, Success Pop, Retry Warning, and DLQ warning) */}
+            {/* Stage 3: Deliver */}
             <div style={{
               flex: 1,
               backgroundColor:
@@ -1294,16 +1311,18 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
                 </svg>
               </div>
               <span style={{
-                fontSize: '11.5px',
-                fontWeight: pipelineStage === 'deliver' || pipelineStage === 'deliver-success' ? 600 : 500,
+                fontSize: '11px',
+                fontFamily: "'JetBrains Mono', monospace",
+                fontWeight: pipelineStage === 'deliver' || pipelineStage === 'deliver-success' ? 700 : 600,
                 color:
                   pipelineStage === 'deliver-success' || pipelineStage === 'deliver'
                     ? '#84CC16'
                     : pipelineStage === 'deliver-retry-warn' || pipelineStage === 'deliver-dlq-warn'
                     ? '#FDE68A'
                     : '#B5AEA3',
+                letterSpacing: '0.05em',
               }}>
-                Deliver
+                DELIVER
               </span>
             </div>
           </div>
@@ -1321,18 +1340,24 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
               marginBottom: '6px',
             }}>
               <span style={{
-                fontSize: '11.5px',
-                fontWeight: 500,
+                fontSize: '10.5px',
+                fontFamily: "'JetBrains Mono', monospace",
+                fontWeight: 600,
                 color: '#858078',
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
               }}>
-                Throughput
+                THROUGHPUT
               </span>
               <span style={{
-                fontSize: '11.5px',
+                fontSize: '10.5px',
+                fontFamily: "'JetBrains Mono', monospace",
                 color: '#858078',
-                fontWeight: 500,
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
               }}>
-                Live Telemetry
+                LIVE TELEMETRY
               </span>
             </div>
 
