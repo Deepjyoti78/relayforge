@@ -1207,48 +1207,34 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         </div>
       )}
 
-      {/* STATS CARDS ROW (SHOWN ONLY IN OVERVIEW SECTION - EXACTLY MATCHING IMAGE 2) */}
+      {/* STATS CARDS ROW (SHOWN ONLY IN OVERVIEW SECTION) */}
       {activeTab === 'dashboard' && (
         <div className="rf-stats-grid rf-stagger-2">
-          {/* Card 1: TOTAL MEMBERS (Active Highlight Surface: Warm Ivory Cream #F7EFE2) */}
+          {/* Card 1: TOTAL MEMBERS */}
           <div
+            className="rf-stat-card"
             onClick={() => onTabChange('members')}
             title="Click to view Members Directory"
-            style={{
-              backgroundColor: '#F7EFE2',
-              border: '1px solid #E5DAC8',
-              borderRadius: '20px',
-              padding: '22px 24px',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
-              cursor: 'pointer',
-              transition: 'transform 0.15s ease',
-              minWidth: 0,
-              boxSizing: 'border-box',
-              position: 'relative',
-              overflow: 'hidden',
-            }}
           >
             <div style={{ position: 'relative', zIndex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#121214" strokeWidth="2.2" style={{ flexShrink: 0 }}>
+                <svg className="rf-card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" strokeWidth="2.2" style={{ flexShrink: 0 }}>
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                   <circle cx="9" cy="7" r="4"></circle>
                   <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                   <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#121214', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <span className="rf-card-label" style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   TOTAL MEMBERS
                 </span>
               </div>
-              <div style={{ fontSize: '34px', fontWeight: 800, color: '#121214', lineHeight: '1.1' }}>
+              <div className="rf-card-value" style={{ fontSize: '34px', fontWeight: 800, lineHeight: '1.1' }}>
                 <AnimatedCounter value={members.length} duration={1200} />
               </div>
               <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{
+                <span className="rf-card-badge" style={{
                   fontSize: '11px',
                   fontWeight: 700,
-                  backgroundColor: '#121214',
-                  color: '#4ADE80',
                   padding: '3px 8px',
                   borderRadius: '999px',
                   display: 'inline-flex',
@@ -1257,18 +1243,16 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 }}>
                   ↑ <AnimatedCounter value={members.length} duration={1200} /> active
                 </span>
-                <span style={{ fontSize: '11px', color: '#737373', fontWeight: 600 }}>Enrolled</span>
+                <span className="rf-card-subtext" style={{ fontSize: '11px', fontWeight: 600 }}>Enrolled</span>
               </div>
             </div>
 
-            {/* Subtle Watermark on right matching Image 2 */}
-            <div style={{
+            {/* Subtle Watermark on right */}
+            <div className="rf-card-watermark" style={{
               position: 'absolute',
               right: '12px',
               bottom: '10px',
-              opacity: 0.15,
               pointerEvents: 'none',
-              color: '#121214',
             }}>
               <svg width="74" height="74" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -1278,98 +1262,71 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             </div>
           </div>
 
-          {/* Card 2: ACTIVE API KEYS (Dark Surface matching Image 2) */}
+          {/* Card 2: ACTIVE API KEYS */}
           <div
+            className="rf-stat-card"
             onClick={() => onTabChange('api-keys')}
             title="Click to manage API Keys"
-            style={{
-              backgroundColor: '#111111',
-              border: '1px solid #202020',
-              borderRadius: '20px',
-              padding: '22px 24px',
-              cursor: 'pointer',
-              transition: 'transform 0.15s ease',
-              minWidth: 0,
-              boxSizing: 'border-box',
-            }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2.2" style={{ flexShrink: 0 }}>
+              <svg className="rf-card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" strokeWidth="2.2" style={{ flexShrink: 0 }}>
                 <path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5-3 3 1.5 1.5L9 14l-5 5H2v-2l5-5 1.5 1.5 3-3-1.5-1.5 3.5-3.5 1.5 1.5L21 2z"></path>
               </svg>
-              <span style={{ fontSize: '11px', fontWeight: 800, color: '#A3A3A3', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              <span className="rf-card-label" style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 ACTIVE API KEYS
               </span>
             </div>
-            <div style={{ fontSize: '34px', fontWeight: 800, color: '#FFFFFF', lineHeight: '1.1' }}>
+            <div className="rf-card-value" style={{ fontSize: '34px', fontWeight: 800, lineHeight: '1.1' }}>
               <AnimatedCounter value={activeKeyCount} duration={1200} />
             </div>
-            <div style={{ marginTop: '12px', fontSize: '11px', color: '#737373', fontWeight: 500 }}>
+            <div className="rf-card-subtext" style={{ marginTop: '12px', fontSize: '11px', fontWeight: 500 }}>
               SHA-256 hashed live keys
             </div>
           </div>
 
-          {/* Card 3: Ingestion Endpoints (Dark Surface matching Image 2) */}
+          {/* Card 3: Ingestion Endpoints */}
           <div
+            className="rf-stat-card"
             onClick={() => onTabChange('endpoints')}
             title="Click to view Endpoints"
-            style={{
-              backgroundColor: '#111111',
-              border: '1px solid #202020',
-              borderRadius: '20px',
-              padding: '22px 24px',
-              cursor: 'pointer',
-              transition: 'transform 0.15s ease',
-              minWidth: 0,
-              boxSizing: 'border-box',
-            }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2" style={{ flexShrink: 0 }}>
+              <svg className="rf-card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" strokeWidth="2" style={{ flexShrink: 0 }}>
                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
               </svg>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              <span className="rf-card-label" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 ENDPOINTS (M3)
               </span>
             </div>
-            <div style={{ fontSize: '34px', fontWeight: 800, color: '#FFFFFF', lineHeight: '1.1' }}>
+            <div className="rf-card-value" style={{ fontSize: '34px', fontWeight: 800, lineHeight: '1.1' }}>
               <AnimatedCounter value={endpoints.length} duration={1200} />
             </div>
-            <div style={{ marginTop: '12px', fontSize: '11px', color: '#737373', fontWeight: 500 }}>
+            <div className="rf-card-subtext" style={{ marginTop: '12px', fontSize: '11px', fontWeight: 500 }}>
               AES-256-GCM signed
             </div>
           </div>
 
-          {/* Card 4: Tenant Isolation (Dark Surface matching Image 2) */}
+          {/* Card 4: Tenant Isolation */}
           <div
+            className="rf-stat-card"
             onClick={() => onTabChange('settings')}
             title="Click to view Architecture & Settings"
-            style={{
-              backgroundColor: '#111111',
-              border: '1px solid #202020',
-              borderRadius: '20px',
-              padding: '22px 24px',
-              cursor: 'pointer',
-              transition: 'transform 0.15s ease',
-              minWidth: 0,
-              boxSizing: 'border-box',
-            }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2" style={{ flexShrink: 0 }}>
+              <svg className="rf-card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" strokeWidth="2" style={{ flexShrink: 0 }}>
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
               </svg>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              <span className="rf-card-label" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 TENANT ISOLATION
               </span>
             </div>
-            <div style={{ fontSize: '26px', fontWeight: 800, color: '#FFFFFF', lineHeight: '1.2' }}>
+            <div className="rf-card-value" style={{ fontSize: '26px', fontWeight: 800, lineHeight: '1.2' }}>
               Enforced
             </div>
             <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0 }}></span>
-              <span style={{ fontSize: '11px', color: '#A3A3A3', fontWeight: 500 }}>PostgreSQL RLS Active</span>
+              <span className="rf-card-subtext" style={{ fontSize: '11px', fontWeight: 500 }}>PostgreSQL RLS Active</span>
             </div>
           </div>
         </div>
@@ -3273,42 +3230,43 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             </div>
           </div>
 
-          {/* Sequential Workflows (M4) Feature Banner matching Image 2 */}
-          <div style={{
-            backgroundColor: '#111111',
-            border: '1px solid #202020',
-            borderRadius: '16px',
-            padding: '20px 24px',
-            marginTop: '20px',
-            marginBottom: '16px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '16px',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '10px',
-                backgroundColor: '#F7EFE2',
-                color: '#121214',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
-              }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                </svg>
-              </div>
+          {/* Bottom Grid: Sequential Workflows (M4) + PostgreSQL RLS Enforced in ONE ROW */}
+          <div className="rf-bottom-cards-grid">
+            {/* Sequential Workflows (M4) Feature Card (Left Column) */}
+            <div style={{
+              backgroundColor: '#111111',
+              border: '1px solid #202020',
+              borderRadius: '16px',
+              padding: '22px 24px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              gap: '16px',
+              boxSizing: 'border-box',
+            }}>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '15px', fontWeight: 700, color: '#FFFFFF' }}>
-                    Sequential Workflow Execution Engine (M4)
-                  </span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '10px',
+                      backgroundColor: '#F7EFE2',
+                      color: '#121214',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.35)',
+                    }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                      </svg>
+                    </div>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
+                      Sequential Workflow Engine (M4)
+                    </span>
+                  </div>
                   <span style={{
                     fontSize: '11px',
                     padding: '2px 8px',
@@ -3320,68 +3278,128 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '4px',
+                    flexShrink: 0,
                   }}>
                     <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#4ADE80' }}></span>
                     Active
                   </span>
                 </div>
-                <p style={{ fontSize: '12px', color: '#737373', margin: '4px 0 0', lineHeight: 1.4 }}>
+                <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
                   Compose multi-step pipelines: Webhook trigger → Conditions → JSON transformation → Sequential HTTP deliveries with resume checkpointing.
                 </p>
               </div>
-            </div>
-            <button
-              onClick={() => onTabChange('workflows')}
-              style={{
-                padding: '9px 20px',
-                backgroundColor: '#F7EFE2',
-                color: '#121214',
-                border: 'none',
-                borderRadius: '999px',
-                fontSize: '12px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'opacity 0.15s ease',
-              }}
-            >
-              Open Workflow Console →
-            </button>
-          </div>
-
-          {/* Architecture Banner matching Image 2 */}
-          <div style={{
-            backgroundColor: '#111111',
-            border: '1px solid #202020',
-            borderRadius: '16px',
-            padding: '20px 24px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
-          }}>
-            <div style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '10px',
-              backgroundColor: 'rgba(16, 185, 129, 0.08)',
-              border: '1px solid rgba(16, 185, 129, 0.25)',
-              color: '#34D399',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-              </svg>
-            </div>
-            <div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>
-                PostgreSQL Row-Level Security Enforced
+              <div style={{ display: 'flex', justifyContent: 'flex-start', paddingTop: '4px' }}>
+                <button
+                  onClick={() => onTabChange('workflows')}
+                  style={{
+                    padding: '8px 18px',
+                    backgroundColor: '#F7EFE2',
+                    color: '#121214',
+                    border: 'none',
+                    borderRadius: '999px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'opacity 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+                >
+                  Open Workflow Console →
+                </button>
               </div>
-              <p style={{ fontSize: '12px', color: '#737373', margin: '4px 0 0', lineHeight: 1.4 }}>
-                Organization slug: {organization.slug} · {organization.id.slice(0, 8)} (Tenant ID: {organization.id}). All queries and outbox workers execute with strict tenant isolation.
-              </p>
+            </div>
+
+            {/* PostgreSQL Row-Level Security Enforced Card (Right Column) */}
+            <div style={{
+              backgroundColor: '#111111',
+              border: '1px solid #202020',
+              borderRadius: '16px',
+              padding: '22px 24px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              gap: '16px',
+              boxSizing: 'border-box',
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '10px',
+                      backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                      border: '1px solid rgba(16, 185, 129, 0.25)',
+                      color: '#34D399',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                      </svg>
+                    </div>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
+                      PostgreSQL Row-Level Security Enforced
+                    </span>
+                  </div>
+                  <span style={{
+                    fontSize: '11px',
+                    padding: '2px 8px',
+                    borderRadius: '999px',
+                    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                    border: '1px solid rgba(16, 185, 129, 0.2)',
+                    color: '#34D399',
+                    fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    flexShrink: 0,
+                  }}>
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981' }}></span>
+                    RLS Active
+                  </span>
+                </div>
+                <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
+                  Organization slug: <span style={{ color: '#E5DAC8', fontWeight: 600 }}>{organization.slug}</span> · <span style={{ color: '#A3A3A3' }}>Tenant ID: {organization.id.slice(0, 8)}...</span> All queries and outbox workers execute with strict tenant isolation.
+                </p>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-start', paddingTop: '4px' }}>
+                <button
+                  onClick={() => onTabChange('settings')}
+                  style={{
+                    padding: '8px 18px',
+                    backgroundColor: 'transparent',
+                    color: '#E5DAC8',
+                    border: '1px solid #333333',
+                    borderRadius: '999px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#181818';
+                    e.currentTarget.style.borderColor = '#555555';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.borderColor = '#333333';
+                  }}
+                >
+                  Security Architecture →
+                </button>
+              </div>
             </div>
           </div>
         </div>

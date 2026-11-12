@@ -83,6 +83,93 @@
         }
       }
 
+      /* Stat Cards with Animated Warm Hover */
+      .rf-stat-card {
+        background-color: #111111;
+        border: 1px solid #202020;
+        border-radius: 20px;
+        padding: 22px 24px;
+        cursor: pointer;
+        min-width: 0;
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
+        transition: background-color 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .rf-stat-card:hover {
+        background-color: #F7EFE2 !important;
+        border-color: #E5DAC8 !important;
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px #E5DAC8;
+      }
+      .rf-stat-card .rf-card-icon {
+        stroke: #A3A3A3;
+        transition: stroke 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .rf-stat-card:hover .rf-card-icon {
+        stroke: #121214 !important;
+      }
+      .rf-stat-card .rf-card-label {
+        color: #A3A3A3;
+        transition: color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .rf-stat-card:hover .rf-card-label {
+        color: #121214 !important;
+      }
+      .rf-stat-card .rf-card-value {
+        color: #FFFFFF;
+        transition: color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .rf-stat-card:hover .rf-card-value {
+        color: #121214 !important;
+      }
+      .rf-stat-card .rf-card-subtext {
+        color: #737373;
+        transition: color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .rf-stat-card:hover .rf-card-subtext {
+        color: #525252 !important;
+      }
+      .rf-stat-card .rf-card-badge {
+        background-color: rgba(34, 197, 94, 0.12);
+        color: #4ADE80;
+        border: 1px solid rgba(34, 197, 94, 0.25);
+        transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .rf-stat-card:hover .rf-card-badge {
+        background-color: rgba(22, 163, 74, 0.14) !important;
+        color: #15803D !important;
+        border-color: rgba(22, 163, 74, 0.25) !important;
+      }
+      .rf-stat-card .rf-card-watermark {
+        color: #FFFFFF;
+        opacity: 0.04;
+        transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .rf-stat-card:hover .rf-card-watermark {
+        color: #121214 !important;
+        opacity: 0.12 !important;
+      }
+
+      /* Bottom Cards Grid in One Row */
+      .rf-bottom-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      @media (max-width: 900px) {
+        .rf-bottom-cards-grid {
+          grid-template-columns: 1fr !important;
+          gap: 14px;
+        }
+      }
+
       .rf-sidebar-desktop {
         display: flex !important;
         flex-shrink: 0;
