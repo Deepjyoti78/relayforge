@@ -147,6 +147,10 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
     <div style={{
       minHeight: '100vh',
       backgroundColor: '#0D0C0B',
+      backgroundImage: `
+        radial-gradient(ellipse 920px 800px at 0% 26%, rgba(225, 115, 32, 0.36) 0%, rgba(190, 88, 20, 0.20) 32%, rgba(140, 55, 12, 0.07) 58%, rgba(13, 12, 11, 0) 78%),
+        radial-gradient(circle 600px at 2% 16%, rgba(245, 135, 40, 0.24) 0%, rgba(195, 90, 22, 0.10) 42%, rgba(13, 12, 11, 0) 72%)
+      `,
       color: '#F5F0E7',
       display: 'flex',
       flexDirection: 'column',
@@ -156,11 +160,31 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       WebkitFontSmoothing: 'antialiased',
       MozOsxFontSmoothing: 'grayscale',
     }}>
+      {/* Ambient Lighting Gradient Orb matching reference image */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: '60px',
+          left: '-140px',
+          width: '780px',
+          height: '760px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle at 45% 48%, rgba(235, 120, 32, 0.44) 0%, rgba(195, 90, 22, 0.28) 32%, rgba(145, 58, 14, 0.10) 58%, transparent 75%)',
+          filter: 'blur(75px)',
+          pointerEvents: 'none',
+          zIndex: 0,
+          opacity: 0.95,
+        }}
+      />
+
       {/* 1. TOP NAVBAR */}
       <header className="rf-landing-header" style={{
         width: '100%',
-        backgroundColor: '#0D0C0B',
-        borderBottom: '1px solid rgba(235, 225, 208, 0.1)',
+        backgroundColor: 'rgba(13, 12, 11, 0.72)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(235, 225, 208, 0.08)',
         position: 'sticky',
         top: 0,
         zIndex: 50,
