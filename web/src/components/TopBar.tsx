@@ -310,7 +310,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               borderRadius: '4px',
               padding: '2px 5px',
               color: 'var(--text-muted)',
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: 'var(--font-mono)',
               whiteSpace: 'nowrap',
               boxShadow: '0 1px 1px rgba(0, 0, 0, 0.05)',
             }}
@@ -340,7 +340,6 @@ export const TopBar: React.FC<TopBarProps> = ({
               cursor: 'pointer',
               transition: 'all 0.15s ease',
               boxShadow: 'var(--shadow-card)',
-              fontFamily: "'JetBrains Mono', monospace",
               flexShrink: 0,
             }}
             onMouseEnter={(e) => {
@@ -451,7 +450,6 @@ export const TopBar: React.FC<TopBarProps> = ({
                       color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)',
                       cursor: 'pointer',
                       fontSize: '12px',
-                      fontFamily: "'JetBrains Mono', monospace",
                       textAlign: 'left',
                       transition: 'all 0.15s ease',
                     }}
