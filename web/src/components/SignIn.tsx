@@ -63,7 +63,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
     try {
       popup = window.open(
         authUrl,
-        provider === 'google' ? 'GoogleSignInPopup' : 'GitHubSignInPopup',
+        'RelayForgeOAuthPopup',
         `width=${width},height=${height},left=${left},top=${top},status=no,toolbar=no,menubar=no,location=yes,resizable=yes`
       );
     } catch {
@@ -83,7 +83,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         clearInterval(timer);
         setIsLoading(false);
       }
-    }, 1000);
+    }, 800);
   };
 
   const handleGoogleSignIn = () => {
@@ -96,10 +96,52 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
     openOAuthPopup('github');
   };
 
-  // Listen for OAuth completion from popup with origin and message structure verification
+  // Multi-channel OAuth completion listener (BroadcastChannel, storage event, postMessage)
   useEffect(() => {
+    const onAuthSuccess = (token: string, email?: string) => {
+      setIsLoading(false);
+      setModalOpen(false);
+      setSessionToken(token);
+      if (onTokenSignIn) {
+        onTokenSignIn(token, email);
+      } else {
+        window.location.reload();
+      }
+    };
+
+    // 1. Modern BroadcastChannel (works seamlessly across tabs and popups even if opener is severed)
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel('rf_oauth_channel');
+      channel.onmessage = (event) => {
+        if (event.data?.type === 'rf_oauth_success' && typeof event.data.token === 'string') {
+          onAuthSuccess(event.data.token, event.data.email);
+        } else if (event.data?.type === 'rf_oauth_error' && typeof event.data.error === 'string') {
+          setIsLoading(false);
+          setAuthError(event.data.error);
+        }
+      };
+    } catch {
+      // BroadcastChannel not available in older browser engines
+    }
+
+    // 2. Storage event listener (fires when popup updates localStorage on same origin)
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === 'rf_oauth_token' && event.newValue) {
+        const token = event.newValue;
+        try { localStorage.removeItem('rf_oauth_token'); } catch {}
+        onAuthSuccess(token);
+      } else if (event.key === 'rf_oauth_error' && event.newValue) {
+        const error = event.newValue;
+        try { localStorage.removeItem('rf_oauth_error'); } catch {}
+        setIsLoading(false);
+        setAuthError(error);
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+
+    // 3. postMessage listener (for direct window.opener communication)
     const handleMessage = (event: MessageEvent) => {
-      // Validate origin: accept same origin, localhost, 127.0.0.1, onrender.com, workers.dev, or pages.dev
       const origin = event.origin || '';
       const isAllowedOrigin =
         origin === window.location.origin ||
@@ -113,14 +155,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
       if (typeof event.data === 'object' && event.data !== null) {
         if (event.data.type === 'rf_oauth_success' && typeof event.data.token === 'string') {
-          setIsLoading(false);
-          setModalOpen(false);
-          if (onTokenSignIn) {
-            onTokenSignIn(event.data.token, event.data.email);
-          } else {
-            setSessionToken(event.data.token);
-            window.location.reload();
-          }
+          onAuthSuccess(event.data.token, event.data.email);
         } else if (event.data.type === 'rf_oauth_error' && typeof event.data.error === 'string') {
           setIsLoading(false);
           setAuthError(event.data.error);
@@ -128,7 +163,12 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       }
     };
     window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+
+    return () => {
+      try { channel?.close(); } catch {}
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('message', handleMessage);
+    };
   }, [onTokenSignIn]);
 
   // Keyboard shortcut (Escape to close modals)
