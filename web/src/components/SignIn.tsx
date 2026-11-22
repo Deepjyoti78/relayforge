@@ -221,7 +221,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       flexDirection: 'column',
       position: 'relative',
       overflowX: 'hidden',
-      fontFamily: "'JetBrains Mono', 'SF Mono', 'Fira Code', 'Roboto Mono', monospace",
+      fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       WebkitFontSmoothing: 'antialiased',
       MozOsxFontSmoothing: 'grayscale',
     }}>
@@ -687,43 +687,40 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 fontWeight: 600,
                 color: '#E9D8B9',
                 marginBottom: '16px',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                fontFamily: "'JetBrains Mono', monospace",
+                letterSpacing: '0.02em',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
               }}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E9D8B9" strokeWidth="2.5">
                   <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                 </svg>
-                <span>DURABLE SYSTEMS ENGINE</span>
+                <span>Durable Systems Engine</span>
               </div>
 
               {/* Dominant Heading in Exactly Two Lines (Fixed Position) */}
               <h1 className="rf-hero-headline rf-scroll-reveal rf-stagger-2" style={{
-                fontSize: 'clamp(24px, 2.7vw, 38px)',
-                fontWeight: 800,
-                lineHeight: 1.2,
-                letterSpacing: '-0.02em',
+                fontSize: 'clamp(26px, 3vw, 42px)',
+                fontWeight: 700,
+                lineHeight: 1.18,
+                letterSpacing: '-0.025em',
                 color: '#F5F0E7',
                 margin: '0 0 clamp(74px, 9.6vh, 105px)',
-                textTransform: 'uppercase',
-                fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
+                fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
               }}>
-                <span className="rf-headline-line-1" style={{ display: 'block' }}>RELIABLE WEBHOOKS &amp;</span>
-                <span className="rf-headline-line-2" style={{ display: 'block' }}>SEQUENTIAL WORKFLOWS</span>
+                <span className="rf-headline-line-1" style={{ display: 'block' }}>Reliable Webhooks &amp;</span>
+                <span className="rf-headline-line-2" style={{ display: 'block' }}>Sequential Workflows</span>
               </h1>
 
               {/* Supporting Description (Moved further below heading) */}
               <p className="rf-hero-desc rf-scroll-reveal rf-stagger-3" style={{
-                fontSize: 'clamp(12px, 1.05vw, 13.5px)',
+                fontSize: 'clamp(13px, 1.1vw, 15px)',
                 color: '#B5AEA3',
                 maxWidth: '520px',
                 lineHeight: 1.6,
-                letterSpacing: '0.02em',
+                letterSpacing: '-0.01em',
                 margin: '0 0 clamp(48px, 6.5vh, 64px)',
-                textTransform: 'uppercase',
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
               }}>
-                INGEST HIGH-THROUGHPUT EVENTS, EXECUTE DURABLE MULTI-STEP PIPELINES, AND GUARANTEE AT-LEAST-ONCE DELIVERY WITH JITTERED EXPONENTIAL RETRIES.
+                Ingest high-throughput events, execute durable multi-step pipelines, and guarantee at-least-once delivery with jittered exponential retries.
               </p>
 
               {/* Two Action Buttons (Moved further downward) */}
@@ -741,14 +738,12 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     border: 'none',
                     borderRadius: '999px',
                     padding: '11px 22px',
-                    fontSize: '12.5px',
-                    fontWeight: 700,
+                    fontSize: '13px',
+                    fontWeight: 600,
                     cursor: 'pointer',
                     boxShadow: '0 4px 20px rgba(245, 240, 231, 0.16)',
                     transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
-                    fontFamily: "'JetBrains Mono', monospace",
+                    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#FFFFFF';
@@ -761,7 +756,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     e.currentTarget.style.boxShadow = '0 4px 20px rgba(245, 240, 231, 0.16)';
                   }}
                 >
-                  <span>GET STARTED</span>
+                  <span>Get Started</span>
                   <span style={{ fontSize: '14px' }}>→</span>
                 </button>
 
@@ -780,13 +775,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     border: '1px solid rgba(235, 225, 208, 0.18)',
                     borderRadius: '999px',
                     padding: '11px 22px',
-                    fontSize: '12.5px',
+                    fontSize: '13px',
                     fontWeight: 600,
                     cursor: 'pointer',
                     transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
-                    fontFamily: "'JetBrains Mono', monospace",
+                    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'rgba(235, 225, 208, 0.08)';
@@ -801,7 +794,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
-                  EXPLORE FEATURES
+                  Explore Features
                 </button>
               </div>
             </div>
@@ -846,12 +839,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               color: '#858078',
               fontWeight: 600,
               textAlign: 'center',
-              letterSpacing: '0.06em',
+              letterSpacing: '0.04em',
               padding: '0 8px',
-              textTransform: 'uppercase',
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
             }}>
-              TRUSTED BY ENGINEERING TEAMS BUILDING RELIABLE SYSTEMS
+              Trusted By Engineering Teams Building Reliable Systems
             </span>
             <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(235, 225, 208, 0.12)' }} />
           </div>
@@ -865,9 +857,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             gap: '24px',
             width: '100%',
             color: '#B5AEA3',
-            fontFamily: "'JetBrains Mono', monospace",
-            textTransform: 'uppercase',
-            letterSpacing: '0.04em',
+            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            letterSpacing: '-0.01em',
           }}>
             {/* Vercel */}
             <div
@@ -879,7 +870,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <polygon points="12 2 22 20 2 20"></polygon>
               </svg>
-              <span>VERCEL</span>
+              <span>Vercel</span>
             </div>
 
             {/* Render */}
@@ -892,7 +883,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3 4h7v7H3z M14 4h7v7h-7z M3 13h7v7H3z"></path>
               </svg>
-              <span>RENDER</span>
+              <span>Render</span>
             </div>
 
             {/* PostgreSQL */}
@@ -907,7 +898,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
                 <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
               </svg>
-              <span>POSTGRESQL</span>
+              <span>PostgreSQL</span>
             </div>
 
             {/* Redis */}
@@ -922,7 +913,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 <polyline points="2 17 12 22 22 17"></polyline>
                 <polyline points="2 12 12 17 22 12"></polyline>
               </svg>
-              <span>REDIS</span>
+              <span>Redis</span>
             </div>
 
             {/* Docker */}
@@ -939,7 +930,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 <rect x="8" y="5" width="3" height="3"></rect>
                 <path d="M2 13c0 4 4 6 10 6s10-2 10-6c-2 0-3-1-4-1s-3 1-4 1H2z"></path>
               </svg>
-              <span>DOCKER</span>
+              <span>Docker</span>
             </div>
 
             {/* Kubernetes */}
@@ -957,7 +948,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 <line x1="3" y1="12" x2="9" y2="12"></line>
                 <line x1="15" y1="12" x2="21" y2="12"></line>
               </svg>
-              <span>KUBERNETES</span>
+              <span>Kubernetes</span>
             </div>
           </div>
         </section>
@@ -976,40 +967,37 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           <div className="rf-scroll-reveal rf-stagger-1" style={{
             fontSize: '11px',
             fontWeight: 700,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
             color: '#B5AEA3',
             marginBottom: '16px',
-            fontFamily: "'JetBrains Mono', monospace",
+            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
           }}>
-            EVENT PROCESSING PLATFORM
+            Event Processing Platform
           </div>
 
           <h2 className="rf-comparison-heading" style={{
             fontSize: 'clamp(28px, 3.4vw, 44px)',
-            fontWeight: 800,
+            fontWeight: 700,
             lineHeight: 1.15,
-            letterSpacing: '-0.02em',
+            letterSpacing: '-0.025em',
             color: '#F5F0E7',
             margin: '0 0 18px',
-            textTransform: 'uppercase',
-            fontFamily: "'JetBrains Mono', monospace",
+            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
           }}>
-            <span className="rf-go-from-line-1 rf-scroll-reveal rf-stagger-2" style={{ display: 'block' }}>GO FROM &ldquo;RAW EVENTS&rdquo; TO</span>
-            <span className="rf-go-from-line-2 rf-scroll-reveal rf-stagger-3" style={{ display: 'block' }}>&ldquo;RELIABLE WORKFLOWS&rdquo;</span>
+            <span className="rf-go-from-line-1 rf-scroll-reveal rf-stagger-2" style={{ display: 'block' }}>Go From &ldquo;Raw Events&rdquo; To</span>
+            <span className="rf-go-from-line-2 rf-scroll-reveal rf-stagger-3" style={{ display: 'block' }}>&ldquo;Reliable Workflows&rdquo;</span>
           </h2>
 
           <p className="rf-scroll-reveal rf-stagger-4" style={{
-            fontSize: 'clamp(12px, 1.05vw, 13.5px)',
+            fontSize: 'clamp(13px, 1.1vw, 15px)',
             color: '#B5AEA3',
             lineHeight: 1.6,
             maxWidth: '620px',
             margin: '0 auto 28px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.02em',
-            fontFamily: "'JetBrains Mono', monospace",
+            letterSpacing: '-0.01em',
+            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
           }}>
-            INGEST, PROCESS, AND DELIVER EVENTS AT SCALE WITH DURABLE WORKFLOWS, RETRIES, AND GUARANTEED DELIVERY.
+            Ingest, process, and deliver events at scale with durable workflows, retries, and guaranteed delivery.
           </p>
 
           <div className="rf-scroll-reveal rf-stagger-5" style={{ display: 'inline-block' }}>
@@ -1025,13 +1013,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 borderRadius: '999px',
                 padding: '12px 26px',
                 fontSize: '13px',
-                fontWeight: 700,
+                fontWeight: 600,
                 cursor: 'pointer',
                 boxShadow: '0 4px 20px rgba(245, 240, 231, 0.16)',
                 transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em',
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = '#FFFFFF';
@@ -1042,7 +1028,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              <span>WATCH A 90S OVERVIEW</span>
+              <span>Watch a 90s Overview</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
               </svg>
@@ -1074,15 +1060,14 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           }}>
             <div>
               <h3 style={{
-                fontSize: '16px',
-                fontWeight: 700,
+                fontSize: '17px',
+                fontWeight: 600,
                 color: '#F5F0E7',
                 margin: '0 0 20px',
-                letterSpacing: '0.02em',
-                textTransform: 'uppercase',
-                fontFamily: "'JetBrains Mono', monospace",
+                letterSpacing: '-0.01em',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
               }}>
-                THE USUAL APPROACH
+                The Usual Approach
               </h3>
 
               {/* Horizontal flow: Event → Custom Code → Queues → Manual Retry */}
@@ -1120,7 +1105,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       <polyline points="14 2 14 8 20 8" />
                     </svg>
                   </div>
-                  <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 600, textTransform: 'uppercase', fontFamily: "'JetBrains Mono', monospace" }}>EVENT</span>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>Event</span>
                 </div>
 
                 <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
@@ -1143,7 +1128,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       <polyline points="8 6 2 12 8 18" />
                     </svg>
                   </div>
-                  <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 600, whiteSpace: 'nowrap', textTransform: 'uppercase', fontFamily: "'JetBrains Mono', monospace" }}>CUSTOM CODE</span>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, whiteSpace: 'nowrap', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>Custom Code</span>
                 </div>
 
                 <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
@@ -1167,7 +1152,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
                     </svg>
                   </div>
-                  <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 600, textTransform: 'uppercase', fontFamily: "'JetBrains Mono', monospace" }}>QUEUES</span>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>Queues</span>
                 </div>
 
                 <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
@@ -1189,23 +1174,23 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
                     </svg>
                   </div>
-                  <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 600, whiteSpace: 'nowrap', textTransform: 'uppercase', fontFamily: "'JetBrains Mono', monospace" }}>MANUAL RETRY</span>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, whiteSpace: 'nowrap', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>Manual Retry</span>
                 </div>
               </div>
 
               {/* 4 Problems */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {[
-                  'BUILD AND MAINTAIN THE PLUMBING',
-                  'HANDLE RETRIES AND FAILURES YOURSELF',
-                  'LIMITED VISIBILITY AND TRACING',
-                  'HARDER TO SCALE AND KEEP RELIABLE',
+                  'Build and maintain the plumbing',
+                  'Handle retries and failures yourself',
+                  'Limited visibility and tracing',
+                  'Harder to scale and keep reliable',
                 ].map((text, idx) => (
                   <div key={idx} className="rf-check-item" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
                     <div style={{ color: '#E06C55', fontSize: '13px', lineHeight: '20px', fontWeight: 700, flexShrink: 0 }}>
                       ✕
                     </div>
-                    <span style={{ fontSize: '12.5px', color: '#B5AEA3', lineHeight: '20px', textTransform: 'uppercase', letterSpacing: '0.02em', fontFamily: "'JetBrains Mono', monospace" }}>
+                    <span style={{ fontSize: '13px', color: '#B5AEA3', lineHeight: '20px', letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
                       {text}
                     </span>
                   </div>
@@ -1229,15 +1214,14 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           }}>
             <div>
               <h3 style={{
-                fontSize: '16px',
-                fontWeight: 700,
+                fontSize: '17px',
+                fontWeight: 600,
                 color: '#F5F0E7',
                 margin: '0 0 20px',
-                letterSpacing: '0.02em',
-                textTransform: 'uppercase',
-                fontFamily: "'JetBrains Mono', monospace",
+                letterSpacing: '-0.01em',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
               }}>
-                WITH RELAYFORGE
+                With RelayForge
               </h3>
 
               {/* Horizontal flow: Event → RelayForge → Your Systems */}
@@ -1275,7 +1259,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       <polyline points="14 2 14 8 20 8" />
                     </svg>
                   </div>
-                  <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 600, textTransform: 'uppercase', fontFamily: "'JetBrains Mono', monospace" }}>EVENT</span>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>Event</span>
                 </div>
 
                 <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
@@ -1298,7 +1282,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                     </svg>
                   </div>
-                  <span style={{ fontSize: '11px', color: '#F5F0E7', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', fontFamily: "'JetBrains Mono', monospace" }}>RELAYFORGE</span>
+                  <span style={{ fontSize: '11px', color: '#F5F0E7', fontWeight: 700, letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>RelayForge</span>
                 </div>
 
                 <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
@@ -1322,23 +1306,23 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
                     </svg>
                   </div>
-                  <span style={{ fontSize: '10.5px', color: '#858078', fontWeight: 600, whiteSpace: 'nowrap', textTransform: 'uppercase', fontFamily: "'JetBrains Mono', monospace" }}>YOUR SYSTEM</span>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, whiteSpace: 'nowrap', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>Your System</span>
                 </div>
               </div>
 
               {/* 4 Advantages */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {[
-                  'DURABLE, MULTI-STEP WORKFLOWS',
-                  'BUILT-IN RETRIES AND DEAD LETTER HANDLING',
-                  'END-TO-END VISIBILITY AND TELEMETRY',
-                  'SCALES RELIABLY WITH YOUR WORKLOAD',
+                  'Durable, multi-step workflows',
+                  'Built-in retries and dead letter handling',
+                  'End-to-end visibility and telemetry',
+                  'Scales reliably with your workload',
                 ].map((text, idx) => (
                   <div key={idx} className="rf-check-item" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
                     <div style={{ color: '#84CC16', fontSize: '14px', lineHeight: '20px', fontWeight: 700, flexShrink: 0 }}>
                       ✓
                     </div>
-                    <span style={{ fontSize: '12.5px', color: '#F5F0E7', fontWeight: 600, lineHeight: '20px', textTransform: 'uppercase', letterSpacing: '0.02em', fontFamily: "'JetBrains Mono', monospace" }}>
+                    <span style={{ fontSize: '13px', color: '#F5F0E7', fontWeight: 500, lineHeight: '20px', letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
                       {text}
                     </span>
                   </div>
@@ -1352,27 +1336,25 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         <div className="rf-impact-container" style={{ textAlign: 'center', margin: '76px auto 0', width: '100%', boxSizing: 'border-box' }}>
           <h2 className="rf-scroll-reveal rf-stagger-1" style={{
             fontSize: 'clamp(24px, 2.6vw, 36px)',
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '-0.02em',
             color: '#F5F0E7',
             margin: '0 0 12px',
-            textTransform: 'uppercase',
-            fontFamily: "'JetBrains Mono', monospace",
+            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
           }}>
-            BETTER INSIGHTS. BIGGER IMPACT.
+            Better Insights. Bigger Impact.
           </h2>
 
           <p className="rf-scroll-reveal rf-stagger-2" style={{
-            fontSize: 'clamp(12px, 1.05vw, 13.5px)',
+            fontSize: 'clamp(13px, 1.1vw, 15px)',
             color: '#B5AEA3',
             lineHeight: 1.6,
             maxWidth: '580px',
             margin: '0 auto 36px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.02em',
-            fontFamily: "'JetBrains Mono', monospace",
+            letterSpacing: '-0.01em',
+            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
           }}>
-            RELAYFORGE GIVES YOU THE RELIABILITY AND VISIBILITY TO TURN EVENTS INTO MEASURABLE BUSINESS OUTCOMES.
+            RelayForge gives you the reliability and visibility to turn events into measurable business outcomes.
           </p>
 
           {/* 4 Metric Blocks */}
@@ -1389,15 +1371,15 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     <AnimatedCounter value={8} duration={1000} />–<AnimatedCounter value={12} duration={1400} />×
                   </>
                 ),
-                label: 'HIGHER PROCESSING RELIABILITY',
+                label: 'Higher Processing Reliability',
               },
               {
                 renderValue: () => (
                   <>
-                    &lt; <AnimatedCounter value={300} duration={1400} /> MS
+                    &lt; <AnimatedCounter value={300} duration={1400} /> ms
                   </>
                 ),
-                label: 'P99 PIPELINE LATENCY',
+                label: 'P99 Pipeline Latency',
               },
               {
                 renderValue: () => (
@@ -1405,13 +1387,13 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     <AnimatedCounter value={99.9} decimals={1} duration={1400} />%
                   </>
                 ),
-                label: 'AT-LEAST-ONCE DELIVERY',
+                label: 'At-Least-Once Delivery',
               },
               {
                 renderValue: () => (
                   <AnimatedCounter value={0} duration={1000} />
                 ),
-                label: 'EVENT LOSS UNDER RETRIES',
+                label: 'Event Loss Under Retries',
               },
             ].map((metric, idx) => (
               <div key={idx} className={`rf-scroll-card rf-impact-card rf-stagger-${idx + 1}`} style={{
@@ -1426,10 +1408,10 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 height: '118px',
                 boxSizing: 'border-box',
               }}>
-                <div style={{ fontSize: '26px', fontWeight: 800, color: '#F5F0E7', lineHeight: 1, fontFamily: "'JetBrains Mono', monospace" }}>
+                <div style={{ fontSize: '26px', fontWeight: 700, color: '#F5F0E7', lineHeight: 1, fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
                   {metric.renderValue()}
                 </div>
-                <div style={{ fontSize: '11.5px', color: '#858078', fontWeight: 600, lineHeight: 1.4, textTransform: 'uppercase', letterSpacing: '0.04em', fontFamily: "'JetBrains Mono', monospace" }}>
+                <div style={{ fontSize: '12px', color: '#858078', fontWeight: 500, lineHeight: 1.4, fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
                   {metric.label}
                 </div>
               </div>
@@ -1458,40 +1440,37 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             <div className="rf-scroll-reveal rf-stagger-1" style={{
               fontSize: '11px',
               fontWeight: 700,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
               color: '#858078',
               marginBottom: '14px',
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
             }}>
-              SEE IT IN ACTION
+              See It In Action
             </div>
 
             <h3 className="rf-scroll-reveal rf-stagger-2" style={{
               fontSize: 'clamp(26px, 3vw, 38px)',
-              fontWeight: 800,
+              fontWeight: 700,
               lineHeight: 1.15,
               letterSpacing: '-0.02em',
               color: '#F5F0E7',
               margin: '0 0 18px',
-              textTransform: 'uppercase',
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
             }}>
-              SEE RELAYFORGE<br />
-              IN ACTION
+              See RelayForge<br />
+              In Action
             </h3>
 
             <p className="rf-scroll-reveal rf-stagger-3" style={{
-              fontSize: 'clamp(12px, 1.05vw, 13.5px)',
+              fontSize: 'clamp(13px, 1.1vw, 15px)',
               color: '#B5AEA3',
               lineHeight: 1.6,
               maxWidth: '430px',
               margin: '0 0 32px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.02em',
-              fontFamily: "'JetBrains Mono', monospace",
+              letterSpacing: '-0.01em',
+              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
             }}>
-              EXPLORE A LIVE DEMO TO SEE HOW EVENTS FLOW THROUGH WORKFLOWS, RETRIES, AND DELIVERY WITH FULL VISIBILITY.
+              Explore a live demo to see how events flow through workflows, retries, and delivery with full visibility.
             </p>
 
             <div className="rf-scroll-reveal rf-stagger-4" style={{ display: 'inline-block' }}>
@@ -1507,13 +1486,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   borderRadius: '999px',
                   padding: '12px 28px',
                   fontSize: '13px',
-                  fontWeight: 700,
+                  fontWeight: 600,
                   cursor: 'pointer',
                   boxShadow: '0 2px 10px rgba(0, 0, 0, 0.25)',
                   transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.04em',
-                  fontFamily: "'JetBrains Mono', monospace",
+                  fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#FFFFFF';
@@ -1524,7 +1501,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                GET DEMO
+                Get Demo
               </button>
             </div>
           </div>
@@ -1646,60 +1623,60 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                   </svg>
                 </div>
-                <span style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '0.04em', color: '#F5F0E7', fontFamily: "'JetBrains Mono', monospace" }}>
-                  RELAYFORGE
+                <span style={{ fontSize: '15px', fontWeight: 700, letterSpacing: '-0.01em', color: '#F5F0E7', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                  RelayForge
                 </span>
               </div>
-              <p style={{ fontSize: '12.5px', color: '#858078', lineHeight: 1.55, marginTop: '14px', maxWidth: '300px', textTransform: 'uppercase', letterSpacing: '0.02em', fontFamily: "'JetBrains Mono', monospace" }}>
-                A DURABLE EVENT PROCESSING PLATFORM FOR RELIABLE, SCALABLE SYSTEMS.
+              <p style={{ fontSize: '13px', color: '#858078', lineHeight: 1.55, marginTop: '14px', maxWidth: '300px', letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                A durable event processing platform for reliable, scalable systems.
               </p>
             </div>
 
             {/* Product Column */}
             <div>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: '#F5F0E7', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: "'JetBrains Mono', monospace" }}>
-                PRODUCT
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px', letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                Product
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: "'JetBrains Mono', monospace" }}>
-                <a href="#rf-metrics-section" style={{ color: '#858078', textDecoration: 'none', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>FEATURES</a>
-                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>INTEGRATIONS</a>
-                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>CHANGELOG</a>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                <a href="#rf-metrics-section" style={{ color: '#858078', textDecoration: 'none', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Features</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Integrations</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Changelog</a>
               </div>
             </div>
 
             {/* Solutions Column */}
             <div>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: '#F5F0E7', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: "'JetBrains Mono', monospace" }}>
-                SOLUTIONS
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px', letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                Solutions
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: "'JetBrains Mono', monospace" }}>
-                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>ORDER PROCESSING</a>
-                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>NOTIFICATIONS</a>
-                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>DATA SYNC</a>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Order Processing</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Notifications</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Data Sync</a>
               </div>
             </div>
 
             {/* Resources Column */}
             <div>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: '#F5F0E7', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: "'JetBrains Mono', monospace" }}>
-                RESOURCES
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px', letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                Resources
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: "'JetBrains Mono', monospace" }}>
-                <a href="https://github.com" target="_blank" rel="noreferrer" style={{ color: '#858078', textDecoration: 'none', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>DOCS</a>
-                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>GUIDES</a>
-                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>API REFERENCE</a>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                <a href="https://github.com" target="_blank" rel="noreferrer" style={{ color: '#858078', textDecoration: 'none', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Docs</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Guides</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>API Reference</a>
               </div>
             </div>
 
             {/* Company Column */}
             <div>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: '#F5F0E7', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: "'JetBrains Mono', monospace" }}>
-                COMPANY
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px', letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                Company
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: "'JetBrains Mono', monospace" }}>
-                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>ABOUT</a>
-                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>PRICING</a>
-                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>CONTACT</a>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>About</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Pricing</a>
+                <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Contact</a>
               </div>
             </div>
           </div>
@@ -1713,21 +1690,20 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             justifyContent: 'space-between',
             flexWrap: 'wrap',
             gap: '16px',
-            fontSize: '11px',
+            fontSize: '12px',
             color: '#666159',
-            fontFamily: "'JetBrains Mono', monospace",
-            textTransform: 'uppercase',
-            letterSpacing: '0.03em',
+            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            letterSpacing: '-0.01em',
           }}>
             <div>
-              &copy; {new Date().getFullYear()} RELAYFORGE. ALL RIGHTS RESERVED.
+              &copy; {new Date().getFullYear()} RelayForge. All rights reserved.
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-              <span style={{ cursor: 'pointer' }} onClick={() => setModalOpen(true)}>PRIVACY POLICY</span>
+              <span style={{ cursor: 'pointer' }} onClick={() => setModalOpen(true)}>Privacy Policy</span>
               <span>•</span>
-              <span style={{ cursor: 'pointer' }} onClick={() => setModalOpen(true)}>TERMS OF SERVICE</span>
+              <span style={{ cursor: 'pointer' }} onClick={() => setModalOpen(true)}>Terms of Service</span>
               <span>•</span>
-              <span style={{ cursor: 'pointer' }} onClick={() => setModalOpen(true)}>SYSTEM STATUS</span>
+              <span style={{ cursor: 'pointer' }} onClick={() => setModalOpen(true)}>System Status</span>
             </div>
           </div>
         </footer>
@@ -1847,26 +1823,25 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               backgroundColor: '#0c0c0e',
               boxSizing: 'border-box',
             }}>
-              {/* Monospace Uppercase Headline */}
+              {/* Clean Title Case Headline */}
               <h2 style={{
-                fontFamily: "'JetBrains Mono', 'SF Mono', 'Fira Code', 'Roboto Mono', monospace",
-                fontSize: '21px',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontSize: '22px',
                 fontWeight: 700,
-                letterSpacing: '0.06em',
+                letterSpacing: '-0.02em',
                 lineHeight: 1.35,
                 color: '#f4f4f6',
-                textTransform: 'uppercase',
                 margin: '0 0 22px 0',
               }}>
                 {authMode === 'signup' ? (
                   <>
-                    LET'S STAY IN TOUCH,<br />
-                    SIGN UP
+                    Let's Stay In Touch,<br />
+                    Sign Up
                   </>
                 ) : (
                   <>
-                    WELCOME BACK,<br />
-                    LOG IN
+                    Welcome Back,<br />
+                    Log In
                   </>
                 )}
               </h2>
@@ -1980,15 +1955,13 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 <div style={{ marginBottom: '14px' }}>
                   <label style={{
                     display: 'block',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: '10.5px',
-                    fontWeight: 600,
-                    letterSpacing: '0.1em',
+                    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                    fontSize: '12px',
+                    fontWeight: 500,
                     color: '#a1a1aa',
                     marginBottom: '6px',
-                    textTransform: 'uppercase',
                   }}>
-                    EMAIL ADDRESS
+                    Email Address
                   </label>
                   <input
                     type="email"
@@ -2024,15 +1997,13 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 <div style={{ marginBottom: '16px' }}>
                   <label style={{
                     display: 'block',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: '10.5px',
-                    fontWeight: 600,
-                    letterSpacing: '0.1em',
+                    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                    fontSize: '12px',
+                    fontWeight: 500,
                     color: '#a1a1aa',
                     marginBottom: '6px',
-                    textTransform: 'uppercase',
                   }}>
-                    PASSWORD
+                    Password
                   </label>
                   <div style={{ position: 'relative', width: '100%' }}>
                     <input
@@ -2127,11 +2098,10 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     border: 'none',
                     borderRadius: '9999px',
                     padding: '13px 20px',
-                    fontSize: '12.5px',
-                    fontWeight: 700,
-                    letterSpacing: '0.12em',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    textTransform: 'uppercase',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    letterSpacing: '-0.01em',
+                    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
                     cursor: isLoading ? 'not-allowed' : 'pointer',
                     boxShadow: '0 4px 18px rgba(245, 238, 227, 0.15)',
                     transition: 'all 0.15s ease',
@@ -2154,7 +2124,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     e.currentTarget.style.boxShadow = '0 4px 18px rgba(245, 238, 227, 0.15)';
                   }}
                 >
-                  {isLoading ? 'PROCESSING...' : (authMode === 'signup' ? 'SIGN UP' : 'LOG IN')}
+                  {isLoading ? 'Processing...' : (authMode === 'signup' ? 'Sign Up' : 'Log In')}
                 </button>
               </form>
 
@@ -2346,17 +2316,17 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               alignItems: 'center',
               gap: '8px',
               fontSize: '11px',
-              fontWeight: 700,
-              letterSpacing: '0.08em',
+              fontWeight: 600,
+              letterSpacing: '0.04em',
               color: '#E9D8B9',
-              textTransform: 'uppercase',
               marginBottom: '12px',
+              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
             }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#E9D8B9' }}></span>
-              SYSTEM ARCHITECTURE WALKTHROUGH
+              System Architecture Walkthrough
             </div>
 
-            <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#F5F0E7', margin: '0 0 10px', letterSpacing: '-0.02em' }}>
+            <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#F5F0E7', margin: '0 0 10px', letterSpacing: '-0.02em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
               RelayForge in 90 Seconds
             </h3>
 

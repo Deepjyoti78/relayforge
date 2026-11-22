@@ -494,11 +494,10 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
           border: isActive ? activeBorder : '1px solid rgba(235, 225, 208, 0.06)',
           borderRadius: '999px',
           padding: '7px 14px',
-          fontSize: '11px',
-          fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
-          textTransform: 'uppercase',
-          letterSpacing: '0.04em',
-          fontWeight: isActive ? 700 : 500,
+          fontSize: '12px',
+          fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+          letterSpacing: '-0.01em',
+          fontWeight: isActive ? 600 : 450,
           cursor: 'pointer',
           marginBottom: '6px',
           boxShadow: isActive ? activeShadow : 'none',
@@ -569,20 +568,20 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
           <div>
             <div style={{
               fontSize: '11px',
-              fontWeight: 700,
+              fontWeight: 600,
               color: '#858078',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
               marginBottom: '6px',
               paddingLeft: '4px',
+              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
             }}>
-              INGEST
+              Ingest
             </div>
 
             {/* Module 1: Webhooks */}
             {renderModuleButton(
               'webhooks',
-              'WEBHOOKS',
+              'Webhooks',
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="6" cy="18" r="2.8" />
                 <circle cx="18" cy="18" r="2.8" />
@@ -595,7 +594,7 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
             {/* Module 2: Event Sources */}
             {renderModuleButton(
               'event-sources',
-              'EVENT SOURCES',
+              'Event Sources',
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="18" cy="6" r="2.5" />
                 <circle cx="6" cy="18" r="2.5" />
@@ -608,20 +607,20 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
           <div style={{ marginTop: '12px' }}>
             <div style={{
               fontSize: '11px',
-              fontWeight: 700,
+              fontWeight: 600,
               color: '#858078',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
               marginBottom: '6px',
               paddingLeft: '4px',
+              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
             }}>
-              PROCESS
+              Process
             </div>
 
             {/* Module 3: Workflows */}
             {renderModuleButton(
               'workflows',
-              'WORKFLOWS',
+              'Workflows',
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 11a9 9 0 0 1 9 9" />
                 <path d="M4 4a16 16 0 0 1 16 16" />
@@ -632,7 +631,7 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
             {/* Module 4: Executions */}
             {renderModuleButton(
               'executions',
-              'EXECUTIONS',
+              'Executions',
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="9.5" />
                 <polygon points="10 8 16 12 10 16" fill="currentColor" stroke="none" />
@@ -644,20 +643,20 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
           <div style={{ marginTop: '12px' }}>
             <div style={{
               fontSize: '11px',
-              fontWeight: 700,
+              fontWeight: 600,
               color: '#858078',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
               marginBottom: '6px',
               paddingLeft: '4px',
+              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
             }}>
-              DELIVER
+              Deliver
             </div>
 
             {/* Module 5: Retries */}
             {renderModuleButton(
               'retries',
-              'RETRIES',
+              'Retries',
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.8 1.04 6.44 2.73" />
                 <polyline points="21 3 21 8 16 8" />
@@ -1340,24 +1339,22 @@ export const InteractiveWorkflowDashboard: React.FC<InteractiveWorkflowDashboard
               marginBottom: '6px',
             }}>
               <span style={{
-                fontSize: '10.5px',
-                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '11px',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
                 fontWeight: 600,
                 color: '#858078',
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
+                letterSpacing: '-0.01em',
               }}>
-                THROUGHPUT
+                Throughput
               </span>
               <span style={{
-                fontSize: '10.5px',
-                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '11px',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
                 color: '#858078',
                 fontWeight: 600,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
+                letterSpacing: '-0.01em',
               }}>
-                LIVE TELEMETRY
+                Live Telemetry
               </span>
             </div>
 
