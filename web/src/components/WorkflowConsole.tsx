@@ -526,19 +526,22 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
 
       {/* Search Bar for Workflows and Executions */}
       {subTab !== 'builder' && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          backgroundColor: '#FFFFFF',
-          border: '1px solid #E5E7EB',
-          borderRadius: '8px',
-          padding: '9px 14px',
-          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
-        }}>
-          <span style={{ color: '#71717A', fontSize: '13px' }}>🔍</span>
+        <div
+          className="rf-search-container"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            backgroundColor: 'var(--bg-card)',
+            border: '1px solid var(--border-main)',
+            borderRadius: '8px',
+            padding: '9px 14px',
+            boxShadow: 'var(--shadow-card)',
+          }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: '13px' }}>🔍</span>
           <input
             type="text"
+            className="rf-search-input"
             placeholder={subTab === 'workflows' ? 'Search workflows by name, description, ID...' : 'Search executions by ID, event ID, status...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -547,7 +550,7 @@ export const WorkflowConsole: React.FC<WorkflowConsoleProps> = ({
               backgroundColor: 'transparent',
               outline: 'none',
               fontSize: '13px',
-              color: '#09090B',
+              color: 'var(--text-primary)',
               width: '100%',
             }}
           />

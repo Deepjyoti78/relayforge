@@ -256,15 +256,16 @@ export const DlqConsole: React.FC<DlqConsoleProps> = ({
         <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '8px' }}>
           <input
             type="text"
+            className="rf-search-input"
             placeholder="Search by Outbox / Event UUID..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
               padding: '6px 12px',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #E5E7EB',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-main)',
               borderRadius: '8px',
-              color: '#09090B',
+              color: 'var(--text-primary)',
               fontSize: '12px',
               width: '240px',
             }}

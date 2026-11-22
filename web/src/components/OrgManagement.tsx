@@ -709,11 +709,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
     fontSize: '10.5px',
     padding: '1px 6px',
     borderRadius: '6px',
-    backgroundColor: isActive ? 'var(--bg-hover)' : 'var(--bg-input)',
-    color: isActive ? 'var(--accent-foreground)' : 'var(--text-muted)',
+    backgroundColor: isActive ? 'rgba(128, 128, 128, 0.2)' : 'var(--bg-input)',
+    color: isActive ? 'inherit' : 'var(--text-muted)',
     border: isActive ? 'none' : '1px solid var(--border-main)',
     fontWeight: 700,
   });
+
+  const getTabBadgeClass = (isActive: boolean) => (isActive ? 'rf-tab-count rf-tab-count-active' : 'rf-tab-count');
 
   return (
     <div className="rf-main-content" style={{ position: 'relative' }}>
@@ -1362,42 +1364,42 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           >
             <button className="rf-pill-btn" onClick={() => onTabChange('members')} style={getTabButtonStyle((activeTab as string) === 'members')}>
               <span>All Members</span>
-              <span style={getTabBadgeStyle((activeTab as string) === 'members')}>{members.length}</span>
+              <span className={getTabBadgeClass((activeTab as string) === 'members')} style={getTabBadgeStyle((activeTab as string) === 'members')}>{members.length}</span>
             </button>
 
             <button className="rf-pill-btn" onClick={() => onTabChange('api-keys')} style={getTabButtonStyle((activeTab as string) === 'api-keys')}>
               <span>API Keys</span>
-              <span style={getTabBadgeStyle((activeTab as string) === 'api-keys')}>{apiKeys.length}</span>
+              <span className={getTabBadgeClass((activeTab as string) === 'api-keys')} style={getTabBadgeStyle((activeTab as string) === 'api-keys')}>{apiKeys.length}</span>
             </button>
 
             <button className="rf-pill-btn" onClick={() => onTabChange('endpoints')} style={getTabButtonStyle((activeTab as string) === 'endpoints')}>
               <span>Endpoints</span>
-              <span style={getTabBadgeStyle((activeTab as string) === 'endpoints')}>{endpoints.length}</span>
+              <span className={getTabBadgeClass((activeTab as string) === 'endpoints')} style={getTabBadgeStyle((activeTab as string) === 'endpoints')}>{endpoints.length}</span>
             </button>
 
             <button className="rf-pill-btn" onClick={() => onTabChange('destinations')} style={getTabButtonStyle((activeTab as string) === 'destinations')}>
               <span>Destinations</span>
-              <span style={getTabBadgeStyle((activeTab as string) === 'destinations')}>{destinations.length}</span>
+              <span className={getTabBadgeClass((activeTab as string) === 'destinations')} style={getTabBadgeStyle((activeTab as string) === 'destinations')}>{destinations.length}</span>
             </button>
 
             <button className="rf-pill-btn" onClick={() => onTabChange('deliveries')} style={getTabButtonStyle((activeTab as string) === 'deliveries')}>
               <span>Deliveries</span>
-              <span style={getTabBadgeStyle((activeTab as string) === 'deliveries')}>{deliveries.length}</span>
+              <span className={getTabBadgeClass((activeTab as string) === 'deliveries')} style={getTabBadgeStyle((activeTab as string) === 'deliveries')}>{deliveries.length}</span>
             </button>
 
             <button className="rf-pill-btn" onClick={() => onTabChange('workflows')} style={getTabButtonStyle((activeTab as string) === 'workflows')}>
               <span>Workflows (M4)</span>
-              <span style={getTabBadgeStyle((activeTab as string) === 'workflows')}>{workflows.length}</span>
+              <span className={getTabBadgeClass((activeTab as string) === 'workflows')} style={getTabBadgeStyle((activeTab as string) === 'workflows')}>{workflows.length}</span>
             </button>
 
             <button className="rf-pill-btn" onClick={() => onTabChange('metrics')} style={getTabButtonStyle((activeTab as string) === 'metrics')}>
               <span>Metrics (M5)</span>
-              <span style={getTabBadgeStyle((activeTab as string) === 'metrics')}>0</span>
+              <span className={getTabBadgeClass((activeTab as string) === 'metrics')} style={getTabBadgeStyle((activeTab as string) === 'metrics')}>0</span>
             </button>
 
             <button className="rf-pill-btn" onClick={() => onTabChange('dlq')} style={getTabButtonStyle((activeTab as string) === 'dlq')}>
               <span>Dead Letter Queue (M5)</span>
-              <span style={getTabBadgeStyle((activeTab as string) === 'dlq')}>0</span>
+              <span className={getTabBadgeClass((activeTab as string) === 'dlq')} style={getTabBadgeStyle((activeTab as string) === 'dlq')}>0</span>
             </button>
 
             <button className="rf-pill-btn" onClick={() => onTabChange('settings')} style={getTabButtonStyle((activeTab as string) === 'settings')}>
@@ -1414,19 +1416,19 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               width: '32px',
               height: '32px',
               borderRadius: '8px',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #E5E7EB',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-main)',
               color: 'var(--text-muted)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
               flexShrink: 0,
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
+              boxShadow: 'var(--shadow-card)',
               transition: 'all 0.15s ease',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F4F4F6'; e.currentTarget.style.color = '#09090B'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#FFFFFF'; e.currentTarget.style.color = '#71717A'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-card)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <polyline points="9 18 15 12 9 6"></polyline>
@@ -1444,25 +1446,26 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           marginBottom: '18px',
           flexWrap: 'wrap',
         }}>
-          {/* Main Search Input */}
-          <div style={{
+          {/* Main Search Input (Wrapped cleanly with no internal input square artifact) */}
+          <div className="rf-search-container" style={{
             flex: 1,
             minWidth: '260px',
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #E5E7EB',
+            backgroundColor: 'var(--bg-card)',
+            border: '1px solid var(--border-main)',
             borderRadius: '8px',
             padding: '8px 14px',
-            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
+            boxShadow: 'var(--shadow-card)',
           }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#71717A" strokeWidth="2.2">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2.2">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
             <input
               type="text"
+              className="rf-search-input"
               placeholder={
                 activeTab === 'api-keys'
                   ? 'Search API key by name, prefix, or scope...'
@@ -1503,15 +1506,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               fontWeight: 500,
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
+              boxShadow: 'var(--shadow-card)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#F4F4F6';
-              e.currentTarget.style.borderColor = '#D1D5DB';
+              e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#FFFFFF';
-              e.currentTarget.style.borderColor = '#E5E7EB';
+              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
             }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1536,15 +1537,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               fontWeight: 500,
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
+              boxShadow: 'var(--shadow-card)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#F4F4F6';
-              e.currentTarget.style.borderColor = '#D1D5DB';
+              e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#FFFFFF';
-              e.currentTarget.style.borderColor = '#E5E7EB';
+              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
             }}
           >
             <span style={{ fontSize: '13px', lineHeight: 1 }}>⇅</span>
@@ -1810,13 +1809,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                         <tr
                           key={m.id}
                           style={{
-                            borderBottom: idx === filteredMembers.length - 1 ? 'none' : '1px solid #E5E7EB',
+                            borderBottom: idx === filteredMembers.length - 1 ? 'none' : '1px solid var(--border-main)',
                             fontSize: '13px',
                             color: 'var(--text-primary)',
                             transition: 'background-color 0.15s ease',
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = '#F9FAFB';
+                            e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor = 'transparent';
@@ -1827,7 +1826,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                             <input
                               type="checkbox"
                               style={{
-                                accentColor: '#09090B',
+                                accentColor: 'var(--accent-primary)',
                                 borderRadius: '4px',
                                 cursor: 'pointer',
                                 width: '15px',
@@ -1836,19 +1835,22 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                             />
                           </td>
 
-                          {/* Member ID Monospace Badge */}
+                          {/* Member ID Monospace Badge (High-Contrast in Both Themes) */}
                           <td style={{ padding: '16px 18px' }}>
-                            <span style={{
-                              display: 'inline-block',
-                              fontFamily: 'monospace',
-                              fontSize: '12px',
-                              fontWeight: 600,
-                              color: '#52525B',
-                              backgroundColor: '#F4F4F6',
-                              border: '1px solid #E5E7EB',
-                              borderRadius: '999px',
-                              padding: '3px 12px',
-                            }}>
+                            <span
+                              className="rf-id-badge"
+                              style={{
+                                display: 'inline-block',
+                                fontFamily: 'var(--font-mono, monospace)',
+                                fontSize: '11.5px',
+                                fontWeight: 600,
+                                color: 'var(--text-secondary)',
+                                backgroundColor: 'var(--bg-input)',
+                                border: '1px solid var(--border-main)',
+                                borderRadius: '999px',
+                                padding: '3px 12px',
+                              }}
+                            >
                               {memberIdDisplay}
                             </span>
                           </td>
@@ -1865,7 +1867,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                     height: '36px',
                                     borderRadius: '50%',
                                     objectFit: 'cover',
-                                    border: '1px solid #E5E7EB',
+                                    border: '1px solid var(--border-main)',
                                   }}
                                 />
                               ) : (
@@ -1873,8 +1875,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                   width: '36px',
                                   height: '36px',
                                   borderRadius: '50%',
-                                  backgroundColor: '#EAEAEB',
-                                  border: '1px solid #E5E7EB',
+                                  backgroundColor: 'var(--bg-input)',
+                                  border: '1px solid var(--border-main)',
                                   color: 'var(--text-primary)',
                                   display: 'flex',
                                   alignItems: 'center',
@@ -1925,9 +1927,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                 borderRadius: '999px',
                                 fontSize: '11px',
                                 fontWeight: 600,
-                                backgroundColor: '#F4F4F6',
-                                border: '1px solid #E5E7EB',
-                                color: '#52525B',
+                                backgroundColor: 'var(--bg-input)',
+                                border: '1px solid var(--border-main)',
+                                color: 'var(--text-secondary)',
                                 letterSpacing: '0.04em',
                               }}>
                                 {m.role}
@@ -1974,8 +1976,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                   width: '32px',
                                   height: '32px',
                                   borderRadius: '50%',
-                                  backgroundColor: isMenuOpen ? '#F4F4F6' : '#FFFFFF',
-                                  border: '1px solid #E5E7EB',
+                                  backgroundColor: isMenuOpen ? 'var(--bg-hover)' : 'var(--bg-card)',
+                                  border: '1px solid var(--border-main)',
                                   color: 'var(--text-primary)',
                                   display: 'flex',
                                   alignItems: 'center',
@@ -1983,16 +1985,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                   cursor: 'pointer',
                                   transition: 'all 0.15s ease',
                                 }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor = '#F4F4F6';
-                                  e.currentTarget.style.borderColor = '#D1D5DB';
-                                }}
-                                onMouseLeave={(e) => {
-                                  if (!isMenuOpen) {
-                                    e.currentTarget.style.backgroundColor = '#FFFFFF';
-                                    e.currentTarget.style.borderColor = '#E5E7EB';
-                                  }
-                                }}
+                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = isMenuOpen ? 'var(--bg-hover)' : 'var(--bg-card)'; }}
                               >
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                                   <circle cx="12" cy="12" r="2"></circle>
@@ -2045,7 +2039,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                                 padding: '6px 8px',
                                                 borderRadius: '6px',
                                                 fontSize: '12px',
-                                                backgroundColor: m.role === r ? '#F4F4F6' : 'transparent',
+                                                backgroundColor: m.role === r ? 'var(--bg-hover)' : 'transparent',
                                                 color: 'var(--text-primary)',
                                                 border: 'none',
                                                 cursor: 'pointer',
@@ -2057,7 +2051,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                             </button>
                                           ))}
                                         </div>
-                                        <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '4px 0' }} />
+                                        <div style={{ height: '1px', backgroundColor: 'var(--border-main)', margin: '4px 0' }} />
                                         <button
                                           onClick={() => {
                                             promptRemoveMember(m);
@@ -2125,7 +2119,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                             width: '100%',
                                             transition: 'background-color 0.15s ease',
                                           }}
-                                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F4F4F6'; }}
+                                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
                                           onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                                         >
                                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -2154,7 +2148,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                             width: '100%',
                                             transition: 'background-color 0.15s ease',
                                           }}
-                                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F4F4F6'; }}
+                                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
                                           onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                                         >
                                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -2165,7 +2159,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                         </button>
                                         {onDeleteOrg && (
                                           <>
-                                            <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '4px 0' }} />
+                                            <div style={{ height: '1px', backgroundColor: 'var(--border-main)', margin: '4px 0' }} />
                                             <button
                                               onClick={() => {
                                                 setActiveMenuMemberId(null);
@@ -2243,7 +2237,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: '14px 20px',
-                borderTop: '1px solid #E5E7EB',
+                borderTop: '1px solid var(--border-main)',
                 backgroundColor: 'var(--bg-input)',
                 color: 'var(--text-muted)',
                 fontSize: '13px',
@@ -2260,14 +2254,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                       width: '30px',
                       height: '30px',
                       borderRadius: '8px',
-                      border: '1px solid #E5E7EB',
-                      backgroundColor: '#FFFFFF',
-                      color: '#A1A1AA',
+                      border: '1px solid var(--border-main)',
+                      backgroundColor: 'var(--bg-card)',
+                      color: 'var(--text-muted)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: 'not-allowed',
                       fontSize: '13px',
+                      opacity: 0.5,
                     }}
                   >
                     &lt;
@@ -2278,8 +2273,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                       height: '30px',
                       borderRadius: '8px',
                       border: 'none',
-                      backgroundColor: '#09090B',
-                      color: '#FFFFFF',
+                      backgroundColor: 'var(--accent-primary)',
+                      color: 'var(--accent-foreground)',
                       fontWeight: 700,
                       display: 'flex',
                       alignItems: 'center',
@@ -2296,14 +2291,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                       width: '30px',
                       height: '30px',
                       borderRadius: '8px',
-                      border: '1px solid #E5E7EB',
-                      backgroundColor: '#FFFFFF',
-                      color: '#A1A1AA',
+                      border: '1px solid var(--border-main)',
+                      backgroundColor: 'var(--bg-card)',
+                      color: 'var(--text-muted)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: 'not-allowed',
                       fontSize: '13px',
+                      opacity: 0.5,
                     }}
                   >
                     &gt;
@@ -2363,15 +2359,16 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <tr
                       key={k.id}
                       style={{
-                        borderBottom: idx === filteredKeys.length - 1 ? 'none' : '1px solid #E5E7EB',
+                        borderBottom: idx === filteredKeys.length - 1 ? 'none' : '1px solid var(--border-main)',
                         fontSize: '13px',
                         color: 'var(--text-primary)',
                       }}
                     >
-                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#52525B' }}>
-                        <span style={{
-                          backgroundColor: '#F4F4F6',
-                          border: '1px solid #E5E7EB',
+                      <td style={{ padding: '14px 20px', fontFamily: 'var(--font-mono, monospace)', fontSize: '12px' }}>
+                        <span className="rf-id-badge" style={{
+                          backgroundColor: 'var(--bg-input)',
+                          border: '1px solid var(--border-main)',
+                          color: 'var(--text-secondary)',
                           padding: '2px 8px',
                           borderRadius: '6px',
                         }}>
@@ -2383,7 +2380,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                         {k.name}
                       </td>
 
-                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', color: 'var(--text-primary)' }}>
+                      <td style={{ padding: '14px 20px', fontFamily: 'var(--font-mono, monospace)', color: 'var(--text-primary)' }}>
                         <code>{k.keyPrefix}...</code>
                       </td>
 
@@ -2391,13 +2388,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                         {k.scopes.map((s) => (
                           <span key={s} style={{
                             padding: '2px 8px',
-                            backgroundColor: '#F4F4F6',
+                            backgroundColor: 'var(--bg-input)',
                             color: 'var(--text-primary)',
                             borderRadius: '4px',
                             fontSize: '11px',
                             fontWeight: 600,
                             marginRight: '4px',
-                            border: '1px solid #E5E7EB',
+                            border: '1px solid var(--border-main)',
                           }}>
                             {s}
                           </span>
@@ -2514,15 +2511,16 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <tr
                       key={ep.id}
                       style={{
-                        borderBottom: idx === filteredEndpoints.length - 1 ? 'none' : '1px solid #E5E7EB',
+                        borderBottom: idx === filteredEndpoints.length - 1 ? 'none' : '1px solid var(--border-main)',
                         fontSize: '13px',
                         color: 'var(--text-primary)',
                       }}
                     >
-                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#52525B' }}>
-                        <span style={{
-                          backgroundColor: '#F4F4F6',
-                          border: '1px solid #E5E7EB',
+                      <td style={{ padding: '14px 20px', fontFamily: 'var(--font-mono, monospace)', fontSize: '12px' }}>
+                        <span className="rf-id-badge" style={{
+                          backgroundColor: 'var(--bg-input)',
+                          border: '1px solid var(--border-main)',
+                          color: 'var(--text-secondary)',
                           padding: '2px 8px',
                           borderRadius: '6px',
                         }}>
@@ -2532,15 +2530,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
                       <td style={{ padding: '14px 20px' }}>
                         <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{ep.name}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>/{ep.slug}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono, monospace)' }}>/{ep.slug}</div>
                       </td>
 
                       <td style={{ padding: '14px 20px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <code style={{
                             fontSize: '11px',
-                            backgroundColor: '#F4F4F6',
-                            border: '1px solid #E5E7EB',
+                            backgroundColor: 'var(--bg-input)',
+                            border: '1px solid var(--border-main)',
                             padding: '3px 8px',
                             borderRadius: '4px',
                             color: 'var(--text-primary)',
@@ -2550,10 +2548,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                           <button
                             onClick={() => handleCopyText(ingestUrl, false, ep.id)}
                             style={{
-                              backgroundColor: '#FFFFFF',
-                              border: '1px solid #E5E7EB',
+                              backgroundColor: 'var(--bg-card)',
+                              border: '1px solid var(--border-main)',
                               borderRadius: '4px',
-                              color: isCopied ? '#16A34A' : '#71717A',
+                              color: isCopied ? '#16A34A' : 'var(--text-muted)',
                               fontSize: '11px',
                               fontWeight: 600,
                               cursor: 'pointer',
@@ -2713,15 +2711,16 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <tr
                       key={d.id}
                       style={{
-                        borderBottom: idx === filteredDestinations.length - 1 ? 'none' : '1px solid #E5E7EB',
+                        borderBottom: idx === filteredDestinations.length - 1 ? 'none' : '1px solid var(--border-main)',
                         fontSize: '13px',
                         color: 'var(--text-primary)',
                       }}
                     >
-                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#52525B' }}>
-                        <span style={{
-                          backgroundColor: '#F4F4F6',
-                          border: '1px solid #E5E7EB',
+                      <td style={{ padding: '14px 20px', fontFamily: 'var(--font-mono, monospace)', fontSize: '12px' }}>
+                        <span className="rf-id-badge" style={{
+                          backgroundColor: 'var(--bg-input)',
+                          border: '1px solid var(--border-main)',
+                          color: 'var(--text-secondary)',
                           padding: '2px 8px',
                           borderRadius: '6px',
                         }}>
@@ -2735,9 +2734,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                           <span style={{
                             fontSize: '10px',
                             fontWeight: 700,
-                            fontFamily: 'monospace',
-                            backgroundColor: '#F4F4F6',
-                            border: '1px solid #E5E7EB',
+                            fontFamily: 'var(--font-mono, monospace)',
+                            backgroundColor: 'var(--bg-input)',
+                            border: '1px solid var(--border-main)',
                             color: 'var(--text-primary)',
                             padding: '2px 6px',
                             borderRadius: '4px',
@@ -2751,8 +2750,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <code style={{
                             fontSize: '12px',
-                            backgroundColor: '#F4F4F6',
-                            border: '1px solid #E5E7EB',
+                            backgroundColor: 'var(--bg-input)',
+                            border: '1px solid var(--border-main)',
                             padding: '3px 8px',
                             borderRadius: '4px',
                             color: 'var(--text-primary)',
@@ -2926,15 +2925,16 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <tr
                       key={att.id}
                       style={{
-                        borderBottom: idx === filteredDeliveries.length - 1 ? 'none' : '1px solid #E5E7EB',
+                        borderBottom: idx === filteredDeliveries.length - 1 ? 'none' : '1px solid var(--border-main)',
                         fontSize: '13px',
                         color: 'var(--text-primary)',
                       }}
                     >
-                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#52525B' }}>
-                        <span style={{
-                          backgroundColor: '#F4F4F6',
-                          border: '1px solid #E5E7EB',
+                      <td style={{ padding: '14px 20px', fontFamily: 'var(--font-mono, monospace)', fontSize: '12px' }}>
+                        <span className="rf-id-badge" style={{
+                          backgroundColor: 'var(--bg-input)',
+                          border: '1px solid var(--border-main)',
+                          color: 'var(--text-secondary)',
                           padding: '2px 8px',
                           borderRadius: '6px',
                         }}>
@@ -2969,9 +2969,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                           <span style={{
                             fontSize: '10px',
                             fontWeight: 700,
-                            fontFamily: 'monospace',
-                            backgroundColor: '#F4F4F6',
-                            border: '1px solid #E5E7EB',
+                            fontFamily: 'var(--font-mono, monospace)',
+                            backgroundColor: 'var(--bg-input)',
+                            border: '1px solid var(--border-main)',
                             color: 'var(--text-primary)',
                             padding: '2px 6px',
                             borderRadius: '4px',
@@ -2980,8 +2980,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                           </span>
                           <code style={{
                             fontSize: '12px',
-                            backgroundColor: '#F4F4F6',
-                            border: '1px solid #E5E7EB',
+                            backgroundColor: 'var(--bg-input)',
+                            border: '1px solid var(--border-main)',
                             padding: '3px 8px',
                             borderRadius: '4px',
                             color: 'var(--text-primary)',

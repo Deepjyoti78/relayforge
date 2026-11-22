@@ -290,6 +290,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           </svg>
           <input
             type="text"
+            className="rf-search-input"
             placeholder="Search resources, keys..."
             style={{
               border: 'none',
