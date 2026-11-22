@@ -85,6 +85,12 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  React.useEffect(() => {
+    if (userDisplayName && !orgName) {
+      setOrgName(`${userDisplayName}'s Org`);
+    }
+  }, [userDisplayName]);
+
   if (!isOpen) return null;
 
   const generatedSlug = (customSlug || orgName)

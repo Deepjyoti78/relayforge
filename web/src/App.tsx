@@ -186,18 +186,18 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (user) {
       const hasOnboarded = localStorage.getItem(`rf_onboarding_done_${user.id}`);
-      const isDefaultOrg = activeOrg?.name === 'army corp' || activeOrg?.name.endsWith("'s Workspace");
-      if (!hasOnboarded || (user.organizations && user.organizations.length <= 1 && isDefaultOrg && !hasOnboarded)) {
+      if (!hasOnboarded) {
         setIsOnboardingOpen(true);
       }
     }
-  }, [user?.id, activeOrg?.name]);
+  }, [user?.id]);
 
   // Multi-channel OAuth completion listener (BroadcastChannel, storage event, postMessage)
   useEffect(() => {
     const handleAuthSuccess = (token: string) => {
       setSessionToken(token);
       setIsSyncing(true);
+      setIsOnboardingOpen(true);
       void loadUser();
     };
 
@@ -419,6 +419,7 @@ export const App: React.FC = () => {
         onTokenSignIn={async (token) => {
           setSessionToken(token);
           setIsSyncing(true);
+          setIsOnboardingOpen(true);
           await loadUser();
         }}
       />
