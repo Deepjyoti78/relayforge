@@ -68,14 +68,14 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
   }, [organizationId, streamPaused]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header & Window Controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#09090B', letterSpacing: '-0.02em' }}>
             Operational Metrics & Real-Time Telemetry
           </h2>
-          <p style={{ fontSize: '12px', color: '#A3A3A3', margin: '4px 0 0 0' }}>
+          <p style={{ fontSize: '12px', color: '#71717A', margin: '4px 0 0 0' }}>
             Quantile latencies, outbox processing rates, and live server-sent telemetry events.
           </p>
         </div>
@@ -89,14 +89,15 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
                 void loadData(hours);
               }}
               style={{
-                padding: '5px 12px',
-                borderRadius: '999px',
-                fontSize: '11px',
-                fontWeight: 700,
-                border: windowHours === hours ? '1px solid transparent' : '1px solid #2A2A2A',
-                backgroundColor: windowHours === hours ? '#FFFFFF' : '#161616',
-                color: windowHours === hours ? '#000000' : '#A3A3A3',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                fontSize: '11.5px',
+                fontWeight: 600,
+                border: windowHours === hours ? '1px solid #09090B' : '1px solid #E5E7EB',
+                backgroundColor: windowHours === hours ? '#09090B' : '#FFFFFF',
+                color: windowHours === hours ? '#FFFFFF' : '#09090B',
                 cursor: 'pointer',
+                transition: 'all 0.15s ease',
               }}
             >
               {hours === 1 ? '1 Hour' : hours === 6 ? '6 Hours' : hours === 24 ? '24 Hours' : '7 Days'}
@@ -105,15 +106,18 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
           <button
             onClick={() => void loadData()}
             style={{
-              padding: '5px 12px',
-              borderRadius: '999px',
-              fontSize: '11px',
+              padding: '6px 12px',
+              borderRadius: '8px',
+              fontSize: '11.5px',
               fontWeight: 600,
-              border: '1px solid #2A2A2A',
-              backgroundColor: '#202020',
-              color: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              backgroundColor: '#FFFFFF',
+              color: '#09090B',
               cursor: 'pointer',
+              transition: 'all 0.15s ease',
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F4F4F6'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#FFFFFF'; }}
           >
             ↻ Refresh
           </button>
@@ -123,10 +127,10 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
       {error && (
         <div style={{
           padding: '12px 16px',
-          backgroundColor: '#2A1C1C',
-          border: '1px solid #442A2A',
-          borderRadius: '12px',
-          color: '#f87171',
+          backgroundColor: '#FEE2E2',
+          border: '1px solid #FCA5A5',
+          borderRadius: '10px',
+          color: '#DC2626',
           fontSize: '12px',
         }}>
           {error}
@@ -137,72 +141,76 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '14px',
+        gap: '12px',
       }}>
         <div style={{
-          backgroundColor: '#161616',
-          border: '1px solid #2A2A2A',
-          borderRadius: '16px',
-          padding: '18px 20px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E5E7EB',
+          borderRadius: '12px',
+          padding: '16px 18px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#71717A', textTransform: 'uppercase' }}>
             p50 Latency (Median)
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 800, color: '#FFFFFF', marginTop: '6px' }}>
+          <div style={{ fontSize: '26px', fontWeight: 800, color: '#09090B', marginTop: '6px' }}>
             {loading ? '...' : `${metrics?.delivery.latency.p50Ms ?? 0} ms`}
           </div>
-          <div style={{ fontSize: '11px', color: '#737373', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', color: '#71717A', marginTop: '4px' }}>
             Typical destination response time
           </div>
         </div>
 
         <div style={{
-          backgroundColor: '#161616',
-          border: '1px solid #2A2A2A',
-          borderRadius: '16px',
-          padding: '18px 20px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E5E7EB',
+          borderRadius: '12px',
+          padding: '16px 18px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#71717A', textTransform: 'uppercase' }}>
             p95 Latency
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 800, color: '#FFFFFF', marginTop: '6px' }}>
+          <div style={{ fontSize: '26px', fontWeight: 800, color: '#09090B', marginTop: '6px' }}>
             {loading ? '...' : `${metrics?.delivery.latency.p95Ms ?? 0} ms`}
           </div>
-          <div style={{ fontSize: '11px', color: '#737373', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', color: '#71717A', marginTop: '4px' }}>
             95% of attempts completed within
           </div>
         </div>
 
         <div style={{
-          backgroundColor: '#161616',
-          border: '1px solid #2A2A2A',
-          borderRadius: '16px',
-          padding: '18px 20px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E5E7EB',
+          borderRadius: '12px',
+          padding: '16px 18px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#71717A', textTransform: 'uppercase' }}>
             p99 Latency
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 800, color: '#FFFFFF', marginTop: '6px' }}>
+          <div style={{ fontSize: '26px', fontWeight: 800, color: '#09090B', marginTop: '6px' }}>
             {loading ? '...' : `${metrics?.delivery.latency.p99Ms ?? 0} ms`}
           </div>
-          <div style={{ fontSize: '11px', color: '#737373', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', color: '#71717A', marginTop: '4px' }}>
             Tail latency for slow destinations
           </div>
         </div>
 
         <div style={{
-          backgroundColor: '#161616',
-          border: '1px solid #2A2A2A',
-          borderRadius: '16px',
-          padding: '18px 20px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E5E7EB',
+          borderRadius: '12px',
+          padding: '16px 18px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#71717A', textTransform: 'uppercase' }}>
             Outbox Lag
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 800, color: '#FFFFFF', marginTop: '6px' }}>
+          <div style={{ fontSize: '26px', fontWeight: 800, color: '#09090B', marginTop: '6px' }}>
             {loading ? '...' : `${metrics?.outbox.oldestPendingLagSeconds ?? 0} s`}
           </div>
-          <div style={{ fontSize: '11px', color: '#737373', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', color: '#71717A', marginTop: '4px' }}>
             Pending backlog: {metrics?.outbox.pendingBacklogCount ?? 0}
           </div>
         </div>
@@ -212,52 +220,56 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '14px',
+        gap: '12px',
       }}>
         <div style={{
-          backgroundColor: '#161616',
-          border: '1px solid #2A2A2A',
-          borderRadius: '16px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E5E7EB',
+          borderRadius: '12px',
           padding: '16px 18px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3' }}>Ingested Webhooks</div>
-          <div style={{ fontSize: '22px', fontWeight: 800, color: '#FFFFFF', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#71717A' }}>Ingested Webhooks</div>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: '#09090B', marginTop: '4px' }}>
             {metrics?.ingestion.totalEvents ?? 0}
           </div>
         </div>
 
         <div style={{
-          backgroundColor: '#161616',
-          border: '1px solid #2A2A2A',
-          borderRadius: '16px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E5E7EB',
+          borderRadius: '12px',
           padding: '16px 18px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3' }}>Delivered Messages</div>
-          <div style={{ fontSize: '22px', fontWeight: 800, color: '#4ade80', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#71717A' }}>Delivered Messages</div>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: '#16A34A', marginTop: '4px' }}>
             {metrics?.delivery.successCount ?? 0}
           </div>
         </div>
 
         <div style={{
-          backgroundColor: '#161616',
-          border: '1px solid #2A2A2A',
-          borderRadius: '16px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E5E7EB',
+          borderRadius: '12px',
           padding: '16px 18px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3' }}>Delivery Success Rate</div>
-          <div style={{ fontSize: '22px', fontWeight: 800, color: '#FFFFFF', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#71717A' }}>Delivery Success Rate</div>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: '#09090B', marginTop: '4px' }}>
             {metrics?.delivery.successRatePercentage ?? 100}%
           </div>
         </div>
 
         <div style={{
-          backgroundColor: '#161616',
-          border: '1px solid #2A2A2A',
-          borderRadius: '16px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E5E7EB',
+          borderRadius: '12px',
           padding: '16px 18px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3' }}>Dead Letter Messages</div>
-          <div style={{ fontSize: '22px', fontWeight: 800, color: (metrics?.outbox.dlqBacklogCount ?? 0) > 0 ? '#f87171' : '#FFFFFF', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#71717A' }}>Dead Letter Messages</div>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: (metrics?.outbox.dlqBacklogCount ?? 0) > 0 ? '#DC2626' : '#09090B', marginTop: '4px' }}>
             {metrics?.outbox.dlqBacklogCount ?? 0}
           </div>
         </div>
@@ -265,10 +277,11 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
 
       {/* Real-time SSE Telemetry Event Console */}
       <div style={{
-        backgroundColor: '#0A0A0A',
-        border: '1px solid #2A2A2A',
-        borderRadius: '16px',
+        backgroundColor: '#FFFFFF',
+        border: '1px solid #E5E7EB',
+        borderRadius: '12px',
         padding: '20px',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -276,13 +289,13 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              backgroundColor: streamConnected ? '#10b981' : '#f59e0b',
-              boxShadow: streamConnected ? '0 0 8px rgba(16, 185, 129, 0.6)' : 'none',
+              backgroundColor: streamConnected ? '#16A34A' : '#F59E0B',
+              boxShadow: streamConnected ? '0 0 6px rgba(22, 163, 74, 0.5)' : 'none',
             }} />
-            <span style={{ fontSize: '13px', fontWeight: 700, color: '#FFFFFF' }}>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: '#09090B' }}>
               Live Telemetry Stream
             </span>
-            <span style={{ fontSize: '11px', color: '#A3A3A3' }}>
+            <span style={{ fontSize: '11.5px', color: '#71717A' }}>
               ({streamConnected ? 'Connected via Redis Pub/Sub SSE' : 'Connecting...'})
             </span>
           </div>
@@ -291,11 +304,11 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
             <button
               onClick={() => setStreamPaused(!streamPaused)}
               style={{
-                padding: '4px 10px',
-                backgroundColor: streamPaused ? '#FFFFFF' : '#202020',
-                color: streamPaused ? '#000000' : '#A3A3A3',
-                border: '1px solid #2A2A2A',
-                borderRadius: '999px',
+                padding: '4px 12px',
+                backgroundColor: streamPaused ? '#09090B' : '#FFFFFF',
+                color: streamPaused ? '#FFFFFF' : '#09090B',
+                border: '1px solid #E5E7EB',
+                borderRadius: '6px',
                 fontSize: '11px',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -306,11 +319,11 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({ organization
             <button
               onClick={() => setStreamEvents([])}
               style={{
-                padding: '4px 10px',
-                backgroundColor: 'transparent',
-                color: '#737373',
-                border: '1px solid #2A2A2A',
-                borderRadius: '999px',
+                padding: '4px 12px',
+                backgroundColor: '#FFFFFF',
+                color: '#71717A',
+                border: '1px solid #E5E7EB',
+                borderRadius: '6px',
                 fontSize: '11px',
                 cursor: 'pointer',
               }}

@@ -689,27 +689,29 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
   });
 
   const getTabButtonStyle = (isActive: boolean) => ({
-    padding: '8px 18px',
-    borderRadius: '999px',
-    fontSize: '13px',
+    padding: '7px 16px',
+    borderRadius: '8px',
+    fontSize: '12.5px',
     fontWeight: 600,
     cursor: 'pointer',
-    backgroundColor: isActive ? '#F7EFE2' : '#0A0A0A',
-    color: isActive ? '#0A0A0A' : '#A3A3A3',
-    border: isActive ? '1px solid transparent' : '1px solid #202020',
+    backgroundColor: isActive ? '#09090B' : '#FFFFFF',
+    color: isActive ? '#FFFFFF' : '#09090B',
+    border: isActive ? '1px solid #09090B' : '1px solid #E5E7EB',
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
     transition: 'all 0.15s ease',
     whiteSpace: 'nowrap' as const,
+    boxShadow: isActive ? '0 1px 3px rgba(0, 0, 0, 0.1)' : '0 1px 2px rgba(0, 0, 0, 0.04)',
   });
 
   const getTabBadgeStyle = (isActive: boolean) => ({
-    fontSize: '11px',
-    padding: '1px 7px',
-    borderRadius: '999px',
-    backgroundColor: isActive ? '#E7DDD0' : '#161616',
-    color: isActive ? '#0A0A0A' : '#A3A3A3',
+    fontSize: '10.5px',
+    padding: '1px 6px',
+    borderRadius: '6px',
+    backgroundColor: isActive ? '#27272A' : '#F4F4F6',
+    color: isActive ? '#FFFFFF' : '#71717A',
+    border: isActive ? 'none' : '1px solid #E5E7EB',
     fontWeight: 700,
   });
 
@@ -738,22 +740,27 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
                 style={{
-                  fontSize: '24px',
+                  fontSize: '22px',
                   fontWeight: 700,
-                  backgroundColor: '#000000',
-                  border: '1px solid #2A2A2A',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
                   borderRadius: '8px',
-                  color: '#FFFFFF',
+                  color: '#09090B',
                   padding: '4px 12px',
+                  outline: 'none',
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
                 }}
               />
               <button
                 type="submit"
                 style={{
                   padding: '7px 16px',
-                  backgroundColor: '#F7EFE2', color: '#121214', border: 'none', borderRadius: '999px',
+                  backgroundColor: '#09090B',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '8px',
                   cursor: 'pointer',
-                  fontWeight: 700,
+                  fontWeight: 600,
                   fontSize: '13px',
                 }}
               >
@@ -764,12 +771,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 onClick={() => { setOrgName(organization.name); setIsRenaming(false); }}
                 style={{
                   padding: '7px 14px',
-                  backgroundColor: 'transparent',
-                  color: '#A3A3A3',
-                  border: '1px solid #2A2A2A',
-                  borderRadius: '999px',
+                  backgroundColor: '#FFFFFF',
+                  color: '#71717A',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '8px',
                   cursor: 'pointer',
                   fontSize: '13px',
+                  fontWeight: 500,
                 }}
               >
                 Cancel
@@ -778,9 +786,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <h1 style={{
-                fontSize: '26px',
+                fontSize: '24px',
                 fontWeight: 800,
-                color: '#FFFFFF',
+                color: '#09090B',
                 margin: 0,
                 letterSpacing: '-0.02em',
               }}>
@@ -793,18 +801,19 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
-                    backgroundColor: '#111111',
-                    border: '1px solid #2A2A2A',
-                    color: '#E5E5E5',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
+                    color: '#09090B',
                     fontSize: '12px',
                     fontWeight: 600,
-                    borderRadius: '999px',
+                    borderRadius: '8px',
                     padding: '4px 12px',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#202020'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#111111'; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F4F4F6'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#FFFFFF'; }}
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M12 20h9"></path>
@@ -816,25 +825,27 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               {isOwner && onDeleteOrg && (
                 <button
                   onClick={() => void handleDeleteOrgConfirm()}
+                  className="rf-btn-destructive"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
-                    backgroundColor: 'rgba(239, 68, 68, 0.12)',
-                    border: '1px solid rgba(239, 68, 68, 0.35)',
-                    color: '#f87171',
+                    backgroundColor: '#DC2626',
+                    border: 'none',
+                    color: '#FFFFFF',
                     fontSize: '12px',
                     fontWeight: 600,
-                    borderRadius: '999px',
+                    borderRadius: '8px',
                     padding: '4px 12px',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
+                    boxShadow: '0 1px 3px rgba(220, 38, 38, 0.25)',
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.12)'; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#B91C1C'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#DC2626'; }}
                   title="Permanently delete this organization"
                 >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2">
                     <polyline points="3 6 5 6 21 6"></polyline>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                   </svg>
@@ -846,7 +857,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
           <p style={{
             fontSize: '13px',
-            color: '#A3A3A3',
+            color: '#71717A',
             margin: '6px 0 0 0',
           }}>
             {activeTab === 'dashboard'
@@ -870,14 +881,14 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               : 'Organization parameters, slug identifier, and Row-Level Security isolation.'}
           </p>
           {renameError && (
-            <div style={{ color: '#f87171', fontSize: '12px', marginTop: '6px' }}>
+            <div style={{ color: '#DC2626', fontSize: '12px', marginTop: '6px' }}>
               {renameError}
             </div>
           )}
         </div>
 
         {/* Top Action Buttons */}
-        <div className="rf-header-btn-wrap" style={{ display: 'flex', gap: '10px' }}>
+        <div className="rf-header-btn-wrap" style={{ display: 'flex', gap: '8px' }}>
           {isOwner && activeTab === 'members' && (
             <button
               onClick={() => setShowAddMemberModal(true)}
@@ -885,12 +896,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '10px 22px',
-                backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
-                fontSize: '13px',
-                fontWeight: 700,
+                padding: '8px 18px',
+                backgroundColor: '#09090B',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#FFFFFF',
+                fontSize: '12.5px',
+                fontWeight: 600,
                 cursor: 'pointer',
-                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
               }}
             >
               + Register Member
@@ -904,12 +918,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '10px 22px',
-                backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
-                fontSize: '13px',
-                fontWeight: 700,
+                padding: '8px 18px',
+                backgroundColor: '#09090B',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#FFFFFF',
+                fontSize: '12.5px',
+                fontWeight: 600,
                 cursor: 'pointer',
-                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
               }}
             >
               + Generate Key
@@ -917,22 +934,23 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           )}
 
           {activeTab === 'endpoints' && (
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ display: 'flex', gap: '8px' }}>
               <button
                 onClick={() => openSimulator()}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  padding: '10px 18px',
-                  backgroundColor: '#202020',
-                  border: '1px solid #2A2A2A',
-                  borderRadius: '999px',
-                  color: '#FFFFFF',
-                  fontSize: '13px',
+                  padding: '8px 16px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '8px',
+                  color: '#09090B',
+                  fontSize: '12.5px',
                   fontWeight: 600,
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
                 }}
               >
                 <span>⚡</span>
@@ -945,12 +963,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
-                    padding: '10px 22px',
-                    backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
-                    fontSize: '13px',
-                    fontWeight: 700,
+                    padding: '8px 18px',
+                    backgroundColor: '#09090B',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#FFFFFF',
+                    fontSize: '12.5px',
+                    fontWeight: 600,
                     cursor: 'pointer',
-                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                   }}
                 >
                   + New Endpoint
@@ -966,12 +987,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '10px 22px',
-                backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
-                fontSize: '13px',
-                fontWeight: 700,
+                padding: '8px 18px',
+                backgroundColor: '#09090B',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#FFFFFF',
+                fontSize: '12.5px',
+                fontWeight: 600,
                 cursor: 'pointer',
-                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
               }}
             >
               + Add Destination
@@ -979,19 +1003,22 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           )}
 
           {activeTab === 'deliveries' && (
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ display: 'flex', gap: '8px' }}>
               <button
                 onClick={() => openSimulator()}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  padding: '10px 18px',
-                  backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
-                  fontSize: '13px',
-                  fontWeight: 700,
+                  padding: '8px 16px',
+                  backgroundColor: '#09090B',
+                  border: 'none',
+                  borderRadius: '8px',
+                  color: '#FFFFFF',
+                  fontSize: '12.5px',
+                  fontWeight: 600,
                   cursor: 'pointer',
-                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                 }}
               >
                 <span>⚡</span>
@@ -1003,14 +1030,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  padding: '10px 18px',
-                  backgroundColor: '#202020',
-                  border: '1px solid #2A2A2A',
-                  borderRadius: '999px',
-                  color: '#FFFFFF',
-                  fontSize: '13px',
+                  padding: '8px 16px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '8px',
+                  color: '#09090B',
+                  fontSize: '12.5px',
                   fontWeight: 600,
                   cursor: 'pointer',
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
                 }}
               >
                 ↻ Refresh
@@ -1025,36 +1053,36 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         <div className="rf-stagger-2" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-          gap: '16px',
-          marginBottom: '26px',
+          gap: '12px',
+          marginBottom: '20px',
         }}>
-          {/* Total Members - High Contrast Ivory Surface matching reference */}
+          {/* Total Members */}
           <div style={{
-            backgroundColor: '#F7EFE2',
-            border: '1px solid #E5DAC8',
-            borderRadius: '16px',
-            padding: '18px 22px',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
+            padding: '16px 18px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             position: 'relative',
             overflow: 'hidden',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', zIndex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', zIndex: 1 }}>
               <div style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '12px',
-                backgroundColor: 'rgba(18, 18, 20, 0.08)',
-                border: '1px solid rgba(18, 18, 20, 0.12)',
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                backgroundColor: '#F4F4F6',
+                border: '1px solid #E5E7EB',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#0A0A0A',
+                color: '#09090B',
                 flexShrink: 0,
               }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                   <circle cx="9" cy="7" r="4"></circle>
                   <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -1062,69 +1090,48 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 </svg>
               </div>
               <div>
-                <div style={{ fontSize: '26px', fontWeight: 800, color: '#0A0A0A', lineHeight: '1.2' }}>
+                <div style={{ fontSize: '24px', fontWeight: 800, color: '#09090B', lineHeight: '1.2' }}>
                   {members.length}
                 </div>
-                <div style={{ fontSize: '13px', color: '#737373', fontWeight: 600, marginTop: '2px' }}>
+                <div style={{ fontSize: '12px', color: '#71717A', fontWeight: 600, marginTop: '2px' }}>
                   Total Members
                 </div>
               </div>
             </div>
-            {/* Watermark silhouette icon on right */}
-            <svg
-              width="68"
-              height="68"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#0A0A0A"
-              strokeWidth="1.2"
-              style={{
-                position: 'absolute',
-                right: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                opacity: 0.12,
-                pointerEvents: 'none',
-              }}
-            >
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
           </div>
 
           {/* Owners */}
           <div style={{
-            backgroundColor: '#121217',
-            border: '1px solid #202020',
-            borderRadius: '16px',
-            padding: '18px 22px',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
+            padding: '16px 18px',
             display: 'flex',
             alignItems: 'center',
-            gap: '16px',
+            gap: '14px',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
           }}>
             <div style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '12px',
-              backgroundColor: '#111111',
-              border: '1px solid #202020',
+              width: '38px',
+              height: '38px',
+              borderRadius: '8px',
+              backgroundColor: '#F4F4F6',
+              border: '1px solid #E5E7EB',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#C5A059',
+              color: '#09090B',
               flexShrink: 0,
             }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C5A059" strokeWidth="2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#09090B" strokeWidth="2">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: '26px', fontWeight: 800, color: '#FFFFFF', lineHeight: '1.2' }}>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: '#09090B', lineHeight: '1.2' }}>
                 {Math.max(1, members.filter((m) => m.role === 'OWNER').length)}
               </div>
-              <div style={{ fontSize: '13px', color: '#A3A3A3', fontWeight: 500, marginTop: '2px' }}>
+              <div style={{ fontSize: '12px', color: '#71717A', fontWeight: 500, marginTop: '2px' }}>
                 Owners
               </div>
             </div>
@@ -1132,37 +1139,38 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
           {/* Active Members */}
           <div style={{
-            backgroundColor: '#121217',
-            border: '1px solid #202020',
-            borderRadius: '16px',
-            padding: '18px 22px',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
+            padding: '16px 18px',
             display: 'flex',
             alignItems: 'center',
-            gap: '16px',
+            gap: '14px',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
           }}>
             <div style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '12px',
-              backgroundColor: '#111111',
-              border: '1px solid #202020',
+              width: '38px',
+              height: '38px',
+              borderRadius: '8px',
+              backgroundColor: '#F4F4F6',
+              border: '1px solid #E5E7EB',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#10b981',
+              color: '#16A34A',
               flexShrink: 0,
             }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                 <circle cx="8.5" cy="7" r="4"></circle>
                 <polyline points="17 11 19 13 23 9"></polyline>
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: '26px', fontWeight: 800, color: '#FFFFFF', lineHeight: '1.2' }}>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: '#09090B', lineHeight: '1.2' }}>
                 {Math.max(1, members.length)}
               </div>
-              <div style={{ fontSize: '13px', color: '#A3A3A3', fontWeight: 500, marginTop: '2px' }}>
+              <div style={{ fontSize: '12px', color: '#71717A', fontWeight: 500, marginTop: '2px' }}>
                 Active Members
               </div>
             </div>
@@ -1170,36 +1178,37 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
           {/* Invitations Pending */}
           <div style={{
-            backgroundColor: '#121217',
-            border: '1px solid #202020',
-            borderRadius: '16px',
-            padding: '18px 22px',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
+            padding: '16px 18px',
             display: 'flex',
             alignItems: 'center',
-            gap: '16px',
+            gap: '14px',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
           }}>
             <div style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '12px',
-              backgroundColor: '#111111',
-              border: '1px solid #202020',
+              width: '38px',
+              height: '38px',
+              borderRadius: '8px',
+              backgroundColor: '#F4F4F6',
+              border: '1px solid #E5E7EB',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#A3A3A3',
+              color: '#71717A',
               flexShrink: 0,
             }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: '26px', fontWeight: 800, color: '#FFFFFF', lineHeight: '1.2' }}>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: '#09090B', lineHeight: '1.2' }}>
                 0
               </div>
-              <div style={{ fontSize: '13px', color: '#A3A3A3', fontWeight: 500, marginTop: '2px' }}>
+              <div style={{ fontSize: '12px', color: '#71717A', fontWeight: 500, marginTop: '2px' }}>
                 Invitations Pending
               </div>
             </div>
@@ -1231,19 +1240,21 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               <div className="rf-card-value" style={{ fontSize: '34px', fontWeight: 800, lineHeight: '1.1' }}>
                 <AnimatedCounter value={members.length} duration={1200} />
               </div>
-              <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span className="rf-card-badge" style={{
                   fontSize: '11px',
                   fontWeight: 700,
-                  padding: '3px 8px',
+                  padding: '3px 9px',
                   borderRadius: '999px',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '4px',
+                  backgroundColor: '#16A34A',
+                  color: '#F5F0E7',
                 }}>
                   ↑ <AnimatedCounter value={members.length} duration={1200} /> active
                 </span>
-                <span className="rf-card-subtext" style={{ fontSize: '11px', fontWeight: 600 }}>Enrolled</span>
+                <span className="rf-card-subtext" style={{ fontSize: '11px', fontWeight: 600, color: '#71717A' }}>Enrolled</span>
               </div>
             </div>
 
@@ -1276,10 +1287,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 ACTIVE API KEYS
               </span>
             </div>
-            <div className="rf-card-value" style={{ fontSize: '34px', fontWeight: 800, lineHeight: '1.1' }}>
+            <div className="rf-card-value" style={{ fontSize: '32px', fontWeight: 800, lineHeight: '1.1' }}>
               <AnimatedCounter value={activeKeyCount} duration={1200} />
             </div>
-            <div className="rf-card-subtext" style={{ marginTop: '12px', fontSize: '11px', fontWeight: 500 }}>
+            <div className="rf-card-subtext" style={{ marginTop: '10px', fontSize: '11px', fontWeight: 500 }}>
               SHA-256 hashed live keys
             </div>
           </div>
@@ -1299,10 +1310,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 ENDPOINTS (M3)
               </span>
             </div>
-            <div className="rf-card-value" style={{ fontSize: '34px', fontWeight: 800, lineHeight: '1.1' }}>
+            <div className="rf-card-value" style={{ fontSize: '32px', fontWeight: 800, lineHeight: '1.1' }}>
               <AnimatedCounter value={endpoints.length} duration={1200} />
             </div>
-            <div className="rf-card-subtext" style={{ marginTop: '12px', fontSize: '11px', fontWeight: 500 }}>
+            <div className="rf-card-subtext" style={{ marginTop: '10px', fontSize: '11px', fontWeight: 500 }}>
               AES-256-GCM signed
             </div>
           </div>
@@ -1321,20 +1332,20 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 TENANT ISOLATION
               </span>
             </div>
-            <div className="rf-card-value" style={{ fontSize: '26px', fontWeight: 800, lineHeight: '1.2' }}>
+            <div className="rf-card-value" style={{ fontSize: '24px', fontWeight: 800, lineHeight: '1.2' }}>
               Enforced
             </div>
-            <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0 }}></span>
+            <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#16A34A', flexShrink: 0 }}></span>
               <span className="rf-card-subtext" style={{ fontSize: '11px', fontWeight: 500 }}>PostgreSQL RLS Active</span>
             </div>
           </div>
         </div>
       )}
 
-      {/* FILTER PILLS ROW (ROUNDED PILLS - SHOWN IN TAB VIEWS) */}
-      {activeTab !== 'dashboard' && (
-        <div className="rf-stagger-3" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '22px' }}>
+      {/* FILTER PILLS ROW (ROUNDED PILLS - ONLY SHOWN IN MEMBERS DIRECTORY VIEW AS REQUESTED) */}
+      {(activeTab as string) === 'members' && (
+        <div className="rf-stagger-3" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
           <div
             id="rf-tab-strip-container"
             className="rf-filter-pills"
@@ -1349,47 +1360,47 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               flex: 1,
             }}
           >
-            <button className="rf-pill-btn" onClick={() => onTabChange('members')} style={getTabButtonStyle(activeTab === 'members')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('members')} style={getTabButtonStyle((activeTab as string) === 'members')}>
               <span>All Members</span>
-              <span style={getTabBadgeStyle(activeTab === 'members')}>{members.length}</span>
+              <span style={getTabBadgeStyle((activeTab as string) === 'members')}>{members.length}</span>
             </button>
 
-            <button className="rf-pill-btn" onClick={() => onTabChange('api-keys')} style={getTabButtonStyle(activeTab === 'api-keys')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('api-keys')} style={getTabButtonStyle((activeTab as string) === 'api-keys')}>
               <span>API Keys</span>
-              <span style={getTabBadgeStyle(activeTab === 'api-keys')}>{apiKeys.length}</span>
+              <span style={getTabBadgeStyle((activeTab as string) === 'api-keys')}>{apiKeys.length}</span>
             </button>
 
-            <button className="rf-pill-btn" onClick={() => onTabChange('endpoints')} style={getTabButtonStyle(activeTab === 'endpoints')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('endpoints')} style={getTabButtonStyle((activeTab as string) === 'endpoints')}>
               <span>Endpoints</span>
-              <span style={getTabBadgeStyle(activeTab === 'endpoints')}>{endpoints.length}</span>
+              <span style={getTabBadgeStyle((activeTab as string) === 'endpoints')}>{endpoints.length}</span>
             </button>
 
-            <button className="rf-pill-btn" onClick={() => onTabChange('destinations')} style={getTabButtonStyle(activeTab === 'destinations')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('destinations')} style={getTabButtonStyle((activeTab as string) === 'destinations')}>
               <span>Destinations</span>
-              <span style={getTabBadgeStyle(activeTab === 'destinations')}>{destinations.length}</span>
+              <span style={getTabBadgeStyle((activeTab as string) === 'destinations')}>{destinations.length}</span>
             </button>
 
-            <button className="rf-pill-btn" onClick={() => onTabChange('deliveries')} style={getTabButtonStyle(activeTab === 'deliveries')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('deliveries')} style={getTabButtonStyle((activeTab as string) === 'deliveries')}>
               <span>Deliveries</span>
-              <span style={getTabBadgeStyle(activeTab === 'deliveries')}>{deliveries.length}</span>
+              <span style={getTabBadgeStyle((activeTab as string) === 'deliveries')}>{deliveries.length}</span>
             </button>
 
-            <button className="rf-pill-btn" onClick={() => onTabChange('workflows')} style={getTabButtonStyle(activeTab === 'workflows')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('workflows')} style={getTabButtonStyle((activeTab as string) === 'workflows')}>
               <span>Workflows (M4)</span>
-              <span style={getTabBadgeStyle(activeTab === 'workflows')}>{workflows.length}</span>
+              <span style={getTabBadgeStyle((activeTab as string) === 'workflows')}>{workflows.length}</span>
             </button>
 
-            <button className="rf-pill-btn" onClick={() => onTabChange('metrics')} style={getTabButtonStyle(activeTab === 'metrics')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('metrics')} style={getTabButtonStyle((activeTab as string) === 'metrics')}>
               <span>Metrics (M5)</span>
-              <span style={getTabBadgeStyle(activeTab === 'metrics')}>0</span>
+              <span style={getTabBadgeStyle((activeTab as string) === 'metrics')}>0</span>
             </button>
 
-            <button className="rf-pill-btn" onClick={() => onTabChange('dlq')} style={getTabButtonStyle(activeTab === 'dlq')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('dlq')} style={getTabButtonStyle((activeTab as string) === 'dlq')}>
               <span>Dead Letter Queue (M5)</span>
-              <span style={getTabBadgeStyle(activeTab === 'dlq')}>0</span>
+              <span style={getTabBadgeStyle((activeTab as string) === 'dlq')}>0</span>
             </button>
 
-            <button className="rf-pill-btn" onClick={() => onTabChange('settings')} style={getTabButtonStyle(activeTab === 'settings')}>
+            <button className="rf-pill-btn" onClick={() => onTabChange('settings')} style={getTabButtonStyle((activeTab as string) === 'settings')}>
               <span>Settings</span>
             </button>
           </div>
@@ -1402,19 +1413,20 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             style={{
               width: '32px',
               height: '32px',
-              borderRadius: '50%',
-              backgroundColor: '#0A0A0A',
-              border: '1px solid #202020',
-              color: '#A3A3A3',
+              borderRadius: '8px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              color: '#71717A',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
               flexShrink: 0,
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
               transition: 'all 0.15s ease',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#202020'; e.currentTarget.style.color = '#FFFFFF'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#0A0A0A'; e.currentTarget.style.color = '#A3A3A3'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F4F4F6'; e.currentTarget.style.color = '#09090B'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#FFFFFF'; e.currentTarget.style.color = '#71717A'; }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <polyline points="9 18 15 12 9 6"></polyline>
@@ -1428,8 +1440,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         <div className="rf-stagger-3" style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',
-          marginBottom: '22px',
+          gap: '10px',
+          marginBottom: '18px',
           flexWrap: 'wrap',
         }}>
           {/* Main Search Input */}
@@ -1438,14 +1450,14 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             minWidth: '260px',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
-            backgroundColor: '#121217',
-            border: '1px solid #202020',
-            borderRadius: '999px',
-            padding: '10px 20px',
-            boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.25)',
+            gap: '10px',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '8px',
+            padding: '8px 14px',
+            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
           }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#737373" strokeWidth="2.2">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#71717A" strokeWidth="2.2">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
@@ -1469,7 +1481,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 backgroundColor: 'transparent',
                 outline: 'none',
                 fontSize: '13px',
-                color: '#FFFFFF',
+                color: '#09090B',
                 width: '100%',
               }}
             />
@@ -1481,22 +1493,25 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '10px 18px',
-              backgroundColor: '#0A0A0A',
-              border: '1px solid #202020',
-              borderRadius: '999px',
-              color: '#E5E5E5',
-              fontSize: '13px',
-              fontWeight: 600,
+              gap: '6px',
+              padding: '8px 14px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              borderRadius: '8px',
+              color: '#09090B',
+              fontSize: '12.5px',
+              fontWeight: 500,
               cursor: 'pointer',
               transition: 'all 0.15s ease',
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#2A2A2A';
+              e.currentTarget.style.backgroundColor = '#F4F4F6';
+              e.currentTarget.style.borderColor = '#D1D5DB';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = '#202020';
+              e.currentTarget.style.backgroundColor = '#FFFFFF';
+              e.currentTarget.style.borderColor = '#E5E7EB';
             }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1511,27 +1526,30 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '10px 18px',
-              backgroundColor: '#0A0A0A',
-              border: '1px solid #202020',
-              borderRadius: '999px',
-              color: '#E5E5E5',
-              fontSize: '13px',
-              fontWeight: 600,
+              gap: '6px',
+              padding: '8px 14px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              borderRadius: '8px',
+              color: '#09090B',
+              fontSize: '12.5px',
+              fontWeight: 500,
               cursor: 'pointer',
               transition: 'all 0.15s ease',
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#2A2A2A';
+              e.currentTarget.style.backgroundColor = '#F4F4F6';
+              e.currentTarget.style.borderColor = '#D1D5DB';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = '#202020';
+              e.currentTarget.style.backgroundColor = '#FFFFFF';
+              e.currentTarget.style.borderColor = '#E5E7EB';
             }}
           >
-            <span style={{ fontSize: '14px', lineHeight: 1 }}>⇅</span>
+            <span style={{ fontSize: '13px', lineHeight: 1 }}>⇅</span>
             <span>Sort: Enrolled Date</span>
-            <span style={{ fontSize: '11px', color: '#A3A3A3' }}>⌄</span>
+            <span style={{ fontSize: '11px', color: '#71717A' }}>⌄</span>
           </button>
         </div>
       )}
@@ -1539,17 +1557,17 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       {/* FEEDBACK BANNER: CREATED RAW API KEY */}
       {createdRawKey && (
         <div style={{
-          backgroundColor: '#161616',
-          border: '1px solid #2A2A2A',
-          borderRadius: '16px',
-          padding: '20px 24px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E5E7EB',
+          borderRadius: '12px',
+          padding: '18px 22px',
           marginBottom: '20px',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#FFFFFF', fontWeight: 700, fontSize: '14px', marginBottom: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#09090B', fontWeight: 700, fontSize: '14px', marginBottom: '6px' }}>
             <span>🔑 API Key Generated Successfully</span>
           </div>
-          <p style={{ fontSize: '13px', color: '#A3A3A3', margin: '0 0 14px' }}>
+          <p style={{ fontSize: '13px', color: '#71717A', margin: '0 0 14px' }}>
             Make sure to copy your API key now. For your security, this key is SHA-256 hashed and will never be shown again.
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1562,21 +1580,21 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 fontFamily: 'monospace',
                 fontSize: '13px',
                 padding: '10px 14px',
-                backgroundColor: '#000000',
-                border: '1px solid #2A2A2A',
+                backgroundColor: '#F9FAFB',
+                border: '1px solid #E5E7EB',
                 borderRadius: '8px',
-                color: '#FFFFFF',
+                color: '#09090B',
               }}
             />
             <button
               onClick={() => handleCopyText(createdRawKey)}
               style={{
                 padding: '10px 18px',
-                backgroundColor: copiedKey ? '#2A2A2A' : '#FFFFFF',
-                color: copiedKey ? '#FFFFFF' : '#000000',
+                backgroundColor: copiedKey ? '#16A34A' : '#09090B',
+                color: copiedKey ? '#F5F0E7' : '#FFFFFF',
                 border: 'none',
                 borderRadius: '8px',
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: '13px',
                 cursor: 'pointer',
               }}
@@ -1587,9 +1605,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               onClick={() => setCreatedRawKey(null)}
               style={{
                 padding: '10px 14px',
-                backgroundColor: 'transparent',
-                color: '#A3A3A3',
-                border: '1px solid #2A2A2A',
+                backgroundColor: '#FFFFFF',
+                color: '#71717A',
+                border: '1px solid #E5E7EB',
                 borderRadius: '8px',
                 fontSize: '13px',
                 cursor: 'pointer',
@@ -1604,17 +1622,17 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
       {/* FEEDBACK BANNER: CREATED RAW SIGNING SECRET (PHASE 2 & 3) */}
       {createdRawSecret && (
         <div style={{
-          backgroundColor: '#161616',
-          border: '1px solid #2A2A2A',
-          borderRadius: '16px',
-          padding: '20px 24px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E5E7EB',
+          borderRadius: '12px',
+          padding: '18px 22px',
           marginBottom: '20px',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#FFFFFF', fontWeight: 700, fontSize: '14px', marginBottom: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#09090B', fontWeight: 700, fontSize: '14px', marginBottom: '6px' }}>
             <span>🔒 Webhook Signing Secret Generated (AES-256-GCM)</span>
           </div>
-          <p style={{ fontSize: '13px', color: '#A3A3A3', margin: '0 0 14px' }}>
+          <p style={{ fontSize: '13px', color: '#71717A', margin: '0 0 14px' }}>
             Make sure to copy your webhook signing secret now. It is encrypted in the database using envelope encryption and cannot be shown again.
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1627,21 +1645,21 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 fontFamily: 'monospace',
                 fontSize: '13px',
                 padding: '10px 14px',
-                backgroundColor: '#000000',
-                border: '1px solid #2A2A2A',
+                backgroundColor: '#F9FAFB',
+                border: '1px solid #E5E7EB',
                 borderRadius: '8px',
-                color: '#FFFFFF',
+                color: '#09090B',
               }}
             />
             <button
               onClick={() => handleCopyText(createdRawSecret, true)}
               style={{
                 padding: '10px 18px',
-                backgroundColor: copiedSecret ? '#2A2A2A' : '#FFFFFF',
-                color: copiedSecret ? '#FFFFFF' : '#000000',
+                backgroundColor: copiedSecret ? '#16A34A' : '#09090B',
+                color: copiedSecret ? '#F5F0E7' : '#FFFFFF',
                 border: 'none',
                 borderRadius: '8px',
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: '13px',
                 cursor: 'pointer',
               }}
@@ -1652,9 +1670,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               onClick={() => setCreatedRawSecret(null)}
               style={{
                 padding: '10px 14px',
-                backgroundColor: 'transparent',
-                color: '#A3A3A3',
-                border: '1px solid #2A2A2A',
+                backgroundColor: '#FFFFFF',
+                color: '#71717A',
+                border: '1px solid #E5E7EB',
                 borderRadius: '8px',
                 fontSize: '13px',
                 cursor: 'pointer',
@@ -1733,27 +1751,28 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           {/* MEMBERS VIEW (MATCHING PIXEL REFERENCE) */}
           {activeTab === 'members' && (
             <div style={{
-              backgroundColor: '#0A0A0A',
-              border: '1px solid #161616',
-              borderRadius: '16px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
               overflow: 'visible',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
             }}>
               <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, textAlign: 'left', minWidth: '700px' }}>
                 <thead>
                   <tr style={{
-                    borderBottom: '1px solid #202020',
-                    color: '#A3A3A3',
+                    borderBottom: '1px solid #E5E7EB',
+                    color: '#71717A',
                     fontSize: '11px',
                     fontWeight: 700,
                     letterSpacing: '0.06em',
                     textTransform: 'uppercase',
-                    backgroundColor: '#0A0A0A',
+                    backgroundColor: '#F9FAFB',
                   }}>
-                    <th style={{ width: '44px', padding: '16px 20px', textAlign: 'center', borderTopLeftRadius: '16px' }}>
+                    <th style={{ width: '44px', padding: '16px 20px', textAlign: 'center', borderTopLeftRadius: '12px' }}>
                       <input
                         type="checkbox"
                         style={{
-                          accentColor: '#C5A059',
+                          accentColor: '#09090B',
                           borderRadius: '4px',
                           cursor: 'pointer',
                           width: '15px',
@@ -1766,13 +1785,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <th style={{ padding: '16px 18px' }}>Role</th>
                     <th style={{ padding: '16px 18px' }}>Enrolled Date</th>
                     <th style={{ padding: '16px 18px' }}>Status</th>
-                    <th style={{ padding: '16px 20px', textAlign: 'right', borderTopRightRadius: '16px' }}>Actions</th>
+                    <th style={{ padding: '16px 20px', textAlign: 'right', borderTopRightRadius: '12px' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredMembers.length === 0 ? (
                     <tr>
-                      <td colSpan={7} style={{ padding: '52px 20px', textAlign: 'center', color: '#737373', fontSize: '13px' }}>
+                      <td colSpan={7} style={{ padding: '52px 20px', textAlign: 'center', color: '#71717A', fontSize: '13px' }}>
                         No members match your search criteria.
                       </td>
                     </tr>
@@ -1791,13 +1810,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                         <tr
                           key={m.id}
                           style={{
-                            borderBottom: idx === filteredMembers.length - 1 ? 'none' : '1px solid #161616',
+                            borderBottom: idx === filteredMembers.length - 1 ? 'none' : '1px solid #E5E7EB',
                             fontSize: '13px',
-                            color: '#FFFFFF',
+                            color: '#09090B',
                             transition: 'background-color 0.15s ease',
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
+                            e.currentTarget.style.backgroundColor = '#F9FAFB';
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor = 'transparent';
@@ -1808,7 +1827,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                             <input
                               type="checkbox"
                               style={{
-                                accentColor: '#C5A059',
+                                accentColor: '#09090B',
                                 borderRadius: '4px',
                                 cursor: 'pointer',
                                 width: '15px',
@@ -1824,9 +1843,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                               fontFamily: 'monospace',
                               fontSize: '12px',
                               fontWeight: 600,
-                              color: '#A3A3A3',
-                              backgroundColor: '#111111',
-                              border: '1px solid #202020',
+                              color: '#52525B',
+                              backgroundColor: '#F4F4F6',
+                              border: '1px solid #E5E7EB',
                               borderRadius: '999px',
                               padding: '3px 12px',
                             }}>
@@ -1846,7 +1865,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                     height: '36px',
                                     borderRadius: '50%',
                                     objectFit: 'cover',
-                                    border: '1px solid #2A2A2A',
+                                    border: '1px solid #E5E7EB',
                                   }}
                                 />
                               ) : (
@@ -1854,9 +1873,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                   width: '36px',
                                   height: '36px',
                                   borderRadius: '50%',
-                                  backgroundColor: '#111111',
-                                  border: '1px solid #2A2A2A',
-                                  color: '#FFFFFF',
+                                  backgroundColor: '#EAEAEB',
+                                  border: '1px solid #E5E7EB',
+                                  color: '#09090B',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
@@ -1867,11 +1886,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                 </div>
                               )}
                               <div>
-                                <div style={{ fontWeight: 600, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <div style={{ fontWeight: 600, color: '#09090B', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                   <span>{m.user.displayName || 'Deepjyoti'}</span>
-                                  {isCurrent && <span style={{ color: '#A3A3A3', fontWeight: 400, fontSize: '12px' }}>(You)</span>}
+                                  {isCurrent && <span style={{ color: '#71717A', fontWeight: 400, fontSize: '12px' }}>(You)</span>}
                                 </div>
-                                <div style={{ fontSize: '12px', color: '#A3A3A3', marginTop: '1px' }}>
+                                <div style={{ fontSize: '12px', color: '#71717A', marginTop: '1px' }}>
                                   {m.user.email || 'deepjyoti478@gmail.com'}
                                 </div>
                               </div>
@@ -1889,12 +1908,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                 borderRadius: '999px',
                                 fontSize: '11px',
                                 fontWeight: 800,
-                                backgroundColor: '#F7EFE2',
-                                color: '#0A0A0A',
+                                backgroundColor: '#FEF3C7',
+                                color: '#92400E',
+                                border: '1px solid #FDE68A',
                                 letterSpacing: '0.04em',
-                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
                               }}>
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="#C5A059" stroke="#9A7B44" strokeWidth="1.5">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="#D97706" stroke="#92400E" strokeWidth="1.5">
                                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                                 </svg>
                                 <span>OWNER</span>
@@ -1905,10 +1924,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                 padding: '4px 12px',
                                 borderRadius: '999px',
                                 fontSize: '11px',
-                                fontWeight: 700,
-                                backgroundColor: '#161616',
-                                border: '1px solid #2A2A2A',
-                                color: '#E5E5E5',
+                                fontWeight: 600,
+                                backgroundColor: '#F4F4F6',
+                                border: '1px solid #E5E7EB',
+                                color: '#52525B',
                                 letterSpacing: '0.04em',
                               }}>
                                 {m.role}
@@ -1917,30 +1936,29 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                           </td>
 
                           {/* Enrolled Date */}
-                          <td style={{ padding: '16px 18px', color: '#A3A3A3', fontSize: '13px' }}>
+                          <td style={{ padding: '16px 18px', color: '#71717A', fontSize: '13px' }}>
                             {enrolledDate}
                           </td>
 
-                          {/* Status Pill with Glowing Green Dot */}
+                          {/* Status Pill with Solid Green Background & Warm Ivory Text */}
                           <td style={{ padding: '16px 18px' }}>
                             <span style={{
                               display: 'inline-flex',
                               alignItems: 'center',
-                              gap: '7px',
+                              gap: '6px',
                               padding: '4px 12px',
                               borderRadius: '999px',
-                              fontSize: '12px',
-                              fontWeight: 600,
-                              backgroundColor: '#0A0A0A',
-                              color: '#FFFFFF',
-                              border: '1px solid #202020',
+                              fontSize: '11.5px',
+                              fontWeight: 700,
+                              backgroundColor: '#16A34A',
+                              color: '#F5F0E7',
+                              boxShadow: '0 1px 2px rgba(22, 163, 74, 0.25)',
                             }}>
                               <span style={{
-                                width: '6px',
-                                height: '6px',
+                                width: '5px',
+                                height: '5px',
                                 borderRadius: '50%',
-                                backgroundColor: '#10b981',
-                                boxShadow: '0 0 6px rgba(16, 185, 129, 0.6)',
+                                backgroundColor: '#F5F0E7',
                               }}></span>
                               Active
                             </span>
@@ -1956,9 +1974,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                   width: '32px',
                                   height: '32px',
                                   borderRadius: '50%',
-                                  backgroundColor: isMenuOpen ? '#202020' : '#0A0A0A',
-                                  border: '1px solid #202020',
-                                  color: '#E5E5E5',
+                                  backgroundColor: isMenuOpen ? '#F4F4F6' : '#FFFFFF',
+                                  border: '1px solid #E5E7EB',
+                                  color: '#09090B',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
@@ -1966,13 +1984,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                   transition: 'all 0.15s ease',
                                 }}
                                 onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor = '#202020';
-                                  e.currentTarget.style.borderColor = '#2A2A2A';
+                                  e.currentTarget.style.backgroundColor = '#F4F4F6';
+                                  e.currentTarget.style.borderColor = '#D1D5DB';
                                 }}
                                 onMouseLeave={(e) => {
                                   if (!isMenuOpen) {
-                                    e.currentTarget.style.backgroundColor = '#0A0A0A';
-                                    e.currentTarget.style.borderColor = '#202020';
+                                    e.currentTarget.style.backgroundColor = '#FFFFFF';
+                                    e.currentTarget.style.borderColor = '#E5E7EB';
                                   }
                                 }}
                               >
@@ -2001,18 +2019,18 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                     position: 'absolute',
                                     right: '20px',
                                     top: '46px',
-                                    backgroundColor: '#111111',
-                                    border: '1px solid #2A2A2A',
+                                    backgroundColor: '#FFFFFF',
+                                    border: '1px solid #E5E7EB',
                                     borderRadius: '12px',
                                     padding: '8px',
-                                    boxShadow: '0 12px 36px rgba(0, 0, 0, 0.85)',
+                                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)',
                                     zIndex: 9999,
                                     minWidth: '205px',
                                     textAlign: 'left',
                                   }}>
                                     {isOwner && !isCurrent ? (
                                       <>
-                                        <div style={{ fontSize: '11px', color: '#A3A3A3', padding: '4px 8px', fontWeight: 600 }}>
+                                        <div style={{ fontSize: '11px', color: '#71717A', padding: '4px 8px', fontWeight: 600 }}>
                                           Change Role:
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '6px' }}>
@@ -2027,8 +2045,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                                 padding: '6px 8px',
                                                 borderRadius: '6px',
                                                 fontSize: '12px',
-                                                backgroundColor: m.role === r ? '#202020' : 'transparent',
-                                                color: '#FFFFFF',
+                                                backgroundColor: m.role === r ? '#F4F4F6' : 'transparent',
+                                                color: '#09090B',
                                                 border: 'none',
                                                 cursor: 'pointer',
                                                 textAlign: 'left',
@@ -2039,7 +2057,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                             </button>
                                           ))}
                                         </div>
-                                        <div style={{ height: '1px', backgroundColor: '#2A2A2A', margin: '4px 0' }} />
+                                        <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '4px 0' }} />
                                         <button
                                           onClick={() => {
                                             promptRemoveMember(m);
@@ -2050,18 +2068,21 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                             alignItems: 'center',
                                             gap: '8px',
                                             width: '100%',
-                                            padding: '6px 8px',
+                                            padding: '8px 10px',
                                             borderRadius: '6px',
                                             fontSize: '12px',
-                                            backgroundColor: 'transparent',
-                                            color: '#f87171',
+                                            backgroundColor: '#DC2626',
+                                            color: '#FFFFFF',
                                             border: 'none',
                                             cursor: 'pointer',
                                             textAlign: 'left',
                                             fontWeight: 600,
+                                            transition: 'background-color 0.15s ease',
                                           }}
+                                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#B91C1C'; }}
+                                          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#DC2626'; }}
                                         >
-                                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2">
                                             <polyline points="3 6 5 6 21 6"></polyline>
                                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                           </svg>
@@ -2075,11 +2096,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                           alignItems: 'center',
                                           gap: '8px',
                                           fontSize: '12px',
-                                          color: '#E5E5E5',
+                                          color: '#09090B',
                                           padding: '7px 10px',
                                           fontWeight: 600,
                                         }}>
-                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C5A059" strokeWidth="2">
+                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2">
                                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                                           </svg>
                                           <span>Organization Owner</span>
@@ -2094,17 +2115,17 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                             alignItems: 'center',
                                             gap: '8px',
                                             padding: '7px 10px',
-                                            borderRadius: '8px',
+                                            borderRadius: '6px',
                                             fontSize: '12px',
                                             backgroundColor: 'transparent',
-                                            color: '#E5E5E5',
+                                            color: '#09090B',
                                             border: 'none',
                                             cursor: 'pointer',
                                             textAlign: 'left',
                                             width: '100%',
                                             transition: 'background-color 0.15s ease',
                                           }}
-                                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#202020'; }}
+                                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F4F4F6'; }}
                                           onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                                         >
                                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -2123,17 +2144,17 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                             alignItems: 'center',
                                             gap: '8px',
                                             padding: '7px 10px',
-                                            borderRadius: '8px',
+                                            borderRadius: '6px',
                                             fontSize: '12px',
                                             backgroundColor: 'transparent',
-                                            color: '#E5E5E5',
+                                            color: '#09090B',
                                             border: 'none',
                                             cursor: 'pointer',
                                             textAlign: 'left',
                                             width: '100%',
                                             transition: 'background-color 0.15s ease',
                                           }}
-                                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#202020'; }}
+                                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F4F4F6'; }}
                                           onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                                         >
                                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -2144,7 +2165,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                         </button>
                                         {onDeleteOrg && (
                                           <>
-                                            <div style={{ height: '1px', backgroundColor: '#2A2A2A', margin: '4px 0' }} />
+                                            <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '4px 0' }} />
                                             <button
                                               onClick={() => {
                                                 setActiveMenuMemberId(null);
@@ -2155,21 +2176,21 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                                 alignItems: 'center',
                                                 gap: '8px',
                                                 width: '100%',
-                                                padding: '7px 10px',
-                                                borderRadius: '8px',
+                                                padding: '8px 10px',
+                                                borderRadius: '6px',
                                                 fontSize: '12px',
-                                                backgroundColor: 'transparent',
-                                                color: '#f87171',
+                                                backgroundColor: '#DC2626',
+                                                color: '#FFFFFF',
                                                 border: 'none',
                                                 cursor: 'pointer',
                                                 textAlign: 'left',
-                                                fontWeight: 500,
+                                                fontWeight: 600,
                                                 transition: 'background-color 0.15s ease',
                                               }}
-                                              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.12)'; }}
-                                              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                                              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#B91C1C'; }}
+                                              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#DC2626'; }}
                                             >
-                                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2">
                                                 <polyline points="3 6 5 6 21 6"></polyline>
                                                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                               </svg>
@@ -2186,11 +2207,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                         }}
                                         style={{
                                           width: '100%',
-                                          padding: '6px 8px',
+                                          padding: '8px 10px',
                                           borderRadius: '6px',
                                           fontSize: '12px',
-                                          backgroundColor: 'transparent',
-                                          color: '#f87171',
+                                          backgroundColor: '#DC2626',
+                                          color: '#FFFFFF',
                                           border: 'none',
                                           cursor: 'pointer',
                                           textAlign: 'left',
@@ -2200,7 +2221,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                         Leave Organization
                                       </button>
                                     ) : (
-                                      <div style={{ fontSize: '12px', color: '#A3A3A3', padding: '6px 8px' }}>
+                                      <div style={{ fontSize: '12px', color: '#71717A', padding: '6px 8px' }}>
                                         No actions available
                                       </div>
                                     )}
@@ -2222,12 +2243,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: '14px 20px',
-                borderTop: '1px solid #161616',
-                backgroundColor: '#121217',
-                color: '#A3A3A3',
+                borderTop: '1px solid #E5E7EB',
+                backgroundColor: '#F9FAFB',
+                color: '#71717A',
                 fontSize: '13px',
-                borderBottomLeftRadius: '16px',
-                borderBottomRightRadius: '16px',
+                borderBottomLeftRadius: '12px',
+                borderBottomRightRadius: '12px',
               }}>
                 <div>
                   Showing 1-{Math.max(1, filteredMembers.length)} of {filteredMembers.length} member{filteredMembers.length === 1 ? '' : 's'}
@@ -2239,9 +2260,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                       width: '30px',
                       height: '30px',
                       borderRadius: '8px',
-                      border: '1px solid #202020',
-                      backgroundColor: '#0A0A0A',
-                      color: '#737373',
+                      border: '1px solid #E5E7EB',
+                      backgroundColor: '#FFFFFF',
+                      color: '#A1A1AA',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -2257,8 +2278,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                       height: '30px',
                       borderRadius: '8px',
                       border: 'none',
-                      backgroundColor: '#F7EFE2',
-                      color: '#0A0A0A',
+                      backgroundColor: '#09090B',
+                      color: '#FFFFFF',
                       fontWeight: 700,
                       display: 'flex',
                       alignItems: 'center',
@@ -2275,9 +2296,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                       width: '30px',
                       height: '30px',
                       borderRadius: '8px',
-                      border: '1px solid #202020',
-                      backgroundColor: '#0A0A0A',
-                      color: '#737373',
+                      border: '1px solid #E5E7EB',
+                      backgroundColor: '#FFFFFF',
+                      color: '#A1A1AA',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -2294,16 +2315,23 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
           {/* API KEYS VIEW */}
         {activeTab === 'api-keys' && (
+          <div style={{
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+          }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '720px' }}>
             <thead>
               <tr style={{
-                borderBottom: '1px solid #2A2A2A',
-                color: '#A3A3A3',
+                borderBottom: '1px solid #E5E7EB',
+                color: '#71717A',
                 fontSize: '11px',
                 fontWeight: 700,
                 letterSpacing: '0.05em',
                 textTransform: 'uppercase',
-                backgroundColor: '#161616',
+                backgroundColor: '#F9FAFB',
               }}>
                 <th style={{ padding: '14px 20px' }}>Key ID</th>
                 <th style={{ padding: '14px 20px' }}>Key Name</th>
@@ -2317,13 +2345,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             <tbody>
               {keysLoading ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#737373' }}>
+                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#71717A' }}>
                     Loading API keys...
                   </td>
                 </tr>
               ) : filteredKeys.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#737373' }}>
+                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#71717A' }}>
                     No API keys found. Generate a key to begin authenticating requests.
                   </td>
                 </tr>
@@ -2335,20 +2363,27 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <tr
                       key={k.id}
                       style={{
-                        borderBottom: idx === filteredKeys.length - 1 ? 'none' : '1px solid #2A2A2A',
+                        borderBottom: idx === filteredKeys.length - 1 ? 'none' : '1px solid #E5E7EB',
                         fontSize: '13px',
-                        color: '#FFFFFF',
+                        color: '#09090B',
                       }}
                     >
-                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#A3A3A3' }}>
-                        {keyIdDisplay}
+                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#52525B' }}>
+                        <span style={{
+                          backgroundColor: '#F4F4F6',
+                          border: '1px solid #E5E7EB',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                        }}>
+                          {keyIdDisplay}
+                        </span>
                       </td>
 
-                      <td style={{ padding: '14px 20px', fontWeight: 600 }}>
+                      <td style={{ padding: '14px 20px', fontWeight: 600, color: '#09090B' }}>
                         {k.name}
                       </td>
 
-                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', color: '#E5E5E5' }}>
+                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', color: '#09090B' }}>
                         <code>{k.keyPrefix}...</code>
                       </td>
 
@@ -2356,20 +2391,20 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                         {k.scopes.map((s) => (
                           <span key={s} style={{
                             padding: '2px 8px',
-                            backgroundColor: '#000000',
-                            color: '#FFFFFF',
+                            backgroundColor: '#F4F4F6',
+                            color: '#09090B',
                             borderRadius: '4px',
                             fontSize: '11px',
                             fontWeight: 600,
                             marginRight: '4px',
-                            border: '1px solid #2A2A2A',
+                            border: '1px solid #E5E7EB',
                           }}>
                             {s}
                           </span>
                         ))}
                       </td>
 
-                      <td style={{ padding: '14px 20px', color: '#A3A3A3', fontSize: '12px' }}>
+                      <td style={{ padding: '14px 20px', color: '#71717A', fontSize: '12px' }}>
                         {new Date(k.createdAt).toLocaleDateString()}
                       </td>
 
@@ -2378,19 +2413,18 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '5px',
-                          padding: '2px 8px',
+                          padding: '3px 10px',
                           borderRadius: '999px',
                           fontSize: '11px',
-                          fontWeight: 600,
-                          backgroundColor: isRevoked ? '#2A1C1C' : '#1E2D22',
-                          color: isRevoked ? '#f87171' : '#4ade80',
-                          border: isRevoked ? '1px solid #442A2A' : '1px solid #2B4232',
+                          fontWeight: 700,
+                          backgroundColor: isRevoked ? '#DC2626' : '#16A34A',
+                          color: isRevoked ? '#FFFFFF' : '#F5F0E7',
                         }}>
                           <span style={{
                             width: '5px',
                             height: '5px',
                             borderRadius: '50%',
-                            backgroundColor: isRevoked ? '#f87171' : '#4ade80',
+                            backgroundColor: isRevoked ? '#FFFFFF' : '#F5F0E7',
                           }}></span>
                           {isRevoked ? 'REVOKED' : 'ACTIVE'}
                         </span>
@@ -2402,15 +2436,18 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                             title="Revoke key"
                             onClick={() => promptRevokeApiKey(k)}
                             style={{
-                              backgroundColor: 'transparent',
-                              border: '1px solid #4A2828',
-                              color: '#f87171',
+                              backgroundColor: '#DC2626',
+                              border: 'none',
+                              color: '#FFFFFF',
                               borderRadius: '6px',
                               padding: '5px 12px',
                               fontSize: '12px',
                               fontWeight: 600,
                               cursor: 'pointer',
+                              transition: 'background-color 0.15s ease',
                             }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#B91C1C'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#DC2626'; }}
                           >
                             Revoke
                           </button>
@@ -2422,20 +2459,28 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               )}
             </tbody>
           </table>
+          </div>
         )}
 
         {/* ENDPOINTS VIEW (MILESTONE 3 PHASE 2 & 3) */}
         {activeTab === 'endpoints' && (
+          <div style={{
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+          }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '780px' }}>
             <thead>
               <tr style={{
-                borderBottom: '1px solid #2A2A2A',
-                color: '#A3A3A3',
+                borderBottom: '1px solid #E5E7EB',
+                color: '#71717A',
                 fontSize: '11px',
                 fontWeight: 700,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
-                backgroundColor: '#161616',
+                backgroundColor: '#F9FAFB',
               }}>
                 <th style={{ padding: '16px 22px' }}>Endpoint ID</th>
                 <th style={{ padding: '16px 22px' }}>Name & Slug</th>
@@ -2449,13 +2494,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             <tbody>
               {endpointsLoading ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#737373' }}>
+                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#71717A' }}>
                     Loading ingestion endpoints...
                   </td>
                 </tr>
               ) : filteredEndpoints.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#737373' }}>
+                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#71717A' }}>
                     No ingestion endpoints created yet. Click "+ New Endpoint" to begin accepting webhooks.
                   </td>
                 </tr>
@@ -2469,38 +2514,46 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <tr
                       key={ep.id}
                       style={{
-                        borderBottom: idx === filteredEndpoints.length - 1 ? 'none' : '1px solid #2A2A2A',
+                        borderBottom: idx === filteredEndpoints.length - 1 ? 'none' : '1px solid #E5E7EB',
                         fontSize: '13px',
-                        color: '#FFFFFF',
+                        color: '#09090B',
                       }}
                     >
-                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#A3A3A3' }}>
-                        {epIdDisplay}
+                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#52525B' }}>
+                        <span style={{
+                          backgroundColor: '#F4F4F6',
+                          border: '1px solid #E5E7EB',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                        }}>
+                          {epIdDisplay}
+                        </span>
                       </td>
 
                       <td style={{ padding: '14px 20px' }}>
-                        <div style={{ fontWeight: 600 }}>{ep.name}</div>
-                        <div style={{ fontSize: '11px', color: '#A3A3A3', fontFamily: 'monospace' }}>/{ep.slug}</div>
+                        <div style={{ fontWeight: 600, color: '#09090B' }}>{ep.name}</div>
+                        <div style={{ fontSize: '11px', color: '#71717A', fontFamily: 'monospace' }}>/{ep.slug}</div>
                       </td>
 
                       <td style={{ padding: '14px 20px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <code style={{
                             fontSize: '11px',
-                            backgroundColor: '#000000',
-                            border: '1px solid #2A2A2A',
+                            backgroundColor: '#F4F4F6',
+                            border: '1px solid #E5E7EB',
                             padding: '3px 8px',
                             borderRadius: '4px',
-                            color: '#FFFFFF',
+                            color: '#09090B',
                           }}>
                             {`/v1/ingest/${ep.id.slice(0, 8)}...`}
                           </code>
                           <button
                             onClick={() => handleCopyText(ingestUrl, false, ep.id)}
                             style={{
-                              backgroundColor: 'transparent',
-                              border: 'none',
-                              color: isCopied ? '#4ade80' : '#A3A3A3',
+                              backgroundColor: '#FFFFFF',
+                              border: '1px solid #E5E7EB',
+                              borderRadius: '4px',
+                              color: isCopied ? '#16A34A' : '#71717A',
                               fontSize: '11px',
                               fontWeight: 600,
                               cursor: 'pointer',
@@ -2512,11 +2565,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                         </div>
                       </td>
 
-                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#E5E5E5' }}>
+                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#09090B' }}>
                         <code>{ep.secretPreview}...</code>
                       </td>
 
-                      <td style={{ padding: '14px 20px', color: '#A3A3A3', fontSize: '12px' }}>
+                      <td style={{ padding: '14px 20px', color: '#71717A', fontSize: '12px' }}>
                         {new Date(ep.createdAt).toLocaleDateString()}
                       </td>
 
@@ -2525,19 +2578,18 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '5px',
-                          padding: '2px 8px',
+                          padding: '3px 10px',
                           borderRadius: '999px',
                           fontSize: '11px',
-                          fontWeight: 600,
-                          backgroundColor: ep.isActive ? '#1E2D22' : '#2A1C1C',
-                          color: ep.isActive ? '#4ade80' : '#f87171',
-                          border: ep.isActive ? '1px solid #2B4232' : '1px solid #442A2A',
+                          fontWeight: 700,
+                          backgroundColor: ep.isActive ? '#16A34A' : '#DC2626',
+                          color: ep.isActive ? '#F5F0E7' : '#FFFFFF',
                         }}>
                           <span style={{
                             width: '5px',
                             height: '5px',
                             borderRadius: '50%',
-                            backgroundColor: ep.isActive ? '#4ade80' : '#f87171',
+                            backgroundColor: ep.isActive ? '#F5F0E7' : '#FFFFFF',
                           }}></span>
                           {ep.isActive ? 'ACTIVE' : 'INACTIVE'}
                         </span>
@@ -2549,11 +2601,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                             title="Test inbound webhook simulation"
                             onClick={() => openSimulator(ep.id)}
                             style={{
-                              backgroundColor: '#202020',
-                              border: '1px solid #2A2A2A',
+                              backgroundColor: '#09090B',
+                              border: 'none',
                               color: '#FFFFFF',
                               borderRadius: '6px',
-                              padding: '4px 10px',
+                              padding: '5px 12px',
                               fontSize: '11px',
                               fontWeight: 600,
                               cursor: 'pointer',
@@ -2567,11 +2619,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                 title="Rotate signing secret"
                                 onClick={() => promptRotateSecret(ep)}
                                 style={{
-                                  backgroundColor: 'transparent',
-                                  border: '1px solid #2A2A2A',
-                                  color: '#E5E5E5',
+                                  backgroundColor: '#FFFFFF',
+                                  border: '1px solid #E5E7EB',
+                                  color: '#09090B',
                                   borderRadius: '6px',
-                                  padding: '4px 10px',
+                                  padding: '5px 10px',
                                   fontSize: '11px',
                                   fontWeight: 600,
                                   cursor: 'pointer',
@@ -2583,15 +2635,18 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                 title="Delete endpoint"
                                 onClick={() => promptDeleteEndpoint(ep)}
                                 style={{
-                                  backgroundColor: 'transparent',
-                                  border: '1px solid #4A2828',
-                                  color: '#f87171',
+                                  backgroundColor: '#DC2626',
+                                  border: 'none',
+                                  color: '#FFFFFF',
                                   borderRadius: '6px',
-                                  padding: '4px 10px',
+                                  padding: '5px 10px',
                                   fontSize: '11px',
                                   fontWeight: 600,
                                   cursor: 'pointer',
+                                  transition: 'background-color 0.15s ease',
                                 }}
+                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#B91C1C'; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#DC2626'; }}
                               >
                                 Delete
                               </button>
@@ -2605,20 +2660,28 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               )}
             </tbody>
           </table>
+          </div>
         )}
 
         {/* DESTINATIONS VIEW (MILESTONE 3 OPTION 1: SSRF PROTECTED) */}
         {activeTab === 'destinations' && (
+          <div style={{
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+          }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '780px' }}>
             <thead>
               <tr style={{
-                borderBottom: '1px solid #2A2A2A',
-                color: '#A3A3A3',
+                borderBottom: '1px solid #E5E7EB',
+                color: '#71717A',
                 fontSize: '11px',
                 fontWeight: 700,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
-                backgroundColor: '#161616',
+                backgroundColor: '#F9FAFB',
               }}>
                 <th style={{ padding: '16px 22px' }}>Destination ID</th>
                 <th style={{ padding: '16px 22px' }}>Name & Method</th>
@@ -2632,13 +2695,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             <tbody>
               {destinationsLoading ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#737373' }}>
+                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#71717A' }}>
                     Loading destination targets...
                   </td>
                 </tr>
               ) : filteredDestinations.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#737373' }}>
+                  <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: '#71717A' }}>
                     No destination targets registered yet. Click "+ New Destination" to configure webhook forward targets.
                   </td>
                 </tr>
@@ -2650,25 +2713,32 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <tr
                       key={d.id}
                       style={{
-                        borderBottom: idx === filteredDestinations.length - 1 ? 'none' : '1px solid #2A2A2A',
+                        borderBottom: idx === filteredDestinations.length - 1 ? 'none' : '1px solid #E5E7EB',
                         fontSize: '13px',
-                        color: '#FFFFFF',
+                        color: '#09090B',
                       }}
                     >
-                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#A3A3A3' }}>
-                        {destIdDisplay}
+                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#52525B' }}>
+                        <span style={{
+                          backgroundColor: '#F4F4F6',
+                          border: '1px solid #E5E7EB',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                        }}>
+                          {destIdDisplay}
+                        </span>
                       </td>
 
                       <td style={{ padding: '14px 20px' }}>
-                        <div style={{ fontWeight: 600 }}>{d.name}</div>
+                        <div style={{ fontWeight: 600, color: '#09090B' }}>{d.name}</div>
                         <div style={{ marginTop: '3px' }}>
                           <span style={{
                             fontSize: '10px',
                             fontWeight: 700,
                             fontFamily: 'monospace',
-                            backgroundColor: '#000000',
-                            border: '1px solid #2A2A2A',
-                            color: '#FFFFFF',
+                            backgroundColor: '#F4F4F6',
+                            border: '1px solid #E5E7EB',
+                            color: '#09090B',
                             padding: '2px 6px',
                             borderRadius: '4px',
                           }}>
@@ -2681,11 +2751,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <code style={{
                             fontSize: '12px',
-                            backgroundColor: '#000000',
-                            border: '1px solid #2A2A2A',
+                            backgroundColor: '#F4F4F6',
+                            border: '1px solid #E5E7EB',
                             padding: '3px 8px',
                             borderRadius: '4px',
-                            color: '#FFFFFF',
+                            color: '#09090B',
                             maxWidth: '320px',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -2695,13 +2765,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                             {d.url}
                           </code>
                           <span style={{
-                            fontSize: '10px',
+                            fontSize: '10.5px',
                             fontWeight: 700,
-                            padding: '2px 6px',
+                            padding: '2px 8px',
                             borderRadius: '999px',
-                            backgroundColor: '#1E2D22',
-                            color: '#4ade80',
-                            border: '1px solid #2B4232',
+                            backgroundColor: '#16A34A',
+                            color: '#F5F0E7',
                             whiteSpace: 'nowrap',
                           }}>
                             ✓ SSRF Safe
@@ -2709,12 +2778,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                         </div>
                       </td>
 
-                      <td style={{ padding: '14px 20px', color: '#E5E5E5', fontSize: '12px' }}>
+                      <td style={{ padding: '14px 20px', color: '#09090B', fontSize: '12px' }}>
                         <div>{d.rateLimitPerSecond} req/sec</div>
-                        <div style={{ fontSize: '11px', color: '#A3A3A3' }}>{d.timeoutMs}ms timeout</div>
+                        <div style={{ fontSize: '11px', color: '#71717A' }}>{d.timeoutMs}ms timeout</div>
                       </td>
 
-                      <td style={{ padding: '14px 20px', color: '#A3A3A3', fontSize: '12px' }}>
+                      <td style={{ padding: '14px 20px', color: '#71717A', fontSize: '12px' }}>
                         {new Date(d.createdAt).toLocaleDateString()}
                       </td>
 
@@ -2726,13 +2795,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '5px',
-                            padding: '2px 8px',
+                            padding: '3px 10px',
                             borderRadius: '999px',
                             fontSize: '11px',
-                            fontWeight: 600,
-                            backgroundColor: d.isActive ? '#1E2D22' : '#2A1C1C',
-                            color: d.isActive ? '#4ade80' : '#f87171',
-                            border: d.isActive ? '1px solid #2B4232' : '1px solid #442A2A',
+                            fontWeight: 700,
+                            backgroundColor: d.isActive ? '#16A34A' : '#DC2626',
+                            color: d.isActive ? '#F5F0E7' : '#FFFFFF',
+                            border: 'none',
                             cursor: canManageKeys ? 'pointer' : 'default',
                           }}
                         >
@@ -2740,7 +2809,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                             width: '5px',
                             height: '5px',
                             borderRadius: '50%',
-                            backgroundColor: d.isActive ? '#4ade80' : '#f87171',
+                            backgroundColor: d.isActive ? '#F5F0E7' : '#FFFFFF',
                           }}></span>
                           {d.isActive ? 'ACTIVE' : 'PAUSED'}
                         </button>
@@ -2753,7 +2822,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                               <span style={{
                                 fontSize: '11px',
                                 fontWeight: 600,
-                                color: pingResult.status === 'SUCCESS' ? '#4ade80' : '#f87171',
+                                color: pingResult.status === 'SUCCESS' ? '#16A34A' : '#DC2626',
                                 whiteSpace: 'nowrap',
                               }}>
                                 {pingResult.text}
@@ -2764,11 +2833,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                               disabled={pingLoadingId === d.id}
                               onClick={() => void handleTestDestinationPing(d.id)}
                               style={{
-                                backgroundColor: '#202020',
-                                border: '1px solid #2A2A2A',
-                                color: pingLoadingId === d.id ? '#A3A3A3' : '#FFFFFF',
+                                backgroundColor: '#09090B',
+                                border: 'none',
+                                color: pingLoadingId === d.id ? '#71717A' : '#FFFFFF',
                                 borderRadius: '6px',
-                                padding: '4px 10px',
+                                padding: '5px 12px',
                                 fontSize: '11px',
                                 fontWeight: 600,
                                 cursor: pingLoadingId === d.id ? 'default' : 'pointer',
@@ -2780,15 +2849,18 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                               title="Delete destination"
                               onClick={() => promptDeleteDestination(d)}
                               style={{
-                                backgroundColor: 'transparent',
-                                border: '1px solid #4A2828',
-                                color: '#f87171',
+                                backgroundColor: '#DC2626',
+                                border: 'none',
+                                color: '#FFFFFF',
                                 borderRadius: '6px',
-                                padding: '4px 10px',
+                                padding: '5px 12px',
                                 fontSize: '11px',
                                 fontWeight: 600,
                                 cursor: 'pointer',
+                                transition: 'background-color 0.15s ease',
                               }}
+                              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#B91C1C'; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#DC2626'; }}
                             >
                               Delete
                             </button>
@@ -2801,20 +2873,28 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               )}
             </tbody>
           </table>
+          </div>
         )}
 
         {/* DELIVERIES & ATTEMPTS VIEW (MILESTONE 3 OPTION 2) */}
         {activeTab === 'deliveries' && (
+          <div style={{
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+          }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '820px' }}>
             <thead>
               <tr style={{
-                borderBottom: '1px solid #2A2A2A',
-                color: '#A3A3A3',
+                borderBottom: '1px solid #E5E7EB',
+                color: '#71717A',
                 fontSize: '11px',
                 fontWeight: 700,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
-                backgroundColor: '#161616',
+                backgroundColor: '#F9FAFB',
               }}>
                 <th style={{ padding: '16px 22px' }}>Attempt ID</th>
                 <th style={{ padding: '16px 22px' }}>Status & Code</th>
@@ -2827,13 +2907,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             <tbody>
               {deliveriesLoading ? (
                 <tr>
-                  <td colSpan={6} style={{ padding: '40px 20px', textAlign: 'center', color: '#737373' }}>
+                  <td colSpan={6} style={{ padding: '40px 20px', textAlign: 'center', color: '#71717A' }}>
                     Loading delivery attempt history...
                   </td>
                 </tr>
               ) : filteredDeliveries.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ padding: '40px 20px', textAlign: 'center', color: '#737373' }}>
+                  <td colSpan={6} style={{ padding: '40px 20px', textAlign: 'center', color: '#71717A' }}>
                     No delivery attempts logged yet. Test a destination using "⚡ Ping" or ingest an inbound webhook.
                   </td>
                 </tr>
@@ -2846,13 +2926,20 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <tr
                       key={att.id}
                       style={{
-                        borderBottom: idx === filteredDeliveries.length - 1 ? 'none' : '1px solid #2A2A2A',
+                        borderBottom: idx === filteredDeliveries.length - 1 ? 'none' : '1px solid #E5E7EB',
                         fontSize: '13px',
-                        color: '#FFFFFF',
+                        color: '#09090B',
                       }}
                     >
-                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#A3A3A3' }}>
-                        {attemptIdDisplay}
+                      <td style={{ padding: '14px 20px', fontFamily: 'monospace', fontSize: '12px', color: '#52525B' }}>
+                        <span style={{
+                          backgroundColor: '#F4F4F6',
+                          border: '1px solid #E5E7EB',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                        }}>
+                          {attemptIdDisplay}
+                        </span>
                       </td>
 
                       <td style={{ padding: '14px 20px' }}>
@@ -2864,15 +2951,14 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                           borderRadius: '999px',
                           fontSize: '11px',
                           fontWeight: 700,
-                          backgroundColor: isSuccess ? '#1E2D22' : '#2A1C1C',
-                          color: isSuccess ? '#4ade80' : '#f87171',
-                          border: isSuccess ? '1px solid #2B4232' : '1px solid #442A2A',
+                          backgroundColor: isSuccess ? '#16A34A' : '#DC2626',
+                          color: isSuccess ? '#F5F0E7' : '#FFFFFF',
                         }}>
                           <span style={{
                             width: '5px',
                             height: '5px',
                             borderRadius: '50%',
-                            backgroundColor: isSuccess ? '#4ade80' : '#f87171',
+                            backgroundColor: isSuccess ? '#F5F0E7' : '#FFFFFF',
                           }}></span>
                           {att.statusCode ? `HTTP ${att.statusCode}` : att.status}
                         </span>
@@ -2884,9 +2970,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                             fontSize: '10px',
                             fontWeight: 700,
                             fontFamily: 'monospace',
-                            backgroundColor: '#000000',
-                            border: '1px solid #2A2A2A',
-                            color: '#FFFFFF',
+                            backgroundColor: '#F4F4F6',
+                            border: '1px solid #E5E7EB',
+                            color: '#09090B',
                             padding: '2px 6px',
                             borderRadius: '4px',
                           }}>
@@ -2894,11 +2980,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                           </span>
                           <code style={{
                             fontSize: '12px',
-                            backgroundColor: '#000000',
-                            border: '1px solid #2A2A2A',
+                            backgroundColor: '#F4F4F6',
+                            border: '1px solid #E5E7EB',
                             padding: '3px 8px',
                             borderRadius: '4px',
-                            color: '#FFFFFF',
+                            color: '#09090B',
                             maxWidth: '300px',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -2909,7 +2995,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                           </code>
                         </div>
                         {att.errorDescription && (
-                          <div style={{ fontSize: '11px', color: '#f87171', marginTop: '4px' }}>
+                          <div style={{ fontSize: '11px', color: '#DC2626', marginTop: '4px' }}>
                             {att.errorDescription}
                           </div>
                         )}
@@ -2920,17 +3006,17 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                           fontSize: '11px',
                           fontWeight: 600,
                           fontFamily: 'monospace',
-                          padding: '2px 8px',
+                          padding: '3px 8px',
                           borderRadius: '999px',
-                          backgroundColor: '#202020',
-                          color: '#E5E5E5',
-                          border: '1px solid #2A2A2A',
+                          backgroundColor: '#F4F4F6',
+                          color: '#09090B',
+                          border: '1px solid #E5E7EB',
                         }}>
                           {att.latencyMs} ms
                         </span>
                       </td>
 
-                      <td style={{ padding: '14px 20px', color: '#A3A3A3', fontSize: '12px' }}>
+                      <td style={{ padding: '14px 20px', color: '#71717A', fontSize: '12px' }}>
                         {new Date(att.createdAt).toLocaleTimeString()} · {new Date(att.createdAt).toLocaleDateString()}
                       </td>
 
@@ -2942,11 +3028,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                               disabled={replayingDeliveryId === att.id}
                               title="Re-enqueue event delivery attempt"
                               style={{
-                                backgroundColor: replayingDeliveryId === att.id ? '#2A2A2A' : '#202020',
-                                border: '1px solid #2A2A2A',
-                                color: '#FFFFFF',
+                                backgroundColor: replayingDeliveryId === att.id ? '#F4F4F6' : '#FFFFFF',
+                                border: '1px solid #E5E7EB',
+                                color: '#09090B',
                                 borderRadius: '6px',
-                                padding: '4px 10px',
+                                padding: '5px 12px',
                                 fontSize: '11px',
                                 fontWeight: 600,
                                 cursor: replayingDeliveryId === att.id ? 'not-allowed' : 'pointer',
@@ -2962,11 +3048,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                           <button
                             onClick={() => setSelectedAttemptForModal(att)}
                             style={{
-                              backgroundColor: '#202020',
-                              border: '1px solid #2A2A2A',
+                              backgroundColor: '#09090B',
+                              border: 'none',
                               color: '#FFFFFF',
                               borderRadius: '6px',
-                              padding: '4px 10px',
+                              padding: '5px 12px',
                               fontSize: '11px',
                               fontWeight: 600,
                               cursor: 'pointer',
@@ -2982,6 +3068,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               )}
             </tbody>
           </table>
+          </div>
         )}
         </div>
       )}
@@ -3020,67 +3107,69 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
       {/* OVERVIEW DASHBOARD VIEW (ACTIVE WHEN activeTab === 'dashboard' - EXACTLY MATCHING IMAGE 2) */}
       {activeTab === 'dashboard' && (
-        <div className="rf-stagger-4" style={{ padding: '8px 0 24px', width: '100%', boxSizing: 'border-box' }}>
+        <div className="rf-stagger-4" style={{ padding: '0 0 20px', width: '100%', boxSizing: 'border-box' }}>
           {/* Header Row: Tenant Operations & Quick Actions */}
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '16px',
-            marginTop: '8px',
+            marginBottom: '12px',
+            marginTop: '4px',
           }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#09090B', margin: 0 }}>
               Tenant Operations
             </h3>
-            <span style={{ fontSize: '12px', fontWeight: 600, color: '#737373' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#71717A', textTransform: 'uppercase' }}>
               Quick Actions
             </span>
           </div>
 
-          {/* Quick Navigation Cards Grid (4 columns matching Image 2) */}
+          {/* Quick Navigation Cards Grid (4 columns matching D2 tight grid) */}
           <div className="rf-nav-grid">
             {/* Box 1: Members Directory */}
             <div style={{
-              backgroundColor: '#111111',
-              border: '1px solid #202020',
-              borderRadius: '16px',
-              padding: '22px 24px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              padding: '16px 18px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              minHeight: '170px',
+              minHeight: '150px',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
             }}>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717A" strokeWidth="2">
                       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                       <circle cx="9" cy="7" r="4"></circle>
                     </svg>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>Members Directory</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#09090B' }}>Members Directory</span>
                   </div>
-                  <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#181818', border: '1px solid #262626', color: '#A3A3A3', fontWeight: 600 }}>
+                  <span style={{ fontSize: '10.5px', padding: '1px 6px', borderRadius: '6px', backgroundColor: '#F4F4F6', border: '1px solid #E5E7EB', color: '#71717A', fontWeight: 600 }}>
                     <AnimatedCounter value={members.length} duration={1200} /> enrolled
                   </span>
                 </div>
-                <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
+                <p style={{ fontSize: '12px', color: '#71717A', margin: 0, lineHeight: 1.5 }}>
                   Manage member permissions, RBAC roles (Owner, Developer, Member), and invitations.
                 </p>
               </div>
               <button
                 onClick={() => onTabChange('members')}
                 style={{
-                  marginTop: '18px',
-                  padding: '9px 18px',
-                  backgroundColor: '#F7EFE2',
+                  marginTop: '14px',
+                  padding: '7px 14px',
+                  backgroundColor: '#09090B',
                   border: 'none',
-                  borderRadius: '999px',
-                  color: '#121214',
+                  borderRadius: '8px',
+                  color: '#FFFFFF',
                   fontSize: '12px',
-                  fontWeight: 700,
+                  fontWeight: 600,
                   cursor: 'pointer',
                   width: 'fit-content',
                   transition: 'opacity 0.15s ease',
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
                 }}
               >
                 View Directory →
@@ -3089,45 +3178,47 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
             {/* Box 2: API Keys */}
             <div style={{
-              backgroundColor: '#111111',
-              border: '1px solid #202020',
-              borderRadius: '16px',
-              padding: '22px 24px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              padding: '16px 18px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              minHeight: '170px',
+              minHeight: '150px',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
             }}>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717A" strokeWidth="2">
                       <path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5-3 3 1.5 1.5L9 14l-5 5H2v-2l5-5 1.5 1.5 3-3-1.5-1.5 3.5-3.5 1.5 1.5L21 2z"></path>
                     </svg>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>API Keys & Credentials</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#09090B' }}>API Keys & Credentials</span>
                   </div>
-                  <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#181818', border: '1px solid #262626', color: '#A3A3A3', fontWeight: 600 }}>
+                  <span style={{ fontSize: '10.5px', padding: '1px 6px', borderRadius: '6px', backgroundColor: '#F4F4F6', border: '1px solid #E5E7EB', color: '#71717A', fontWeight: 600 }}>
                     <AnimatedCounter value={activeKeyCount} duration={1200} /> active
                   </span>
                 </div>
-                <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
+                <p style={{ fontSize: '12px', color: '#71717A', margin: 0, lineHeight: 1.5 }}>
                   High-throughput ingestion keys with SHA-256 database hashing and instant revocation.
                 </p>
               </div>
               <button
                 onClick={() => onTabChange('api-keys')}
                 style={{
-                  marginTop: '18px',
-                  padding: '9px 18px',
-                  backgroundColor: '#F7EFE2',
+                  marginTop: '14px',
+                  padding: '7px 14px',
+                  backgroundColor: '#09090B',
                   border: 'none',
-                  borderRadius: '999px',
-                  color: '#121214',
+                  borderRadius: '8px',
+                  color: '#FFFFFF',
                   fontSize: '12px',
-                  fontWeight: 700,
+                  fontWeight: 600,
                   cursor: 'pointer',
                   width: 'fit-content',
                   transition: 'opacity 0.15s ease',
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
                 }}
               >
                 Manage API Keys →
@@ -3136,46 +3227,48 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
             {/* Box 3: Endpoints */}
             <div style={{
-              backgroundColor: '#111111',
-              border: '1px solid #202020',
-              borderRadius: '16px',
-              padding: '22px 24px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              padding: '16px 18px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              minHeight: '170px',
+              minHeight: '150px',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
             }}>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717A" strokeWidth="2">
                       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                     </svg>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>Webhook Ingestion</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#09090B' }}>Webhook Ingestion</span>
                   </div>
-                  <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#181818', border: '1px solid #262626', color: '#A3A3A3', fontWeight: 600 }}>
+                  <span style={{ fontSize: '10.5px', padding: '1px 6px', borderRadius: '6px', backgroundColor: '#F4F4F6', border: '1px solid #E5E7EB', color: '#71717A', fontWeight: 600 }}>
                     <AnimatedCounter value={endpoints.length} duration={1200} /> endpoints
                   </span>
                 </div>
-                <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
+                <p style={{ fontSize: '12px', color: '#71717A', margin: 0, lineHeight: 1.5 }}>
                   Dedicated tenant endpoints secured by rotated AES-256-CCM signing secrets.
                 </p>
               </div>
               <button
                 onClick={() => onTabChange('endpoints')}
                 style={{
-                  marginTop: '18px',
-                  padding: '9px 18px',
-                  backgroundColor: '#F7EFE2',
+                  marginTop: '14px',
+                  padding: '7px 14px',
+                  backgroundColor: '#09090B',
                   border: 'none',
-                  borderRadius: '999px',
-                  color: '#121214',
+                  borderRadius: '8px',
+                  color: '#FFFFFF',
                   fontSize: '12px',
-                  fontWeight: 700,
+                  fontWeight: 600,
                   cursor: 'pointer',
                   width: 'fit-content',
                   transition: 'opacity 0.15s ease',
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
                 }}
               >
                 Configure Endpoints →
@@ -3184,45 +3277,47 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
             {/* Box 4: Deliveries & Pipeline */}
             <div style={{
-              backgroundColor: '#111111',
-              border: '1px solid #202020',
-              borderRadius: '16px',
-              padding: '22px 24px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              padding: '16px 18px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              minHeight: '170px',
+              minHeight: '150px',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
             }}>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3A3" strokeWidth="2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717A" strokeWidth="2">
                       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
                     </svg>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>Deliveries & DLQ</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#09090B' }}>Deliveries & DLQ</span>
                   </div>
-                  <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#181818', border: '1px solid #262626', color: '#A3A3A3', fontWeight: 600 }}>
+                  <span style={{ fontSize: '10.5px', padding: '1px 6px', borderRadius: '6px', backgroundColor: '#F4F4F6', border: '1px solid #E5E7EB', color: '#71717A', fontWeight: 600 }}>
                     {deliveries.length} logs
                   </span>
                 </div>
-                <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
+                <p style={{ fontSize: '12px', color: '#71717A', margin: 0, lineHeight: 1.5 }}>
                   Durable HTTP outbox worker, exponential retry, and dead letter routing.
                 </p>
               </div>
               <button
                 onClick={() => onTabChange('deliveries')}
                 style={{
-                  marginTop: '18px',
-                  padding: '9px 18px',
-                  backgroundColor: '#F7EFE2',
+                  marginTop: '14px',
+                  padding: '7px 14px',
+                  backgroundColor: '#09090B',
                   border: 'none',
-                  borderRadius: '999px',
-                  color: '#121214',
+                  borderRadius: '8px',
+                  color: '#FFFFFF',
                   fontSize: '12px',
-                  fontWeight: 700,
+                  fontWeight: 600,
                   cursor: 'pointer',
                   width: 'fit-content',
                   transition: 'opacity 0.15s ease',
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
                 }}
               >
                 Inspect Deliveries →
@@ -3234,80 +3329,76 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           <div className="rf-bottom-cards-grid">
             {/* Sequential Workflows (M4) Feature Card (Left Column) */}
             <div style={{
-              backgroundColor: '#111111',
-              border: '1px solid #202020',
-              borderRadius: '16px',
-              padding: '22px 24px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              padding: '16px 18px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              gap: '16px',
+              gap: '12px',
               boxSizing: 'border-box',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
             }}>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '10px',
-                      backgroundColor: '#F7EFE2',
-                      color: '#121214',
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: '#09090B',
+                      color: '#FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
-                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.35)',
                     }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                       </svg>
                     </div>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
+                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#09090B', letterSpacing: '-0.01em' }}>
                       Sequential Workflow Engine (M4)
                     </span>
                   </div>
                   <span style={{
                     fontSize: '11px',
-                    padding: '2px 8px',
+                    padding: '3px 8px',
                     borderRadius: '999px',
-                    backgroundColor: '#181818',
-                    border: '1px solid #262626',
-                    color: '#4ADE80',
+                    backgroundColor: '#16A34A',
+                    color: '#F5F0E7',
                     fontWeight: 700,
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '4px',
                     flexShrink: 0,
                   }}>
-                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#4ADE80' }}></span>
                     Active
                   </span>
                 </div>
-                <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
+                <p style={{ fontSize: '12px', color: '#71717A', margin: 0, lineHeight: 1.5 }}>
                   Compose multi-step pipelines: Webhook trigger → Conditions → JSON transformation → Sequential HTTP deliveries with resume checkpointing.
                 </p>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-start', paddingTop: '4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-start', paddingTop: '2px' }}>
                 <button
                   onClick={() => onTabChange('workflows')}
                   style={{
-                    padding: '8px 18px',
-                    backgroundColor: '#F7EFE2',
-                    color: '#121214',
+                    padding: '7px 14px',
+                    backgroundColor: '#09090B',
+                    color: '#FFFFFF',
                     border: 'none',
-                    borderRadius: '999px',
+                    borderRadius: '8px',
                     fontSize: '12px',
-                    fontWeight: 700,
+                    fontWeight: 600,
                     cursor: 'pointer',
                     whiteSpace: 'nowrap',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
-                    transition: 'opacity 0.15s ease',
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
                 >
                   Open Workflow Console →
                 </button>
@@ -3316,69 +3407,68 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
             {/* PostgreSQL Row-Level Security Enforced Card (Right Column) */}
             <div style={{
-              backgroundColor: '#111111',
-              border: '1px solid #202020',
-              borderRadius: '16px',
-              padding: '22px 24px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              padding: '16px 18px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              gap: '16px',
+              gap: '12px',
               boxSizing: 'border-box',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
             }}>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '10px',
-                      backgroundColor: 'rgba(16, 185, 129, 0.08)',
-                      border: '1px solid rgba(16, 185, 129, 0.25)',
-                      color: '#34D399',
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: '#F4F4F6',
+                      border: '1px solid #E5E7EB',
+                      color: '#16A34A',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
                     }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                       </svg>
                     </div>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
+                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#09090B', letterSpacing: '-0.01em' }}>
                       PostgreSQL Row-Level Security Enforced
                     </span>
                   </div>
                   <span style={{
                     fontSize: '11px',
-                    padding: '2px 8px',
+                    padding: '3px 8px',
                     borderRadius: '999px',
-                    backgroundColor: 'rgba(16, 185, 129, 0.08)',
-                    border: '1px solid rgba(16, 185, 129, 0.2)',
-                    color: '#34D399',
+                    backgroundColor: '#16A34A',
+                    color: '#F5F0E7',
                     fontWeight: 700,
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '4px',
                     flexShrink: 0,
                   }}>
-                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981' }}></span>
                     RLS Active
                   </span>
                 </div>
-                <p style={{ fontSize: '12px', color: '#737373', margin: 0, lineHeight: 1.5 }}>
-                  Organization slug: <span style={{ color: '#E5DAC8', fontWeight: 600 }}>{organization.slug}</span> · <span style={{ color: '#A3A3A3' }}>Tenant ID: {organization.id.slice(0, 8)}...</span> All queries and outbox workers execute with strict tenant isolation.
+                <p style={{ fontSize: '12px', color: '#71717A', margin: 0, lineHeight: 1.5 }}>
+                  Organization slug: <span style={{ color: '#09090B', fontWeight: 600 }}>{organization.slug}</span> · <span style={{ color: '#71717A' }}>Tenant ID: {organization.id.slice(0, 8)}...</span> All queries and outbox workers execute with strict tenant isolation.
                 </p>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-start', paddingTop: '4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-start', paddingTop: '2px' }}>
                 <button
                   onClick={() => onTabChange('settings')}
                   style={{
-                    padding: '8px 18px',
-                    backgroundColor: 'transparent',
-                    color: '#E5DAC8',
-                    border: '1px solid #333333',
-                    borderRadius: '999px',
+                    padding: '7px 14px',
+                    backgroundColor: '#FFFFFF',
+                    color: '#09090B',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
                     fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -3386,15 +3476,16 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
                     transition: 'all 0.15s ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#181818';
-                    e.currentTarget.style.borderColor = '#555555';
+                    e.currentTarget.style.backgroundColor = '#F4F4F6';
+                    e.currentTarget.style.borderColor = '#D1D5DB';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.borderColor = '#333333';
+                    e.currentTarget.style.backgroundColor = '#FFFFFF';
+                    e.currentTarget.style.borderColor = '#E5E7EB';
                   }}
                 >
                   Security Architecture →
@@ -3407,24 +3498,24 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
         {/* SETTINGS VIEW (ACTIVE WHEN activeTab === 'settings') */}
         {activeTab === 'settings' && (
-          <div className="rf-stagger-4" style={{ padding: '40px 20px', maxWidth: '640px', margin: '0 auto', textAlign: 'left' }}>
+          <div className="rf-stagger-4" style={{ padding: '32px 16px', maxWidth: '640px', margin: '0 auto', textAlign: 'left' }}>
             <div style={{
-              backgroundColor: '#161616',
-              border: '1px solid #2A2A2A',
-              borderRadius: '20px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              borderRadius: '16px',
               padding: '28px',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
             }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#FFFFFF' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: '#09090B' }}>
                 Organization Parameters
               </h3>
-              <p style={{ fontSize: '13px', color: '#A3A3A3', margin: '0 0 20px' }}>
+              <p style={{ fontSize: '13px', color: '#71717A', margin: '0 0 20px' }}>
                 Manage configuration and security policies for {organization.name}.
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#71717A', textTransform: 'uppercase', marginBottom: '6px' }}>
                     Organization ID
                   </label>
                   <input
@@ -3436,17 +3527,17 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                       fontFamily: 'monospace',
                       fontSize: '12px',
                       padding: '10px 14px',
-                      backgroundColor: '#000000',
-                      border: '1px solid #2A2A2A',
+                      backgroundColor: '#F9FAFB',
+                      border: '1px solid #E5E7EB',
                       borderRadius: '8px',
-                      color: '#A3A3A3',
+                      color: '#09090B',
                       boxSizing: 'border-box',
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#71717A', textTransform: 'uppercase', marginBottom: '6px' }}>
                     Tenant URL Slug
                   </label>
                   <input
@@ -3458,17 +3549,17 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                       fontFamily: 'monospace',
                       fontSize: '12px',
                       padding: '10px 14px',
-                      backgroundColor: '#000000',
-                      border: '1px solid #2A2A2A',
+                      backgroundColor: '#F9FAFB',
+                      border: '1px solid #E5E7EB',
                       borderRadius: '8px',
-                      color: '#A3A3A3',
+                      color: '#09090B',
                       boxSizing: 'border-box',
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#71717A', textTransform: 'uppercase', marginBottom: '6px' }}>
                     Tenant Isolation Mode
                   </label>
                   <div style={{
@@ -3476,12 +3567,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     alignItems: 'center',
                     gap: '8px',
                     padding: '10px 14px',
-                    backgroundColor: '#000000',
-                    border: '1px solid #2A2A2A',
+                    backgroundColor: '#F9FAFB',
+                    border: '1px solid #E5E7EB',
                     borderRadius: '8px',
                   }}>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981' }} />
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#FFFFFF' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#16A34A' }} />
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#09090B' }}>
                       Enforced (PostgreSQL Row-Level Security)
                     </span>
                   </div>
@@ -3491,12 +3582,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   <div style={{
                     marginTop: '12px',
                     paddingTop: '20px',
-                    borderTop: '1px solid #2A2A2A',
+                    borderTop: '1px solid #E5E7EB',
                   }}>
-                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#f87171', textTransform: 'uppercase', marginBottom: '6px' }}>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#DC2626', textTransform: 'uppercase', marginBottom: '6px' }}>
                       Danger Zone
                     </label>
-                    <p style={{ fontSize: '12px', color: '#A3A3A3', margin: '0 0 14px' }}>
+                    <p style={{ fontSize: '12px', color: '#71717A', margin: '0 0 14px' }}>
                       Permanently delete this organization, along with all associated API keys, endpoints, destinations, and delivery history.
                     </p>
                     <button
@@ -3504,14 +3595,18 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                       onClick={() => void handleDeleteOrgConfirm()}
                       style={{
                         padding: '10px 18px',
-                        backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                        border: '1px solid #ef4444',
-                        color: '#f87171',
+                        backgroundColor: '#DC2626',
+                        border: 'none',
+                        color: '#FFFFFF',
                         borderRadius: '8px',
                         fontSize: '13px',
                         fontWeight: 700,
                         cursor: 'pointer',
+                        boxShadow: '0 1px 2px rgba(220, 38, 38, 0.2)',
+                        transition: 'background-color 0.15s ease',
                       }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#B91C1C'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#DC2626'; }}
                     >
                       Delete Organization
                     </button>
@@ -3532,7 +3627,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(14, 14, 16, 0.75)',
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
           backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
@@ -3541,18 +3636,18 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           padding: '16px',
         }}>
           <div style={{
-            backgroundColor: '#161616',
-            borderRadius: '20px',
-            border: '1px solid #2A2A2A',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            border: '1px solid #E5E7EB',
             width: '100%',
             maxWidth: '460px',
             padding: '28px',
-            boxShadow: '0 20px 30px rgba(0, 0, 0, 0.6)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
           }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#FFFFFF' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: '#09090B' }}>
               Register Organization Member
             </h3>
-            <p style={{ fontSize: '13px', color: '#A3A3A3', margin: '0 0 20px' }}>
+            <p style={{ fontSize: '13px', color: '#71717A', margin: '0 0 20px' }}>
               Invite a collaborator to access organization resources and pipelines.
             </p>
 
@@ -3563,11 +3658,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onChange={(e) => setInputType(e.target.value as 'email' | 'username')}
                   style={{
                     padding: '9px 12px',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '10px',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
                     fontSize: '13px',
-                    backgroundColor: '#000000',
-                    color: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
+                    color: '#09090B',
+                    outline: 'none',
                   }}
                 >
                   <option value="email">User Email</option>
@@ -3583,17 +3679,18 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     flex: 1,
                     minWidth: '180px',
                     padding: '9px 14px',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '10px',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
                     fontSize: '13px',
-                    backgroundColor: '#000000',
-                    color: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
+                    color: '#09090B',
+                    outline: 'none',
                   }}
                 />
               </div>
 
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#A3A3A3', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#71717A', marginBottom: '6px' }}>
                   Assigned Role
                 </label>
                 <select
@@ -3602,11 +3699,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   style={{
                     width: '100%',
                     padding: '9px 14px',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '10px',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
                     fontSize: '13px',
-                    backgroundColor: '#000000',
-                    color: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
+                    color: '#09090B',
+                    outline: 'none',
                   }}
                 >
                   <option value="VIEWER">VIEWER (Read-only)</option>
@@ -3616,7 +3714,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               </div>
 
               {addError && (
-                <div style={{ color: '#f87171', fontSize: '12px', marginBottom: '16px' }}>
+                <div style={{ color: '#DC2626', fontSize: '12px', marginBottom: '16px' }}>
                   {addError}
                 </div>
               )}
@@ -3627,10 +3725,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onClick={() => setShowAddMemberModal(false)}
                   style={{
                     padding: '9px 18px',
-                    backgroundColor: 'transparent',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '999px',
-                    color: '#A3A3A3',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
+                    color: '#09090B',
                     fontSize: '13px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -3643,10 +3741,14 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   disabled={addLoading}
                   style={{
                     padding: '9px 22px',
-                    backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
+                    backgroundColor: '#09090B',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#FFFFFF',
                     fontSize: '13px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
+                    fontWeight: 600,
+                    cursor: addLoading ? 'not-allowed' : 'pointer',
+                    opacity: addLoading ? 0.7 : 1,
                   }}
                 >
                   {addLoading ? 'Adding...' : 'Add Member'}
@@ -3665,7 +3767,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(14, 14, 16, 0.75)',
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
           backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
@@ -3674,24 +3776,24 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           padding: '16px',
         }}>
           <div style={{
-            backgroundColor: '#161616',
-            borderRadius: '20px',
-            border: '1px solid #2A2A2A',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            border: '1px solid #E5E7EB',
             width: '100%',
             maxWidth: '460px',
             padding: '28px',
-            boxShadow: '0 20px 30px rgba(0, 0, 0, 0.6)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
           }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#FFFFFF' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: '#09090B' }}>
               Create Organization API Key
             </h3>
-            <p style={{ fontSize: '13px', color: '#A3A3A3', margin: '0 0 20px' }}>
+            <p style={{ fontSize: '13px', color: '#71717A', margin: '0 0 20px' }}>
               Generate a secure SHA-256 hashed API key to authenticate programmatic requests.
             </p>
 
             <form onSubmit={handleCreateApiKey}>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#A3A3A3', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#71717A', marginBottom: '6px' }}>
                   Key Name
                 </label>
                 <input
@@ -3703,17 +3805,19 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   style={{
                     width: '100%',
                     padding: '9px 14px',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '10px',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
                     fontSize: '13px',
-                    backgroundColor: '#000000',
-                    color: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
+                    color: '#09090B',
+                    outline: 'none',
+                    boxSizing: 'border-box',
                   }}
                 />
               </div>
 
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#A3A3A3', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#71717A', marginBottom: '6px' }}>
                   Scope
                 </label>
                 <select
@@ -3722,11 +3826,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   style={{
                     width: '100%',
                     padding: '9px 14px',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '10px',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
                     fontSize: '13px',
-                    backgroundColor: '#000000',
-                    color: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
+                    color: '#09090B',
+                    outline: 'none',
+                    boxSizing: 'border-box',
                   }}
                 >
                   <option value="ingest">Ingestion (ingest) — Inbound webhooks</option>
@@ -3735,7 +3841,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               </div>
 
               {keyActionError && (
-                <div style={{ color: '#f87171', fontSize: '12px', marginBottom: '16px' }}>
+                <div style={{ color: '#DC2626', fontSize: '12px', marginBottom: '16px' }}>
                   {keyActionError}
                 </div>
               )}
@@ -3746,10 +3852,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onClick={() => setShowAddKeyModal(false)}
                   style={{
                     padding: '9px 18px',
-                    backgroundColor: 'transparent',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '999px',
-                    color: '#A3A3A3',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
+                    color: '#09090B',
                     fontSize: '13px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -3761,9 +3867,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   type="submit"
                   style={{
                     padding: '9px 22px',
-                    backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
+                    backgroundColor: '#09090B',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#FFFFFF',
                     fontSize: '13px',
-                    fontWeight: 700,
+                    fontWeight: 600,
                     cursor: 'pointer',
                   }}
                 >
@@ -3783,7 +3892,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(14, 14, 16, 0.75)',
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
           backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
@@ -3792,24 +3901,24 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           padding: '16px',
         }}>
           <div style={{
-            backgroundColor: '#161616',
-            borderRadius: '20px',
-            border: '1px solid #2A2A2A',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            border: '1px solid #E5E7EB',
             width: '100%',
             maxWidth: '460px',
             padding: '28px',
-            boxShadow: '0 20px 30px rgba(0, 0, 0, 0.6)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
           }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#FFFFFF' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: '#09090B' }}>
               Create Ingestion Endpoint
             </h3>
-            <p style={{ fontSize: '13px', color: '#A3A3A3', margin: '0 0 20px' }}>
+            <p style={{ fontSize: '13px', color: '#71717A', margin: '0 0 20px' }}>
               Register a dedicated webhook ingestion endpoint. A unique AES-256-GCM signing secret will be generated.
             </p>
 
             <form onSubmit={handleCreateEndpoint}>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#A3A3A3', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#71717A', marginBottom: '6px' }}>
                   Endpoint Name
                 </label>
                 <input
@@ -3821,17 +3930,19 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   style={{
                     width: '100%',
                     padding: '9px 14px',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '10px',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
                     fontSize: '13px',
-                    backgroundColor: '#000000',
-                    color: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
+                    color: '#09090B',
+                    outline: 'none',
+                    boxSizing: 'border-box',
                   }}
                 />
               </div>
 
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#A3A3A3', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#71717A', marginBottom: '6px' }}>
                   Slug (Optional URL identifier)
                 </label>
                 <input
@@ -3842,20 +3953,22 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   style={{
                     width: '100%',
                     padding: '9px 14px',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '10px',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
                     fontSize: '13px',
-                    backgroundColor: '#000000',
-                    color: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
+                    color: '#09090B',
+                    outline: 'none',
+                    boxSizing: 'border-box',
                   }}
                 />
-                <span style={{ fontSize: '11px', color: '#737373', marginTop: '4px', display: 'block' }}>
+                <span style={{ fontSize: '11px', color: '#71717A', marginTop: '4px', display: 'block' }}>
                   Leave empty to automatically generate a unique slug.
                 </span>
               </div>
 
               {endpointActionError && (
-                <div style={{ color: '#f87171', fontSize: '12px', marginBottom: '16px' }}>
+                <div style={{ color: '#DC2626', fontSize: '12px', marginBottom: '16px' }}>
                   {endpointActionError}
                 </div>
               )}
@@ -3866,10 +3979,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onClick={() => setShowAddEndpointModal(false)}
                   style={{
                     padding: '9px 18px',
-                    backgroundColor: 'transparent',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '999px',
-                    color: '#A3A3A3',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
+                    color: '#09090B',
                     fontSize: '13px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -3881,9 +3994,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   type="submit"
                   style={{
                     padding: '9px 22px',
-                    backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
+                    backgroundColor: '#09090B',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#FFFFFF',
                     fontSize: '13px',
-                    fontWeight: 700,
+                    fontWeight: 600,
                     cursor: 'pointer',
                   }}
                 >
@@ -3903,7 +4019,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(14, 14, 16, 0.75)',
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
           backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
@@ -3912,24 +4028,24 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           padding: '16px',
         }}>
           <div style={{
-            backgroundColor: '#161616',
-            borderRadius: '20px',
-            border: '1px solid #2A2A2A',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            border: '1px solid #E5E7EB',
             width: '100%',
             maxWidth: '500px',
             padding: '28px',
-            boxShadow: '0 20px 30px rgba(0, 0, 0, 0.6)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
           }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#FFFFFF' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: '#09090B' }}>
               Register Destination Target
             </h3>
-            <p style={{ fontSize: '13px', color: '#A3A3A3', margin: '0 0 20px' }}>
+            <p style={{ fontSize: '13px', color: '#71717A', margin: '0 0 20px' }}>
               Register a webhook delivery destination. Targets are protected against SSRF attacks (private IPs, loopback, and cloud metadata are strictly blocked).
             </p>
 
             <form onSubmit={handleCreateDestination}>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#A3A3A3', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#71717A', marginBottom: '6px' }}>
                   Destination Name
                 </label>
                 <input
@@ -3941,17 +4057,19 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   style={{
                     width: '100%',
                     padding: '9px 14px',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '10px',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
                     fontSize: '13px',
-                    backgroundColor: '#000000',
-                    color: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
+                    color: '#09090B',
+                    outline: 'none',
+                    boxSizing: 'border-box',
                   }}
                 />
               </div>
 
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#A3A3A3', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#71717A', marginBottom: '6px' }}>
                   Target Webhook URL (SSRF Protected)
                 </label>
                 <input
@@ -3962,21 +4080,23 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   style={{
                     width: '100%',
                     padding: '9px 14px',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '10px',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
                     fontSize: '13px',
-                    backgroundColor: '#000000',
-                    color: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
+                    color: '#09090B',
+                    outline: 'none',
+                    boxSizing: 'border-box',
                   }}
                 />
-                <span style={{ fontSize: '11px', color: '#737373', marginTop: '4px', display: 'block' }}>
+                <span style={{ fontSize: '11px', color: '#71717A', marginTop: '4px', display: 'block' }}>
                   Only public HTTP/HTTPS URLs allowed. RFC 1918 private subnets and 169.254.169.254 metadata are rejected.
                 </span>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '20px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#A3A3A3', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#71717A', marginBottom: '6px' }}>
                     HTTP Method
                   </label>
                   <select
@@ -3985,11 +4105,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     style={{
                       width: '100%',
                       padding: '9px 10px',
-                      border: '1px solid #2A2A2A',
-                      borderRadius: '10px',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '8px',
                       fontSize: '13px',
-                      backgroundColor: '#000000',
-                      color: '#FFFFFF',
+                      backgroundColor: '#FFFFFF',
+                      color: '#09090B',
+                      outline: 'none',
                     }}
                   >
                     <option value="POST">POST</option>
@@ -3999,7 +4120,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#A3A3A3', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#71717A', marginBottom: '6px' }}>
                     Rate Limit (req/s)
                   </label>
                   <input
@@ -4011,17 +4132,18 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     style={{
                       width: '100%',
                       padding: '9px 10px',
-                      border: '1px solid #2A2A2A',
-                      borderRadius: '10px',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '8px',
                       fontSize: '13px',
-                      backgroundColor: '#000000',
-                      color: '#FFFFFF',
+                      backgroundColor: '#FFFFFF',
+                      color: '#09090B',
+                      outline: 'none',
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#A3A3A3', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#71717A', marginBottom: '6px' }}>
                     Timeout (ms)
                   </label>
                   <input
@@ -4034,18 +4156,19 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     style={{
                       width: '100%',
                       padding: '9px 10px',
-                      border: '1px solid #2A2A2A',
-                      borderRadius: '10px',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '8px',
                       fontSize: '13px',
-                      backgroundColor: '#000000',
-                      color: '#FFFFFF',
+                      backgroundColor: '#FFFFFF',
+                      color: '#09090B',
+                      outline: 'none',
                     }}
                   />
                 </div>
               </div>
 
               {destinationActionError && (
-                <div style={{ color: '#f87171', fontSize: '12px', marginBottom: '16px' }}>
+                <div style={{ color: '#DC2626', fontSize: '12px', marginBottom: '16px' }}>
                   {destinationActionError}
                 </div>
               )}
@@ -4056,10 +4179,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onClick={() => setShowAddDestinationModal(false)}
                   style={{
                     padding: '9px 18px',
-                    backgroundColor: 'transparent',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '999px',
-                    color: '#A3A3A3',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
+                    color: '#09090B',
                     fontSize: '13px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -4071,9 +4194,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   type="submit"
                   style={{
                     padding: '9px 22px',
-                    backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
+                    backgroundColor: '#09090B',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#FFFFFF',
                     fontSize: '13px',
-                    fontWeight: 700,
+                    fontWeight: 600,
                     cursor: 'pointer',
                   }}
                 >
@@ -4093,7 +4219,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(14, 14, 16, 0.75)',
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
           backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
@@ -4102,18 +4228,18 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           padding: '16px',
         }}>
           <div style={{
-            backgroundColor: '#161616',
-            borderRadius: '20px',
-            border: '1px solid #2A2A2A',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            border: '1px solid #E5E7EB',
             width: '100%',
             maxWidth: '650px',
             padding: '28px',
             maxHeight: '90vh',
             overflowY: 'auto',
-            boxShadow: '0 20px 30px rgba(0, 0, 0, 0.6)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#FFFFFF' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#09090B' }}>
                 Delivery Attempt Details
               </h3>
               <button
@@ -4121,7 +4247,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#A3A3A3',
+                  color: '#71717A',
                   fontSize: '20px',
                   cursor: 'pointer',
                   padding: '4px',
@@ -4132,31 +4258,31 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ backgroundColor: '#0A0A0A', padding: '10px 14px', borderRadius: '10px', border: '1px solid #2A2A2A' }}>
-                <span style={{ fontSize: '11px', color: '#A3A3A3', display: 'block' }}>Status & Latency</span>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: selectedAttemptForModal.status === 'SUCCESS' ? '#4ade80' : '#f87171' }}>
+              <div style={{ backgroundColor: '#F9FAFB', padding: '10px 14px', borderRadius: '8px', border: '1px solid #E5E7EB' }}>
+                <span style={{ fontSize: '11px', color: '#71717A', display: 'block' }}>Status & Latency</span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: selectedAttemptForModal.status === 'SUCCESS' ? '#16A34A' : '#DC2626' }}>
                   {selectedAttemptForModal.statusCode ? `HTTP ${selectedAttemptForModal.statusCode}` : selectedAttemptForModal.status} · {selectedAttemptForModal.latencyMs}ms
                 </span>
               </div>
-              <div style={{ backgroundColor: '#0A0A0A', padding: '10px 14px', borderRadius: '10px', border: '1px solid #2A2A2A' }}>
-                <span style={{ fontSize: '11px', color: '#A3A3A3', display: 'block' }}>Target URL</span>
-                <span style={{ fontSize: '12px', fontFamily: 'monospace', color: '#FFFFFF', wordBreak: 'break-all' }}>
+              <div style={{ backgroundColor: '#F9FAFB', padding: '10px 14px', borderRadius: '8px', border: '1px solid #E5E7EB' }}>
+                <span style={{ fontSize: '11px', color: '#71717A', display: 'block' }}>Target URL</span>
+                <span style={{ fontSize: '12px', fontFamily: 'monospace', color: '#09090B', wordBreak: 'break-all' }}>
                   {selectedAttemptForModal.requestMethod} {selectedAttemptForModal.requestUrl}
                 </span>
               </div>
             </div>
 
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#A3A3A3', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#71717A', marginBottom: '6px' }}>
                 Request Headers (including Outbound HMAC Signature)
               </label>
               <pre style={{
-                backgroundColor: '#000000',
-                border: '1px solid #2A2A2A',
+                backgroundColor: '#F9FAFB',
+                border: '1px solid #E5E7EB',
                 borderRadius: '8px',
                 padding: '12px',
                 fontSize: '11px',
-                color: '#E5E5E5',
+                color: '#09090B',
                 overflowX: 'auto',
                 margin: 0,
               }}>
@@ -4166,16 +4292,16 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
             {selectedAttemptForModal.responseHeaders && (
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#A3A3A3', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#71717A', marginBottom: '6px' }}>
                   Response Headers
                 </label>
                 <pre style={{
-                  backgroundColor: '#000000',
-                  border: '1px solid #2A2A2A',
+                  backgroundColor: '#F9FAFB',
+                  border: '1px solid #E5E7EB',
                   borderRadius: '8px',
                   padding: '12px',
                   fontSize: '11px',
-                  color: '#E5E5E5',
+                  color: '#09090B',
                   overflowX: 'auto',
                   margin: 0,
                 }}>
@@ -4186,16 +4312,16 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
             {selectedAttemptForModal.responseBodyPreview && (
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#A3A3A3', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#71717A', marginBottom: '6px' }}>
                   Response Body Preview
                 </label>
                 <pre style={{
-                  backgroundColor: '#000000',
-                  border: '1px solid #2A2A2A',
+                  backgroundColor: '#F9FAFB',
+                  border: '1px solid #E5E7EB',
                   borderRadius: '8px',
                   padding: '12px',
                   fontSize: '11px',
-                  color: '#FFFFFF',
+                  color: '#09090B',
                   overflowX: 'auto',
                   margin: 0,
                   whiteSpace: 'pre-wrap',
@@ -4216,11 +4342,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   }}
                   style={{
                     padding: '8px 20px',
-                    backgroundColor: '#202020',
-                    color: '#FFFFFF',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '999px',
-                    fontWeight: 700,
+                    backgroundColor: '#FFFFFF',
+                    color: '#09090B',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
+                    fontWeight: 600,
                     fontSize: '13px',
                     cursor: 'pointer',
                     display: 'inline-flex',
@@ -4236,8 +4362,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 onClick={() => setSelectedAttemptForModal(null)}
                 style={{
                   padding: '8px 20px',
-                  backgroundColor: '#F7EFE2', color: '#121214', border: 'none', borderRadius: '999px',
-                  fontWeight: 700,
+                  backgroundColor: '#09090B',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: 600,
                   fontSize: '13px',
                   cursor: 'pointer',
                 }}
@@ -4257,7 +4386,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(14, 14, 16, 0.75)',
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
           backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
@@ -4266,15 +4395,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           padding: '16px',
         }}>
           <div style={{
-            backgroundColor: '#161616',
-            borderRadius: '20px',
-            border: '1px solid #2A2A2A',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            border: '1px solid #E5E7EB',
             width: '100%',
             maxWidth: '680px',
             padding: '28px',
             maxHeight: '92vh',
             overflowY: 'auto',
-            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.7)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
           }}>
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
@@ -4282,9 +4411,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 <div style={{
                   width: '38px',
                   height: '38px',
-                  borderRadius: '10px',
-                  backgroundColor: '#000000',
-                  border: '1px solid #2A2A2A',
+                  borderRadius: '8px',
+                  backgroundColor: '#F4F4F6',
+                  border: '1px solid #E5E7EB',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -4293,10 +4422,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   ⚡
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px', color: '#FFFFFF' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px', color: '#09090B' }}>
                     Inbound Webhook Simulator
                   </h3>
-                  <p style={{ fontSize: '12px', color: '#A3A3A3', margin: 0 }}>
+                  <p style={{ fontSize: '12px', color: '#71717A', margin: 0 }}>
                     Simulate authenticated webhook ingestion, HMAC-SHA256 signature verification, and outbox dispatch.
                   </p>
                 </div>
@@ -4307,7 +4436,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#A3A3A3',
+                  color: '#71717A',
                   fontSize: '20px',
                   cursor: 'pointer',
                   padding: '4px',
@@ -4319,16 +4448,16 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
             {/* Target Endpoint Selection */}
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#71717A', textTransform: 'uppercase', marginBottom: '6px' }}>
                 Target Ingestion Endpoint
               </label>
               {endpoints.length === 0 ? (
                 <div style={{
                   padding: '12px 14px',
-                  backgroundColor: '#2A1C1C',
-                  border: '1px solid #442A2A',
+                  backgroundColor: '#FEE2E2',
+                  border: '1px solid #FCA5A5',
                   borderRadius: '8px',
-                  color: '#f87171',
+                  color: '#DC2626',
                   fontSize: '12px',
                 }}>
                   No ingestion endpoints available. Create an endpoint first to simulate webhooks.
@@ -4340,11 +4469,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   style={{
                     width: '100%',
                     padding: '10px 14px',
-                    border: '1px solid #2A2A2A',
+                    border: '1px solid #E5E7EB',
                     borderRadius: '8px',
                     fontSize: '13px',
-                    backgroundColor: '#000000',
-                    color: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
+                    color: '#09090B',
                     outline: 'none',
                     boxSizing: 'border-box',
                   }}
@@ -4360,7 +4489,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
             {/* Preset Event Types Bar */}
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#71717A', textTransform: 'uppercase', marginBottom: '6px' }}>
                 Sample Event Presets
               </label>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -4369,13 +4498,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onClick={() => setSimulatorPreset('payment.succeeded')}
                   style={{
                     padding: '5px 12px',
-                    borderRadius: '999px',
+                    borderRadius: '8px',
                     fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
-                    backgroundColor: simulatorEventType === 'payment.succeeded' ? '#FFFFFF' : '#202020',
-                    color: simulatorEventType === 'payment.succeeded' ? '#000000' : '#E5E5E5',
-                    border: '1px solid #2A2A2A',
+                    backgroundColor: simulatorEventType === 'payment.succeeded' ? '#09090B' : '#FFFFFF',
+                    color: simulatorEventType === 'payment.succeeded' ? '#FFFFFF' : '#71717A',
+                    border: simulatorEventType === 'payment.succeeded' ? '1px solid #09090B' : '1px solid #E5E7EB',
                   }}
                 >
                   ⚡ payment.succeeded
@@ -4385,13 +4514,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onClick={() => setSimulatorPreset('user.signup')}
                   style={{
                     padding: '5px 12px',
-                    borderRadius: '999px',
+                    borderRadius: '8px',
                     fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
-                    backgroundColor: simulatorEventType === 'user.signup' ? '#FFFFFF' : '#202020',
-                    color: simulatorEventType === 'user.signup' ? '#000000' : '#E5E5E5',
-                    border: '1px solid #2A2A2A',
+                    backgroundColor: simulatorEventType === 'user.signup' ? '#09090B' : '#FFFFFF',
+                    color: simulatorEventType === 'user.signup' ? '#FFFFFF' : '#71717A',
+                    border: simulatorEventType === 'user.signup' ? '1px solid #09090B' : '1px solid #E5E7EB',
                   }}
                 >
                   👤 user.signup
@@ -4401,13 +4530,13 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onClick={() => setSimulatorPreset('order.fulfilled')}
                   style={{
                     padding: '5px 12px',
-                    borderRadius: '999px',
+                    borderRadius: '8px',
                     fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
-                    backgroundColor: simulatorEventType === 'order.fulfilled' ? '#FFFFFF' : '#202020',
-                    color: simulatorEventType === 'order.fulfilled' ? '#000000' : '#E5E5E5',
-                    border: '1px solid #2A2A2A',
+                    backgroundColor: simulatorEventType === 'order.fulfilled' ? '#09090B' : '#FFFFFF',
+                    color: simulatorEventType === 'order.fulfilled' ? '#FFFFFF' : '#71717A',
+                    border: simulatorEventType === 'order.fulfilled' ? '1px solid #09090B' : '1px solid #E5E7EB',
                   }}
                 >
                   📦 order.fulfilled
@@ -4418,7 +4547,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             {/* Event Type & Idempotency Key */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#71717A', textTransform: 'uppercase', marginBottom: '6px' }}>
                   X-Event-Type Header
                 </label>
                 <input
@@ -4428,18 +4557,19 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   style={{
                     width: '100%',
                     padding: '9px 12px',
-                    border: '1px solid #2A2A2A',
+                    border: '1px solid #E5E7EB',
                     borderRadius: '8px',
                     fontSize: '13px',
-                    backgroundColor: '#000000',
-                    color: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
+                    color: '#09090B',
                     boxSizing: 'border-box',
+                    outline: 'none',
                   }}
                 />
               </div>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#71717A', textTransform: 'uppercase' }}>
                     Idempotency Key
                   </label>
                   <button
@@ -4448,7 +4578,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     style={{
                       background: 'none',
                       border: 'none',
-                      color: '#A3A3A3',
+                      color: '#71717A',
                       fontSize: '11px',
                       cursor: 'pointer',
                       textDecoration: 'underline',
@@ -4466,13 +4596,14 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   style={{
                     width: '100%',
                     padding: '9px 12px',
-                    border: '1px solid #2A2A2A',
+                    border: '1px solid #E5E7EB',
                     borderRadius: '8px',
                     fontSize: '13px',
-                    backgroundColor: '#000000',
-                    color: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
+                    color: '#09090B',
                     boxSizing: 'border-box',
                     fontFamily: 'monospace',
+                    outline: 'none',
                   }}
                 />
               </div>
@@ -4480,7 +4611,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
             {/* JSON Payload Editor */}
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#A3A3A3', textTransform: 'uppercase', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#71717A', textTransform: 'uppercase', marginBottom: '6px' }}>
                 Webhook Body (JSON Payload)
               </label>
               <textarea
@@ -4491,14 +4622,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   width: '100%',
                   fontFamily: 'monospace',
                   fontSize: '12px',
-                  backgroundColor: '#000000',
-                  color: '#FFFFFF',
-                  border: '1px solid #2A2A2A',
+                  backgroundColor: '#F9FAFB',
+                  color: '#09090B',
+                  border: '1px solid #E5E7EB',
                   borderRadius: '8px',
                   padding: '12px',
                   boxSizing: 'border-box',
                   resize: 'vertical',
                   lineHeight: '1.4',
+                  outline: 'none',
                 }}
               />
             </div>
@@ -4507,10 +4639,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             {simulatorError && (
               <div style={{
                 padding: '10px 14px',
-                backgroundColor: '#2A1C1C',
-                border: '1px solid #442A2A',
+                backgroundColor: '#FEE2E2',
+                border: '1px solid #FCA5A5',
                 borderRadius: '8px',
-                color: '#f87171',
+                color: '#DC2626',
                 fontSize: '12px',
                 marginBottom: '16px',
               }}>
@@ -4521,8 +4653,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             {/* Simulation Result Receipt Card */}
             {simulatorResult && (
               <div style={{
-                backgroundColor: '#0A0A0A',
-                border: '1px solid #2A2A2A',
+                backgroundColor: '#F9FAFB',
+                border: '1px solid #E5E7EB',
                 borderRadius: '12px',
                 padding: '16px',
                 marginBottom: '18px',
@@ -4531,16 +4663,15 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{
                       padding: '3px 10px',
-                      borderRadius: '999px',
+                      borderRadius: '8px',
                       fontSize: '11px',
                       fontWeight: 700,
-                      backgroundColor: simulatorResult.status === 'duplicate' ? '#2B2314' : '#1E2D22',
-                      color: simulatorResult.status === 'duplicate' ? '#f59e0b' : '#4ade80',
-                      border: simulatorResult.status === 'duplicate' ? '1px solid #4D3C1D' : '1px solid #2B4232',
+                      backgroundColor: simulatorResult.status === 'duplicate' ? '#F59E0B' : '#16A34A',
+                      color: simulatorResult.status === 'duplicate' ? '#FFFFFF' : '#F5F0E7',
                     }}>
                       {simulatorResult.status === 'duplicate' ? 'HTTP 200 (DUPLICATE)' : 'HTTP 202 ACCEPTED'}
                     </span>
-                    <span style={{ fontSize: '12px', color: '#A3A3A3' }}>
+                    <span style={{ fontSize: '12px', color: '#71717A' }}>
                       {simulatorResult.status === 'duplicate' ? 'Idempotently deduplicated' : 'Outbox message queued'}
                     </span>
                   </div>
@@ -4553,12 +4684,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     }}
                     style={{
                       padding: '5px 12px',
-                      backgroundColor: '#202020',
-                      border: '1px solid #2A2A2A',
-                      borderRadius: '999px',
-                      color: '#FFFFFF',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '8px',
+                      color: '#09090B',
                       fontSize: '11px',
-                      fontWeight: 700,
+                      fontWeight: 600,
                       cursor: 'pointer',
                     }}
                   >
@@ -4568,12 +4699,12 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '11px' }}>
                   <div>
-                    <span style={{ color: '#737373', display: 'block' }}>Event ID</span>
-                    <code style={{ color: '#FFFFFF' }}>{simulatorResult.eventId}</code>
+                    <span style={{ color: '#71717A', display: 'block' }}>Event ID</span>
+                    <code style={{ color: '#09090B' }}>{simulatorResult.eventId}</code>
                   </div>
                   <div>
-                    <span style={{ color: '#737373', display: 'block' }}>HMAC Signature</span>
-                    <code style={{ color: '#A3A3A3' }}>{simulatorResult.signature.slice(0, 24)}...</code>
+                    <span style={{ color: '#71717A', display: 'block' }}>HMAC Signature</span>
+                    <code style={{ color: '#71717A' }}>{simulatorResult.signature.slice(0, 24)}...</code>
                   </div>
                 </div>
               </div>
@@ -4586,10 +4717,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 onClick={handleCopyCurl}
                 style={{
                   padding: '9px 16px',
-                  backgroundColor: '#202020',
-                  border: '1px solid #2A2A2A',
-                  borderRadius: '999px',
-                  color: copiedCurl ? '#4ade80' : '#E5E5E5',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '8px',
+                  color: copiedCurl ? '#16A34A' : '#09090B',
                   fontSize: '12px',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -4604,10 +4735,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onClick={() => setShowSimulatorModal(false)}
                   style={{
                     padding: '9px 18px',
-                    backgroundColor: 'transparent',
-                    border: '1px solid #2A2A2A',
-                    borderRadius: '999px',
-                    color: '#A3A3A3',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
+                    color: '#09090B',
                     fontSize: '13px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -4621,11 +4752,14 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   onClick={() => void handleRunSimulator()}
                   style={{
                     padding: '9px 24px',
-                    backgroundColor: '#F7EFE2', border: 'none', borderRadius: '999px', color: '#121214',
+                    backgroundColor: '#09090B',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#FFFFFF',
                     fontSize: '13px',
-                    fontWeight: 700,
+                    fontWeight: 600,
                     cursor: simulatorLoading || endpoints.length === 0 ? 'not-allowed' : 'pointer',
-                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                     opacity: simulatorLoading || endpoints.length === 0 ? 0.6 : 1,
                     display: 'flex',
                     alignItems: 'center',
@@ -4648,8 +4782,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(14, 14, 16, 0.8)',
-          backdropFilter: 'blur(6px)',
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -4657,26 +4791,26 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           padding: '16px',
         }}>
           <div style={{
-            backgroundColor: '#161616',
-            borderRadius: '20px',
-            border: '1px solid #2A2A2A',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            border: '1px solid #E5E7EB',
             width: '100%',
             maxWidth: '460px',
             padding: '28px',
-            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.7)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
           }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', marginBottom: '16px' }}>
               <div style={{
                 width: '42px',
                 height: '42px',
-                borderRadius: '12px',
-                backgroundColor: confirmModal.confirmVariant === 'warning' ? '#2B2314' : '#2A1C1C',
-                border: confirmModal.confirmVariant === 'warning' ? '1px solid #4D3C1D' : '1px solid #442A2A',
+                borderRadius: '10px',
+                backgroundColor: confirmModal.confirmVariant === 'warning' ? '#FEF3C7' : '#FEE2E2',
+                border: confirmModal.confirmVariant === 'warning' ? '1px solid #FCD34D' : '1px solid #FCA5A5',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                color: confirmModal.confirmVariant === 'warning' ? '#f59e0b' : '#f87171',
+                color: confirmModal.confirmVariant === 'warning' ? '#D97706' : '#DC2626',
               }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                   <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
@@ -4685,10 +4819,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 </svg>
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: '#FFFFFF' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: '#09090B' }}>
                   {confirmModal.title}
                 </h3>
-                <p style={{ fontSize: '13px', color: '#A3A3A3', margin: 0, lineHeight: 1.5 }}>
+                <p style={{ fontSize: '13px', color: '#71717A', margin: 0, lineHeight: 1.5 }}>
                   {confirmModal.message}
                 </p>
               </div>
@@ -4701,10 +4835,10 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 onClick={() => setConfirmModal(null)}
                 style={{
                   padding: '10px 18px',
-                  backgroundColor: '#202020',
-                  border: '1px solid #2A2A2A',
-                  borderRadius: '999px',
-                  color: '#FFFFFF',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '8px',
+                  color: '#09090B',
                   fontSize: '13px',
                   fontWeight: 600,
                   cursor: isConfirmLoading ? 'not-allowed' : 'pointer',
@@ -4719,20 +4853,31 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 onClick={() => void executeConfirmedAction()}
                 style={{
                   padding: '10px 22px',
-                  backgroundColor: confirmModal.confirmVariant === 'warning' ? '#d97706' : '#dc2626',
+                  backgroundColor: confirmModal.confirmVariant === 'warning' ? '#D97706' : '#DC2626',
                   border: 'none',
-                  borderRadius: '999px',
-                  color: '#ffffff',
+                  borderRadius: '8px',
+                  color: '#FFFFFF',
                   fontSize: '13px',
                   fontWeight: 700,
                   cursor: isConfirmLoading ? 'not-allowed' : 'pointer',
                   boxShadow: confirmModal.confirmVariant === 'warning'
-                    ? '0 2px 10px rgba(217, 119, 6, 0.35)'
-                    : '0 2px 10px rgba(220, 38, 38, 0.35)',
+                    ? '0 2px 8px rgba(217, 119, 6, 0.25)'
+                    : '0 2px 8px rgba(220, 38, 38, 0.25)',
                   opacity: isConfirmLoading ? 0.7 : 1,
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
+                  transition: 'background-color 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  if (confirmModal.confirmVariant !== 'warning') {
+                    e.currentTarget.style.backgroundColor = '#B91C1C';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (confirmModal.confirmVariant !== 'warning') {
+                    e.currentTarget.style.backgroundColor = '#DC2626';
+                  }
                 }}
               >
                 {isConfirmLoading && (

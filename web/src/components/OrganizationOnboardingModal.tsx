@@ -94,8 +94,8 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.88)',
-        backdropFilter: 'blur(8px)',
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        backdropFilter: 'blur(4px)',
         zIndex: 9999,
         display: 'flex',
         alignItems: 'center',
@@ -108,12 +108,12 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
         style={{
           width: '100%',
           maxWidth: '460px',
-          backgroundColor: '#0A0A0A',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          borderRadius: '14px',
-          padding: '24px 26px',
-          color: '#FFFFFF',
-          boxShadow: '0 24px 60px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E5E7EB',
+          borderRadius: '16px',
+          padding: '28px',
+          color: '#09090B',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
           overflow: 'hidden',
           boxSizing: 'border-box',
@@ -127,18 +127,19 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
                 fontFamily: 'monospace',
                 fontSize: '10px',
                 letterSpacing: '0.12em',
-                color: '#A1A1AA',
+                color: '#71717A',
                 textTransform: 'uppercase',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
+                border: '1px solid #E5E7EB',
+                backgroundColor: '#F4F4F6',
                 padding: '2px 6px',
-                borderRadius: '3px',
+                borderRadius: '4px',
               }}
             >
               WORKSPACE SETUP
             </span>
-            <span style={{ fontSize: '11px', color: '#52525B' }}>• Multi-Tenant Namespace</span>
+            <span style={{ fontSize: '11px', color: '#71717A' }}>• Multi-Tenant Namespace</span>
           </div>
-          <h2 style={{ fontSize: '18px', fontWeight: 600, letterSpacing: '-0.02em', margin: 0, color: '#FFFFFF' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.02em', margin: 0, color: '#09090B' }}>
             Create Your Organization
           </h2>
           <p style={{ fontSize: '12.5px', color: '#71717A', marginTop: '4px', marginBottom: 0, lineHeight: 1.4 }}>
@@ -150,10 +151,10 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
           <div
             style={{
               padding: '10px 12px',
-              backgroundColor: 'rgba(239, 68, 68, 0.12)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '6px',
-              color: '#F87171',
+              backgroundColor: '#FEE2E2',
+              border: '1px solid #FCA5A5',
+              borderRadius: '8px',
+              color: '#DC2626',
               fontSize: '12px',
               marginBottom: '16px',
             }}
@@ -165,8 +166,8 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
         <form onSubmit={handleSubmit}>
           {/* Organization Name & Slug */}
           <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#D4D4D8', marginBottom: '6px' }}>
-              Organization Name <span style={{ color: '#F87171' }}>*</span>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#71717A', marginBottom: '6px' }}>
+              Organization Name <span style={{ color: '#DC2626' }}>*</span>
             </label>
             <input
               type="text"
@@ -178,17 +179,17 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
               style={{
                 width: '100%',
                 padding: '9px 12px',
-                backgroundColor: '#121214',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '6px',
-                color: '#FFFFFF',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E5E7EB',
+                borderRadius: '8px',
+                color: '#09090B',
                 fontSize: '13px',
                 outline: 'none',
                 boxSizing: 'border-box',
                 transition: 'border-color 0.15s ease',
               }}
-              onFocus={(e) => (e.target.style.borderColor = '#FFFFFF')}
-              onBlur={(e) => (e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)')}
+              onFocus={(e) => (e.target.style.borderColor = '#09090B')}
+              onBlur={(e) => (e.target.style.borderColor = '#E5E7EB')}
             />
 
             {/* Inline Slug Preview & Edit */}
@@ -204,7 +205,7 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
               }}
             >
               <span>
-                Namespace: <span style={{ color: '#A1A1AA' }}>relayforge.dev/org/{isEditingSlug ? '' : (generatedSlug || 'my-org')}</span>
+                Namespace: <span style={{ color: '#09090B' }}>relayforge.dev/org/{isEditingSlug ? '' : (generatedSlug || 'my-org')}</span>
               </span>
               <button
                 type="button"
@@ -212,7 +213,7 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#A1A1AA',
+                  color: '#71717A',
                   fontSize: '10px',
                   cursor: 'pointer',
                   padding: 0,
@@ -233,10 +234,10 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
                   width: '100%',
                   marginTop: '6px',
                   padding: '6px 10px',
-                  backgroundColor: '#161618',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '4px',
-                  color: '#FFFFFF',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '6px',
+                  color: '#09090B',
                   fontSize: '11.5px',
                   fontFamily: 'monospace',
                   outline: 'none',
@@ -248,7 +249,7 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
 
           {/* Industry Workload Dropdown */}
           <div style={{ marginBottom: '14px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#D4D4D8', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#71717A', marginBottom: '6px' }}>
               Workload Profile
             </label>
             <div style={{ position: 'relative' }}>
@@ -258,10 +259,10 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
                 style={{
                   width: '100%',
                   padding: '9px 12px',
-                  backgroundColor: '#121214',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '6px',
-                  color: '#FFFFFF',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '8px',
+                  color: '#09090B',
                   fontSize: '12.5px',
                   outline: 'none',
                   boxSizing: 'border-box',
@@ -271,7 +272,7 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
                 }}
               >
                 {WORKLOAD_OPTIONS.map((opt) => (
-                  <option key={opt.id} value={opt.id} style={{ backgroundColor: '#18181B', color: '#FFFFFF' }}>
+                  <option key={opt.id} value={opt.id}>
                     {opt.label}
                   </option>
                 ))}
@@ -295,7 +296,7 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
           {/* 2-Column Compact Row: Architecture Tier & Scale */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '22px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 500, color: '#A1A1AA', marginBottom: '5px' }}>
+              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, color: '#71717A', marginBottom: '5px' }}>
                 Engine Tier
               </label>
               <div style={{ position: 'relative' }}>
@@ -305,10 +306,10 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
                   style={{
                     width: '100%',
                     padding: '8px 10px',
-                    backgroundColor: '#121214',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    borderRadius: '6px',
-                    color: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
+                    color: '#09090B',
                     fontSize: '11.5px',
                     outline: 'none',
                     boxSizing: 'border-box',
@@ -318,7 +319,7 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
                   }}
                 >
                   {ARCHITECTURE_OPTIONS.map((tier) => (
-                    <option key={tier.id} value={tier.id} style={{ backgroundColor: '#18181B', color: '#FFFFFF' }}>
+                    <option key={tier.id} value={tier.id}>
                       {tier.label}
                     </option>
                   ))}
@@ -340,7 +341,7 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 500, color: '#A1A1AA', marginBottom: '5px' }}>
+              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 600, color: '#71717A', marginBottom: '5px' }}>
                 Monthly Scale
               </label>
               <div style={{ position: 'relative' }}>
@@ -350,10 +351,10 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
                   style={{
                     width: '100%',
                     padding: '8px 10px',
-                    backgroundColor: '#121214',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    borderRadius: '6px',
-                    color: '#FFFFFF',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
+                    color: '#09090B',
                     fontSize: '11.5px',
                     outline: 'none',
                     boxSizing: 'border-box',
@@ -363,7 +364,7 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
                   }}
                 >
                   {VOLUME_OPTIONS.map((vol) => (
-                    <option key={vol.id} value={vol.id} style={{ backgroundColor: '#18181B', color: '#FFFFFF' }}>
+                    <option key={vol.id} value={vol.id}>
                       {vol.label}
                     </option>
                   ))}
@@ -392,7 +393,7 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
               alignItems: 'center',
               justifyContent: 'space-between',
               paddingTop: '14px',
-              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              borderTop: '1px solid #E5E7EB',
             }}
           >
             {onSkip ? (
@@ -408,7 +409,7 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
                   padding: '6px 8px',
                   transition: 'color 0.15s ease',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#09090B')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#71717A')}
               >
                 Skip for now
@@ -419,10 +420,10 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
               type="submit"
               disabled={isSubmitting || !orgName.trim()}
               style={{
-                backgroundColor: '#FFFFFF',
-                color: '#000000',
+                backgroundColor: '#09090B',
+                color: '#FFFFFF',
                 border: 'none',
-                borderRadius: '6px',
+                borderRadius: '8px',
                 padding: '9px 18px',
                 fontSize: '12.5px',
                 fontWeight: 600,
@@ -432,6 +433,7 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                 transition: 'opacity 0.15s ease',
               }}
             >

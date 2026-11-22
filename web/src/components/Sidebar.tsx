@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { UserOrganization, UserProfile } from '../types.ts';
 
 interface SidebarProps {
@@ -39,6 +39,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [newOrgSlug, setNewOrgSlug] = useState('');
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsProfileMenuOpen(false);
+      }
+    };
+    if (isProfileMenuOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+      document.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isProfileMenuOpen]);
 
   const isCollapsedMode = isCollapsed && !isMobile;
 
@@ -92,17 +115,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
       gap: isCollapsedMode ? '0' : '10px',
       width: isCollapsedMode ? '36px' : '100%',
       height: isCollapsedMode ? '36px' : 'auto',
-      padding: isCollapsedMode ? '0' : '8.5px 14px',
-      borderRadius: isCollapsedMode ? '10px' : '999px',
+      padding: isCollapsedMode ? '0' : '8px 12px',
+      borderRadius: '8px',
       fontSize: '12.5px',
-      fontWeight: isActive ? 700 : 500,
-      backgroundColor: isActive ? '#F7EFE2' : 'transparent',
-      color: isActive ? '#0A0A0A' : '#A3A3A3',
-      border: 'none',
+      fontWeight: isActive ? 600 : 500,
+      backgroundColor: isActive ? '#FFFFFF' : 'transparent',
+      color: isActive ? '#09090B' : '#52525B',
+      border: isActive ? '1px solid #E5E7EB' : '1px solid transparent',
       cursor: 'pointer',
       textAlign: 'left' as const,
-      transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-      boxShadow: isActive ? '0 2px 8px rgba(0, 0, 0, 0.25)' : 'none',
+      transition: 'all 0.15s ease',
+      boxShadow: isActive ? '0 1px 3px rgba(0, 0, 0, 0.05)' : 'none',
       margin: isCollapsedMode ? '0 auto' : '0',
       flexShrink: 0,
       position: 'relative' as const,
@@ -115,11 +138,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return {
       fontSize: '9.5px',
       fontWeight: 700,
-      backgroundColor: isActive ? '#E5DAC8' : '#202020',
-      color: isActive ? '#0A0A0A' : '#A3A3A3',
-      padding: '2px 7px',
-      borderRadius: '999px',
-      border: isActive ? '1px solid #D8CBB6' : '1px solid #2A2A2A',
+      backgroundColor: isActive ? '#F4F4F6' : '#EAEAEB',
+      color: isActive ? '#09090B' : '#71717A',
+      padding: '2px 6px',
+      borderRadius: '6px',
+      border: '1px solid #E5E7EB',
       fontFamily: "'JetBrains Mono', monospace",
     };
   };
@@ -127,8 +150,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const sidebarContent = (
     <aside style={{
       width: isMobile ? '280px' : (isCollapsed ? '68px' : '260px'),
-      backgroundColor: '#0A0A0A',
-      borderRight: '1px solid #202020',
+      backgroundColor: '#F4F4F6',
+      borderRight: '1px solid #E5E7EB',
       display: 'flex',
       flexDirection: 'column',
       height: '100vh',
@@ -138,13 +161,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       left: 0,
       bottom: 0,
       zIndex: isMobile ? 100 : 1,
-      boxShadow: isMobile ? '0 0 35px rgba(0, 0, 0, 0.7)' : 'none',
+      boxShadow: isMobile ? '0 0 30px rgba(0, 0, 0, 0.15)' : 'none',
       transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-      overflow: 'hidden',
+      overflow: 'visible',
     }}>
       {/* Brand Header */}
       <div style={{
-        padding: isCollapsedMode ? '18px 0 12px' : '20px 20px 16px',
+        padding: isCollapsedMode ? '16px 0 12px' : '18px 16px 14px',
         borderBottom: 'none',
         display: 'flex',
         alignItems: 'center',
@@ -156,28 +179,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '10px',
-            border: '1px solid #E5DAC8',
-            backgroundColor: '#F7EFE2',
-            color: '#0A0A0A',
+            width: '34px',
+            height: '34px',
+            borderRadius: '9px',
+            border: '1px solid #09090B',
+            backgroundColor: '#09090B',
+            color: '#FFFFFF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.12)',
             flexShrink: 0,
           }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
             </svg>
           </div>
           {!isCollapsedMode && (
             <div>
-              <div style={{ fontSize: '14px', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: '1.2' }}>
+              <div style={{ fontSize: '14px', fontWeight: 800, color: '#09090B', letterSpacing: '-0.02em', lineHeight: '1.2' }}>
                 RELAYFORGE
               </div>
-              <div style={{ fontSize: '11px', color: '#A3A3A3', fontWeight: 500 }}>
+              <div style={{ fontSize: '11px', color: '#71717A', fontWeight: 500 }}>
                 Management Console
               </div>
             </div>
@@ -189,9 +212,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={onToggleCollapse}
             title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             style={{
-              background: '#161616',
-              border: '1px solid #2A2A2A',
-              color: '#A3A3A3',
+              background: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              color: '#71717A',
               borderRadius: '8px',
               width: '28px',
               height: '28px',
@@ -200,17 +223,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
               justifyContent: 'center',
               cursor: 'pointer',
               fontSize: '12px',
-              transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+              transition: 'all 0.15s ease',
               padding: 0,
               flexShrink: 0,
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#FFFFFF';
-              e.currentTarget.style.borderColor = '#4A4A58';
+              e.currentTarget.style.color = '#09090B';
+              e.currentTarget.style.borderColor = '#D1D5DB';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.color = '#A3A3A3';
-              e.currentTarget.style.borderColor = '#2A2A2A';
+              e.currentTarget.style.color = '#71717A';
+              e.currentTarget.style.borderColor = '#E5E7EB';
             }}
           >
             {isCollapsed ? (
@@ -233,7 +257,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             style={{
               background: 'transparent',
               border: 'none',
-              color: '#A3A3A3',
+              color: '#71717A',
               fontSize: '18px',
               cursor: 'pointer',
               padding: '6px',
@@ -248,26 +272,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Navigation Sections */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: isCollapsedMode ? '8px 0' : '12px 12px', width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: isCollapsedMode ? '8px 0' : '10px 12px', width: '100%', boxSizing: 'border-box' }}>
         {/* Section: MAIN MENU */}
-        <div style={{ marginBottom: '22px' }}>
+        <div style={{ marginBottom: '18px' }}>
           {!isCollapsedMode ? (
             <div style={{
               fontSize: '11px',
               fontWeight: 700,
               letterSpacing: '0.08em',
-              color: '#737373',
+              color: '#71717A',
               textTransform: 'uppercase',
-              padding: '0 10px 10px',
+              padding: '0 8px 8px',
               fontFamily: "'JetBrains Mono', monospace",
             }}>
               Main
             </div>
           ) : (
-            <div style={{ height: '1px', backgroundColor: '#202020', margin: '4px 14px 10px' }} />
+            <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '4px 14px 10px' }} />
           )}
 
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {/* Overview / Dashboard */}
             <button
               onClick={() => handleTabClick('dashboard')}
@@ -310,7 +334,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               title="API Keys"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
                   <path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5-3 3 1.5 1.5L9 14l-5 5H2v-2l5-5 1.5 1.5 3-3-1.5-1.5 3.5-3.5 1.5 1.5L21 2z"></path>
                 </svg>
@@ -347,7 +371,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               title="Destinations"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
                   <circle cx="12" cy="12" r="10"></circle>
                   <line x1="22" y1="12" x2="18" y2="12"></line>
@@ -374,7 +398,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               title="Delivery History"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
                   <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                 </svg>
@@ -397,7 +421,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               title="Workflows"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
                   <rect x="3" y="3" width="6" height="6" rx="1"></rect>
                   <rect x="15" y="15" width="6" height="6" rx="1"></rect>
@@ -423,7 +447,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               title="Metrics & Streams"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
                   <path d="M18 20V10"></path>
                   <path d="M12 20V4"></path>
@@ -448,7 +472,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               title="Dead Letter Queue"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                   <line x1="9" y1="9" x2="15" y2="15"></line>
@@ -466,19 +490,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Section: ORGANIZATIONS */}
-        <div style={{ marginBottom: '22px' }}>
+        <div style={{ marginBottom: '18px' }}>
           {!isCollapsedMode ? (
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              padding: '0 10px 10px',
+              padding: '0 8px 8px',
             }}>
               <span style={{
                 fontSize: '11px',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
-                color: '#737373',
+                color: '#71717A',
                 textTransform: 'uppercase',
                 fontFamily: "'JetBrains Mono', monospace",
               }}>
@@ -487,32 +511,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 onClick={() => (onOpenCreateModal ? onOpenCreateModal() : setIsCreatingOrg((prev) => !prev))}
                 style={{
-                  backgroundColor: '#161616',
-                  border: '1px solid #2A2A2A',
-                  color: '#FFFFFF',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  color: '#09090B',
                   fontSize: '10.5px',
                   fontWeight: 600,
-                  borderRadius: '999px',
+                  borderRadius: '6px',
                   padding: '2px 7px',
                   cursor: 'pointer',
                   fontFamily: "'JetBrains Mono', monospace",
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
                 }}
               >
                 + New
               </button>
             </div>
           ) : (
-            <div style={{ height: '1px', backgroundColor: '#202020', margin: '4px 14px 10px' }} />
+            <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '4px 14px 10px' }} />
           )}
 
           {/* Quick Create Organization Form (Only expanded) */}
           {!isCollapsedMode && isCreatingOrg && (
             <form onSubmit={handleCreateSubmit} style={{
               padding: '12px',
-              backgroundColor: '#161616',
-              borderRadius: '12px',
-              border: '1px solid #2A2A2A',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '10px',
+              border: '1px solid #E5E7EB',
               marginBottom: '10px',
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
             }}>
               <input
                 type="text"
@@ -524,11 +550,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   width: '100%',
                   padding: '7px 10px',
                   borderRadius: '6px',
-                  border: '1px solid #2A2A2A',
-                  backgroundColor: '#000000',
-                  color: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  backgroundColor: '#F8F9FA',
+                  color: '#09090B',
                   fontSize: '12px',
                   marginBottom: '6px',
+                  boxSizing: 'border-box',
                 }}
               />
               <input
@@ -540,15 +567,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   width: '100%',
                   padding: '7px 10px',
                   borderRadius: '6px',
-                  border: '1px solid #2A2A2A',
-                  backgroundColor: '#000000',
-                  color: '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  backgroundColor: '#F8F9FA',
+                  color: '#09090B',
                   fontSize: '12px',
                   marginBottom: '8px',
+                  boxSizing: 'border-box',
                 }}
               />
               {createError && (
-                <div style={{ color: '#f87171', fontSize: '11px', marginBottom: '6px' }}>
+                <div style={{ color: '#DC2626', fontSize: '11px', marginBottom: '6px' }}>
                   {createError}
                 </div>
               )}
@@ -560,8 +588,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     padding: '4px 10px',
                     fontSize: '11px',
                     backgroundColor: 'transparent',
-                    border: '1px solid #2A2A2A',
-                    color: '#A3A3A3',
+                    border: '1px solid #E5E7EB',
+                    color: '#71717A',
                     borderRadius: '6px',
                     cursor: 'pointer',
                   }}
@@ -574,9 +602,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   style={{
                     padding: '4px 12px',
                     fontSize: '11px',
-                    backgroundColor: '#FFFFFF',
-                    color: '#000000',
-                    fontWeight: 700,
+                    backgroundColor: '#09090B',
+                    color: '#FFFFFF',
+                    fontWeight: 600,
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -589,10 +617,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
 
           {/* Organization list */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {organizations.length === 0 ? (
               !isCollapsedMode ? (
-                <div style={{ padding: '8px 10px', fontSize: '12px', color: '#737373', fontFamily: "'JetBrains Mono', monospace" }}>
+                <div style={{ padding: '6px 8px', fontSize: '12px', color: '#71717A', fontFamily: "'JetBrains Mono', monospace" }}>
                   No organizations yet.
                 </div>
               ) : null
@@ -611,13 +639,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         justifyContent: 'center',
                         width: '36px',
                         height: '36px',
-                        borderRadius: '10px',
-                        backgroundColor: isSelected ? '#1E1E28' : 'transparent',
-                        border: isSelected ? '1px solid #363648' : '1px solid transparent',
-                        color: isSelected ? '#D4AF78' : '#A3A3A3',
+                        borderRadius: '8px',
+                        backgroundColor: isSelected ? '#FFFFFF' : 'transparent',
+                        border: isSelected ? '1px solid #E5E7EB' : '1px solid transparent',
+                        color: isSelected ? '#09090B' : '#71717A',
                         cursor: 'pointer',
                         margin: '0 auto',
-                        transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                        boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.06)' : 'none',
+                        transition: 'all 0.15s ease',
                       }}
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -638,47 +667,47 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       width: '100%',
-                      padding: '8.5px 12px',
-                      borderRadius: '12px',
+                      padding: '8px 10px',
+                      borderRadius: '8px',
                       fontSize: '12px',
-                      backgroundColor: isSelected ? '#191922' : 'transparent',
-                      color: '#FFFFFF',
-                      border: isSelected ? '1px solid #2A2A2A' : '1px solid transparent',
+                      backgroundColor: isSelected ? '#FFFFFF' : 'transparent',
+                      color: '#09090B',
+                      border: isSelected ? '1px solid #E5E7EB' : '1px solid transparent',
                       cursor: 'pointer',
                       textAlign: 'left',
-                      transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                      boxShadow: isSelected ? '0 2px 10px rgba(0,0,0,0.35)' : 'none',
+                      transition: 'all 0.15s ease',
+                      boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.06)' : 'none',
                       fontFamily: "'JetBrains Mono', monospace",
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-                      <div style={{ color: isSelected ? '#D4AF78' : '#737373', flexShrink: 0 }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                      <div style={{ color: isSelected ? '#09090B' : '#71717A', flexShrink: 0 }}>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
                           <polyline points="2 17 12 22 22 17"></polyline>
                           <polyline points="2 12 12 17 22 12"></polyline>
                         </svg>
                       </div>
                       <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        <div style={{ fontWeight: 700, color: '#FFFFFF', fontSize: '12.5px', lineHeight: 1.2 }}>{org.name}</div>
-                        <div style={{ fontSize: '10.5px', color: '#737373', fontWeight: 400, marginTop: '1px' }}>
+                        <div style={{ fontWeight: 600, color: '#09090B', fontSize: '12.5px', lineHeight: 1.2 }}>{org.name}</div>
+                        <div style={{ fontSize: '10.5px', color: '#71717A', fontWeight: 400, marginTop: '1px' }}>
                           {org.slug}.rlf
                         </div>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
                       <span style={{
                         fontSize: '9.5px',
-                        fontWeight: 700,
-                        backgroundColor: '#202020',
-                        color: '#E5E5E5',
+                        fontWeight: 600,
+                        backgroundColor: '#F4F4F6',
+                        color: '#52525B',
                         padding: '1.5px 6px',
-                        borderRadius: '999px',
-                        border: '1px solid #2A2A2A',
+                        borderRadius: '4px',
+                        border: '1px solid #E5E7EB',
                       }}>
                         {org.role}
                       </span>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#737373" strokeWidth="2.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717A" strokeWidth="2.5">
                         <polyline points="6 9 12 15 18 9"></polyline>
                       </svg>
                     </div>
@@ -696,18 +725,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
               fontSize: '11px',
               fontWeight: 700,
               letterSpacing: '0.08em',
-              color: '#737373',
+              color: '#71717A',
               textTransform: 'uppercase',
-              padding: '0 10px 10px',
+              padding: '0 8px 8px',
               fontFamily: "'JetBrains Mono', monospace",
             }}>
               Administration
             </div>
           ) : (
-            <div style={{ height: '1px', backgroundColor: '#202020', margin: '4px 14px 10px' }} />
+            <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '4px 14px 10px' }} />
           )}
 
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <button
               onClick={() => handleTabClick('settings')}
               className={`rf-nav-item ${activeTab === 'settings' ? "rf-nav-item-active" : ""} ${isCollapsedMode ? "rf-nav-collapsed" : ""}`}
@@ -724,23 +753,189 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* User Footer Profile & Logout */}
-      <div style={{
-        padding: isCollapsedMode ? '14px 0' : '14px 16px',
-        borderTop: '1px solid #202020',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: isCollapsedMode ? 'center' : 'space-between',
-        backgroundColor: '#0A0A0A',
-        width: '100%',
-        boxSizing: 'border-box',
-      }}>
+      {/* User Footer Profile & Popover (NavUser style matching D2) */}
+      <div
+        ref={profileMenuRef}
+        style={{
+          padding: isCollapsedMode ? '10px 0' : '10px 12px',
+          borderTop: '1px solid #E5E7EB',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: isCollapsedMode ? 'center' : 'space-between',
+          backgroundColor: '#F4F4F6',
+          width: '100%',
+          boxSizing: 'border-box',
+          position: 'relative',
+        }}
+      >
+        {/* Upward Opening Popover Menu (Matching D2 NavUser in Image 10) */}
+        {isProfileMenuOpen && (
+          <div
+            className="rf-modal-animate"
+            style={{
+              position: 'absolute',
+              bottom: 'calc(100% + 8px)',
+              left: isCollapsedMode ? '64px' : '10px',
+              width: isCollapsedMode ? '230px' : 'calc(100% - 20px)',
+              minWidth: '220px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.08)',
+              padding: '6px',
+              zIndex: 100,
+            }}
+          >
+            {/* Popover Header with User Details */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '8px 10px',
+            }}>
+              {user.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt=""
+                  style={{ width: '34px', height: '34px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #E5E7EB', flexShrink: 0 }}
+                />
+              ) : (
+                <div style={{
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '8px',
+                  backgroundColor: '#EAEAEB',
+                  border: '1px solid #E5E7EB',
+                  color: '#09090B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  flexShrink: 0,
+                }}>
+                  {getInitials(user.displayName, user.email)}
+                </div>
+              )}
+              <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#09090B', lineHeight: '1.2' }}>
+                  {user.displayName || 'Deepjyoti'}
+                </div>
+                <div style={{ fontSize: '11px', color: '#71717A', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {user.email || 'developer@relayforge.dev'}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '4px 0' }} />
+
+            {/* Menu Action: Profile */}
+            <button
+              onClick={() => {
+                setIsProfileMenuOpen(false);
+                if (onOpenProfile) onOpenProfile();
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                width: '100%',
+                padding: '8px 10px',
+                borderRadius: '6px',
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: '#09090B',
+                fontSize: '13px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'background-color 0.15s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F4F4F6'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#71717A" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>Profile</span>
+            </button>
+
+            {/* Menu Action: Notifications */}
+            <button
+              onClick={() => {
+                setIsProfileMenuOpen(false);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                width: '100%',
+                padding: '8px 10px',
+                borderRadius: '6px',
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: '#09090B',
+                fontSize: '13px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'background-color 0.15s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F4F4F6'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#71717A" strokeWidth="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span>Notifications</span>
+            </button>
+
+            <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '4px 0' }} />
+
+            {/* Menu Action: Sign out */}
+            <button
+              onClick={() => {
+                setIsProfileMenuOpen(false);
+                onLogout();
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                width: '100%',
+                padding: '8px 10px',
+                borderRadius: '6px',
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: '#DC2626',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'background-color 0.15s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FEE2E2'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Sign out</span>
+            </button>
+          </div>
+        )}
+
+        {/* User Account Trigger Button */}
         {isCollapsedMode ? (
           <div
-            onClick={onOpenProfile}
+            onClick={() => setIsProfileMenuOpen((prev) => !prev)}
             title={`${user.displayName || 'Developer'} (${user.email || 'developer@relayforge'})`}
             style={{
-              cursor: onOpenProfile ? 'pointer' : 'default',
+              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -750,64 +945,66 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <img
                 src={user.avatarUrl}
                 alt=""
-                style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #2A2A2A' }}
+                style={{ width: '34px', height: '34px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #E5E7EB' }}
               />
             ) : (
               <div style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                backgroundColor: '#202020',
-                border: '1px solid #2A2A2A',
-                color: '#FFFFFF',
+                width: '34px',
+                height: '34px',
+                borderRadius: '8px',
+                backgroundColor: isProfileMenuOpen ? '#FFFFFF' : '#EAEAEB',
+                border: '1px solid #E5E7EB',
+                color: '#09090B',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '12px',
                 fontWeight: 700,
+                boxShadow: isProfileMenuOpen ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
               }}>
                 {getInitials(user.displayName, user.email)}
               </div>
             )}
           </div>
         ) : (
-          <>
-            <div
-              onClick={onOpenProfile}
-              title="View profile details"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                overflow: 'hidden',
-                cursor: onOpenProfile ? 'pointer' : 'default',
-                padding: '4px 6px',
-                borderRadius: '8px',
-                transition: 'background-color 0.15s ease',
-                flex: 1,
-                minWidth: 0,
-              }}
-              onMouseEnter={(e) => {
-                if (onOpenProfile) e.currentTarget.style.backgroundColor = '#161616';
-              }}
-              onMouseLeave={(e) => {
-                if (onOpenProfile) e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-            >
+          <div
+            onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+            title="Account Menu"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              cursor: 'pointer',
+              padding: '6px 8px',
+              borderRadius: '8px',
+              backgroundColor: isProfileMenuOpen ? '#FFFFFF' : 'transparent',
+              border: isProfileMenuOpen ? '1px solid #E5E7EB' : '1px solid transparent',
+              boxShadow: isProfileMenuOpen ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              if (!isProfileMenuOpen) e.currentTarget.style.backgroundColor = '#EAEAEB';
+            }}
+            onMouseLeave={(e) => {
+              if (!isProfileMenuOpen) e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden', minWidth: 0 }}>
               {user.avatarUrl ? (
                 <img
                   src={user.avatarUrl}
                   alt=""
-                  style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #2A2A2A', flexShrink: 0 }}
+                  style={{ width: '32px', height: '32px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #E5E7EB', flexShrink: 0 }}
                 />
               ) : (
                 <div style={{
                   width: '32px',
                   height: '32px',
-                  borderRadius: '50%',
-                  backgroundColor: '#202020',
-                  border: '1px solid #2A2A2A',
-                  color: '#FFFFFF',
+                  borderRadius: '8px',
+                  backgroundColor: '#EAEAEB',
+                  border: '1px solid #E5E7EB',
+                  color: '#09090B',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -819,37 +1016,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               )}
               <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: '#FFFFFF', lineHeight: '1.2' }}>
-                  {user.displayName || 'Developer'}
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#09090B', lineHeight: '1.2' }}>
+                  {user.displayName || 'Deepjyoti'}
                 </div>
-                <div style={{ fontSize: '11px', color: '#A3A3A3', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {user.email || 'developer@relayforge'}
+                <div style={{ fontSize: '11px', color: '#71717A', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {user.email || 'developer@relayforge.dev'}
                 </div>
               </div>
             </div>
 
-            <button
-              onClick={onLogout}
-              title="Sign out"
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#71717A"
+              strokeWidth="2"
               style={{
-                backgroundColor: 'transparent',
-                border: 'none',
-                color: '#A3A3A3',
-                cursor: 'pointer',
-                padding: '6px',
-                borderRadius: '6px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                flexShrink: 0,
+                transform: isProfileMenuOpen ? 'rotate(180deg)' : 'none',
+                transition: 'transform 0.15s ease',
               }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-              </svg>
-            </button>
-          </>
+              <polyline points="7 15 12 10 17 15"></polyline>
+            </svg>
+          </div>
         )}
       </div>
     </aside>
