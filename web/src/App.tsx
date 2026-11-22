@@ -19,6 +19,7 @@ import {
   updateMemberRole,
   updateOrganization,
 } from './api.ts';
+import { OrganizationOnboardingModal } from './components/OrganizationOnboardingModal.tsx';
 import { OrgManagement } from './components/OrgManagement.tsx';
 import { ProfileModal } from './components/ProfileModal.tsx';
 import { Sidebar } from './components/Sidebar.tsx';
@@ -42,11 +43,13 @@ export const App: React.FC = () => {
         const cleanUrl = window.location.pathname + (remainingQuery ? `?${remainingQuery}` : '') + window.location.hash;
         window.history.replaceState({}, '', cleanUrl);
 
-        // If inside an OAuth popup window, notify the opener window and close
+        // If inside an OAuth popup window, notify the opener window and close immediately
         if (window.opener && window.opener !== window) {
           try {
-            window.opener.postMessage({ type: 'rf_oauth_success', token: initialUrlToken }, window.location.origin);
-            window.close();
+            window.opener.postMessage({ type: 'rf_oauth_success', token: initialUrlToken }, '*');
+            setTimeout(() => {
+              try { window.close(); } catch {}
+            }, 100);
           } catch {
             // Ignore popup messaging errors
           }
@@ -60,8 +63,10 @@ export const App: React.FC = () => {
 
         if (window.opener && window.opener !== window) {
           try {
-            window.opener.postMessage({ type: 'rf_oauth_error', error: oauthError }, window.location.origin);
-            window.close();
+            window.opener.postMessage({ type: 'rf_oauth_error', error: oauthError }, '*');
+            setTimeout(() => {
+              try { window.close(); } catch {}
+            }, 100);
           } catch {
             // Ignore popup messaging errors
           }
@@ -97,6 +102,7 @@ export const App: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [createOrgModalOpen, setCreateOrgModalOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [modalOrgName, setModalOrgName] = useState('');
   const [modalOrgSlug, setModalOrgSlug] = useState('');
   const [modalOrgLoading, setModalOrgLoading] = useState(false);
@@ -140,6 +146,17 @@ export const App: React.FC = () => {
     }
   }, []);
 
+  // Trigger professional onboarding for newly signed-in users or default orgs
+  useEffect(() => {
+    if (user) {
+      const hasOnboarded = localStorage.getItem(`rf_onboarding_done_${user.id}`);
+      const isDefaultOrg = activeOrg?.name === 'army corp' || activeOrg?.name.endsWith("'s Workspace");
+      if (!hasOnboarded || (user.organizations && user.organizations.length <= 1 && isDefaultOrg && !hasOnboarded)) {
+        setIsOnboardingOpen(true);
+      }
+    }
+  }, [user?.id, activeOrg?.name]);
+
   useEffect(() => {
     const handleOAuthMessage = (event: MessageEvent) => {
       const origin = event.origin || '';
@@ -147,7 +164,9 @@ export const App: React.FC = () => {
         origin === window.location.origin ||
         origin.includes('localhost') ||
         origin.includes('127.0.0.1') ||
-        origin.endsWith('.onrender.com');
+        origin.endsWith('.onrender.com') ||
+        origin.endsWith('.workers.dev') ||
+        origin.endsWith('.pages.dev');
 
       if (!isAllowedOrigin) return;
 
@@ -249,6 +268,53 @@ export const App: React.FC = () => {
       setModalOrgLoading(false);
     }
   };
+
+  const handleOnboardingComplete = async (orgData: {
+    name: string;
+    slug?: string;
+    workloadType: string;
+    architectureTier: string;
+    estimatedVolume: string;
+  }) => {
+    if (!user) return;
+    const newOrg = await createOrganization(orgData.name, orgData.slug);
+    localStorage.setItem(`rf_onboarding_done_${user.id}`, 'true');
+    localStorage.setItem(`rf_workload_${newOrg.id}`, orgData.workloadType);
+    localStorage.setItem(`rf_tier_${newOrg.id}`, orgData.architectureTier);
+    localStorage.setItem(`rf_volume_${newOrg.id}`, orgData.estimatedVolume);
+    await loadUser();
+    setSelectedOrgId(newOrg.id);
+    setIsOnboardingOpen(false);
+  };
+
+  // Prevent full app / dashboard rendering inside an OAuth popup window
+  if (typeof window !== 'undefined' && window.opener && window.opener !== window) {
+    return (
+      <div style={{
+        display: 'flex',
+        minHeight: '100vh',
+        backgroundColor: '#000000',
+        color: '#FFFFFF',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'monospace',
+        fontSize: '12px',
+        letterSpacing: '0.05em',
+      }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+          <div style={{
+            width: '26px',
+            height: '26px',
+            border: '2px solid rgba(255, 255, 255, 0.2)',
+            borderTopColor: '#FFFFFF',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+          }} />
+          <span style={{ color: '#D4D4D8' }}>AUTHENTICATED — CLOSING POPUP...</span>
+        </div>
+      </div>
+    );
+  }
 
   const isLandingPreview = typeof window !== 'undefined' && (new URLSearchParams(window.location.search).get('view') === 'landing' || new URLSearchParams(window.location.search).has('landing'));
 
@@ -589,6 +655,20 @@ export const App: React.FC = () => {
           isOpen={profileModalOpen}
           onClose={() => setProfileModalOpen(false)}
           onLogout={handleLogout}
+        />
+      )}
+
+      {/* Organization Onboarding Modal */}
+      {user && (
+        <OrganizationOnboardingModal
+          isOpen={isOnboardingOpen}
+          userDisplayName={user.displayName}
+          userEmail={user.email}
+          onComplete={handleOnboardingComplete}
+          onSkip={() => {
+            localStorage.setItem(`rf_onboarding_done_${user.id}`, 'true');
+            setIsOnboardingOpen(false);
+          }}
         />
       )}
     </div>

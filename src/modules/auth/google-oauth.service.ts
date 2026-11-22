@@ -32,6 +32,8 @@ export class GoogleOAuthService {
         parsed.hostname === 'localhost' ||
         parsed.hostname === '127.0.0.1' ||
         parsed.hostname.endsWith('.onrender.com') ||
+        parsed.hostname.endsWith('.workers.dev') ||
+        parsed.hostname.endsWith('.pages.dev') ||
         parsed.hostname === 'relayforge-staging-web.onrender.com'
       );
     } catch {

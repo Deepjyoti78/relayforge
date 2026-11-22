@@ -99,13 +99,15 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
   // Listen for OAuth completion from popup with origin and message structure verification
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      // Validate origin: accept same origin, localhost, 127.0.0.1, or onrender.com subdomains
+      // Validate origin: accept same origin, localhost, 127.0.0.1, onrender.com, workers.dev, or pages.dev
       const origin = event.origin || '';
       const isAllowedOrigin =
         origin === window.location.origin ||
         origin.includes('localhost') ||
         origin.includes('127.0.0.1') ||
-        origin.endsWith('.onrender.com');
+        origin.endsWith('.onrender.com') ||
+        origin.endsWith('.workers.dev') ||
+        origin.endsWith('.pages.dev');
 
       if (!isAllowedOrigin) return;
 
