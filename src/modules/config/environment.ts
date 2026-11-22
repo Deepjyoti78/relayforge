@@ -38,6 +38,8 @@ const redisUrl = z.preprocess((val) => {
 const DEFAULT_INSECURE_ENCRYPTION_KEY = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
 const DEFAULT_INSECURE_GITHUB_CLIENT_ID = 'gh_placeholder_client_id';
 const DEFAULT_INSECURE_GITHUB_CLIENT_SECRET = 'gh_placeholder_client_secret';
+const DEFAULT_INSECURE_GOOGLE_CLIENT_ID = 'google_placeholder_client_id';
+const DEFAULT_INSECURE_GOOGLE_CLIENT_SECRET = 'google_placeholder_client_secret';
 
 const baseSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -53,6 +55,9 @@ const baseSchema = z.object({
   GITHUB_CLIENT_ID: z.string().default(DEFAULT_INSECURE_GITHUB_CLIENT_ID),
   GITHUB_CLIENT_SECRET: z.string().default(DEFAULT_INSECURE_GITHUB_CLIENT_SECRET),
   GITHUB_CALLBACK_URL: z.string().url().default('http://127.0.0.1:3100/auth/github/callback'),
+  GOOGLE_CLIENT_ID: z.string().default(DEFAULT_INSECURE_GOOGLE_CLIENT_ID),
+  GOOGLE_CLIENT_SECRET: z.string().default(DEFAULT_INSECURE_GOOGLE_CLIENT_SECRET),
+  GOOGLE_CALLBACK_URL: z.string().url().default('http://127.0.0.1:3100/auth/google/callback'),
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
   SESSION_COOKIE_NAME: z.string().default('rf_session'),
   ENCRYPTION_KEY: z.string().default(DEFAULT_INSECURE_ENCRYPTION_KEY),
@@ -79,19 +84,21 @@ export function parseEnvironment(role: ProcessRole, input: NodeJS.ProcessEnv) {
           message: 'Production requires a secure ENCRYPTION_KEY of at least 32 characters',
         });
       }
-      if (data.GITHUB_CLIENT_ID === DEFAULT_INSECURE_GITHUB_CLIENT_ID) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['GITHUB_CLIENT_ID'],
-          message: 'Production requires a valid GITHUB_CLIENT_ID',
-        });
-      }
-      if (data.GITHUB_CLIENT_SECRET === DEFAULT_INSECURE_GITHUB_CLIENT_SECRET) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['GITHUB_CLIENT_SECRET'],
-          message: 'Production requires a valid GITHUB_CLIENT_SECRET',
-        });
+      if (role === 'api') {
+        if (data.GITHUB_CLIENT_ID === DEFAULT_INSECURE_GITHUB_CLIENT_ID) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['GITHUB_CLIENT_ID'],
+            message: 'Production requires a valid GITHUB_CLIENT_ID',
+          });
+        }
+        if (data.GITHUB_CLIENT_SECRET === DEFAULT_INSECURE_GITHUB_CLIENT_SECRET) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['GITHUB_CLIENT_SECRET'],
+            message: 'Production requires a valid GITHUB_CLIENT_SECRET',
+          });
+        }
       }
       if (data.ALLOW_PRIVATE_DESTINATIONS) {
         ctx.addIssue({
@@ -129,6 +136,9 @@ export function parseEnvironment(role: ProcessRole, input: NodeJS.ProcessEnv) {
     githubClientId: values.GITHUB_CLIENT_ID,
     githubClientSecret: values.GITHUB_CLIENT_SECRET,
     githubCallbackUrl: values.GITHUB_CALLBACK_URL,
+    googleClientId: values.GOOGLE_CLIENT_ID,
+    googleClientSecret: values.GOOGLE_CLIENT_SECRET,
+    googleCallbackUrl: values.GOOGLE_CALLBACK_URL,
     frontendUrl: values.FRONTEND_URL,
     sessionCookieName: values.SESSION_COOKIE_NAME,
     encryptionKey: createHash('sha256').update(values.ENCRYPTION_KEY).digest(),

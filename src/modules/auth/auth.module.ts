@@ -4,6 +4,7 @@ import { AuthController } from './auth.controller';
 import { AuthGuard } from './auth.guard';
 import { AuthorizationService } from './authorization.service';
 import { GitHubOAuthService } from './github-oauth.service';
+import { GoogleOAuthService } from './google-oauth.service';
 import { SessionService } from './session.service';
 
 @Module({
@@ -11,6 +12,7 @@ import { SessionService } from './session.service';
   controllers: [AuthController],
   providers: [
     GitHubOAuthService,
+    GoogleOAuthService,
     SessionService,
     AuthorizationService,
     AuthGuard,
@@ -19,6 +21,8 @@ import { SessionService } from './session.service';
     SessionService,
     AuthorizationService,
     AuthGuard,
+    GitHubOAuthService,
+    GoogleOAuthService,
   ],
 })
 export class AuthModule {}

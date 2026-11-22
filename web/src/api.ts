@@ -128,6 +128,13 @@ export function getApiBaseUrl(): string {
   return '';
 }
 
+export function getAuthStartUrl(provider: 'github' | 'google'): string {
+  const apiBase = getApiBaseUrl();
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const base = apiBase ? apiBase.replace(/\/+$/, '') : '';
+  return `${base}/auth/${provider}/start?redirect_uri=${encodeURIComponent(origin)}`;
+}
+
 async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   const token = getSessionToken();
   const headers = new Headers(init?.headers);

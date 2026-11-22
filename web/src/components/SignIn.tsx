@@ -1,4 +1,4 @@
-import { getApiBaseUrl, setSessionToken } from '../api.ts';
+import { getAuthStartUrl, setSessionToken } from '../api.ts';
 import React, { useState, useEffect } from 'react';
 import { InteractiveWorkflowDashboard } from './InteractiveWorkflowDashboard.tsx';
 import { AnimatedCounter } from './AnimatedCounter.tsx';
@@ -19,10 +19,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [manualToken, setManualToken] = useState('');
   const [showManualInput, setShowManualInput] = useState(false);
-  const isDev = import.meta.env.DEV || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
-
-  const apiBase = getApiBaseUrl();
-  const startUrl = `${apiBase}/auth/github/start?redirect_uri=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : '')}`;
+  const isDev = (import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
 
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,59 +45,89 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const token = `rf_${authMode}_${btoa(cleanEmail).replace(/=/g, '').slice(0, 14)}_${Date.now()}`;
-      await new Promise((res) => setTimeout(res, 450));
-      if (onTokenSignIn) {
-        onTokenSignIn(token, cleanEmail);
-      } else {
-        setSessionToken(token);
-        window.location.reload();
-      }
-    } catch (err: unknown) {
-      setAuthError(err instanceof Error ? err.message : 'Authentication failed.');
-    } finally {
-      setIsLoading(false);
-    }
+    setAuthError('Please sign in using "Continue with Google" or "Continue with GitHub". Direct password login is restricted in this staging environment.');
   };
 
-  const handleGoogleSignIn = async () => {
+  const openOAuthPopup = (provider: 'google' | 'github') => {
     setIsLoading(true);
     setAuthError(null);
+    const authUrl = getAuthStartUrl(provider);
+
+    // Standard centered OAuth popup coordinates
+    const width = 500;
+    const height = 620;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2.5;
+
+    let popup: Window | null = null;
     try {
-      await new Promise((res) => setTimeout(res, 450));
-      const googleEmail = 'google.user@relayforge.io';
-      const token = `rf_google_${Date.now()}`;
-      if (onTokenSignIn) {
-        onTokenSignIn(token, googleEmail);
-      } else {
-        setSessionToken(token);
-        window.location.reload();
-      }
-    } catch (err: unknown) {
-      setAuthError(err instanceof Error ? err.message : 'Google sign-in failed.');
-    } finally {
-      setIsLoading(false);
+      popup = window.open(
+        authUrl,
+        provider === 'google' ? 'GoogleSignInPopup' : 'GitHubSignInPopup',
+        `width=${width},height=${height},left=${left},top=${top},status=no,toolbar=no,menubar=no,location=yes,resizable=yes`
+      );
+    } catch {
+      popup = null;
     }
+
+    // If popup was blocked by browser or failed, fall back to direct full-page redirect
+    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+      window.location.href = authUrl;
+      return;
+    }
+
+    popup.focus();
+
+    const timer = setInterval(() => {
+      if (!popup || popup.closed) {
+        clearInterval(timer);
+        setIsLoading(false);
+      }
+    }, 1000);
+  };
+
+  const handleGoogleSignIn = () => {
+    if (isLoading) return;
+    openOAuthPopup('google');
   };
 
   const handleGitHubSignIn = () => {
-    if (apiBase && !apiBase.includes('undefined')) {
-      window.location.href = startUrl;
-    } else {
-      setIsLoading(true);
-      setTimeout(() => {
-        const gitToken = `rf_gh_${Date.now()}`;
-        if (onTokenSignIn) {
-          onTokenSignIn(gitToken, 'developer@github.com');
-        } else {
-          setSessionToken(gitToken);
-          window.location.reload();
-        }
-      }, 400);
-    }
+    if (isLoading) return;
+    openOAuthPopup('github');
   };
+
+  // Listen for OAuth completion from popup with origin and message structure verification
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // Validate origin: accept same origin, localhost, 127.0.0.1, or onrender.com subdomains
+      const origin = event.origin || '';
+      const isAllowedOrigin =
+        origin === window.location.origin ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1') ||
+        origin.endsWith('.onrender.com');
+
+      if (!isAllowedOrigin) return;
+
+      if (typeof event.data === 'object' && event.data !== null) {
+        if (event.data.type === 'rf_oauth_success' && typeof event.data.token === 'string') {
+          setIsLoading(false);
+          setModalOpen(false);
+          if (onTokenSignIn) {
+            onTokenSignIn(event.data.token, event.data.email);
+          } else {
+            setSessionToken(event.data.token);
+            window.location.reload();
+          }
+        } else if (event.data.type === 'rf_oauth_error' && typeof event.data.error === 'string') {
+          setIsLoading(false);
+          setAuthError(event.data.error);
+        }
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [onTokenSignIn]);
 
   // Keyboard shortcut (Escape to close modals)
   useEffect(() => {
@@ -1765,6 +1792,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 {/* Continue with GitHub Button */}
                 <button
                   type="button"
+                  disabled={isLoading}
                   onClick={handleGitHubSignIn}
                   style={{
                     flex: 1,
@@ -1779,11 +1807,13 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     color: '#e4e4e7',
                     fontSize: '12px',
                     fontWeight: 500,
-                    cursor: 'pointer',
+                    cursor: isLoading ? 'not-allowed' : 'pointer',
+                    opacity: isLoading ? 0.65 : 1,
                     transition: 'all 0.15s ease',
                     whiteSpace: 'nowrap',
                   }}
                   onMouseEnter={(e) => {
+                    if (isLoading) return;
                     e.currentTarget.style.backgroundColor = '#1c1c20';
                     e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.28)';
                   }}
@@ -1801,6 +1831,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 {/* Continue with Google Button */}
                 <button
                   type="button"
+                  disabled={isLoading}
                   onClick={handleGoogleSignIn}
                   style={{
                     flex: 1,
@@ -1815,11 +1846,13 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     color: '#111113',
                     fontSize: '12px',
                     fontWeight: 600,
-                    cursor: 'pointer',
+                    cursor: isLoading ? 'not-allowed' : 'pointer',
+                    opacity: isLoading ? 0.65 : 1,
                     transition: 'all 0.15s ease',
                     whiteSpace: 'nowrap',
                   }}
                   onMouseEnter={(e) => {
+                    if (isLoading) return;
                     e.currentTarget.style.backgroundColor = '#ffffff';
                     e.currentTarget.style.borderColor = '#ffffff';
                   }}

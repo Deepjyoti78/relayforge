@@ -45,6 +45,12 @@ services:
         sync: false # Paste GitHub OAuth App Client ID
       - key: GITHUB_CLIENT_SECRET
         sync: false # Paste GitHub OAuth App Client Secret
+      - key: GOOGLE_CALLBACK_URL
+        value: https://relayforge-staging-api.onrender.com/auth/google/callback
+      - key: GOOGLE_CLIENT_ID
+        sync: false # Paste Google OAuth Client ID
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false # Paste Google OAuth Client Secret
 
   # 2. RelayForge Background Outbox Worker (NestJS Daemon) - Free Tier
   # Runs as an isolated Web Service listening on /health for zero cloud costs

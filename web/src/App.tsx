@@ -33,70 +33,59 @@ export const App: React.FC = () => {
     try {
       const params = new URLSearchParams(window.location.search);
       initialUrlToken = params.get('token');
+      const oauthError = params.get('error_description') || params.get('error');
+
       if (initialUrlToken) {
         setSessionToken(initialUrlToken);
         params.delete('token');
         const remainingQuery = params.toString();
         const cleanUrl = window.location.pathname + (remainingQuery ? `?${remainingQuery}` : '') + window.location.hash;
         window.history.replaceState({}, '', cleanUrl);
+
+        // If inside an OAuth popup window, notify the opener window and close
+        if (window.opener && window.opener !== window) {
+          try {
+            window.opener.postMessage({ type: 'rf_oauth_success', token: initialUrlToken }, window.location.origin);
+            window.close();
+          } catch {
+            // Ignore popup messaging errors
+          }
+        }
+      } else if (oauthError) {
+        params.delete('error');
+        params.delete('error_description');
+        const remainingQuery = params.toString();
+        const cleanUrl = window.location.pathname + (remainingQuery ? `?${remainingQuery}` : '') + window.location.hash;
+        window.history.replaceState({}, '', cleanUrl);
+
+        if (window.opener && window.opener !== window) {
+          try {
+            window.opener.postMessage({ type: 'rf_oauth_error', error: oauthError }, window.location.origin);
+            window.close();
+          } catch {
+            // Ignore popup messaging errors
+          }
+        }
       }
     } catch {
       // Ignore URL parsing errors
     }
   }
 
-    const fallbackUser: UserProfile = {
-    id: 'current-user',
-    email: 'deepjyoti478@gmail.com',
-    displayName: 'Deepjyoti',
-    avatarUrl: null,
-    createdAt: new Date().toISOString(),
-    organizations: [
-      {
-        id: 'army-corp-org',
-        name: 'army corp',
-        slug: 'army-corp',
-        role: 'OWNER',
-        joinedAt: new Date().toISOString(),
-      }
-    ]
-  };
-
-  const fallbackOrg: OrganizationDetails = {
-    id: 'army-corp-org',
-    name: 'army corp',
-    slug: 'army-corp',
-    role: 'OWNER',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  const fallbackMember: OrganizationMember = {
-    id: 'mem-deepjyoti',
-    userId: 'current-user',
-    role: 'OWNER',
-    joinedAt: new Date().toISOString(),
-    user: {
-      id: 'current-user',
-      email: 'deepjyoti478@gmail.com',
-      displayName: 'Deepjyoti',
-      avatarUrl: null,
-    }
-  };
-
   const tokenPresent = !!getSessionToken() || !!initialUrlToken;
   const cachedUser = getCachedUser();
   const cachedOrg = getCachedOrg();
   const cachedMembers = getCachedMembers();
 
-  // Instant fallback user so there is ZERO delay and ZERO loading screen
-  const immediateUser: UserProfile = cachedUser ?? fallbackUser;
-  const initialActiveOrg: OrganizationDetails = cachedOrg ?? fallbackOrg;
-  const initialMembers: OrganizationMember[] = (cachedMembers && cachedMembers.length > 0) ? cachedMembers : [fallbackMember];
+  // If token is present and we have a cached user from a previous session, use it during revalidation.
+  // If no token is present, user is strictly unauthenticated (guest).
+  const immediateUser: UserProfile | null = tokenPresent ? cachedUser : null;
+  const initialActiveOrg: OrganizationDetails | null = tokenPresent ? cachedOrg : null;
+  const initialMembers: OrganizationMember[] = tokenPresent && cachedMembers ? cachedMembers : [];
 
   const [user, setUser] = useState<UserProfile | null>(immediateUser);
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(
-    () => initialActiveOrg.id
+    () => initialActiveOrg?.id ?? null
   );
   const [activeOrg, setActiveOrg] = useState<OrganizationDetails | null>(
     () => initialActiveOrg
@@ -125,7 +114,9 @@ export const App: React.FC = () => {
             return exists ? prev : data.organizations[0]!.id;
           });
         }
-      } else if (!getSessionToken()) {
+      } else {
+        // Token invalid, expired, or user not found
+        setSessionToken(null);
         setUser(null);
         setCachedUser(null);
         setActiveOrg(null);
@@ -134,7 +125,10 @@ export const App: React.FC = () => {
         setCachedMembers(null);
       }
     } catch (err) {
-      console.warn('Background sync warning:', err);
+      console.warn('Authentication sync warning:', err);
+      if (!getCachedUser()) {
+        setUser(null);
+      }
     } finally {
       setIsSyncing(false);
     }
@@ -144,6 +138,27 @@ export const App: React.FC = () => {
     if (tokenPresent) {
       void loadUser();
     }
+  }, []);
+
+  useEffect(() => {
+    const handleOAuthMessage = (event: MessageEvent) => {
+      const origin = event.origin || '';
+      const isAllowedOrigin =
+        origin === window.location.origin ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1') ||
+        origin.endsWith('.onrender.com');
+
+      if (!isAllowedOrigin) return;
+
+      if (event.data && event.data.type === 'rf_oauth_success' && event.data.token) {
+        setSessionToken(event.data.token);
+        setIsSyncing(true);
+        void loadUser();
+      }
+    };
+    window.addEventListener('message', handleOAuthMessage);
+    return () => window.removeEventListener('message', handleOAuthMessage);
   }, []);
 
   const loadActiveOrg = async (orgId: string) => {
@@ -237,32 +252,40 @@ export const App: React.FC = () => {
 
   const isLandingPreview = typeof window !== 'undefined' && (new URLSearchParams(window.location.search).get('view') === 'landing' || new URLSearchParams(window.location.search).has('landing'));
 
+  if (tokenPresent && isSyncing && !user) {
+    return (
+      <div style={{
+        display: 'flex',
+        minHeight: '100vh',
+        backgroundColor: '#000000',
+        color: '#FFFFFF',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'monospace',
+        fontSize: '13px',
+        letterSpacing: '0.05em',
+      }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+          <div style={{
+            width: '26px',
+            height: '26px',
+            border: '2px solid rgba(255, 255, 255, 0.12)',
+            borderTopColor: '#FFFFFF',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+          }} />
+          <span style={{ color: '#A1A1AA' }}>AUTHENTICATING RELAYFORGE SESSION...</span>
+        </div>
+      </div>
+    );
+  }
+
   if (!user || isLandingPreview) {
     return (
       <SignIn
-        onTokenSignIn={async (token, email) => {
+        onTokenSignIn={async (token) => {
           setSessionToken(token);
-          const emailToUse = email || 'deepjyoti478@gmail.com';
-          const namePart = emailToUse.split('@')[0];
-          const displayName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
-          const fallbackUser: UserProfile = {
-            id: 'current-user',
-            email: emailToUse,
-            displayName,
-            avatarUrl: null,
-            createdAt: new Date().toISOString(),
-            organizations: [
-              {
-                id: 'army-corp-org',
-                name: 'army corp',
-                slug: 'army-corp',
-                role: 'OWNER',
-                joinedAt: new Date().toISOString(),
-              }
-            ]
-          };
-          setUser(fallbackUser);
-          setCachedUser(fallbackUser);
+          setIsSyncing(true);
           await loadUser();
         }}
       />

@@ -27,6 +27,22 @@ export class GitHubOAuthService {
     private readonly database: DatabaseService,
   ) {}
 
+  private isAllowedRedirectOrigin(urlStr: string): boolean {
+    try {
+      const parsed = new URL(urlStr);
+      const frontendOrigin = new URL(this.config.values.frontendUrl).origin;
+      return (
+        parsed.origin === frontendOrigin ||
+        parsed.hostname === 'localhost' ||
+        parsed.hostname === '127.0.0.1' ||
+        parsed.hostname.endsWith('.onrender.com') ||
+        parsed.hostname === 'relayforge-staging-web.onrender.com'
+      );
+    } catch {
+      return false;
+    }
+  }
+
   /**
    * Generates a GitHub OAuth authorization URL with PKCE (S256) and a unique short-lived state.
    * Persists state, PKCE code verifier, and redirect URI in PostgreSQL.
@@ -36,11 +52,15 @@ export class GitHubOAuthService {
     const { verifier, challenge } = generatePkcePair();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minute expiry
 
+    const resolvedRedirectUri = redirectUri && this.isAllowedRedirectOrigin(redirectUri)
+      ? redirectUri
+      : this.config.values.frontendUrl;
+
     await this.database.client.oAuthState.create({
       data: {
         state,
         codeVerifier: verifier,
-        redirectUri: (() => { if (!redirectUri) return this.config.values.frontendUrl; try { const parsed = new URL(redirectUri); const frontendOrigin = new URL(this.config.values.frontendUrl).origin; if (parsed.origin === frontendOrigin || (this.config.values.environment !== 'production' && (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1'))) { return redirectUri; } } catch {} return this.config.values.frontendUrl; })(),
+        redirectUri: resolvedRedirectUri,
         expiresAt,
       },
     });
@@ -217,26 +237,111 @@ export class GitHubOAuthService {
       return updatedUser;
     }
 
-    // New user registration
-    return this.database.client.$transaction(async (tx) => {
-      const user = await tx.user.create({
-        data: {
-          displayName: profile.name ?? profile.login,
-          avatarUrl: profile.avatar_url ?? null,
-          email,
-        },
+    // Safe account linking: If verified email matches an existing user, link to that account
+    if (email) {
+      const existingUserByEmail = await this.database.client.user.findFirst({
+        where: { email },
       });
 
-      await tx.externalIdentity.create({
-        data: {
-          userId: user.id,
-          provider: 'github',
-          providerUserId,
-          providerUsername: profile.login,
-        },
-      });
+      if (existingUserByEmail) {
+        try {
+          await this.database.client.externalIdentity.create({
+            data: {
+              userId: existingUserByEmail.id,
+              provider: 'github',
+              providerUserId,
+              providerUsername: profile.login,
+            },
+          });
 
-      return user;
-    });
+          return await this.database.client.user.update({
+            where: { id: existingUserByEmail.id },
+            data: {
+              avatarUrl: existingUserByEmail.avatarUrl ?? profile.avatar_url ?? null,
+              displayName: existingUserByEmail.displayName ?? profile.name ?? profile.login,
+            },
+          });
+        } catch (err: unknown) {
+          // If concurrent request created the identity first, return existing user
+          if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: string }).code === 'P2002') {
+            const recheck = await this.database.client.externalIdentity.findUnique({
+              where: {
+                provider_providerUserId: {
+                  provider: 'github',
+                  providerUserId,
+                },
+              },
+              include: { user: true },
+            });
+            if (recheck?.user) return recheck.user;
+          }
+          throw err;
+        }
+      }
+    }
+
+    // New user registration with automatic workspace provisioning
+    try {
+      return await this.database.client.$transaction(async (tx) => {
+        const user = await tx.user.create({
+          data: {
+            displayName: profile.name ?? profile.login,
+            avatarUrl: profile.avatar_url ?? null,
+            email,
+          },
+        });
+
+        await tx.externalIdentity.create({
+          data: {
+            userId: user.id,
+            provider: 'github',
+            providerUserId,
+            providerUsername: profile.login,
+          },
+        });
+
+        // Auto-provision initial workspace
+        const orgName = `${user.displayName || profile.login || 'Personal'}'s Workspace`;
+        const baseSlug = (profile.login || user.displayName || 'workspace')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .slice(0, 32);
+        const suffix = Math.random().toString(36).substring(2, 7);
+        const slug = `${baseSlug || 'org'}-${suffix}`;
+
+        const org = await tx.organization.create({
+          data: {
+            name: orgName,
+            slug,
+            createdBy: user.id,
+          },
+        });
+
+        await tx.membership.create({
+          data: {
+            organizationId: org.id,
+            userId: user.id,
+            role: 'OWNER',
+          },
+        });
+
+        return user;
+      });
+    } catch (err: unknown) {
+      // Handle concurrent first-time registration race condition
+      if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: string }).code === 'P2002') {
+        const recheck = await this.database.client.externalIdentity.findUnique({
+          where: {
+            provider_providerUserId: {
+              provider: 'github',
+              providerUserId,
+            },
+          },
+          include: { user: true },
+        });
+        if (recheck?.user) return recheck.user;
+      }
+      throw err;
+    }
   }
 }

@@ -9,13 +9,17 @@ import {
 } from '@nestjs/common';
 import { createHash, randomUUID } from 'node:crypto';
 import { fetch as undiciFetch } from 'undici';
-import { signWebhookPayload } from '../../common/crypto';
+import { decryptSecret, signWebhookPayload } from '../../common/crypto';
+import { isReservedDeliveryHeader, redactSensitiveHeaders } from '../../common/header-utils';
 import { createPinnedDispatcher, validateDestinationUrl } from '../../common/security/ssrf.validator';
 import type { Prisma } from '../../generated/prisma/client';
 import { AuthorizationService } from '../auth/authorization.service';
 import { RuntimeConfig } from '../config/config.module';
 import { TenantContextService } from '../database/tenant-context.service';
 import { EventStreamService } from '../observability/event-stream.service';
+
+// Re-export for consumers that import from this module.
+export { isReservedDeliveryHeader, redactSensitiveHeaders } from '../../common/header-utils';
 
 /**
  * Computes a deterministic logical delivery UUID for an event-destination pair.
@@ -78,6 +82,14 @@ export class DeliveryService {
     @Optional() private readonly eventStream?: EventStreamService,
   ) {}
 
+  private getEncryptionKey(): Buffer {
+    if (this.config?.values?.encryptionKey) {
+      return this.config.values.encryptionKey;
+    }
+    const rawKey = process.env.ENCRYPTION_KEY || '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+    return createHash('sha256').update(rawKey).digest();
+  }
+
   /**
    * Executes HTTP delivery to a destination target with SSRF validation,
    * DNS-pinned socket connection (anti-rebinding), HMAC signing,
@@ -126,7 +138,82 @@ export class DeliveryService {
     }
 
     const timestamp = Math.floor(Date.now() / 1000);
-    const signingSecret = params.signingSecret || 'relayforge_webhook_secret';
+
+    // Resolve signing secret: use explicit secret if passed, otherwise securely
+    // resolve the organization's encrypted signing secret from the database.
+    let signingSecret = params.signingSecret;
+    if (!signingSecret) {
+      try {
+        const secretRows = await this.tenantContext.runInTenantContext(params.organizationId, '', async (tx) => {
+          return tx.$queryRaw<{
+            endpoint_id: string;
+            secret_ciphertext: string;
+            secret_iv: string;
+            secret_tag: string;
+          }[]>`
+            SELECT endpoint_id, secret_ciphertext, secret_iv, secret_tag
+            FROM get_org_endpoint_signing_secret(${params.organizationId}::uuid)
+          `;
+        });
+        const secretRow = secretRows?.[0];
+        if (secretRow) {
+          signingSecret = decryptSecret(
+            secretRow.secret_ciphertext,
+            secretRow.secret_iv,
+            secretRow.secret_tag,
+            this.getEncryptionKey(),
+          );
+        }
+      } catch {
+        // Fallback to direct table query inside tenant context
+        try {
+          const endpoint = await this.tenantContext.runInTenantContext(params.organizationId, '', async (tx) => {
+            return tx.endpoint.findFirst({
+              where: { organizationId: params.organizationId, isActive: true },
+              orderBy: { createdAt: 'asc' },
+            });
+          });
+          if (endpoint?.secretCiphertext && endpoint?.secretIv && endpoint?.secretTag) {
+            signingSecret = decryptSecret(
+              endpoint.secretCiphertext,
+              endpoint.secretIv,
+              endpoint.secretTag,
+              this.getEncryptionKey(),
+            );
+          }
+        } catch {
+          // No secret found
+        }
+      }
+    }
+
+    // Reject delivery if no signing secret is configured — refuse the insecure fallback.
+    if (!signingSecret) {
+      this.logger.warn({
+        event: 'delivery_no_signing_secret',
+        destinationId: params.destination.id,
+      });
+      return this.persistAttempt(params.organizationId, {
+        id: attemptId,
+        organizationId: params.organizationId,
+        eventId: params.eventId,
+        destinationId: params.destination.id,
+        outboxMessageId: params.outboxMessageId ?? null,
+        workflowExecutionId: params.workflowExecutionId ?? null,
+        stepExecutionId: params.stepExecutionId ?? null,
+        attemptNumber: params.attemptNumber ?? 1,
+        status: 'FAILED',
+        statusCode: null,
+        latencyMs: 0,
+        requestUrl: params.destination.url,
+        requestMethod: params.destination.httpMethod ?? 'POST',
+        requestHeaders: {},
+        responseHeaders: null,
+        responseBodyPreview: null,
+        errorDescription: 'Delivery aborted: no signing secret configured for this destination.',
+      });
+    }
+
     const signature = signWebhookPayload(bodyStr, signingSecret, timestamp);
 
     const requestHeaders: Record<string, string> = {
@@ -144,10 +231,11 @@ export class DeliveryService {
       'x-relayforge-signature': signature,
     };
 
-    // Merge custom destination headers
+    // Merge custom destination headers, enforcing delivery-boundary protection
+    // against reserved header override.
     if (params.destination.headers && typeof params.destination.headers === 'object') {
       for (const [k, v] of Object.entries(params.destination.headers)) {
-        if (typeof v === 'string') {
+        if (typeof v === 'string' && !isReservedDeliveryHeader(k)) {
           requestHeaders[k.toLowerCase()] = v;
         }
       }
@@ -255,7 +343,9 @@ export class DeliveryService {
       latencyMs,
       requestUrl: params.destination.url,
       requestMethod: params.destination.httpMethod ?? 'POST',
-      requestHeaders,
+      // Redact credentials and signing material before persisting to storage.
+      // The full headers are only kept in-process for the HTTP call above.
+      requestHeaders: redactSensitiveHeaders(requestHeaders),
       responseHeaders,
       responseBodyPreview,
       errorDescription,
@@ -453,6 +543,29 @@ export class DeliveryService {
         throw new NotFoundException('An ingestion endpoint is required before pinging destinations.');
       }
 
+      // Decrypt the endpoint signing secret to use for the ping delivery.
+      let endpointSigningSecret: string | undefined;
+      if (
+        endpoint.secretCiphertext &&
+        endpoint.secretIv &&
+        endpoint.secretTag
+      ) {
+        try {
+          endpointSigningSecret = decryptSecret(
+            endpoint.secretCiphertext,
+            endpoint.secretIv,
+            endpoint.secretTag,
+            this.getEncryptionKey(),
+          );
+        } catch {
+          // Decryption failed
+        }
+      }
+
+      if (!endpointSigningSecret) {
+        throw new BadRequestException('The ingestion endpoint does not have a valid signing secret configured.');
+      }
+
       const syntheticEvent = await tx.event.create({
         data: {
           organizationId,
@@ -470,8 +583,9 @@ export class DeliveryService {
       return {
         syntheticEvent,
         destination,
+        endpointSigningSecret,
       };
-    }).then(async ({ syntheticEvent, destination }) => {
+    }).then(async ({ syntheticEvent, destination, endpointSigningSecret }) => {
       // Execute delivery outside the transaction so HTTP latency and persistAttempt are separate
       return this.deliverEventToDestination({
         organizationId,
@@ -491,6 +605,7 @@ export class DeliveryService {
         },
         eventType: 'relayforge.ping',
         attemptNumber: 1,
+        signingSecret: endpointSigningSecret,
       });
     });
   }

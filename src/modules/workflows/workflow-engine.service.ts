@@ -4,9 +4,11 @@ import {
   NotFoundException,
   Optional,
 } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import type { Prisma } from '../../generated/prisma/client';
+import { decryptSecret } from '../../common/crypto';
 import { DatabaseService } from '../database/database.service';
+import { RuntimeConfig } from '../config/config.module';
 import { TenantContextService } from '../database/tenant-context.service';
 import { DeliveryService } from '../delivery/delivery.service';
 import { calculateNextRetryDelay, evaluateRetry } from '../delivery/retry-policy';
@@ -40,8 +42,17 @@ export class WorkflowEngineService {
     private readonly database: DatabaseService,
     private readonly tenantContext: TenantContextService,
     private readonly deliveryService: DeliveryService,
+    @Optional() private readonly config?: RuntimeConfig,
     @Optional() private readonly eventStream?: EventStreamService,
   ) {}
+
+  private getEncryptionKey(): Buffer {
+    if (this.config?.values?.encryptionKey) {
+      return this.config.values.encryptionKey;
+    }
+    const rawKey = process.env.ENCRYPTION_KEY || '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+    return createHash('sha256').update(rawKey).digest();
+  }
 
   /**
    * Worker outbox hook: dispatches workflow execution for a claimed outbox row.
@@ -558,6 +569,54 @@ export class WorkflowEngineService {
       };
     }
 
+    // 1b. Fetch the org's endpoint signing secret for outbound HMAC signing.
+    //     Uses the same SECURITY DEFINER function as the outbox worker.
+    let signingSecret: string | undefined;
+    try {
+      const secretRows = await this.database.client.$queryRaw<{
+        endpoint_id: string;
+        secret_ciphertext: string;
+        secret_iv: string;
+        secret_tag: string;
+      }[]>`
+        SELECT endpoint_id, secret_ciphertext, secret_iv, secret_tag
+        FROM get_org_endpoint_signing_secret(${organizationId}::uuid)
+      `;
+      const secretRow = secretRows?.[0];
+      if (secretRow) {
+        signingSecret = decryptSecret(
+          secretRow.secret_ciphertext,
+          secretRow.secret_iv,
+          secretRow.secret_tag,
+          this.getEncryptionKey(),
+        );
+      }
+    } catch (err: unknown) {
+      this.logger.warn({
+        event: 'workflow_signing_secret_fetch_failed',
+        executionId,
+        organizationId,
+        error: safeError(err),
+      });
+    }
+
+    // Abort delivery if no signing secret is available — refuse unsigned delivery.
+    if (!signingSecret) {
+      this.logger.warn({
+        event: 'workflow_no_signing_secret',
+        executionId,
+        organizationId,
+        message: 'No active endpoint signing secret found; aborting step delivery.',
+      });
+      return {
+        status: 'FAILED' as const,
+        statusCode: null,
+        latencyMs: 0,
+        errorDescription: 'Workflow delivery aborted: no signing secret configured for this organisation.',
+        retryAfterSeconds: null,
+      };
+    }
+
     // 2. Stable downstream idempotency identifier
     const customDeliveryId = `wf_${executionId}_${action.nodeId}`;
 
@@ -580,6 +639,7 @@ export class WorkflowEngineService {
       workflowExecutionId: executionId,
       stepExecutionId,
       customDeliveryId,
+      signingSecret,
     });
 
     return attempt;

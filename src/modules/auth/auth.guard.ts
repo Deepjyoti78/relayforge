@@ -78,11 +78,12 @@ export class AuthGuard implements CanActivate {
       const host = request.headers.host;
       const frontendUrl = new URL(this.config.values.frontendUrl);
 
-      // Allow matching host or matching configured frontend origin
+      // Allow matching host, configured frontend origin, local dev, or onrender staging subdomains
       const isAllowed = originUrl.host === host
         || originUrl.origin === frontendUrl.origin
         || originUrl.hostname === '127.0.0.1'
-        || originUrl.hostname === 'localhost';
+        || originUrl.hostname === 'localhost'
+        || originUrl.hostname.endsWith('.onrender.com');
 
       if (!isAllowed) {
         throw new ForbiddenException('CSRF origin mismatch');

@@ -71,5 +71,15 @@ describe('process configuration boundaries', () => {
       GITHUB_CLIENT_SECRET: 'gh_secret_abcdef1234567890abcdef',
       ALLOW_PRIVATE_DESTINATIONS: 'true',
     })).toThrow(ConfigurationError);
+
+    // Worker in production does not require GitHub OAuth credentials
+    const workerProdConfig = parseEnvironment('worker', {
+      WORKER_DATABASE_URL: apiEnvironment.DATABASE_URL,
+      REDIS_URL: 'redis://localhost/0',
+      NODE_ENV: 'production',
+      ENCRYPTION_KEY: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef_prod',
+    });
+    expect(workerProdConfig.role).toBe('worker');
+    expect(workerProdConfig.environment).toBe('production');
   });
 });

@@ -1,5 +1,5 @@
 import { ForbiddenException } from '@nestjs/common';
-import { verifyWebhookSignature } from '../src/common/crypto';
+import { encryptSecret, verifyWebhookSignature } from '../src/common/crypto';
 import { AuthorizationService } from '../src/modules/auth/authorization.service';
 import type { RuntimeConfig } from '../src/modules/config/config.module';
 import type { TenantContextService } from '../src/modules/database/tenant-context.service';
@@ -17,6 +17,20 @@ describe('Milestone 3 Option 2: DeliveryService Unit Tests', () => {
   let mockConfig: RuntimeConfig;
 
   beforeEach(() => {
+    const testEncryptionKey = Buffer.from(
+      '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+      'hex',
+    );
+    mockAuthz = new AuthorizationService();
+    mockConfig = {
+      values: {
+        allowPrivateDestinations: true, // Allow localhost / arbitrary URLs in unit tests
+        encryptionKey: testEncryptionKey,
+      },
+    } as unknown as RuntimeConfig;
+
+    const encSecret = encryptSecret('whsec_test_ping_secret_12345', testEncryptionKey);
+
     mockTenantContext = {
       runInTenantContext: jest
         .fn()
@@ -43,7 +57,12 @@ describe('Milestone 3 Option 2: DeliveryService Unit Tests', () => {
                 create: jest.fn().mockResolvedValue({ id: eventId }),
               },
               endpoint: {
-                findFirst: jest.fn().mockResolvedValue({ id: 'ep-1' }),
+                findFirst: jest.fn().mockResolvedValue({
+                  id: 'ep-1',
+                  secretCiphertext: encSecret.ciphertext,
+                  secretIv: encSecret.iv,
+                  secretTag: encSecret.tag,
+                }),
               },
               deliveryAttempt: {
                 create: jest.fn().mockImplementation((args: { data: unknown }) =>
@@ -78,13 +97,6 @@ describe('Milestone 3 Option 2: DeliveryService Unit Tests', () => {
           },
         ),
     } as unknown as jest.Mocked<TenantContextService>;
-
-    mockAuthz = new AuthorizationService();
-    mockConfig = {
-      values: {
-        allowPrivateDestinations: true, // Allow localhost / arbitrary URLs in unit tests
-      },
-    } as unknown as RuntimeConfig;
 
     deliveryService = new DeliveryService(mockTenantContext, mockAuthz, mockConfig);
   });
@@ -166,6 +178,7 @@ describe('Milestone 3 Option 2: DeliveryService Unit Tests', () => {
         },
         payload: { test: true },
         eventType: 'test.event',
+        signingSecret: 'whsec_test_secret_key_12345',
       });
 
       expect(attempt.status).toBe('FAILED');
@@ -189,6 +202,7 @@ describe('Milestone 3 Option 2: DeliveryService Unit Tests', () => {
         },
         payload: { test: true },
         eventType: 'test.event',
+        signingSecret: 'whsec_test_secret_key_12345',
       });
 
       expect(attempt.status).toBe('UNKNOWN');

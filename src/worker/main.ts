@@ -15,8 +15,9 @@ async function bootstrap(): Promise<void> {
   app.enableShutdownHooks(['SIGINT', 'SIGTERM']);
 
   // Support cloud environments (e.g. Render free tier) requiring an HTTP health check port
-  if (process.env.PORT) {
-    const port = parseInt(process.env.PORT, 10);
+  const workerHttpPort = process.env.WORKER_PORT || (process.env.NODE_ENV === 'production' ? process.env.PORT : undefined);
+  if (workerHttpPort) {
+    const port = parseInt(workerHttpPort, 10);
     const server = createServer((req, res) => {
       if (req.url === '/health' || req.url === '/healthz' || req.url === '/') {
         res.writeHead(200, { 'Content-Type': 'application/json' });

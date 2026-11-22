@@ -1,9 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { createHash } from 'node:crypto';
+import { decryptSecret } from '../common/crypto';
 import { DatabaseService } from '../modules/database/database.service';
 import { DeliveryService } from '../modules/delivery/delivery.service';
 import { RateLimiterService } from '../modules/delivery/rate-limiter.service';
 import { evaluateRetry } from '../modules/delivery/retry-policy';
+import { RuntimeConfig } from '../modules/config/config.module';
 import { EventStreamService } from '../modules/observability/event-stream.service';
 import { safeError } from '../modules/observability/logging';
 import { WorkflowEngineService } from '../modules/workflows/workflow-engine.service';
@@ -35,6 +38,13 @@ interface ActiveDestinationRow {
   is_active: boolean;
 }
 
+interface OrgEndpointSecretRow {
+  endpoint_id: string;
+  secret_ciphertext: string;
+  secret_iv: string;
+  secret_tag: string;
+}
+
 @Injectable()
 export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(OutboxWorkerService.name);
@@ -48,8 +58,17 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
     private readonly deliveryService: DeliveryService,
     private readonly rateLimiter: RateLimiterService,
     private readonly eventStream: EventStreamService,
-    private readonly workflowEngine?: WorkflowEngineService,
+    @Optional() private readonly workflowEngine?: WorkflowEngineService,
+    @Optional() private readonly config?: RuntimeConfig,
   ) {}
+
+  private getEncryptionKey(): Buffer {
+    if (this.config?.values?.encryptionKey) {
+      return this.config.values.encryptionKey;
+    }
+    const rawKey = process.env.ENCRYPTION_KEY || '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+    return createHash('sha256').update(rawKey).digest();
+  }
 
   onModuleInit(): void {
     this.isRunning = true;
@@ -167,6 +186,45 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
         return;
       }
 
+      // 1b. Fetch the org's endpoint signing secret for outbound HMAC signing.
+      //     Uses a SECURITY DEFINER function to bypass RLS (worker has no user context).
+      let orgSigningSecret: string | undefined;
+      try {
+        const secretRows = await this.database.client.$queryRaw<OrgEndpointSecretRow[]>`
+          SELECT endpoint_id, secret_ciphertext, secret_iv, secret_tag
+          FROM get_org_endpoint_signing_secret(${msg.org_id}::uuid)
+        `;
+        const secretRow = secretRows?.[0];
+        if (secretRow) {
+          orgSigningSecret = decryptSecret(
+            secretRow.secret_ciphertext,
+            secretRow.secret_iv,
+            secretRow.secret_tag,
+            this.getEncryptionKey(),
+          );
+        }
+      } catch (err: unknown) {
+        this.logger.warn({
+          event: 'outbox_signing_secret_fetch_failed',
+          outboxId: msg.id,
+          orgId: msg.org_id,
+          error: safeError(err),
+        });
+        // If we cannot decrypt the signing secret, abort delivery for this batch.
+        // This prevents unsigned deliveries from silently going out.
+        return;
+      }
+
+      if (!orgSigningSecret) {
+        this.logger.warn({
+          event: 'outbox_no_signing_secret',
+          outboxId: msg.id,
+          orgId: msg.org_id,
+          message: 'No active endpoint found for org; skipping delivery.',
+        });
+        return;
+      }
+
       // 2. Check destination rate limits before delivery
       for (const dest of destinations) {
         if (dest.rate_limit_per_second > 0) {
@@ -212,6 +270,7 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
           eventType,
           outboxMessageId: msg.id,
           attemptNumber: msg.attempt_count,
+          signingSecret: orgSigningSecret,
         });
 
         if (attempt.status === 'SUCCESS') {

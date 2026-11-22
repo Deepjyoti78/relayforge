@@ -19,12 +19,14 @@ import { AuthGuard } from './auth.guard';
 import type { AuthenticatedRequest } from './auth.guard';
 import { CurrentUser } from './current-user.decorator';
 import { GitHubOAuthService } from './github-oauth.service';
+import { GoogleOAuthService } from './google-oauth.service';
 import { SessionService } from './session.service';
 
 @Controller()
 export class AuthController {
   constructor(
     private readonly gitHubOAuth: GitHubOAuthService,
+    private readonly googleOAuth: GoogleOAuthService,
     private readonly sessionService: SessionService,
     private readonly database: DatabaseService,
     private readonly tenantContext: TenantContextService,
@@ -44,6 +46,47 @@ export class AuthController {
     @Res() res: Response,
   ): Promise<void> {
     const { user, redirectUri } = await this.gitHubOAuth.handleCallback(code, state);
+    const { token, session } = await this.sessionService.createSession(user.id);
+
+    // Calculate maxAge in seconds
+    const maxAge = Math.floor((session.expiresAt.getTime() - Date.now()) / 1000);
+    const cookieHeader = serializeCookie(this.config.values.sessionCookieName, token, {
+      httpOnly: true,
+      secure: this.config.values.environment === 'production',
+      sameSite: this.config.values.environment === 'production' ? 'None' : 'Lax',
+      path: '/',
+      maxAge,
+      expires: session.expiresAt,
+    });
+
+    res.setHeader('Set-Cookie', cookieHeader);
+
+    // Pass token in redirect URL for SPAs across subdomains (e.g. onrender.com)
+    let destination = redirectUri;
+    try {
+      const redirectUrl = new URL(redirectUri);
+      redirectUrl.searchParams.set('token', token);
+      destination = redirectUrl.toString();
+    } catch {
+      destination = redirectUri;
+    }
+
+    res.redirect(302, destination);
+  }
+
+  @Get('auth/google/start')
+  async googleStart(@Query('redirect_uri') redirectUri: string | undefined, @Res() res: Response): Promise<void> {
+    const { url } = await this.googleOAuth.createAuthorizationUrl(redirectUri);
+    res.redirect(302, url);
+  }
+
+  @Get('auth/google/callback')
+  async googleCallback(
+    @Query('code') code: string,
+    @Query('state') state: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const { user, redirectUri } = await this.googleOAuth.handleCallback(code, state);
     const { token, session } = await this.sessionService.createSession(user.id);
 
     // Calculate maxAge in seconds

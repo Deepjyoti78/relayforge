@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import type { Prisma } from '../../generated/prisma/client';
 import { validateDestinationUrl } from '../../common/security/ssrf.validator';
+import { isReservedDeliveryHeader, redactSensitiveHeaders } from '../../common/header-utils';
 import { AuthorizationService } from '../auth/authorization.service';
 import { RuntimeConfig } from '../config/config.module';
 import { TenantContextService } from '../database/tenant-context.service';
@@ -99,6 +100,11 @@ export class DestinationService {
       for (const [key, val] of Object.entries(input.headers)) {
         if (typeof key !== 'string' || typeof val !== 'string') {
           throw new BadRequestException('All header keys and values must be strings.');
+        }
+        if (isReservedDeliveryHeader(key)) {
+          throw new BadRequestException(
+            `Header '${key}' is reserved by RelayForge and cannot be overridden by custom destination configuration.`,
+          );
         }
       }
       parsedHeaders = input.headers;
@@ -252,6 +258,11 @@ export class DestinationService {
         if (typeof key !== 'string' || typeof val !== 'string') {
           throw new BadRequestException('All header keys and values must be strings.');
         }
+        if (isReservedDeliveryHeader(key)) {
+          throw new BadRequestException(
+            `Header '${key}' is reserved by RelayForge and cannot be overridden by custom destination configuration.`,
+          );
+        }
       }
       parsedHeaders = input.headers;
     }
@@ -342,13 +353,16 @@ export class DestinationService {
     createdAt: Date;
     updatedAt: Date;
   }): DestinationDto {
+    const rawHeaders = record.headers as Record<string, string> | null | undefined;
     return {
       id: record.id,
       organizationId: record.organizationId,
       name: record.name,
       url: record.url,
       httpMethod: record.httpMethod,
-      headers: (record.headers as Record<string, string>) || null,
+      // Redact credential values in API responses — Authorization tokens and API
+      // keys stored in custom destination headers must never be exposed to viewers.
+      headers: rawHeaders ? redactSensitiveHeaders(rawHeaders) : null,
       rateLimitPerSecond: record.rateLimitPerSecond,
       timeoutMs: record.timeoutMs,
       isActive: record.isActive,
