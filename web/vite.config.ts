@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-const backendTarget = process.env.VITE_API_URL || 'http://127.0.0.1:3100';
+const backendTarget = process.env.DEV_API_PROXY_TARGET || (process.env.VITE_API_URL === '/' ? undefined : process.env.VITE_API_URL) || 'http://127.0.0.1:3100';
 
 export default defineConfig({
   plugins: [react()],

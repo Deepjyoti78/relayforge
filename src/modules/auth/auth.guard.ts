@@ -5,11 +5,12 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import { parseCookies } from '../../common/cookies';
 import type { Session, User } from '../../generated/prisma/client';
 import { RuntimeConfig } from '../config/config.module';
 import { isTrustedFrontendOrigin, isTrustedFrontendUrl } from './browser-security';
+import { clearSessionCookie } from './auth-cookies';
 import { SessionService } from './session.service';
 
 export interface AuthenticatedRequest extends Request {
@@ -39,6 +40,11 @@ export class AuthGuard implements CanActivate {
 
     const auth = await this.sessionService.validateSession(token);
     if (!auth) {
+      if (cookies[cookieName]) {
+        const response = context.switchToHttp().getResponse<Response>();
+        response.setHeader('Set-Cookie', clearSessionCookie(this.config.values));
+        response.setHeader('Cache-Control', 'no-store');
+      }
       throw new UnauthorizedException('Invalid or expired session');
     }
 

@@ -486,4 +486,45 @@ describe('Milestone 2: Identity, Organizations, and Multi-Tenant RLS', () => {
     });
   });
 
+  describe('Session persistence and invalidation', () => {
+    it.each(['expired', 'revoked'])('%s cookies cannot access /v1/me and are removed', async (reason) => {
+      const token = generateToken();
+      await database.client.session.create({ data: {
+        userId: userA.id, tokenHash: hashToken(token),
+        expiresAt: new Date(Date.now() + (reason === 'expired' ? -1000 : 60000)),
+        revokedAt: reason === 'revoked' ? new Date() : null,
+      } });
+      const cookie = serializeCookie('rf_session', token);
+      for (const method of ['get', 'post'] as const) {
+        const path = method === 'get' ? '/v1/me' : '/v1/auth/logout';
+        const res = await request(app.getHttpServer())[method](path).set('Cookie', cookie)
+          .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin).expect(401);
+        expect(res.headers['cache-control']).toBe('no-store');
+        expect((res.headers['set-cookie'] as unknown as string[]).some(c => c.includes('Max-Age=0'))).toBe(true);
+      }
+    });
+    it('repeated /v1/me reads preserve the same user and absolute session expiry', async () => {
+      const before = await database.client.session.findUniqueOrThrow({ where: { tokenHash: hashToken(userA.sessionToken) } });
+      for (let i = 0; i < 2; i++) {
+        const res = await request(app.getHttpServer()).get('/v1/me').set('Cookie', userA.cookie).expect(200);
+        expect((res.body as { id: string }).id).toBe(userA.id);
+        expect(res.headers['cache-control']).toBe('no-store');
+        expect(JSON.stringify(res.body)).not.toContain(userA.sessionToken);
+      }
+      const after = await database.client.session.findUniqueOrThrow({ where: { tokenHash: hashToken(userA.sessionToken) } });
+      expect(after.expiresAt).toEqual(before.expiresAt);
+    });
+    it('removed members lose organization access and both SSE aliases', async () => {
+      await request(app.getHttpServer()).get('/v1/organizations/' + orgA.id).set('Cookie', userViewer.cookie).expect(200);
+      await tenantContext.runInTenantContext(orgA.id, userViewer.id, tx => tx.membership.deleteMany({
+        where: { organizationId: orgA.id, userId: userViewer.id },
+      }));
+      for (const suffix of ['', '/events/stream', '/telemetry/events/stream']) {
+        const res = await request(app.getHttpServer()).get('/v1/organizations/' + orgA.id + suffix).set('Cookie', userViewer.cookie);
+        if (suffix) expect(res.status).toBe(403);
+        else expect([403, 404]).toContain(res.status);
+      }
+    });
+  });
+
 });

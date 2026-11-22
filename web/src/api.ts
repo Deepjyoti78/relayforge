@@ -212,14 +212,11 @@ export async function fetchMe(): Promise<UserProfile | null> {
 }
 
 export async function logout(): Promise<void> {
-  try {
-    await apiFetch('/v1/auth/logout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
-  } catch {
-    // Ignore network error on logout
-  }
+  const res = await apiFetch('/v1/auth/logout', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+  });
+  // A rejected expired/revoked cookie is cleared by the backend AuthGuard.
+  if (!res.ok && res.status !== 401) throw new Error('Unable to sign out. Please try again.');
   setSessionToken(null);
   clearAppCache();
 }

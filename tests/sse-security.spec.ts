@@ -24,7 +24,7 @@ describe('SSE organization authorization over HTTP', () => {
       providers: [AuthGuard, AuthorizationService,
         { provide: RuntimeConfig, useValue: { values: { sessionCookieName: 'rf_session' } } },
         { provide: SessionService, useValue: { validateSession: (token: string) =>
-          Promise.resolve(token === 'valid' ? { user: { id: 'user-1' }, session: {} } : null) } },
+          Promise.resolve(token === 'valid' ? { user: { id: 'user-1' }, session: { expiresAt: new Date(Date.now() + 60000) } } : null) } },
         { provide: MetricsService, useValue: {} },
         { provide: EventStreamService, useValue: { getStreamForOrganization: stream } },
         { provide: TenantContextService, useValue: {

@@ -1,140 +1,236 @@
-RelayForge authentication security review
-Date: 22 November 2026 (Asia/Calcutta)
+RelayForge authentication security review — independently verified follow-up
+23 November 2026 (Asia/Calcutta)
 Repository: Deepjyoti78/relayforge
-Base: release/staging-deployment, 81de4a50b859838b0111fa3907efe5179a9e4174
-Review branch: codex/auth-security-review
-Local worktree: C:/Users/deepjyoti/Desktop/RelayForge/auth-security-review-worktree
+Review branch/worktree: codex/auth-security-review / auth-security-review-worktree
+Starting security commit: 0cfa2e0; staging comparison snapshot: 248a01f
+The actual source and diff were reviewed; the earlier report was not used as proof.
 
-Scope and corrections
-- Both OAuth services now trust only the configured FRONTEND_URL origin,
-  including scheme and port. Redirect URLs with userinfo are rejected. Invalid
-  redirects fall back to FRONTEND_URL. Stored redirects are revalidated during
-  callback, covering states created before this patch.
-- Google and GitHub callbacks keep the session in an HttpOnly cookie. Session
-  tokens are no longer appended to redirect URLs. Successful callbacks set
-  Cache-Control: no-store and Referrer-Policy: no-referrer. Internal/provider
-  error descriptions are no longer reflected into redirect URLs.
-- Browser OAuth uses full-page navigation for both providers. It no longer
-  passes tokens through postMessage, BroadcastChannel, storage events, or URL
-  parameters. The frontend validates the cookie via /v1/me on every startup.
-  Legacy URL tokens are discarded and removed from history. Legacy persisted
-  session/popup tokens are removed. The existing development manual-token
-  facility uses memory only; it does not survive reload.
-- Credentialed CORS permits the exact configured frontend origin. Shared hosting
-  suffixes, unconditional loopback origins, malformed origins, and arbitrary
-  ports are no longer allowed. Nonbrowser requests without Origin still work.
-- Cookie-authenticated mutations require an exact trusted Origin or, only when
-  Origin is absent, a trusted Referer. Missing/null/untrusted origins fail closed.
-  Bearer-only clients remain supported. A bearer header cannot exempt a request
-  authenticated by a cookie from CSRF checks. The request Host is not trusted.
-- Both SSE aliases verify membership using the authenticated user and requested
-  organization inside tenant context before obtaining the stream. VIEWER members
-  remain authorized; nonmembers receive 403 and unauthenticated clients 401.
-- Existing integration fixtures send Origin for cookie-authenticated mutations.
-  Existing OAuth test mocks were typed so the complete lint check passes.
+Findings and implemented corrections
+1. The earlier exact-origin redirect/CORS/CSRF fixes are present in code and tested.
+   Both providers reject other hosting tenants, arbitrary loopback origins/ports,
+   userinfo URLs and scheme changes; saved redirects are revalidated at callback.
+   Cookie mutations require exact configured Origin, or trusted Referer only when
+   Origin is absent. Bearer-only clients remain supported. A bearer header cannot
+   bypass CSRF if the cookie supplies authentication. Request Host is not trusted.
+2. OAuth state was not bound to the initiating browser. Ten new HTTP regressions
+   failed before the correction (audit-state-before.log); all now pass. Each provider
+   now has a 10-minute HttpOnly, Path=/, SameSite=Lax binding cookie containing the
+   state hash. Production adds Secure and a __Host- prefix; no Domain attribute is
+   set. Callback verifies the hash with timingSafeEqual BEFORE provider exchange.
+   Other-browser, mismatched, wrong-provider, malformed and missing state fail closed.
+   Matching callbacks clear the binding; denial also deletes the stored state.
+   Database expiry and single-use deletion remain enforced. Same-provider concurrent
+   login attempts intentionally replace the cookie; only the latest can complete.
+3. First-time sign-in was broken under the restricted database role: both OAuth
+   services created a workspace without transaction-local app.current_user_id.
+   Two real PostgreSQL tests reproduced error 42501/RLS (audit-provisioning-before.log).
+   Both services now set the new user's RLS identity inside the existing provisioning
+   transaction, before creating the organization/OWNER membership. No RLS policy,
+   role privilege or database schema was weakened. Verified identity linking,
+   returning identities and Google unverified-email non-linking are covered.
+4. Session cookies remain HttpOnly, host-only and Secure in production. Creation
+   and deletion now share options. Production previously used None for creation
+   and Lax for clearing; cookie identity already matched by name/path/domain, but
+   policy flags were inconsistent. SESSION_COOKIE_SAME_SITE=lax|none now lets the
+   release choose a policy; omitted preserves production None and development Lax.
+   Explicit none without production Secure is rejected. Invalid names are rejected.
+   Invalid/expired/revoked cookie sessions receive 401 and an expired clearing cookie.
+   /v1/me and logout use Cache-Control: no-store. Session creation stores only a hash.
+5. Browser sessions are not adopted from URLs or persisted in localStorage. Legacy
+   tokens are discarded/removed. OAuth uses full-page navigation, with no token
+   broadcast/postMessage/storage-event relay. App startup revalidates /v1/me before
+   rendering authenticated content. Manual development tokens remain memory-only.
+   API calls retain credentials: include. Failed logout now rejects instead of
+   pretending to log out; the UI keeps its session and shows an error. A 401 from
+   stale-session logout is handled as signed out because the backend clears it.
+6. Session persistence is fixed at seven days. validateSession checks revocation
+   and absolute expiry and may update lastActiveAt after 60 seconds; it does NOT
+   extend expiry or rotate the token. There is no refresh endpoint or OAuth refresh
+   token persistence. Reload/repeated /v1/me retain the user until expiry; users
+   reauthenticate afterwards. This existing policy was verified, not expanded.
+7. Organization controllers use AuthGuard and service-level membership/OWNER checks
+   within RLS tenant/user context. Existing role/isolation tests pass. Both SSE
+   aliases verify the current user/org membership before opening, including VIEWER
+   access. Live streams now end at 30 seconds or earlier captured session expiry;
+   native EventSource reconnect re-enters session and membership checks. No database
+   transaction stays open for the stream. Revocation/removal exposure is bounded to
+   the current connection's remaining lifetime, not eliminated instantaneously.
+   Real Chromium tests observe final failed reconnect after approximately 34 seconds
+   (30-second connection plus browser retry delay) for both revocation and removal.
+8. Development defaults had mismatched localhost frontend vs 127.0.0.1 callbacks.
+   Defaults and .env.example now use localhost consistently so host-only state and
+   session cookies survive the round trip. Actual existing .env files were untouched.
+   Existing local configurations still need the alignment check in the checklist.
 
-Regression evidence, before implementation
-- OAuth redirects/callback token exposure and CSRF: 27 failing assertions,
-  23 passing; audit-auth-before.log.
-- SSE HTTP authorization: 4 failing assertions, 2 passing. Both routes returned
-  streams for authenticated nonmembers; audit-sse-before.log.
-- API bootstrap CORS and actual frontend storage module: 8 failing assertions,
-  7 passing; audit-browser-before.log.
-- The CORS and storage regressions were run against restored original versions
-  of those two files before applying their corrections. No real provider tokens
-  or production accounts were used.
+Cloudflare/Render deployment: actual expected cookie behavior
+Evidence: render.yaml sets the API at relayforge-staging-api.onrender.com,
+FRONTEND_URL at relayforge-staging-web.onrender.com and frontend VITE_API_URL at the
+Render API. Both Wrangler files configure static SPA assets, without a proxy handler
+or run_worker_first. The repo does not identify a live Cloudflare account hostname
+or establish live dashboard environment overrides, so those were not assumed.
 
-Validation
-- npm test: PASS, 239 tests across 18 suites (final log: audit-unit.log).
-- npm run test:integration: PASS, 82 tests across 9 suites; real local PostgreSQL
-  and Redis, restricted API/worker database roles (audit-integration.log).
-- npm run lint: PASS (audit-lint.log).
-- npm run typecheck: PASS (audit-typecheck.log).
-- npm --prefix web run build: PASS, including frontend TypeScript and Vite
-  production bundle (audit-web-build.log).
-- npm run build: PASS, Prisma generation and backend compilation
-  (audit-api-build.log).
-- git diff --check: PASS.
-- All 13 existing migrations applied to the isolated relayforge_test database.
-  No application schema migration was introduced by this patch.
-- Sandbox initially blocked DNS/local services. Tests and builds requiring
-  network/process access were rerun with reviewed permissions; final results
-  above use those runs. Logs are local ignored artifacts, not committed.
-- Nonfatal existing warnings: Vite entry bundle exceeds 500 kB minified; pg warns
-  about a query submitted while another query is executing. The final integration
-  run exited normally; an earlier run reported an open handle.
+The authoritative Public Suffix List contains onrender.com, workers.dev and pages.dev.
+Consequently the two distinct Render hosts are DIFFERENT sites, despite sharing an
+onrender.com suffix. Any Cloudflare-default frontend to the Render API is cross-site
+too. At top-level navigation to the API, state cookies can be set, and SameSite=Lax
+allows the top-level GET callback from Google/GitHub. The callback can set a Secure
+API session cookie. After redirect to the frontend, however, /v1/me and SSE requests
+to the API are third-party contexts. With None plus credentials they can work only
+when browser policy permits them. With third-party cookies blocked they carry no
+usable API session and /v1/me returns 401. Lax also omits the cookie on these cross-
+site fetches regardless of the CORS allowlist. CORS cannot override cookie policy.
+Trying to share Domain=onrender.com is prohibited by its public-suffix status.
 
-Environment-dependent release checks still required
-- Live Google and GitHub consent, registered callback URLs, redirect back to the
-  configured frontend, /v1/me after navigation/reload, logout, and SSE should be
-  exercised in staging using authorized test accounts. Provider calls were
-  mocked in unit tests; live provider consent was not attempted.
-- Cross-site frontend/API hosting depends on third-party-cookie policy even with
-  SameSite=None; Secure and fetch/EventSource credentials enabled. In particular,
-  distinct hosting-provider domains can be cross-site. Browsers that block those
-  cookies may fail sign-in persistence. Validate supported browsers. A same-site
-  domain arrangement or same-origin API proxy is the preferred deployment remedy;
-  do not restore URL/localStorage session-token delivery as a workaround.
-- FRONTEND_URL must equal the actual frontend origin (a path is allowed in the
-  configured URL) and use HTTPS in production. Development frontend/API hosts
-  must align for Lax cookies; frontend fallback now preserves localhost versus
-  127.0.0.1. An explicit VITE_API_URL still takes precedence. No deployment
-  environment values or secrets were modified.
-- Frontend has no standalone lint/test script. Its module behavior is covered
-  through Jest's VM sandbox and its typecheck is included in the build; no
-  automated real-browser end-to-end flow was run.
+A Cloudflare frontend also needs FRONTEND_URL changed from the Render frontend to
+its exact public origin, otherwise redirects fall back to Render and CORS rejects
+its requests. The actual live settings/consent registrations were not modified or
+asserted. This patch preserves legacy None by default; it does not claim default
+hosting now works with third-party-cookie blocking.
 
-Remaining security risks / follow-up work
-- Previously exposed session tokens may already exist in copied URLs, external
-  logs, browser history, or other clients. Removing local storage does not revoke
-  server-side sessions. An authorized operational session revocation should be
-  considered separately; this audit did not revoke users' sessions.
-- OAuth state is single-use and expires after ten minutes, but is not bound to
-  the initiating browser with a separate cookie. Login-CSRF/session-swapping
-  protection remains incomplete and deserves a focused follow-up with provider-
-  specific browser-bound state. This patch does not claim to close that issue.
-- SSE membership/session authorization is checked at connection time. An already
-  open stream is not revalidated when membership is removed or a session is
-  revoked/expires. Immediate disconnect/revalidation needs follow-up.
-- Origin checks mitigate cookie CSRF, not same-origin XSS. General XSS auditing,
-  dependency vulnerabilities, OAuth account-linking policy, and infrastructure
-  configuration were outside this targeted patch.
+Recommended solutions (configuration/proxy proposals, not deployed):
+A. Bind Cloudflare frontend app.relayforge.example and Render API api.relayforge.example
+   to owned HTTPS custom domains. These share a schemeful site while remaining
+   different origins. Use host-only API cookies, SESSION_COOKIE_SAME_SITE=lax,
+   exact frontend CORS, and credentialed requests. Do not widen the cookie Domain.
+B. Proxy /auth/*, /v1/* and /health/* at the exact frontend origin F to one fixed
+   Render upstream, and build with VITE_API_URL=/. Configure public provider callback
+   URLs through F. Cookie Set-Cookie headers are then interpreted against F, making
+   the host-only cookie first-party for both the SPA and API paths. Cloudflare needs
+   a reviewed Worker fetch handler, ASSETS binding, and assets.run_worker_first route
+   patterns so the SPA fallback cannot absorb callbacks/API requests. Forward method,
+   body, query, browser Origin/Referer and Cookie, preserve separate Set-Cookie headers,
+   status/Location and streaming bodies, use upstream redirect: manual, and disable
+   auth caching/buffering. Upstream must be fixed (e.g. nonsecret API_ORIGIN), not
+   browser-selected. The local browser suite exercises the same-origin Vite proxy
+   using VITE_API_URL=/ and DEV_API_PROXY_TARGET; it does not certify a Cloudflare
+   production Worker that has not been implemented/deployed.
+See auth-release-checklist.txt for exact variable names and provider registrations.
 
-Changed files (plus this report)
+Automated browser coverage vs live provider checks
+Playwright 1.65.1 / Chromium 159 is pinned as a DEV-only dependency. The test launcher
+requires NODE_ENV=test, refuses databases not ending in _test, binds loopback-only
+listeners, and is never imported by src or production entry points. Local consent,
+provider token exchange and provider profile calls are MOCKED; external HTTPS calls
+are blocked. Real application callbacks, PKCE/state storage, provisioning/linking,
+HttpOnly cookies, hashing, frontend bootstrap, HTTP guards, PostgreSQL RLS and Redis
+are exercised. Twelve real-browser tests cover both providers, stolen callbacks,
+redirect fallback, persistence/reload/logout, expiry/revocation, CORS/CSRF rejection,
+logout failure and active SSE removal/revocation. Production Secure/None/Lax flags
+also have focused unit tests. Browser tests use HTTP localhost/Lax, not production
+TLS or third-party-cookie policy. Live consent and Chrome/Firefox/Safari deployment
+policy checks remain manual; see the checklist. No real OAuth credentials/accounts
+were used. The initial attempt to intercept redirects in the browser was replaced
+with a local mock consent server to avoid real provider navigation.
+
+Validation (local logs are ignored artifacts in this worktree)
+- npm test: PASS, 261 tests / 21 suites; audit-unit.log.
+- npm run test:integration: PASS, 90 tests / 11 suites, PostgreSQL/Redis; audit-integration.log.
+- npm run test:browser: PASS, 12 Chromium tests; audit-browser.log.
+- npm run lint: PASS; audit-lint.log.
+- npm run typecheck: PASS; audit-typecheck.log.
+- npm --prefix web run build: PASS, frontend TypeScript and Vite; audit-web-build.log.
+- npm run build: PASS, Prisma generation and API TypeScript; audit-api-build.log.
+- git diff --check: PASS. CI YAML parsed with js-yaml; independent browser job present.
+Local dependency junctions were preserved: Playwright was installed in an ignored
+isolated .cache/browser-tools directory and put on process-local PATH/NODE_PATH for
+execution. A fresh npm ci installs the committed Playwright dev dependency normally.
+Tests requiring local sockets/DNS/browser subprocesses used reviewed tool permissions.
+Nonfatal warnings remain: Vite entry bundle >500 kB, and pg concurrent-query deprecation.
+
+CI vulnerability gate — existing dependency issue, not a new auth regression
+Hosted run: https://github.com/Deepjyoti78/relayforge/actions/runs/45055019603
+Job: https://github.com/Deepjyoti78/relayforge/actions/runs/45055019603/job/137308202795
+Head: bbb5a57ed5ea860c1a7d4f5374f4aa9fe6066695 (before these follow-up changes).
+Read the actual job metadata and logs: npm ci and Prisma generation succeeded;
+npm audit --omit=dev --audit-level=moderate failed with exit 1, reporting effect
+<=3.22.0 via @prisma/config and prisma, GHSA-7589-6fvf-x4pw (CVE-2026-121707). Later
+unit/build/integration/Docker gates were skipped, so that hosted run is not evidence
+those checks failed. Local runs above validate the auth branch separately.
+The lockfile initially matched staging (SHA-256 C820F4E93D5CFA8E87A62B8B428C864C5EE87539B2775031500DB4D52CA36611).
+Before/after audit JSON findings are identical: 3 high, 0 critical, exit 1. They are
+one underlying advisory with the two parent-package findings, not three unrelated
+new flaws. Lockfile additions are only @playwright/test, playwright and playwright-core
+(all dev); existing production dependency versions were not changed. Evidence:
+.cache/audit-vulnerabilities-before.json and .cache/audit-vulnerabilities-final.json.
+The advisory identifies effect 3.22.1 as patched. npm audit fix --force proposes a
+breaking Prisma downgrade to 6.12.0; it was NOT run. Recommend a separate narrowly
+reviewed Prisma-compatible patch/override after generation, migration and runtime
+validation. The audit remains a release blocker; no exception was added. A new
+independent browser-authentication CI job runs without depending on the failing
+verify job, but it has not run remotely because this branch has not been pushed.
+
+Remaining risks / release conditions
+- Choose and provision a same-site/same-origin topology and exact provider callbacks.
+  The production proxy/domain work is proposed, not performed. Live environment
+  variables and real provider consent still need authorized manual verification.
+- Third-party-cookie-blocking behavior on default hosting remains a real deployment
+  limitation; do not restore URL/localStorage tokens to work around it.
+- Previously exposed sessions remain server-valid until expiry/revocation; no live
+  sessions were revoked. Consider a separately authorized operational revocation.
+- SSE revocation/removal has up to 30 seconds of residual access on an existing
+  connection; immediate server-push disconnect would require further infrastructure.
+- The existing dependency advisory still blocks CI/release; actual production TLS,
+  Cloudflare proxy behavior and Safari/Firefox were not tested by the local suite.
+- Fixed seven-day sessions require sign-in after expiry. XSS/dependency/infrastructure
+  hardening beyond the reviewed auth paths is not certified by these tests.
+
+Changed files against staging snapshot 248a01f
+- .env.example
+- .env.production.example
+- .github/workflows/ci.yml
+- docs/auth-draft-pr-plan.txt
+- docs/auth-release-checklist.txt
+- docs/auth-security-review.txt
+- package-lock.json
+- package.json
+- playwright.config.cjs
 - src/api/create-api.ts
+- src/modules/auth/auth-cookies.ts
 - src/modules/auth/auth.controller.ts
 - src/modules/auth/auth.guard.ts
 - src/modules/auth/browser-security.ts
 - src/modules/auth/github-oauth.service.ts
 - src/modules/auth/google-oauth.service.ts
+- src/modules/config/environment.ts
 - src/modules/observability/telemetry.controller.ts
 - tests/api-keys.integration-spec.ts
 - tests/auth-security.spec.ts
 - tests/browser-session-security.spec.ts
+- tests/browser/auth.browser.cjs
+- tests/browser/server.cjs
 - tests/concurrency-hardening.integration-spec.ts
 - tests/cors-security.spec.ts
 - tests/delivery.integration-spec.ts
 - tests/destinations.integration-spec.ts
 - tests/endpoints-ingestion.integration-spec.ts
+- tests/environment.spec.ts
 - tests/oauth-authentication.spec.ts
+- tests/oauth-browser-binding.spec.ts
+- tests/oauth-provisioning.integration-spec.ts
+- tests/oauth-state.integration-spec.ts
 - tests/observability-dlq.integration-spec.ts
+- tests/session-lifecycle.spec.ts
+- tests/sse-lifetime.spec.ts
 - tests/sse-security.spec.ts
 - tests/tenancy.integration-spec.ts
 - tests/workflow-execution.integration-spec.ts
 - web/src/App.tsx
 - web/src/api.ts
 - web/src/components/SignIn.tsx
+- web/vite.config.ts
 
 Review handling
-The shared checkout contained unrelated typography work which another process
-committed while the audit ran. Security edits were copied and hash-verified into
-this isolated worktree, then only the exact unchanged copies were removed from
-the shared checkout. The typography commit is the base of the review branch and
-is not included in the security diff. No main-branch push, remote push, PR merge,
-automatic merge, deployment, or deployment-secret update was performed.
+The existing local worktree/branch was used. Unrelated navbar, typography and
+InteractiveWorkflowDashboard changes through staging 248a01f were retained; the
+security diff against that snapshot does not revert them. No live-secret update,
+production session mutation, push, PR merge, automatic merge or deployment occurred.
+Draft PR title/review order and next steps: docs/auth-draft-pr-plan.txt.
 
-References
-OWASP CSRF Prevention Cheat Sheet (exact Origin/Referer checks and fail-closed
-behavior): https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
-MDN third-party cookies (browser policy and cross-site cookie limitations):
+Primary references
+https://publicsuffix.org/list/public_suffix_list.dat
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie
 https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Third-party_cookies
+https://developers.cloudflare.com/workers/static-assets/routing/worker-script/
+https://developers.google.com/identity/protocols/oauth2/web-server
+https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+https://github.com/advisories/GHSA-7589-6fvf-x4pw

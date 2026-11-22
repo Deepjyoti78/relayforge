@@ -113,7 +113,12 @@ export const App: React.FC = () => {
   }, [selectedOrgId]);
 
   const handleLogout = async () => {
-    await logout();
+    try {
+      await logout();
+    } catch {
+      window.alert('Unable to sign out. Please try again.');
+      return;
+    }
     setUser(null);
     setSelectedOrgId(null);
     setActiveOrg(null);

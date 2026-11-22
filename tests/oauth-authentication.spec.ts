@@ -1,8 +1,9 @@
 import { BadRequestException } from '@nestjs/common';
 import { GoogleOAuthService } from '../src/modules/auth/google-oauth.service';
 import { GitHubOAuthService } from '../src/modules/auth/github-oauth.service';
+import { oauthStateCookie } from '../src/modules/auth/auth-cookies';
 import { AuthController } from '../src/modules/auth/auth.controller';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import type { AuthenticatedRequest } from '../src/modules/auth/auth.guard';
 import type { User } from '../src/generated/prisma/client';
 import type { RuntimeConfig } from '../src/modules/config/config.module';
@@ -16,6 +17,7 @@ function containing(value: unknown): unknown { return expect.objectContaining(va
 const mockQuery = () => jest.fn<Promise<unknown>, [unknown]>();
 function createMockDatabase() {
   const client = {
+    $executeRaw: jest.fn<Promise<number>, [TemplateStringsArray, ...unknown[]]>().mockResolvedValue(1),
     oAuthState: { create: mockQuery(), findUnique: mockQuery(), delete: mockQuery().mockResolvedValue({}) },
     externalIdentity: { findUnique: mockQuery(), create: mockQuery(), update: mockQuery() },
     user: { create: mockQuery(), update: mockQuery(), findFirst: mockQuery() },
@@ -128,12 +130,12 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
         user: { id: 'user-1' } as User, redirectUri: mockConfig.values.frontendUrl,
       });
       (mockConfig.values as { environment: string }).environment = 'production';
-      const res = { setHeader: jest.fn(), redirect: jest.fn() };
-      if (provider === 'google') await authController.googleCallback('code', 'state', res as unknown as Response);
-      else await authController.githubCallback('code', 'state', res as unknown as Response);
+      const res = { setHeader: jest.fn(), append: jest.fn(), redirect: jest.fn() };
+      if (provider === 'google') await authController.googleCallback('code', 'state', res as unknown as Response, { headers: { cookie: oauthStateCookie(mockConfig.values, provider, 'state') } } as unknown as Request);
+      else await authController.githubCallback('code', 'state', res as unknown as Response, { headers: { cookie: oauthStateCookie(mockConfig.values, provider, 'state') } } as unknown as Request);
       expect(res.redirect).toHaveBeenCalledWith(302, mockConfig.values.frontendUrl);
-      expect(res.setHeader).toHaveBeenCalledWith('Set-Cookie', expect.stringContaining('HttpOnly'));
-      expect(res.setHeader).toHaveBeenCalledWith('Set-Cookie', expect.stringContaining('Secure'));
+      expect(res.append).toHaveBeenCalledWith('Set-Cookie', expect.stringContaining('HttpOnly'));
+      expect(res.append).toHaveBeenCalledWith('Set-Cookie', expect.stringContaining('Secure'));
     });
   });
 
@@ -329,7 +331,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
         sessionToken: 'active-token-to-revoke',
       };
       const mockRes = {
-        setHeader: jest.fn(),
+        setHeader: jest.fn(), append: jest.fn(),
         json: jest.fn(),
       };
 
@@ -347,6 +349,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
   describe('AuthController Endpoints', () => {
     it('googleStart redirects to Google authorization URL (302)', async () => {
       const mockRes = {
+        setHeader: jest.fn(),
         redirect: jest.fn(),
       };
 
@@ -379,13 +382,13 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
       } as User);
 
       const mockRes = {
-        setHeader: jest.fn(),
+        setHeader: jest.fn(), append: jest.fn(),
         redirect: jest.fn(),
       };
 
-      await authController.googleCallback('code-123', 'valid-state', mockRes as unknown as Response);
+      await authController.googleCallback('code-123', 'valid-state', mockRes as unknown as Response, { headers: { cookie: oauthStateCookie(mockConfig.values, 'google', 'valid-state') } } as unknown as Request);
 
-      expect(mockRes.setHeader).toHaveBeenCalledWith(
+      expect(mockRes.append).toHaveBeenCalledWith(
         'Set-Cookie',
         expect.stringContaining('rf_session='),
       );
@@ -397,6 +400,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
 
     it('githubStart redirects to GitHub authorization URL (302)', async () => {
       const mockRes = {
+        setHeader: jest.fn(),
         redirect: jest.fn(),
       };
 

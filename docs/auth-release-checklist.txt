@@ -1,0 +1,66 @@
+RelayForge authentication release checklist | 23 November 2026
+No deployment or live-secret changes were made by this audit.
+
+[ ] Choose and provision one HTTPS topology before release.
+    A: Cloudflare frontend https://app.relayforge.example and Render API
+       https://api.relayforge.example (replace with owned custom domains).
+    B: Same-origin proxy at F, the exact active HTTPS frontend origin. Route
+       /auth/*, /v1/* and /health/* to a fixed Render API origin before SPA fallback.
+       The current Wrangler files are asset-only; this proxy is a proposal,
+       not an implemented/deployed production handler. See the review for details.
+
+[ ] Configure API runtime variables through the approved deployment process.
+    NODE_ENV=production
+    FRONTEND_URL=https://app.relayforge.example              [A; use F for B]
+    GITHUB_CALLBACK_URL=https://api.relayforge.example/auth/github/callback [A]
+    GOOGLE_CALLBACK_URL=https://api.relayforge.example/auth/google/callback [A]
+    GITHUB_CALLBACK_URL=F/auth/github/callback                [B; replace F]
+    GOOGLE_CALLBACK_URL=F/auth/google/callback                [B; replace F]
+    SESSION_COOKIE_NAME=<stable name; recommend __Host-rf_session>
+    SESSION_COOKIE_SAME_SITE=lax                             [A and B]
+    GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET                 [existing values]
+    GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET                 [existing values]
+    DATABASE_URL, REDIS_URL, ENCRYPTION_KEY                    [existing secured values]
+    HOST=0.0.0.0 and PORT=<platform-required port>
+    Keep WORKER_DATABASE_URL and MIGRATION_DATABASE_URL on their separate,
+    restricted worker/migration identities. Do not share migration credentials
+    with the API. Do not put any secret in VITE_*.
+
+[ ] Set frontend BUILD variable VITE_API_URL=https://api.relayforge.example [A],
+    or VITE_API_URL=/ [B], then rebuild. None of these names contain secret values.
+    For B only, a proposed proxy needs fixed nonsecret API_ORIGIN and ASSETS binding;
+    assets.run_worker_first must cover the three route patterns. Preserve method,
+    body, query, browser Origin/Referer, Cookie, separate Set-Cookie headers,
+    Location, status and SSE streaming. Use redirect: manual and no auth caching.
+    Do not accept arbitrary upstream URLs or log credentials/code/state.
+
+[ ] Register providers against the exact public callback variables above.
+    Google Cloud OAuth WEB client: Authorized redirect URIs must exactly match
+    GOOGLE_CALLBACK_URL (scheme, host, port and path); configure authorized domains,
+    consent publishing/test users and the frontend JS origin where applicable.
+    GitHub OAuth App: Homepage URL=FRONTEND_URL; Authorization callback URL=
+    GITHUB_CALLBACK_URL. Disable wildcard matching; separate staging/provider apps
+    as needed. The client ID/secret pair must belong to that same environment.
+    For B callbacks must pass through F, not go directly to the Render hostname.
+
+[ ] Resolve the existing effect/Prisma vulnerability gate in a separate narrow PR.
+    Do not run npm audit fix --force: it proposes a breaking Prisma 6.12.0 downgrade.
+[ ] Confirm unit, PostgreSQL/Redis integration, Chromium, lint, typecheck, frontend
+    build, API build and git diff --check; verify new browser CI on a draft PR.
+[ ] Manually test LIVE Google and GitHub: new/returning users, verified-email linking,
+    denial, expiry/replay and overlapping attempts (latest same-provider attempt wins).
+[ ] On supported Chrome/Firefox/Safari with third-party cookies BLOCKED, verify
+    /v1/me after navigation/reload, HttpOnly+Secure cookies, logout/failure handling,
+    revoked/expired sessions, rejected origins and no URL/storage/message tokens.
+[ ] Confirm SSE closes within 30 seconds (or earlier absolute expiry) after removal
+    or revocation, then reconnect receives 401/403; account for reconnect delay.
+[ ] Decide separately whether previously exposed server sessions should be revoked.
+    No users' production sessions were revoked by the audit. Keep rollback cookie-only.
+
+Compatibility notes: omitted SESSION_COOKIE_SAME_SITE preserves legacy production
+None. Explicit none requires NODE_ENV=production/Secure; it does not override browser
+third-party-cookie blocking. Use lax with A/B. Existing local .env files were not
+changed: align frontend, API/public callbacks to one hostname (new defaults use
+localhost). For a local proxy use VITE_API_URL=/ and DEV_API_PROXY_TARGET=<loopback
+API>; configure callbacks for the public development frontend. Sessions have a fixed
+seven-day lifetime; re-sign-in is required after expiry, with no rolling refresh API.

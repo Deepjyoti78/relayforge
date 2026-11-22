@@ -8,16 +8,14 @@ interface SignInProps {
 }
 
 export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(() => new URLSearchParams(window.location.search).has('error'));
   const [authMode, setAuthMode] = useState<'signup' | 'login'>('signup');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [authError, setAuthError] = useState<string | null>(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.has('error') ? 'Sign-in failed or was cancelled. Please try again.' : null;
-  });
+  const [authError, setAuthError] = useState<string | null>(() =>
+    new URLSearchParams(window.location.search).has('error') ? 'Sign-in failed or was cancelled. Please try again.' : null);
   const [overviewModalOpen, setOverviewModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [manualToken, setManualToken] = useState('');

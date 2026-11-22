@@ -1,0 +1,33 @@
+Draft PR plan (not created or pushed)
+
+Title: Harden cookie-based OAuth and reauthorize organization streams
+Base: release/staging-deployment
+Head: codex/auth-security-review
+
+Problem and result:
+OAuth previously accepted unrelated hosting domains and delivered session tokens
+through URLs and frontend storage. OAuth callbacks now require the initiating
+browser's provider-specific HttpOnly state cookie, sessions remain in HttpOnly
+cookies, and exact frontend-origin checks protect redirects/CORS/cookie writes.
+Both SSE aliases check organization membership and bound connections so revocation
+and removal are rechecked. First-time Google/GitHub provisioning now sets the new
+user's transaction-local RLS identity before creating the initial owner workspace.
+
+Review sequence:
+1. Review shared cookie/state helpers, callback state consumption and PKCE behavior.
+2. Review minimal RLS provisioning change and verified identity-linking coverage.
+3. Review /v1/me cache policy, invalid-session clearing, logout error handling and
+   the explicit seven-day absolute lifetime (there is no rolling refresh endpoint).
+4. Review SSE 30-second authorization window and browser reconnect behavior.
+5. Review Playwright's test-only local provider/control server isolation and CI job.
+6. Review current diff against staging; unrelated navbar/typography changes through
+   248a01f were preserved. Refresh the base comparison if staging advances again.
+
+Evidence: docs/auth-security-review.txt lists commands, exact results and log paths.
+Release gates: docs/auth-release-checklist.txt lists environment names, exact provider
+callbacks and manual consent/browser-policy checks. Existing dependency audit remains
+red and should be fixed in a separate narrow dependency PR with generation/migration
+and runtime validation; do not approve a force downgrade to Prisma 6.
+
+After human review, push only the dedicated branch and open a DRAFT PR. Do not merge,
+auto-merge, deploy or change live secrets as part of this plan.
