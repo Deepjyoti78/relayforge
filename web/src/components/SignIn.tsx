@@ -225,253 +225,287 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       WebkitFontSmoothing: 'antialiased',
       MozOsxFontSmoothing: 'grayscale',
     }}>
-      {/* 1. TOP NAVBAR */}
+      {/* 1. TOP NAVBAR (Respan AI gateway style) */}
       <header className="rf-landing-header" style={{
         width: '100%',
-        backgroundColor: '#0D0C0B',
-        borderBottom: '1px solid rgba(235, 225, 208, 0.1)',
+        backgroundColor: '#000000',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         position: 'sticky',
         top: 0,
         zIndex: 50,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
       }}>
         <div className="rf-landing-container" style={{
-          maxWidth: '1480px',
+          maxWidth: '1440px',
           margin: '0 auto',
-          padding: '0 clamp(24px, 4vw, 56px)',
-          height: '74px',
+          padding: '0 clamp(20px, 3.5vw, 48px)',
+          height: '64px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           boxSizing: 'border-box',
           width: '100%',
         }}>
-          {/* Brand Logo & Name */}
-          <div className="rf-header-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div className="rf-brand-icon" style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
-              backgroundColor: '#F5F0E7',
-              color: '#0D0C0B',
+          {/* Brand Logo & Name: [.] RelayForge */}
+          <div
+            className="rf-header-brand"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 10px rgba(245, 240, 231, 0.15)',
-              flexShrink: 0,
+              gap: '8px',
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}
+          >
+            <span style={{
+              fontSize: '17px',
+              fontWeight: 700,
+              color: '#FFFFFF',
+              letterSpacing: '-0.02em',
+              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
             }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-              </svg>
-            </div>
-            <span className="rf-brand-title" style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '0.06em', color: '#F5F0E7', fontFamily: "'JetBrains Mono', monospace" }}>
-              RELAYFORGE
+              [.]
+            </span>
+            <span style={{
+              fontSize: '16px',
+              fontWeight: 600,
+              letterSpacing: '-0.02em',
+              color: '#FFFFFF',
+              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            }}>
+              RelayForge
             </span>
           </div>
 
-          {/* Center Navigation Links (Product, Solutions, Docs, Pricing, Resources) */}
+          {/* Center Navigation Links (Product, Solutions, Models, Docs, Pricing, Contact, Resources) */}
           <nav className="rf-landing-nav-center" style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '32px',
-            fontSize: '13px',
-            fontFamily: "'JetBrains Mono', monospace",
-            fontWeight: 600,
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-            color: '#B5AEA3',
+            gap: '28px',
+            fontSize: '13.5px',
+            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            fontWeight: 450,
+            letterSpacing: '-0.01em',
+            color: '#A1A1AA',
           }}>
             <button
-              onClick={() => { setAuthMode('signup'); setModalOpen(true); }}
+              onClick={() => {
+                const el = document.getElementById('features') || document.querySelector('section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                else { setAuthMode('signup'); setModalOpen(true); }
+              }}
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#B5AEA3',
-                fontSize: '13px',
-                fontFamily: "'JetBrains Mono', monospace",
-                fontWeight: 600,
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
+                color: '#A1A1AA',
+                fontSize: '13.5px',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontWeight: 450,
+                letterSpacing: '-0.01em',
                 cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
                 padding: '6px 0',
                 transition: 'color 0.15s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
             >
-              PRODUCT <span style={{ fontSize: '11px', opacity: 0.7 }}>⌄</span>
+              Product
             </button>
             <button
               onClick={() => { setAuthMode('signup'); setModalOpen(true); }}
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#B5AEA3',
-                fontSize: '13px',
-                fontFamily: "'JetBrains Mono', monospace",
-                fontWeight: 600,
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
+                color: '#A1A1AA',
+                fontSize: '13.5px',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontWeight: 450,
+                letterSpacing: '-0.01em',
                 cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
                 padding: '6px 0',
                 transition: 'color 0.15s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
             >
-              SOLUTIONS <span style={{ fontSize: '11px', opacity: 0.7 }}>⌄</span>
+              Solutions
+            </button>
+            <button
+              onClick={() => { setAuthMode('signup'); setModalOpen(true); }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#A1A1AA',
+                fontSize: '13.5px',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontWeight: 450,
+                letterSpacing: '-0.01em',
+                cursor: 'pointer',
+                padding: '6px 0',
+                transition: 'color 0.15s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
+            >
+              Models
             </button>
             <a
-              href="https://github.com"
+              href="https://github.com/Deepjyoti78/relayforge"
               target="_blank"
               rel="noreferrer"
               style={{
-                color: '#B5AEA3',
+                color: '#A1A1AA',
                 textDecoration: 'none',
-                fontSize: '13px',
-                fontFamily: "'JetBrains Mono', monospace",
-                fontWeight: 600,
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
+                fontSize: '13.5px',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontWeight: 450,
+                letterSpacing: '-0.01em',
+                padding: '6px 0',
                 transition: 'color 0.15s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
             >
-              DOCS
+              Docs
             </a>
             <button
               onClick={() => { setAuthMode('signup'); setModalOpen(true); }}
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#B5AEA3',
-                fontSize: '13px',
-                fontFamily: "'JetBrains Mono', monospace",
-                fontWeight: 600,
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
+                color: '#A1A1AA',
+                fontSize: '13.5px',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontWeight: 450,
+                letterSpacing: '-0.01em',
                 cursor: 'pointer',
                 padding: '6px 0',
                 transition: 'color 0.15s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
             >
-              PRICING
+              Pricing
             </button>
             <button
               onClick={() => { setAuthMode('signup'); setModalOpen(true); }}
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#B5AEA3',
-                fontSize: '13px',
-                fontFamily: "'JetBrains Mono', monospace",
-                fontWeight: 600,
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
+                color: '#A1A1AA',
+                fontSize: '13.5px',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontWeight: 450,
+                letterSpacing: '-0.01em',
                 cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
                 padding: '6px 0',
                 transition: 'color 0.15s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
             >
-              RESOURCES <span style={{ fontSize: '11px', opacity: 0.7 }}>⌄</span>
+              Contact
+            </button>
+            <button
+              onClick={() => { setAuthMode('signup'); setModalOpen(true); }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#A1A1AA',
+                fontSize: '13.5px',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontWeight: 450,
+                letterSpacing: '-0.01em',
+                cursor: 'pointer',
+                padding: '6px 0',
+                transition: 'color 0.15s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
+            >
+              Resources
             </button>
           </nav>
 
-          {/* Right Action Buttons & Mobile Hamburger */}
-          <div className="rf-header-right-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span className="rf-landing-badge" style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontSize: '11px',
-              fontFamily: "'JetBrains Mono', monospace",
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              color: '#B5AEA3',
-              backgroundColor: 'rgba(235, 225, 208, 0.05)',
-              padding: '6px 14px',
-              borderRadius: '999px',
-              border: '1px solid rgba(235, 225, 208, 0.14)',
-              fontWeight: 600,
-            }}>
-              <span style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                backgroundColor: '#E9D8B9',
-                boxShadow: '0 0 8px rgba(233, 216, 185, 0.8)',
-              }}></span>
-              PRODUCTION READY v1.0
-            </span>
-
-            <button
-              className="rf-header-signin-btn"
-              onClick={() => { setAuthMode('login'); setModalOpen(true); }}
+          {/* Right Action Buttons: GitHub 994, Book a demo, Dashboard */}
+          <div className="rf-header-right-actions" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <a
+              href="https://github.com/Deepjyoti78/relayforge"
+              target="_blank"
+              rel="noreferrer"
+              className="rf-header-github-btn"
               style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#F5F0E7',
-                fontSize: '13px',
-                fontFamily: "'JetBrains Mono', monospace",
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-                fontWeight: 600,
-                cursor: 'pointer',
-                padding: '8px 14px',
-                borderRadius: '8px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                color: '#A1A1AA',
+                fontSize: '13.5px',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontWeight: 500,
+                textDecoration: 'none',
+                padding: '6px 8px',
                 transition: 'color 0.15s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#E9D8B9'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
             >
-              SIGN IN
-            </button>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+              </svg>
+              <span>994</span>
+            </a>
 
             <button
-              id="open-signin-button"
-              className="rf-header-get-started-btn"
+              className="rf-header-book-demo-btn"
               onClick={() => { setAuthMode('signup'); setModalOpen(true); }}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#F5F0E7',
-                color: '#0D0C0B',
-                border: 'none',
-                borderRadius: '999px',
-                padding: '10px 22px',
-                fontSize: '12.5px',
-                fontFamily: "'JetBrains Mono', monospace",
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-                fontWeight: 700,
+                backgroundColor: '#18181B',
+                border: '1px solid rgba(255, 255, 255, 0.14)',
+                borderRadius: '8px',
+                color: '#FFFFFF',
+                fontSize: '13px',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontWeight: 500,
+                padding: '7px 15px',
                 cursor: 'pointer',
-                boxShadow: '0 2px 12px rgba(245, 240, 231, 0.12)',
-                transition: 'all 0.16s ease',
+                transition: 'all 0.15s ease',
+                whiteSpace: 'nowrap',
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#FFFFFF';
-                e.currentTarget.style.transform = 'translateY(-1px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#F5F0E7';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#27272A'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#18181B'; }}
             >
-              GET STARTED
+              Book a demo
+            </button>
+
+            <button
+              id="open-signin-button"
+              className="rf-header-dashboard-btn"
+              onClick={() => { setAuthMode('login'); setModalOpen(true); }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#FFFFFF',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#000000',
+                fontSize: '13px',
+                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontWeight: 600,
+                padding: '7px 16px',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+            >
+              Dashboard
             </button>
 
             {/* Mobile Hamburger Toggle Button */}
@@ -483,24 +517,24 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 display: 'none',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '40px',
-                height: '40px',
-                borderRadius: '10px',
-                backgroundColor: 'rgba(235, 225, 208, 0.06)',
-                border: '1px solid rgba(235, 225, 208, 0.16)',
-                color: '#F5F0E7',
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.14)',
+                color: '#FFFFFF',
                 cursor: 'pointer',
                 padding: 0,
                 transition: 'all 0.15s ease',
               }}
             >
               {mobileMenuOpen ? (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
               ) : (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="4" y1="6" x2="20" y2="6"></line>
                   <line x1="4" y1="12" x2="20" y2="12"></line>
                   <line x1="4" y1="18" x2="20" y2="18"></line>
@@ -514,93 +548,101 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         {mobileMenuOpen && (
           <div className="rf-mobile-drawer" style={{
             position: 'absolute',
-            top: '74px',
+            top: '64px',
             left: 0,
             right: 0,
-            backgroundColor: '#12110F',
-            borderBottom: '1px solid rgba(235, 225, 208, 0.16)',
+            backgroundColor: '#09090B',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
             padding: '20px 24px 28px',
             display: 'flex',
             flexDirection: 'column',
             gap: '16px',
             zIndex: 49,
-            boxShadow: '0 20px 48px rgba(0, 0, 0, 0.85)',
+            boxShadow: '0 20px 48px rgba(0, 0, 0, 0.95)',
+            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
           }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button
                 onClick={() => { setMobileMenuOpen(false); setModalOpen(true); }}
-                style={{ background: 'none', border: 'none', color: '#F5F0E7', textAlign: 'left', padding: '10px 4px', fontSize: '16px', fontWeight: 600, cursor: 'pointer' }}
+                style={{ background: 'none', border: 'none', color: '#FFFFFF', textAlign: 'left', padding: '10px 4px', fontSize: '15px', fontWeight: 500, cursor: 'pointer' }}
               >
                 Product
               </button>
               <button
                 onClick={() => { setMobileMenuOpen(false); setModalOpen(true); }}
-                style={{ background: 'none', border: 'none', color: '#F5F0E7', textAlign: 'left', padding: '10px 4px', fontSize: '16px', fontWeight: 600, cursor: 'pointer' }}
+                style={{ background: 'none', border: 'none', color: '#FFFFFF', textAlign: 'left', padding: '10px 4px', fontSize: '15px', fontWeight: 500, cursor: 'pointer' }}
               >
                 Solutions
               </button>
+              <button
+                onClick={() => { setMobileMenuOpen(false); setModalOpen(true); }}
+                style={{ background: 'none', border: 'none', color: '#FFFFFF', textAlign: 'left', padding: '10px 4px', fontSize: '15px', fontWeight: 500, cursor: 'pointer' }}
+              >
+                Models
+              </button>
               <a
-                href="https://github.com"
+                href="https://github.com/Deepjyoti78/relayforge"
                 target="_blank"
                 rel="noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                style={{ color: '#F5F0E7', textDecoration: 'none', padding: '10px 4px', fontSize: '15px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}
+                style={{ color: '#FFFFFF', textDecoration: 'none', padding: '10px 4px', fontSize: '15px', fontWeight: 500 }}
               >
-                DOCS
+                Docs
               </a>
               <button
                 onClick={() => { setMobileMenuOpen(false); setModalOpen(true); }}
-                style={{ background: 'none', border: 'none', color: '#F5F0E7', textAlign: 'left', padding: '10px 4px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.04em' }}
+                style={{ background: 'none', border: 'none', color: '#FFFFFF', textAlign: 'left', padding: '10px 4px', fontSize: '15px', fontWeight: 500, cursor: 'pointer' }}
               >
-                PRICING
+                Pricing
               </button>
               <button
-                onClick={() => { setMobileMenuOpen(false); setOverviewModalOpen(true); }}
-                style={{ background: 'none', border: 'none', color: '#E9D8B9', textAlign: 'left', padding: '10px 4px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}
+                onClick={() => { setMobileMenuOpen(false); setModalOpen(true); }}
+                style={{ background: 'none', border: 'none', color: '#FFFFFF', textAlign: 'left', padding: '10px 4px', fontSize: '15px', fontWeight: 500, cursor: 'pointer' }}
               >
-                <span>WATCH 90S OVERVIEW</span>
-                <span style={{ fontSize: '12px' }}>▶</span>
+                Contact
+              </button>
+              <button
+                onClick={() => { setMobileMenuOpen(false); setModalOpen(true); }}
+                style={{ background: 'none', border: 'none', color: '#FFFFFF', textAlign: 'left', padding: '10px 4px', fontSize: '15px', fontWeight: 500, cursor: 'pointer' }}
+              >
+                Resources
               </button>
             </div>
-            <div style={{ height: '1px', backgroundColor: 'rgba(235, 225, 208, 0.12)', margin: '4px 0' }} />
+            <div style={{ height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.1)', margin: '4px 0' }} />
             <div style={{ display: 'flex', gap: '12px' }}>
-              <button
-                onClick={() => { setMobileMenuOpen(false); setAuthMode('login'); setModalOpen(true); }}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  borderRadius: '999px',
-                  backgroundColor: 'rgba(235, 225, 208, 0.06)',
-                  border: '1px solid rgba(235, 225, 208, 0.2)',
-                  color: '#F5F0E7',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  fontFamily: "'JetBrains Mono', monospace",
-                }}
-              >
-                SIGN IN
-              </button>
               <button
                 onClick={() => { setMobileMenuOpen(false); setAuthMode('signup'); setModalOpen(true); }}
                 style={{
                   flex: 1,
-                  padding: '12px',
-                  borderRadius: '999px',
-                  backgroundColor: '#F5F0E7',
-                  border: 'none',
-                  color: '#0D0C0B',
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  backgroundColor: '#18181B',
+                  border: '1px solid rgba(255, 255, 255, 0.14)',
+                  color: '#FFFFFF',
                   fontSize: '13px',
-                  fontWeight: 700,
+                  fontWeight: 500,
                   cursor: 'pointer',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  fontFamily: "'JetBrains Mono', monospace",
+                  fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
                 }}
               >
-                GET STARTED
+                Book a demo
+              </button>
+              <button
+                onClick={() => { setMobileMenuOpen(false); setAuthMode('login'); setModalOpen(true); }}
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  backgroundColor: '#FFFFFF',
+                  border: 'none',
+                  color: '#000000',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                }}
+              >
+                Dashboard
               </button>
             </div>
           </div>
@@ -2599,13 +2641,12 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             font-size: 14.5px !important;
             letter-spacing: 0.01em !important;
           }
-          .rf-header-get-started-btn {
-            display: none !important;
-          }
-          .rf-header-signin-btn {
-            display: none !important;
-          }
-          .rf-landing-badge {
+          .rf-header-get-started-btn,
+          .rf-header-signin-btn,
+          .rf-landing-badge,
+          .rf-header-github-btn,
+          .rf-header-book-demo-btn,
+          .rf-header-dashboard-btn {
             display: none !important;
           }
           .rf-header-right-actions {
