@@ -19,6 +19,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [manualToken, setManualToken] = useState('');
   const [showManualInput, setShowManualInput] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const isDev = (import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
 
   const handleManualSubmit = (e: React.FormEvent) => {
@@ -212,6 +213,16 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
     return () => observer.disconnect();
   }, []);
 
+  // Dynamic Navbar Scroll Listener (shows separation border and subtle blur on scroll)
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -225,16 +236,18 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       WebkitFontSmoothing: 'antialiased',
       MozOsxFontSmoothing: 'grayscale',
     }}>
-      {/* 1. TOP NAVBAR (Respan AI gateway style) */}
+      {/* 1. TOP NAVBAR */}
       <header className="rf-landing-header" style={{
         width: '100%',
-        backgroundColor: '#000000',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        backgroundColor: isScrolled ? 'rgba(13, 12, 11, 0.85)' : '#0D0C0B',
+        borderBottom: isScrolled ? '1px solid rgba(235, 225, 208, 0.1)' : '1px solid transparent',
         position: 'sticky',
         top: 0,
         zIndex: 50,
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        backdropFilter: isScrolled ? 'blur(16px)' : 'none',
+        WebkitBackdropFilter: isScrolled ? 'blur(16px)' : 'none',
+        boxShadow: isScrolled ? '0 4px 20px rgba(0, 0, 0, 0.45)' : 'none',
+        transition: 'background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
       }}>
         <div className="rf-landing-container" style={{
           maxWidth: '1440px',
@@ -247,34 +260,47 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           boxSizing: 'border-box',
           width: '100%',
         }}>
-          {/* Brand Logo & Name: [.] RelayForge */}
+          {/* Brand Logo & Name: RelayForge */}
           <div
             className="rf-header-brand"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: '10px',
               cursor: 'pointer',
               userSelect: 'none',
             }}
           >
-            <span style={{
-              fontSize: '17px',
-              fontWeight: 700,
-              color: '#FFFFFF',
-              letterSpacing: '-0.02em',
-              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-            }}>
-              [.]
-            </span>
-            <span style={{
-              fontSize: '16px',
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-              color: '#FFFFFF',
-              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-            }}>
+            <div
+              className="rf-brand-icon"
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                backgroundColor: '#F5F0E7',
+                color: '#0D0C0B',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 2px 8px rgba(245, 240, 231, 0.16)',
+                flexShrink: 0,
+              }}
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <span
+              className="rf-brand-title"
+              style={{
+                fontSize: '16px',
+                fontWeight: 650,
+                letterSpacing: '-0.015em',
+                color: '#F5F0E7',
+                fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+              }}
+            >
               RelayForge
             </span>
           </div>
@@ -551,8 +577,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             top: '64px',
             left: 0,
             right: 0,
-            backgroundColor: '#09090B',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+            backgroundColor: '#0D0C0B',
+            borderBottom: '1px solid rgba(235, 225, 208, 0.12)',
             padding: '20px 24px 28px',
             display: 'flex',
             flexDirection: 'column',
