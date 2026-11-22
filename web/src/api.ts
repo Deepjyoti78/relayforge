@@ -121,11 +121,32 @@ export function getApiBaseUrl(): string {
   }
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
-    if (host.includes('relayforge-staging-web.onrender.com') || host.includes('onrender.com')) {
+    if (
+      host.includes('relayforge-staging-web.onrender.com') ||
+      host.includes('onrender.com') ||
+      host.includes('workers.dev') ||
+      host.includes('pages.dev')
+    ) {
       return 'https://relayforge-staging-api.onrender.com';
     }
   }
   return '';
+}
+
+export function warmupApi(): void {
+  try {
+    const base = getApiBaseUrl();
+    if (base) {
+      void fetch(`${base}/health/live`, { mode: 'no-cors' }).catch(() => {});
+    }
+  } catch {
+    // Ignore warmup errors
+  }
+}
+
+// Automatically trigger background warmup when module loads
+if (typeof window !== 'undefined') {
+  warmupApi();
 }
 
 export function getAuthStartUrl(provider: 'github' | 'google'): string {
