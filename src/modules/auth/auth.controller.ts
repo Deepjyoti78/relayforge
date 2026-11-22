@@ -44,34 +44,55 @@ export class AuthController {
     @Query('code') code: string,
     @Query('state') state: string,
     @Res() res: Response,
+    @Query('error') error?: string,
+    @Query('error_description') errorDescription?: string,
   ): Promise<void> {
-    const { user, redirectUri } = await this.gitHubOAuth.handleCallback(code, state);
-    const { token, session } = await this.sessionService.createSession(user.id);
-
-    // Calculate maxAge in seconds
-    const maxAge = Math.floor((session.expiresAt.getTime() - Date.now()) / 1000);
-    const cookieHeader = serializeCookie(this.config.values.sessionCookieName, token, {
-      httpOnly: true,
-      secure: this.config.values.environment === 'production',
-      sameSite: this.config.values.environment === 'production' ? 'None' : 'Lax',
-      path: '/',
-      maxAge,
-      expires: session.expiresAt,
-    });
-
-    res.setHeader('Set-Cookie', cookieHeader);
-
-    // Pass token in redirect URL for SPAs across subdomains (e.g. onrender.com)
-    let destination = redirectUri;
-    try {
-      const redirectUrl = new URL(redirectUri);
-      redirectUrl.searchParams.set('token', token);
-      destination = redirectUrl.toString();
-    } catch {
-      destination = redirectUri;
+    if (error) {
+      const fallbackUrl = new URL(this.config.values.frontendUrl);
+      fallbackUrl.searchParams.set('error', error);
+      if (errorDescription) fallbackUrl.searchParams.set('error_description', errorDescription);
+      return res.redirect(302, fallbackUrl.toString());
     }
 
-    res.redirect(302, destination);
+    try {
+      const { user, redirectUri } = await this.gitHubOAuth.handleCallback(code, state);
+      const { token, session } = await this.sessionService.createSession(user.id);
+
+      // Calculate maxAge in seconds
+      const maxAge = Math.floor((session.expiresAt.getTime() - Date.now()) / 1000);
+      const cookieHeader = serializeCookie(this.config.values.sessionCookieName, token, {
+        httpOnly: true,
+        secure: this.config.values.environment === 'production',
+        sameSite: this.config.values.environment === 'production' ? 'None' : 'Lax',
+        path: '/',
+        maxAge,
+        expires: session.expiresAt,
+      });
+
+      res.setHeader('Set-Cookie', cookieHeader);
+
+      // Pass token in redirect URL for SPAs across subdomains (e.g. onrender.com)
+      let destination = redirectUri;
+      try {
+        const redirectUrl = new URL(redirectUri);
+        redirectUrl.searchParams.set('token', token);
+        destination = redirectUrl.toString();
+      } catch {
+        destination = redirectUri;
+      }
+
+      res.redirect(302, destination);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'GitHub authentication failed';
+      let dest = this.config.values.frontendUrl;
+      try {
+        const fallbackUrl = new URL(dest);
+        fallbackUrl.searchParams.set('error', 'github_auth_failed');
+        fallbackUrl.searchParams.set('error_description', msg);
+        dest = fallbackUrl.toString();
+      } catch {}
+      res.redirect(302, dest);
+    }
   }
 
   @Get('auth/google/start')
@@ -85,34 +106,55 @@ export class AuthController {
     @Query('code') code: string,
     @Query('state') state: string,
     @Res() res: Response,
+    @Query('error') error?: string,
+    @Query('error_description') errorDescription?: string,
   ): Promise<void> {
-    const { user, redirectUri } = await this.googleOAuth.handleCallback(code, state);
-    const { token, session } = await this.sessionService.createSession(user.id);
-
-    // Calculate maxAge in seconds
-    const maxAge = Math.floor((session.expiresAt.getTime() - Date.now()) / 1000);
-    const cookieHeader = serializeCookie(this.config.values.sessionCookieName, token, {
-      httpOnly: true,
-      secure: this.config.values.environment === 'production',
-      sameSite: this.config.values.environment === 'production' ? 'None' : 'Lax',
-      path: '/',
-      maxAge,
-      expires: session.expiresAt,
-    });
-
-    res.setHeader('Set-Cookie', cookieHeader);
-
-    // Pass token in redirect URL for SPAs across subdomains (e.g. onrender.com)
-    let destination = redirectUri;
-    try {
-      const redirectUrl = new URL(redirectUri);
-      redirectUrl.searchParams.set('token', token);
-      destination = redirectUrl.toString();
-    } catch {
-      destination = redirectUri;
+    if (error) {
+      const fallbackUrl = new URL(this.config.values.frontendUrl);
+      fallbackUrl.searchParams.set('error', error);
+      if (errorDescription) fallbackUrl.searchParams.set('error_description', errorDescription);
+      return res.redirect(302, fallbackUrl.toString());
     }
 
-    res.redirect(302, destination);
+    try {
+      const { user, redirectUri } = await this.googleOAuth.handleCallback(code, state);
+      const { token, session } = await this.sessionService.createSession(user.id);
+
+      // Calculate maxAge in seconds
+      const maxAge = Math.floor((session.expiresAt.getTime() - Date.now()) / 1000);
+      const cookieHeader = serializeCookie(this.config.values.sessionCookieName, token, {
+        httpOnly: true,
+        secure: this.config.values.environment === 'production',
+        sameSite: this.config.values.environment === 'production' ? 'None' : 'Lax',
+        path: '/',
+        maxAge,
+        expires: session.expiresAt,
+      });
+
+      res.setHeader('Set-Cookie', cookieHeader);
+
+      // Pass token in redirect URL for SPAs across subdomains (e.g. onrender.com)
+      let destination = redirectUri;
+      try {
+        const redirectUrl = new URL(redirectUri);
+        redirectUrl.searchParams.set('token', token);
+        destination = redirectUrl.toString();
+      } catch {
+        destination = redirectUri;
+      }
+
+      res.redirect(302, destination);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Google authentication failed';
+      let dest = this.config.values.frontendUrl;
+      try {
+        const fallbackUrl = new URL(dest);
+        fallbackUrl.searchParams.set('error', 'google_auth_failed');
+        fallbackUrl.searchParams.set('error_description', msg);
+        dest = fallbackUrl.toString();
+      } catch {}
+      res.redirect(302, dest);
+    }
   }
 
   @Post('v1/auth/logout')

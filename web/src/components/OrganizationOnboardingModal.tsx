@@ -14,61 +14,24 @@ interface OrganizationOnboardingModalProps {
   onSkip?: () => void;
 }
 
-const WORKLOAD_TYPES = [
-  {
-    id: 'fintech',
-    title: 'Fintech & Transactional Banking',
-    badge: 'PCI-DSS',
-    desc: 'Strict idempotency guarantees, zero data loss, sub-second ledger and payout webhooks.',
-  },
-  {
-    id: 'saas',
-    title: 'SaaS & Cloud Microservices',
-    badge: 'EVENT-DRIVEN',
-    desc: 'High-throughput fanout, multi-tenant workspace separation, automated retry escalation.',
-  },
-  {
-    id: 'ecommerce',
-    title: 'E-Commerce & High-Volume Retail',
-    badge: 'SURGE-PROOF',
-    desc: 'Buffered ingest during flash sales, automated order sync, Shopify & Stripe pipelines.',
-  },
-  {
-    id: 'ai-agents',
-    title: 'AI Agents & Bounded Workflows',
-    badge: 'STEP DURABILITY',
-    desc: 'Multi-step stateful LLM tool execution, webhook callbacks, long-running agentic tasks.',
-  },
-  {
-    id: 'healthcare',
-    title: 'Healthcare & Telehealth Data Relays',
-    badge: 'HIPAA-READY',
-    desc: 'Encrypted payload transit, strict audit logging, automated failover into dead-letter queues.',
-  },
+const WORKLOAD_OPTIONS = [
+  { id: 'fintech', label: 'Fintech & Transactional Banking (PCI-DSS)' },
+  { id: 'saas', label: 'SaaS & Cloud Microservices (Event-Driven)' },
+  { id: 'ecommerce', label: 'E-Commerce & High-Volume Retail (Surge-Proof)' },
+  { id: 'ai-agents', label: 'AI Agents & Durable Workflows' },
+  { id: 'healthcare', label: 'Healthcare & Telehealth Relays (HIPAA-Ready)' },
 ];
 
-const ARCHITECTURE_TIERS = [
-  {
-    id: 'zero-drop',
-    name: 'High-Assurance Transactional Outbox (Recommended)',
-    desc: 'ACID-guaranteed delivery via PostgreSQL SKIP LOCKED leases with Dead-Letter recovery.',
-  },
-  {
-    id: 'low-latency',
-    name: 'Ultra-Low Latency Direct Relay',
-    desc: 'Optimized for sub-50ms dispatch to private VPC endpoints and edge webhooks.',
-  },
-  {
-    id: 'fifo-workflows',
-    name: 'Strict FIFO Sequential Bounded Workflows',
-    desc: 'Enforces strict step execution order with idempotency keys and step-level timeouts.',
-  },
+const ARCHITECTURE_OPTIONS = [
+  { id: 'zero-drop', label: 'Transactional Outbox (Recommended)' },
+  { id: 'low-latency', label: 'Low-Latency Direct Relay' },
+  { id: 'fifo-workflows', label: 'Strict FIFO Sequential Workflows' },
 ];
 
-const VOLUME_TIERS = [
-  { id: 'starter', label: '< 100k events / mo', sub: 'Standard SLA' },
-  { id: 'scale', label: '100k – 2.5M events / mo', sub: 'High Concurrency' },
-  { id: 'enterprise', label: '2.5M+ events / mo', sub: 'Dedicated Isolation' },
+const VOLUME_OPTIONS = [
+  { id: 'starter', label: '< 100k events/mo' },
+  { id: 'scale', label: '100k – 2.5M events/mo' },
+  { id: 'enterprise', label: '2.5M+ events/mo' },
 ];
 
 export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalProps> = ({
@@ -79,6 +42,7 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
 }) => {
   const [orgName, setOrgName] = useState(userDisplayName ? `${userDisplayName}'s Org` : '');
   const [customSlug, setCustomSlug] = useState('');
+  const [isEditingSlug, setIsEditingSlug] = useState(false);
   const [selectedWorkload, setSelectedWorkload] = useState('fintech');
   const [selectedTier, setSelectedTier] = useState('zero-drop');
   const [selectedVolume, setSelectedVolume] = useState('scale');
@@ -131,68 +95,67 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
         right: 0,
         bottom: 0,
         backgroundColor: 'rgba(0, 0, 0, 0.88)',
-        backdropFilter: 'blur(10px)',
+        backdropFilter: 'blur(8px)',
         zIndex: 9999,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '20px',
-        overflowY: 'auto',
+        padding: '16px',
+        overflow: 'hidden',
       }}
     >
       <div
         style={{
           width: '100%',
-          maxWidth: '680px',
+          maxWidth: '460px',
           backgroundColor: '#0A0A0A',
-          border: '1px solid rgba(255, 255, 255, 0.14)',
-          borderRadius: '16px',
-          padding: '36px',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          borderRadius: '14px',
+          padding: '24px 26px',
           color: '#FFFFFF',
-          boxShadow: '0 24px 64px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.04)',
+          boxShadow: '0 24px 60px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.05)',
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-          maxHeight: '90vh',
-          overflowY: 'auto',
+          overflow: 'hidden',
+          boxSizing: 'border-box',
         }}
       >
         {/* Header */}
-        <div style={{ marginBottom: '28px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
             <span
               style={{
                 fontFamily: 'monospace',
-                fontSize: '11px',
+                fontSize: '10px',
                 letterSpacing: '0.12em',
                 color: '#A1A1AA',
                 textTransform: 'uppercase',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                padding: '2px 8px',
-                borderRadius: '4px',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                padding: '2px 6px',
+                borderRadius: '3px',
               }}
             >
-              Workspace Setup
+              WORKSPACE SETUP
             </span>
-            <span style={{ fontSize: '12px', color: '#71717A' }}>•</span>
-            <span style={{ fontSize: '12px', color: '#71717A' }}>Multi-Tenant Architecture</span>
+            <span style={{ fontSize: '11px', color: '#52525B' }}>• Multi-Tenant Namespace</span>
           </div>
-          <h2 style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.02em', margin: 0 }}>
-            Create Your Production Organization
+          <h2 style={{ fontSize: '18px', fontWeight: 600, letterSpacing: '-0.02em', margin: 0, color: '#FFFFFF' }}>
+            Create Your Organization
           </h2>
-          <p style={{ fontSize: '13.5px', color: '#A1A1AA', marginTop: '6px', lineHeight: 1.5 }}>
-            Configure your tenant namespace, industry workload parameters, and delivery resilience settings before entering the RelayForge developer console.
+          <p style={{ fontSize: '12.5px', color: '#71717A', marginTop: '4px', marginBottom: 0, lineHeight: 1.4 }}>
+            Configure your workspace namespace and delivery engine profile.
           </p>
         </div>
 
         {errorMessage && (
           <div
             style={{
-              padding: '12px 16px',
-              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              padding: '10px 12px',
+              backgroundColor: 'rgba(239, 68, 68, 0.12)',
               border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '8px',
+              borderRadius: '6px',
               color: '#F87171',
-              fontSize: '13px',
-              marginBottom: '20px',
+              fontSize: '12px',
+              marginBottom: '16px',
             }}
           >
             {errorMessage}
@@ -200,25 +163,26 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
         )}
 
         <form onSubmit={handleSubmit}>
-          {/* Question 1: Organization Name */}
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#E4E4E7', marginBottom: '8px' }}>
-              1. Organization or Company Name <span style={{ color: '#F87171' }}>*</span>
+          {/* Organization Name & Slug */}
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#D4D4D8', marginBottom: '6px' }}>
+              Organization Name <span style={{ color: '#F87171' }}>*</span>
             </label>
             <input
               type="text"
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
-              placeholder="e.g. Acme Financial, Stripe Relays, CloudHealth"
+              placeholder="e.g. Acme Relays"
               required
+              autoFocus
               style={{
                 width: '100%',
-                padding: '12px 14px',
+                padding: '9px 12px',
                 backgroundColor: '#121214',
                 border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '8px',
+                borderRadius: '6px',
                 color: '#FFFFFF',
-                fontSize: '14px',
+                fontSize: '13px',
                 outline: 'none',
                 boxSizing: 'border-box',
                 transition: 'border-color 0.15s ease',
@@ -226,175 +190,211 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
               onFocus={(e) => (e.target.style.borderColor = '#FFFFFF')}
               onBlur={(e) => (e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)')}
             />
-          </div>
 
-          {/* Question 2: Workspace Identifier / Slug */}
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#E4E4E7', marginBottom: '6px' }}>
-              2. Workspace Slug / URL Namespace
-            </label>
+            {/* Inline Slug Preview & Edit */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                backgroundColor: '#121214',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '8px',
-                overflow: 'hidden',
+                justifyContent: 'space-between',
+                marginTop: '5px',
+                fontSize: '11px',
+                color: '#71717A',
+                fontFamily: 'monospace',
               }}
             >
-              <span style={{ padding: '0 12px', fontSize: '13px', color: '#71717A', fontFamily: 'monospace' }}>
-                relayforge.dev/org/
+              <span>
+                Namespace: <span style={{ color: '#A1A1AA' }}>relayforge.dev/org/{isEditingSlug ? '' : (generatedSlug || 'my-org')}</span>
               </span>
+              <button
+                type="button"
+                onClick={() => setIsEditingSlug(!isEditingSlug)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#A1A1AA',
+                  fontSize: '10px',
+                  cursor: 'pointer',
+                  padding: 0,
+                  textDecoration: 'underline',
+                }}
+              >
+                {isEditingSlug ? 'Done' : 'Customize'}
+              </button>
+            </div>
+
+            {isEditingSlug && (
               <input
                 type="text"
                 value={customSlug || generatedSlug}
                 onChange={(e) => setCustomSlug(e.target.value)}
-                placeholder="acme-corp"
+                placeholder="custom-slug"
                 style={{
-                  flex: 1,
-                  padding: '12px 14px 12px 0',
-                  backgroundColor: 'transparent',
-                  border: 'none',
+                  width: '100%',
+                  marginTop: '6px',
+                  padding: '6px 10px',
+                  backgroundColor: '#161618',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '4px',
                   color: '#FFFFFF',
-                  fontSize: '13px',
+                  fontSize: '11.5px',
                   fontFamily: 'monospace',
                   outline: 'none',
+                  boxSizing: 'border-box',
                 }}
               />
-            </div>
-            <p style={{ fontSize: '11.5px', color: '#71717A', marginTop: '5px', marginBottom: 0 }}>
-              Unique tenant isolation key used in webhook ingestion endpoints and API key scopes.
-            </p>
+            )}
           </div>
 
-          {/* Question 3: Workload & Industry Domain */}
-          <div style={{ marginBottom: '26px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#E4E4E7', marginBottom: '10px' }}>
-              3. Select Primary Workload & Industry Domain <span style={{ color: '#F87171' }}>*</span>
+          {/* Industry Workload Dropdown */}
+          <div style={{ marginBottom: '14px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#D4D4D8', marginBottom: '6px' }}>
+              Workload Profile
             </label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {WORKLOAD_TYPES.map((type) => {
-                const isSelected = selectedWorkload === type.id;
-                return (
-                  <div
-                    key={type.id}
-                    onClick={() => setSelectedWorkload(type.id)}
-                    style={{
-                      padding: '12px 16px',
-                      borderRadius: '8px',
-                      border: `1px solid ${isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)'}`,
-                      backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.05)' : '#121214',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
-                        <span style={{ fontSize: '13.5px', fontWeight: 500, color: isSelected ? '#FFFFFF' : '#E4E4E7' }}>
-                          {type.title}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            fontFamily: 'monospace',
-                            padding: '1px 6px',
-                            borderRadius: '4px',
-                            backgroundColor: isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.08)',
-                            color: isSelected ? '#000000' : '#A1A1AA',
-                            fontWeight: 600,
-                          }}
-                        >
-                          {type.badge}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '12px', color: '#71717A', lineHeight: 1.4 }}>{type.desc}</div>
-                    </div>
-                    <div
-                      style={{
-                        width: '16px',
-                        height: '16px',
-                        borderRadius: '50%',
-                        border: `2px solid ${isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)'}`,
-                        backgroundColor: isSelected ? '#FFFFFF' : 'transparent',
-                        marginLeft: '12px',
-                        flexShrink: 0,
-                      }}
-                    />
-                  </div>
-                );
-              })}
+            <div style={{ position: 'relative' }}>
+              <select
+                value={selectedWorkload}
+                onChange={(e) => setSelectedWorkload(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '9px 12px',
+                  backgroundColor: '#121214',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  borderRadius: '6px',
+                  color: '#FFFFFF',
+                  fontSize: '12.5px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  cursor: 'pointer',
+                  appearance: 'none',
+                  WebkitAppearance: 'none',
+                }}
+              >
+                {WORKLOAD_OPTIONS.map((opt) => (
+                  <option key={opt.id} value={opt.id} style={{ backgroundColor: '#18181B', color: '#FFFFFF' }}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <div
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
+                  fontSize: '10px',
+                  color: '#71717A',
+                }}
+              >
+                ▼
+              </div>
             </div>
           </div>
 
-          {/* Question 4: Architecture Tier */}
-          <div style={{ marginBottom: '26px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#E4E4E7', marginBottom: '8px' }}>
-              4. Delivery Engine Resilience Architecture
-            </label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {ARCHITECTURE_TIERS.map((tier) => {
-                const isSelected = selectedTier === tier.id;
-                return (
-                  <div
-                    key={tier.id}
-                    onClick={() => setSelectedTier(tier.id)}
-                    style={{
-                      padding: '10px 14px',
-                      borderRadius: '8px',
-                      border: `1px solid ${isSelected ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.08)'}`,
-                      backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.04)' : '#121214',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <div style={{ fontSize: '13px', fontWeight: 500, color: isSelected ? '#FFFFFF' : '#D4D4D8' }}>
-                      {tier.name}
-                    </div>
-                    <div style={{ fontSize: '11.5px', color: '#71717A', marginTop: '2px' }}>{tier.desc}</div>
-                  </div>
-                );
-              })}
+          {/* 2-Column Compact Row: Architecture Tier & Scale */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '22px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 500, color: '#A1A1AA', marginBottom: '5px' }}>
+                Engine Tier
+              </label>
+              <div style={{ position: 'relative' }}>
+                <select
+                  value={selectedTier}
+                  onChange={(e) => setSelectedTier(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    backgroundColor: '#121214',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    borderRadius: '6px',
+                    color: '#FFFFFF',
+                    fontSize: '11.5px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    cursor: 'pointer',
+                    appearance: 'none',
+                    WebkitAppearance: 'none',
+                  }}
+                >
+                  {ARCHITECTURE_OPTIONS.map((tier) => (
+                    <option key={tier.id} value={tier.id} style={{ backgroundColor: '#18181B', color: '#FFFFFF' }}>
+                      {tier.label}
+                    </option>
+                  ))}
+                </select>
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    pointerEvents: 'none',
+                    fontSize: '9px',
+                    color: '#71717A',
+                  }}
+                >
+                  ▼
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 500, color: '#A1A1AA', marginBottom: '5px' }}>
+                Monthly Scale
+              </label>
+              <div style={{ position: 'relative' }}>
+                <select
+                  value={selectedVolume}
+                  onChange={(e) => setSelectedVolume(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    backgroundColor: '#121214',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    borderRadius: '6px',
+                    color: '#FFFFFF',
+                    fontSize: '11.5px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    cursor: 'pointer',
+                    appearance: 'none',
+                    WebkitAppearance: 'none',
+                  }}
+                >
+                  {VOLUME_OPTIONS.map((vol) => (
+                    <option key={vol.id} value={vol.id} style={{ backgroundColor: '#18181B', color: '#FFFFFF' }}>
+                      {vol.label}
+                    </option>
+                  ))}
+                </select>
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    pointerEvents: 'none',
+                    fontSize: '9px',
+                    color: '#71717A',
+                  }}
+                >
+                  ▼
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Question 5: Estimated Volume */}
-          <div style={{ marginBottom: '32px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#E4E4E7', marginBottom: '8px' }}>
-              5. Projected Monthly Webhook Scale
-            </label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-              {VOLUME_TIERS.map((v) => {
-                const isSelected = selectedVolume === v.id;
-                return (
-                  <div
-                    key={v.id}
-                    onClick={() => setSelectedVolume(v.id)}
-                    style={{
-                      padding: '10px 12px',
-                      borderRadius: '8px',
-                      border: `1px solid ${isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)'}`,
-                      backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.06)' : '#121214',
-                      cursor: 'pointer',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <div style={{ fontSize: '12.5px', fontWeight: 500, color: isSelected ? '#FFFFFF' : '#D4D4D8' }}>
-                      {v.label}
-                    </div>
-                    <div style={{ fontSize: '10.5px', color: '#71717A', marginTop: '2px', fontFamily: 'monospace' }}>
-                      {v.sub}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '16px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+          {/* Action Buttons */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingTop: '14px',
+              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            }}
+          >
             {onSkip ? (
               <button
                 type="button"
@@ -403,12 +403,15 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
                   background: 'none',
                   border: 'none',
                   color: '#71717A',
-                  fontSize: '13px',
+                  fontSize: '12px',
                   cursor: 'pointer',
-                  padding: '8px 12px',
+                  padding: '6px 8px',
+                  transition: 'color 0.15s ease',
                 }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#71717A')}
               >
-                Skip to Default Console →
+                Skip for now
               </button>
             ) : <div />}
 
@@ -419,20 +422,20 @@ export const OrganizationOnboardingModal: React.FC<OrganizationOnboardingModalPr
                 backgroundColor: '#FFFFFF',
                 color: '#000000',
                 border: 'none',
-                borderRadius: '8px',
-                padding: '12px 24px',
-                fontSize: '13.5px',
+                borderRadius: '6px',
+                padding: '9px 18px',
+                fontSize: '12.5px',
                 fontWeight: 600,
-                letterSpacing: '0.02em',
+                letterSpacing: '0.01em',
                 cursor: isSubmitting || !orgName.trim() ? 'not-allowed' : 'pointer',
                 opacity: isSubmitting || !orgName.trim() ? 0.6 : 1,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '6px',
                 transition: 'opacity 0.15s ease',
               }}
             >
-              {isSubmitting ? 'PROVISIONING WORKSPACE...' : 'LAUNCH WORKSPACE & OPEN CONSOLE →'}
+              {isSubmitting ? 'Provisioning...' : 'Launch Workspace →'}
             </button>
           </div>
         </form>

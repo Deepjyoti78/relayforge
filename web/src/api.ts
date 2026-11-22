@@ -121,16 +121,12 @@ export function getApiBaseUrl(): string {
   }
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
-    if (
-      host.includes('relayforge-staging-web.onrender.com') ||
-      host.includes('onrender.com') ||
-      host.includes('workers.dev') ||
-      host.includes('pages.dev')
-    ) {
-      return 'https://relayforge-staging-api.onrender.com';
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return 'http://127.0.0.1:3100';
     }
+    return 'https://relayforge-staging-api.onrender.com';
   }
-  return '';
+  return 'https://relayforge-staging-api.onrender.com';
 }
 
 export function warmupApi(): void {
