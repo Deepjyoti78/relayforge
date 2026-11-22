@@ -511,7 +511,7 @@ export const App: React.FC = () => {
           onOpenProfile={() => setProfileModalOpen(true)}
         />
 
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#F8F9FA', minWidth: 0, width: '100%' }}>
+        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: 'var(--bg-main)', minWidth: 0, width: '100%', transition: 'background-color 0.2s ease' }}>
           {activeOrg ? (
             <OrgManagement
               organization={activeOrg}
@@ -534,16 +534,16 @@ export const App: React.FC = () => {
               justifyContent: 'center',
               padding: '40px 20px',
               textAlign: 'center',
-              backgroundColor: '#F8F9FA',
+              backgroundColor: 'var(--bg-main)',
             }}>
               <div style={{
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #E5E7EB',
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--border-main)',
                 borderRadius: '16px',
                 padding: '40px 32px',
                 maxWidth: '440px',
                 width: '100%',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                boxShadow: 'var(--shadow-card)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -552,13 +552,13 @@ export const App: React.FC = () => {
                   width: '52px',
                   height: '52px',
                   borderRadius: '12px',
-                  backgroundColor: '#F4F4F6',
-                  border: '1px solid #E5E7EB',
+                  backgroundColor: 'var(--bg-input)',
+                  border: '1px solid var(--border-main)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: '16px',
-                  color: '#09090B',
+                  color: 'var(--text-primary)',
                 }}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -567,10 +567,10 @@ export const App: React.FC = () => {
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                   </svg>
                 </div>
-                <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: '#09090B' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px', color: 'var(--text-primary)' }}>
                   No Organization Selected
                 </h2>
-                <p style={{ fontSize: '13px', margin: 0, color: '#71717A', lineHeight: 1.5 }}>
+                <p style={{ fontSize: '13px', margin: 0, color: 'var(--text-muted)', lineHeight: 1.5 }}>
                   Create or select an organization from the sidebar to manage identity, roles, and API keys.
                 </p>
                 <button
@@ -581,15 +581,15 @@ export const App: React.FC = () => {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '8px',
-                    backgroundColor: '#09090B',
-                    color: '#FFFFFF',
+                    backgroundColor: 'var(--accent-primary)',
+                    color: 'var(--accent-foreground)',
                     border: 'none',
                     borderRadius: '8px',
                     padding: '10px 22px',
                     fontSize: '13.5px',
                     fontWeight: 600,
                     cursor: 'pointer',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                    boxShadow: 'var(--shadow-card)',
                     transition: 'opacity 0.15s ease',
                   }}
                   onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
@@ -625,23 +625,23 @@ export const App: React.FC = () => {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #E5E7EB',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-main)',
               borderRadius: '16px',
               maxWidth: '440px',
               width: '100%',
               padding: '28px 24px',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#09090B' }}>Create Organization</h3>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>Create Organization</h3>
               <button
                 onClick={() => setCreateOrgModalOpen(false)}
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#71717A',
+                  color: 'var(--text-muted)',
                   fontSize: '20px',
                   cursor: 'pointer',
                   padding: '4px',
@@ -651,19 +651,19 @@ export const App: React.FC = () => {
                 ×
               </button>
             </div>
-            <p style={{ margin: '0 0 20px', fontSize: '13px', color: '#71717A', lineHeight: 1.5 }}>
+            <p style={{ margin: '0 0 20px', fontSize: '13px', color: 'var(--text-muted)', lineHeight: 1.5 }}>
               Organizations isolate tenant identities, API keys, webhook endpoints, and workflows.
             </p>
 
             {modalOrgError && (
-              <div style={{ padding: '10px 12px', borderRadius: '8px', backgroundColor: '#FEE2E2', border: '1px solid #FCA5A5', color: '#DC2626', fontSize: '12px', marginBottom: '16px' }}>
+              <div style={{ padding: '10px 12px', borderRadius: '8px', backgroundColor: 'rgba(220, 38, 38, 0.1)', border: '1px solid #DC2626', color: '#DC2626', fontSize: '12px', marginBottom: '16px' }}>
                 {modalOrgError}
               </div>
             )}
 
             <form onSubmit={handleModalCreateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#09090B', marginBottom: '6px' }}>Organization Name *</label>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>Organization Name *</label>
                 <input
                   type="text"
                   required
@@ -674,9 +674,9 @@ export const App: React.FC = () => {
                     width: '100%',
                     padding: '10px 12px',
                     borderRadius: '8px',
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #E5E7EB',
-                    color: '#09090B',
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-main)',
+                    color: 'var(--text-primary)',
                     fontSize: '13px',
                     boxSizing: 'border-box',
                   }}
@@ -684,7 +684,7 @@ export const App: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#09090B', marginBottom: '6px' }}>Custom Slug (Optional)</label>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>Custom Slug (Optional)</label>
                 <input
                   type="text"
                   placeholder="e.g. acme-corp"
@@ -694,9 +694,9 @@ export const App: React.FC = () => {
                     width: '100%',
                     padding: '10px 12px',
                     borderRadius: '8px',
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #E5E7EB',
-                    color: '#09090B',
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-main)',
+                    color: 'var(--text-primary)',
                     fontSize: '13px',
                     boxSizing: 'border-box',
                   }}
@@ -709,10 +709,10 @@ export const App: React.FC = () => {
                   onClick={() => setCreateOrgModalOpen(false)}
                   style={{
                     padding: '9px 16px',
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #E5E7EB',
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-main)',
                     borderRadius: '8px',
-                    color: '#09090B',
+                    color: 'var(--text-primary)',
                     fontSize: '13px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -725,10 +725,10 @@ export const App: React.FC = () => {
                   disabled={modalOrgLoading}
                   style={{
                     padding: '9px 20px',
-                    backgroundColor: '#09090B',
+                    backgroundColor: 'var(--accent-primary)',
                     border: 'none',
                     borderRadius: '8px',
-                    color: '#FFFFFF',
+                    color: 'var(--accent-foreground)',
                     fontSize: '13px',
                     fontWeight: 600,
                     cursor: 'pointer',

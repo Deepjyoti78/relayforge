@@ -119,13 +119,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       borderRadius: '8px',
       fontSize: '12.5px',
       fontWeight: isActive ? 600 : 500,
-      backgroundColor: isActive ? '#FFFFFF' : 'transparent',
-      color: isActive ? '#09090B' : '#52525B',
-      border: isActive ? '1px solid #E5E7EB' : '1px solid transparent',
+      backgroundColor: isActive ? 'var(--bg-card)' : 'transparent',
+      color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+      border: isActive ? '1px solid var(--border-main)' : '1px solid transparent',
       cursor: 'pointer',
       textAlign: 'left' as const,
       transition: 'all 0.15s ease',
-      boxShadow: isActive ? '0 1px 3px rgba(0, 0, 0, 0.05)' : 'none',
+      boxShadow: isActive ? 'var(--shadow-card)' : 'none',
       margin: isCollapsedMode ? '0 auto' : '0',
       flexShrink: 0,
       position: 'relative' as const,
@@ -138,11 +138,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return {
       fontSize: '9.5px',
       fontWeight: 700,
-      backgroundColor: isActive ? '#F4F4F6' : '#EAEAEB',
-      color: isActive ? '#09090B' : '#71717A',
+      backgroundColor: isActive ? 'var(--bg-hover)' : 'var(--bg-input)',
+      color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
       padding: '2px 6px',
       borderRadius: '6px',
-      border: '1px solid #E5E7EB',
+      border: '1px solid var(--border-main)',
       fontFamily: "'JetBrains Mono', monospace",
     };
   };
@@ -150,8 +150,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const sidebarContent = (
     <aside style={{
       width: isMobile ? '280px' : (isCollapsed ? '68px' : '260px'),
-      backgroundColor: '#F4F4F6',
-      borderRight: '1px solid #E5E7EB',
+      backgroundColor: 'var(--bg-sidebar)',
+      borderRight: '1px solid var(--border-main)',
       display: 'flex',
       flexDirection: 'column',
       height: '100vh',
@@ -161,8 +161,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       left: 0,
       bottom: 0,
       zIndex: isMobile ? 100 : 1,
-      boxShadow: isMobile ? '0 0 30px rgba(0, 0, 0, 0.15)' : 'none',
-      transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+      boxShadow: isMobile ? '0 0 30px rgba(0, 0, 0, 0.25)' : 'none',
+      transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, border-color 0.2s ease',
       overflow: 'visible',
     }}>
       {/* Brand Header */}
@@ -640,12 +640,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         width: '36px',
                         height: '36px',
                         borderRadius: '8px',
-                        backgroundColor: isSelected ? '#FFFFFF' : 'transparent',
-                        border: isSelected ? '1px solid #E5E7EB' : '1px solid transparent',
-                        color: isSelected ? '#09090B' : '#71717A',
+                        backgroundColor: isSelected ? 'var(--bg-card)' : 'transparent',
+                        border: isSelected ? '1px solid var(--border-main)' : '1px solid transparent',
+                        color: isSelected ? 'var(--text-primary)' : 'var(--text-muted)',
                         cursor: 'pointer',
                         margin: '0 auto',
-                        boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.06)' : 'none',
+                        boxShadow: isSelected ? 'var(--shadow-card)' : 'none',
                         transition: 'all 0.15s ease',
                       }}
                     >
@@ -670,18 +670,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       padding: '8px 10px',
                       borderRadius: '8px',
                       fontSize: '12px',
-                      backgroundColor: isSelected ? '#FFFFFF' : 'transparent',
-                      color: '#09090B',
-                      border: isSelected ? '1px solid #E5E7EB' : '1px solid transparent',
+                      backgroundColor: isSelected ? 'var(--bg-card)' : 'transparent',
+                      color: 'var(--text-primary)',
+                      border: isSelected ? '1px solid var(--border-main)' : '1px solid transparent',
                       cursor: 'pointer',
                       textAlign: 'left',
                       transition: 'all 0.15s ease',
-                      boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.06)' : 'none',
+                      boxShadow: isSelected ? 'var(--shadow-card)' : 'none',
                       fontFamily: "'JetBrains Mono', monospace",
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-                      <div style={{ color: isSelected ? '#09090B' : '#71717A', flexShrink: 0 }}>
+                      <div style={{ color: isSelected ? 'var(--text-primary)' : 'var(--text-muted)', flexShrink: 0 }}>
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
                           <polyline points="2 17 12 22 22 17"></polyline>
@@ -689,8 +689,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         </svg>
                       </div>
                       <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        <div style={{ fontWeight: 600, color: '#09090B', fontSize: '12.5px', lineHeight: 1.2 }}>{org.name}</div>
-                        <div style={{ fontSize: '10.5px', color: '#71717A', fontWeight: 400, marginTop: '1px' }}>
+                        <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '12.5px', lineHeight: 1.2 }}>{org.name}</div>
+                        <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontWeight: 400, marginTop: '1px' }}>
                           {org.slug}.rlf
                         </div>
                       </div>
@@ -699,15 +699,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <span style={{
                         fontSize: '9.5px',
                         fontWeight: 600,
-                        backgroundColor: '#F4F4F6',
-                        color: '#52525B',
+                        backgroundColor: 'var(--bg-input)',
+                        color: 'var(--text-secondary)',
                         padding: '1.5px 6px',
                         borderRadius: '4px',
-                        border: '1px solid #E5E7EB',
+                        border: '1px solid var(--border-main)',
                       }}>
                         {org.role}
                       </span>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#71717A" strokeWidth="2.5">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2.5">
                         <polyline points="6 9 12 15 18 9"></polyline>
                       </svg>
                     </div>
@@ -758,11 +758,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         ref={profileMenuRef}
         style={{
           padding: isCollapsedMode ? '10px 0' : '10px 12px',
-          borderTop: '1px solid #E5E7EB',
+          borderTop: '1px solid var(--border-main)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: isCollapsedMode ? 'center' : 'space-between',
-          backgroundColor: '#F4F4F6',
+          backgroundColor: 'var(--bg-sidebar)',
           width: '100%',
           boxSizing: 'border-box',
           position: 'relative',
@@ -778,10 +778,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               left: isCollapsedMode ? '64px' : '10px',
               width: isCollapsedMode ? '230px' : 'calc(100% - 20px)',
               minWidth: '220px',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #E5E7EB',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-main)',
               borderRadius: '12px',
-              boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.08)',
+              boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.15)',
               padding: '6px',
               zIndex: 100,
             }}
@@ -797,16 +797,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <img
                   src={user.avatarUrl}
                   alt=""
-                  style={{ width: '34px', height: '34px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #E5E7EB', flexShrink: 0 }}
+                  style={{ width: '34px', height: '34px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border-main)', flexShrink: 0 }}
                 />
               ) : (
                 <div style={{
                   width: '34px',
                   height: '34px',
                   borderRadius: '8px',
-                  backgroundColor: '#EAEAEB',
-                  border: '1px solid #E5E7EB',
-                  color: '#09090B',
+                  backgroundColor: 'var(--bg-hover)',
+                  border: '1px solid var(--border-main)',
+                  color: 'var(--text-primary)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -818,16 +818,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               )}
               <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: '#09090B', lineHeight: '1.2' }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: '1.2' }}>
                   {user.displayName || 'Deepjyoti'}
                 </div>
-                <div style={{ fontSize: '11px', color: '#71717A', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {user.email || 'developer@relayforge.dev'}
                 </div>
               </div>
             </div>
 
-            <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '4px 0' }} />
+            <div style={{ height: '1px', backgroundColor: 'var(--border-main)', margin: '4px 0' }} />
 
             {/* Menu Action: Profile */}
             <button
@@ -844,17 +844,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 borderRadius: '6px',
                 border: 'none',
                 backgroundColor: 'transparent',
-                color: '#09090B',
+                color: 'var(--text-primary)',
                 fontSize: '13px',
                 fontWeight: 500,
                 cursor: 'pointer',
                 textAlign: 'left',
                 transition: 'background-color 0.15s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F4F4F6'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#71717A" strokeWidth="2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
@@ -875,24 +875,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 borderRadius: '6px',
                 border: 'none',
                 backgroundColor: 'transparent',
-                color: '#09090B',
+                color: 'var(--text-primary)',
                 fontSize: '13px',
                 fontWeight: 500,
                 cursor: 'pointer',
                 textAlign: 'left',
                 transition: 'background-color 0.15s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F4F4F6'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#71717A" strokeWidth="2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
               </svg>
               <span>Notifications</span>
             </button>
 
-            <div style={{ height: '1px', backgroundColor: '#E5E7EB', margin: '4px 0' }} />
+            <div style={{ height: '1px', backgroundColor: 'var(--border-main)', margin: '4px 0' }} />
 
             {/* Menu Action: Sign out */}
             <button
@@ -916,7 +916,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 textAlign: 'left',
                 transition: 'background-color 0.15s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FEE2E2'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.1)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2">
@@ -945,22 +945,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <img
                 src={user.avatarUrl}
                 alt=""
-                style={{ width: '34px', height: '34px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #E5E7EB' }}
+                style={{ width: '34px', height: '34px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border-main)' }}
               />
             ) : (
               <div style={{
                 width: '34px',
                 height: '34px',
                 borderRadius: '8px',
-                backgroundColor: isProfileMenuOpen ? '#FFFFFF' : '#EAEAEB',
-                border: '1px solid #E5E7EB',
-                color: '#09090B',
+                backgroundColor: isProfileMenuOpen ? 'var(--bg-card)' : 'var(--bg-hover)',
+                border: '1px solid var(--border-main)',
+                color: 'var(--text-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '12px',
                 fontWeight: 700,
-                boxShadow: isProfileMenuOpen ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                boxShadow: isProfileMenuOpen ? 'var(--shadow-card)' : 'none',
               }}>
                 {getInitials(user.displayName, user.email)}
               </div>
@@ -978,13 +978,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
               cursor: 'pointer',
               padding: '6px 8px',
               borderRadius: '8px',
-              backgroundColor: isProfileMenuOpen ? '#FFFFFF' : 'transparent',
-              border: isProfileMenuOpen ? '1px solid #E5E7EB' : '1px solid transparent',
-              boxShadow: isProfileMenuOpen ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+              backgroundColor: isProfileMenuOpen ? 'var(--bg-card)' : 'transparent',
+              border: isProfileMenuOpen ? '1px solid var(--border-main)' : '1px solid transparent',
+              boxShadow: isProfileMenuOpen ? 'var(--shadow-card)' : 'none',
               transition: 'all 0.15s ease',
             }}
             onMouseEnter={(e) => {
-              if (!isProfileMenuOpen) e.currentTarget.style.backgroundColor = '#EAEAEB';
+              if (!isProfileMenuOpen) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
             }}
             onMouseLeave={(e) => {
               if (!isProfileMenuOpen) e.currentTarget.style.backgroundColor = 'transparent';
@@ -995,16 +995,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <img
                   src={user.avatarUrl}
                   alt=""
-                  style={{ width: '32px', height: '32px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #E5E7EB', flexShrink: 0 }}
+                  style={{ width: '32px', height: '32px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border-main)', flexShrink: 0 }}
                 />
               ) : (
                 <div style={{
                   width: '32px',
                   height: '32px',
                   borderRadius: '8px',
-                  backgroundColor: '#EAEAEB',
-                  border: '1px solid #E5E7EB',
-                  color: '#09090B',
+                  backgroundColor: 'var(--bg-hover)',
+                  border: '1px solid var(--border-main)',
+                  color: 'var(--text-primary)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -1016,10 +1016,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               )}
               <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: '#09090B', lineHeight: '1.2' }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: '1.2' }}>
                   {user.displayName || 'Deepjyoti'}
                 </div>
-                <div style={{ fontSize: '11px', color: '#71717A', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {user.email || 'developer@relayforge.dev'}
                 </div>
               </div>

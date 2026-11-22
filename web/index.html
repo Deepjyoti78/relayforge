@@ -8,8 +8,29 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        try {
+          var theme = localStorage.getItem('rf_active_theme') || 'vercel';
+          var mode = localStorage.getItem('rf_theme_mode') || 'light';
+          document.documentElement.setAttribute('data-theme', theme);
+          if (mode === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <style>
-      :root {
+      /* ========================================================= */
+      /* THEME TOKENS: Vercel (Default), Supabase & Claude         */
+      /* Light mode and Dark mode (Black mode) specifications      */
+      /* ========================================================= */
+
+      /* Base Default: Light Vercel */
+      :root,
+      [data-theme='vercel'] {
         --color-0: #FFFFFF;
         --color-1: #F8F9FA;
         --color-2: #F4F4F6;
@@ -19,9 +40,174 @@
         --color-6: #09090B;
         --bg-main: #F8F9FA;
         --bg-card: #FFFFFF;
+        --bg-sidebar: #F4F4F6;
+        --bg-topbar: #FFFFFF;
+        --bg-input: #F4F4F6;
+        --bg-hover: #EAEAEB;
         --border-main: #E5E7EB;
+        --border-subtle: #F0F0F2;
         --text-primary: #09090B;
+        --text-secondary: #52525B;
         --text-muted: #71717A;
+        --accent-primary: #09090B;
+        --accent-foreground: #FFFFFF;
+        --badge-bg: #EAEAEB;
+        --badge-text: #09090B;
+        --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+        --scrollbar-thumb: #D1D5DB;
+        --scrollbar-thumb-hover: #9CA3AF;
+      }
+
+      /* Dark Mode: Vercel (True Black) */
+      .dark,
+      html.dark,
+      [data-theme='vercel'].dark,
+      html.dark [data-theme='vercel'] {
+        --color-0: #000000;
+        --color-1: #09090B;
+        --color-2: #121214;
+        --color-3: #A1A1AA;
+        --color-4: #D4D4D8;
+        --color-5: #E4E4E7;
+        --color-6: #FAFAFA;
+        --bg-main: #000000;
+        --bg-card: #0D0D0E;
+        --bg-sidebar: #09090B;
+        --bg-topbar: #09090B;
+        --bg-input: #17171A;
+        --bg-hover: #1F1F23;
+        --border-main: #27272A;
+        --border-subtle: #1C1C1F;
+        --text-primary: #FAFAFA;
+        --text-secondary: #D4D4D8;
+        --text-muted: #A1A1AA;
+        --accent-primary: #FAFAFA;
+        --accent-foreground: #09090B;
+        --badge-bg: #1F1F23;
+        --badge-text: #FAFAFA;
+        --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
+        --scrollbar-thumb: #27272A;
+        --scrollbar-thumb-hover: #3F3F46;
+      }
+
+      /* Light Mode: Supabase (Emerald Tech) */
+      [data-theme='supabase'] {
+        --color-0: #FFFFFF;
+        --color-1: #F8FAFC;
+        --color-2: #F1F5F9;
+        --color-3: #64748B;
+        --color-4: #334155;
+        --color-5: #1E293B;
+        --color-6: #0F172A;
+        --bg-main: #F8FAFC;
+        --bg-card: #FFFFFF;
+        --bg-sidebar: #F1F5F9;
+        --bg-topbar: #FFFFFF;
+        --bg-input: #F1F5F9;
+        --bg-hover: #E2E8F0;
+        --border-main: #E2E8F0;
+        --border-subtle: #F1F5F9;
+        --text-primary: #0F172A;
+        --text-secondary: #334155;
+        --text-muted: #64748B;
+        --accent-primary: #10B981;
+        --accent-foreground: #FFFFFF;
+        --badge-bg: #D1FAE5;
+        --badge-text: #065F46;
+        --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+        --scrollbar-thumb: #CBD5E1;
+        --scrollbar-thumb-hover: #94A3B8;
+      }
+
+      /* Dark Mode: Supabase (Deep Tech Forest) */
+      [data-theme='supabase'].dark,
+      html.dark[data-theme='supabase'],
+      html.dark [data-theme='supabase'] {
+        --color-0: #0E1217;
+        --color-1: #10141A;
+        --color-2: #151A21;
+        --color-3: #8E9FB5;
+        --color-4: #CBD5E1;
+        --color-5: #E2E8F0;
+        --color-6: #F8FAFC;
+        --bg-main: #0E1217;
+        --bg-card: #151A21;
+        --bg-sidebar: #10141A;
+        --bg-topbar: #10141A;
+        --bg-input: #1C232D;
+        --bg-hover: #242D3A;
+        --border-main: #222B38;
+        --border-subtle: #19202A;
+        --text-primary: #F8FAFC;
+        --text-secondary: #CBD5E1;
+        --text-muted: #8E9FB5;
+        --accent-primary: #3ECF8E;
+        --accent-foreground: #0E1217;
+        --badge-bg: #163B34;
+        --badge-text: #3ECF8E;
+        --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px -1px rgba(0, 0, 0, 0.5);
+        --scrollbar-thumb: #222B38;
+        --scrollbar-thumb-hover: #334155;
+      }
+
+      /* Light Mode: Claude (Warm Sand & Terracotta) */
+      [data-theme='claude'] {
+        --color-0: #FFFFFF;
+        --color-1: #FAF8F5;
+        --color-2: #F3EFEA;
+        --color-3: #847C72;
+        --color-4: #575149;
+        --color-5: #3A352F;
+        --color-6: #26221D;
+        --bg-main: #FAF8F5;
+        --bg-card: #FFFFFF;
+        --bg-sidebar: #F3EFEA;
+        --bg-topbar: #FFFFFF;
+        --bg-input: #F3EFEA;
+        --bg-hover: #E9E3DA;
+        --border-main: #E6DFD5;
+        --border-subtle: #F0EAE1;
+        --text-primary: #26221D;
+        --text-secondary: #575149;
+        --text-muted: #847C72;
+        --accent-primary: #D97706;
+        --accent-foreground: #FFFFFF;
+        --badge-bg: #FDE68A;
+        --badge-text: #78350F;
+        --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+        --scrollbar-thumb: #D8CEBE;
+        --scrollbar-thumb-hover: #B5A895;
+      }
+
+      /* Dark Mode: Claude (Warm Charcoal & Amber) */
+      [data-theme='claude'].dark,
+      html.dark[data-theme='claude'],
+      html.dark [data-theme='claude'] {
+        --color-0: #141210;
+        --color-1: #171412;
+        --color-2: #1C1916;
+        --color-3: #9E9486;
+        --color-4: #D4CDC3;
+        --color-5: #EDE8E1;
+        --color-6: #FAF8F5;
+        --bg-main: #141210;
+        --bg-card: #1C1916;
+        --bg-sidebar: #171412;
+        --bg-topbar: #171412;
+        --bg-input: #26221D;
+        --bg-hover: #332D27;
+        --border-main: #332C25;
+        --border-subtle: #25201A;
+        --text-primary: #FAF8F5;
+        --text-secondary: #D4CDC3;
+        --text-muted: #9E9486;
+        --accent-primary: #E07A5F;
+        --accent-foreground: #141210;
+        --badge-bg: #3B2418;
+        --badge-text: #FBBF24;
+        --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px -1px rgba(0, 0, 0, 0.5);
+        --scrollbar-thumb: #332C25;
+        --scrollbar-thumb-hover: #4D4339;
       }
       *, *::before, *::after {
         box-sizing: border-box;
@@ -32,29 +218,30 @@
       body {
         margin: 0;
         font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Roboto Mono', monospace, -apple-system, sans-serif !important;
-        background-color: #F8F9FA;
-        color: #09090B;
+        background-color: var(--bg-main) !important;
+        color: var(--text-primary) !important;
         min-height: 100vh;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        transition: background-color 0.2s ease, color 0.2s ease;
       }
       code, pre {
         font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Roboto Mono', monospace !important;
       }
-      /* Custom scrollbar matching light monochromatic D2 palette */
+      /* Custom scrollbar matching active theme palette */
       ::-webkit-scrollbar {
         width: 6px;
         height: 6px;
       }
       ::-webkit-scrollbar-track {
-        background: #F8F9FA;
+        background: var(--bg-main);
       }
       ::-webkit-scrollbar-thumb {
-        background: #D1D5DB;
+        background: var(--scrollbar-thumb);
         border-radius: 999px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #9CA3AF;
+        background: var(--scrollbar-thumb-hover);
       }
 
       /* Responsive Layout Utilities - Tight gaps matching D2 */
@@ -90,8 +277,8 @@
 
       /* Stat Cards matching D2 Card Hierarchy */
       .rf-stat-card {
-        background-color: #FFFFFF;
-        border: 1px solid #E5E7EB;
+        background-color: var(--bg-card) !important;
+        border: 1px solid var(--border-main) !important;
         border-radius: 12px;
         padding: 16px 18px;
         cursor: pointer;
@@ -99,45 +286,45 @@
         box-sizing: border-box;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+        box-shadow: var(--shadow-card);
         transition: background-color 0.2s ease,
                     border-color 0.2s ease,
                     transform 0.2s ease,
                     box-shadow 0.2s ease;
       }
       .rf-stat-card:hover {
-        background-color: #FFFFFF !important;
-        border-color: #D1D5DB !important;
+        background-color: var(--bg-card) !important;
+        border-color: var(--text-muted) !important;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 0 0 1px #E5E7EB;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--border-main);
       }
       .rf-stat-card .rf-card-icon {
-        stroke: #71717A;
+        stroke: var(--text-muted);
         transition: stroke 0.2s ease;
       }
       .rf-stat-card:hover .rf-card-icon {
-        stroke: #09090B !important;
+        stroke: var(--text-primary) !important;
       }
       .rf-stat-card .rf-card-label {
-        color: #71717A;
+        color: var(--text-muted) !important;
         transition: color 0.2s ease;
       }
       .rf-stat-card:hover .rf-card-label {
-        color: #09090B !important;
+        color: var(--text-primary) !important;
       }
       .rf-stat-card .rf-card-value {
-        color: #09090B;
+        color: var(--text-primary) !important;
         transition: color 0.2s ease;
       }
       .rf-stat-card:hover .rf-card-value {
-        color: #09090B !important;
+        color: var(--text-primary) !important;
       }
       .rf-stat-card .rf-card-subtext {
-        color: #71717A;
+        color: var(--text-muted) !important;
         transition: color 0.2s ease;
       }
       .rf-stat-card:hover .rf-card-subtext {
-        color: #52525B !important;
+        color: var(--text-secondary) !important;
       }
       /* Active Badge: Solid Green background with warm ivory text */
       .rf-card-badge {
@@ -236,10 +423,11 @@
         padding: 24px 28px;
         overflow-y: auto;
         overflow-x: hidden;
-        background-color: #F8F9FA;
-        color: #09090B;
+        background-color: var(--bg-main) !important;
+        color: var(--text-primary) !important;
         box-sizing: border-box;
         min-width: 0;
+        transition: background-color 0.2s ease, color 0.2s ease;
       }
       @media (max-width: 1024px) {
         .rf-main-content {
@@ -562,16 +750,6 @@
             </svg>
           </div>
           <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #71717A; text-transform: uppercase;">
-            RELAYFORGE
-          </div>
-        </div>
-      </div>
-    </div>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-            </svg>
-          </div>
-          <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #737373; text-transform: uppercase;">
             RELAYFORGE
           </div>
         </div>
