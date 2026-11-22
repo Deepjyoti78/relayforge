@@ -24,13 +24,30 @@ export async function createApiApplication(): Promise<NestExpressApplication> {
         'http://127.0.0.1:5173',
         'http://localhost:3000',
       ];
-      if (
-        allowed.some((a) => a && a.toLowerCase() === origin.toLowerCase()) ||
-        origin.endsWith('.onrender.com') ||
-        origin.endsWith('.workers.dev') ||
-        origin.endsWith('.pages.dev')
-      ) {
-        return callback(null, true);
+      try {
+        const parsed = new URL(origin);
+        if (
+          allowed.some((a) => a && a.toLowerCase() === origin.toLowerCase()) ||
+          parsed.hostname.endsWith('.onrender.com') ||
+          parsed.hostname.endsWith('.workers.dev') ||
+          parsed.hostname.endsWith('.pages.dev') ||
+          parsed.hostname === 'localhost' ||
+          parsed.hostname === '127.0.0.1' ||
+          origin.endsWith('.onrender.com') ||
+          origin.endsWith('.workers.dev') ||
+          origin.endsWith('.pages.dev')
+        ) {
+          return callback(null, true);
+        }
+      } catch {
+        if (
+          allowed.some((a) => a && a.toLowerCase() === origin.toLowerCase()) ||
+          origin.endsWith('.onrender.com') ||
+          origin.endsWith('.workers.dev') ||
+          origin.endsWith('.pages.dev')
+        ) {
+          return callback(null, true);
+        }
       }
       return callback(null, false);
     },

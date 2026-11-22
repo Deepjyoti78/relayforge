@@ -73,23 +73,32 @@ export class AuthGuard implements CanActivate {
       return;
     }
 
+    let originUrl: URL;
     try {
-      const originUrl = new URL(origin);
-      const host = request.headers.host;
-      const frontendUrl = new URL(this.config.values.frontendUrl);
-
-      // Allow matching host, configured frontend origin, local dev, or onrender staging subdomains
-      const isAllowed = originUrl.host === host
-        || originUrl.origin === frontendUrl.origin
-        || originUrl.hostname === '127.0.0.1'
-        || originUrl.hostname === 'localhost'
-        || originUrl.hostname.endsWith('.onrender.com');
-
-      if (!isAllowed) {
-        throw new ForbiddenException('CSRF origin mismatch');
-      }
+      originUrl = new URL(origin);
     } catch {
       throw new ForbiddenException('Invalid request origin');
+    }
+
+    const host = request.headers.host;
+    let frontendOrigin = '';
+    try {
+      frontendOrigin = new URL(this.config.values.frontendUrl).origin;
+    } catch {
+      // ignore invalid frontendUrl in config
+    }
+
+    // Allow matching host, configured frontend origin, local dev, or onrender / cloudflare staging subdomains
+    const isAllowed = originUrl.host === host
+      || (frontendOrigin ? originUrl.origin === frontendOrigin : false)
+      || originUrl.hostname === '127.0.0.1'
+      || originUrl.hostname === 'localhost'
+      || originUrl.hostname.endsWith('.onrender.com')
+      || originUrl.hostname.endsWith('.workers.dev')
+      || originUrl.hostname.endsWith('.pages.dev');
+
+    if (!isAllowed) {
+      throw new ForbiddenException('CSRF origin mismatch');
     }
   }
 }

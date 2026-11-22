@@ -351,6 +351,7 @@ export const App: React.FC = () => {
     localStorage.setItem(`rf_volume_${newOrg.id}`, orgData.estimatedVolume);
     await loadUser();
     setSelectedOrgId(newOrg.id);
+    await loadActiveOrg(newOrg.id);
     setIsOnboardingOpen(false);
   };
 

@@ -160,7 +160,7 @@ async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Promise<R
       } catch {
         // Ignore abort errors
       }
-    }, 5000);
+    }, 20000);
   }
 
   const res = await fetch(url, {
