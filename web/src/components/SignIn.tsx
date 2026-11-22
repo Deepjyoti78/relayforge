@@ -244,23 +244,25 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         position: 'sticky',
         top: 0,
         zIndex: 50,
+        paddingTop: '12px',
+        paddingBottom: '12px',
         backdropFilter: isScrolled ? 'blur(16px)' : 'none',
         WebkitBackdropFilter: isScrolled ? 'blur(16px)' : 'none',
         boxShadow: isScrolled ? '0 4px 20px rgba(0, 0, 0, 0.45)' : 'none',
         transition: 'background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
       }}>
         <div className="rf-landing-container" style={{
-          maxWidth: '1440px',
+          maxWidth: '1400px',
           margin: '0 auto',
-          padding: '0 clamp(20px, 3.5vw, 48px)',
-          height: '64px',
+          padding: '0 clamp(20px, 4vw, 52px)',
+          height: '56px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           boxSizing: 'border-box',
           width: '100%',
         }}>
-          {/* Brand Logo & Name: RelayForge */}
+          {/* Brand Logo & Name: RelayForge (Shifted rightward for balanced indentation) */}
           <div
             className="rf-header-brand"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -270,6 +272,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               gap: '10px',
               cursor: 'pointer',
               userSelect: 'none',
+              marginLeft: 'clamp(12px, 2.2vw, 36px)',
             }}
           >
             <div
@@ -305,16 +308,18 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </span>
           </div>
 
-          {/* Center Navigation Links (Product, Solutions, Models, Docs, Pricing, Contact, Resources) */}
+          {/* Right-aligned Navigation Links (Product, Solutions, Models, Docs, Pricing, Contact, Resources) */}
           <nav className="rf-landing-nav-center" style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '28px',
+            gap: '26px',
             fontSize: '13.5px',
             fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
             fontWeight: 450,
             letterSpacing: '-0.01em',
             color: '#A1A1AA',
+            marginLeft: 'auto',
+            marginRight: '32px',
           }}>
             <button
               onClick={() => {
@@ -455,35 +460,15 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </button>
           </nav>
 
-          {/* Right Action Buttons: GitHub 994, Book a demo, Dashboard */}
-          <div className="rf-header-right-actions" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <a
-              href="https://github.com/Deepjyoti78/relayforge"
-              target="_blank"
-              rel="noreferrer"
-              className="rf-header-github-btn"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                color: '#A1A1AA',
-                fontSize: '13.5px',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-                fontWeight: 500,
-                textDecoration: 'none',
-                padding: '6px 8px',
-                transition: 'color 0.15s ease',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-              </svg>
-              <span>994</span>
-            </a>
-
+          {/* Right Action Button: Book a demo */}
+          <div className="rf-header-right-actions" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            marginRight: 'clamp(12px, 2.2vw, 36px)',
+          }}>
             <button
+              id="open-signin-button"
               className="rf-header-book-demo-btn"
               onClick={() => { setAuthMode('signup'); setModalOpen(true); }}
               style={{
@@ -491,47 +476,27 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 backgroundColor: '#18181B',
-                border: '1px solid rgba(255, 255, 255, 0.14)',
+                border: '1px solid rgba(255, 255, 255, 0.16)',
                 borderRadius: '8px',
                 color: '#FFFFFF',
                 fontSize: '13px',
                 fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
                 fontWeight: 500,
-                padding: '7px 15px',
+                padding: '7px 18px',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
                 whiteSpace: 'nowrap',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#27272A'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#18181B'; }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#27272A';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.28)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#18181B';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.16)';
+              }}
             >
               Book a demo
-            </button>
-
-            <button
-              id="open-signin-button"
-              className="rf-header-dashboard-btn"
-              onClick={() => { setAuthMode('login'); setModalOpen(true); }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#FFFFFF',
-                border: 'none',
-                borderRadius: '8px',
-                color: '#000000',
-                fontSize: '13px',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-                fontWeight: 600,
-                padding: '7px 16px',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-                whiteSpace: 'nowrap',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
-            >
-              Dashboard
             </button>
 
             {/* Mobile Hamburger Toggle Button */}
@@ -635,40 +600,23 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               </button>
             </div>
             <div style={{ height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.1)', margin: '4px 0' }} />
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div>
               <button
                 onClick={() => { setMobileMenuOpen(false); setAuthMode('signup'); setModalOpen(true); }}
                 style={{
-                  flex: 1,
-                  padding: '10px 14px',
+                  width: '100%',
+                  padding: '11px 16px',
                   borderRadius: '8px',
                   backgroundColor: '#18181B',
-                  border: '1px solid rgba(255, 255, 255, 0.14)',
+                  border: '1px solid rgba(255, 255, 255, 0.16)',
                   color: '#FFFFFF',
-                  fontSize: '13px',
+                  fontSize: '13.5px',
                   fontWeight: 500,
                   cursor: 'pointer',
                   fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
                 }}
               >
                 Book a demo
-              </button>
-              <button
-                onClick={() => { setMobileMenuOpen(false); setAuthMode('login'); setModalOpen(true); }}
-                style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: '8px',
-                  backgroundColor: '#FFFFFF',
-                  border: 'none',
-                  color: '#000000',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-                }}
-              >
-                Dashboard
               </button>
             </div>
           </div>
@@ -689,7 +637,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           width: '100%',
           maxWidth: '1400px',
           margin: '0 auto',
-          padding: 'clamp(28px, 3.2vw, 46px) clamp(20px, 4vw, 52px) 16px',
+          padding: 'clamp(36px, 4vw, 56px) clamp(20px, 4vw, 52px) 16px',
           boxSizing: 'border-box',
         }}>
           <div className="rf-hero-split-grid" style={{
