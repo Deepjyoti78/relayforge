@@ -43,6 +43,11 @@ No deployment or live-secret changes were made by this audit.
     as needed. The client ID/secret pair must belong to that same environment.
     For B callbacks must pass through F, not go directly to the Render hostname.
 
+[ ] Verify separate API/worker database identities and migration-only privileges.
+    The current Render blueprint shares the API URL with the worker; startup only
+    warns about unsafe roles. Health and bootstrap-script success are not proof.
+[ ] Resolve cloud database/Redis TLS certificate verification in a separate change;
+    current cloud/pooler and rediss code disables verification. No live fix was made.
 [ ] Resolve the existing effect/Prisma vulnerability gate in a separate narrow PR.
     Do not run npm audit fix --force: it proposes a breaking Prisma 6.12.0 downgrade.
 [ ] Confirm unit, PostgreSQL/Redis integration, Chromium, lint, typecheck, frontend

@@ -2,7 +2,7 @@ RelayForge authentication security review — independently verified follow-up
 23 November 2026 (Asia/Calcutta)
 Repository: Deepjyoti78/relayforge
 Review branch/worktree: codex/auth-security-review / auth-security-review-worktree
-Starting security commit: 0cfa2e0; staging comparison snapshot: 248a01f
+Starting security commit: 0cfa2e0; staging comparison snapshot: d4177c2
 The actual source and diff were reviewed; the earlier report was not used as proof.
 
 Findings and implemented corrections
@@ -157,7 +157,7 @@ breaking Prisma downgrade to 6.12.0; it was NOT run. Recommend a separate narrow
 reviewed Prisma-compatible patch/override after generation, migration and runtime
 validation. The audit remains a release blocker; no exception was added. A new
 independent browser-authentication CI job runs without depending on the failing
-verify job, but it has not run remotely because this branch has not been pushed.
+verify job, and its head-specific status is recorded separately in the draft PR description.
 
 Remaining risks / release conditions
 - Choose and provision a same-site/same-origin topology and exact provider callbacks.
@@ -174,16 +174,25 @@ Remaining risks / release conditions
 - Fixed seven-day sessions require sign-in after expiry. XSS/dependency/infrastructure
   hardening beyond the reviewed auth paths is not certified by these tests.
 
-Changed files against staging snapshot 248a01f
+Changed files against staging snapshot d4177c2
 - .env.example
 - .env.production.example
 - .github/workflows/ci.yml
+- README.md
 - docs/auth-draft-pr-plan.txt
 - docs/auth-release-checklist.txt
 - docs/auth-security-review.txt
+- docs/deployment.md
+- docs/foundation.md
+- docs/operations-runbook.md
+- docs/production-security.md
+- docs/roadmap.md
+- docs/security.md
+- docs/tenancy.md
 - package-lock.json
 - package.json
 - playwright.config.cjs
+- scripts/staging-e2e-verify.cjs
 - src/api/create-api.ts
 - src/modules/auth/auth-cookies.ts
 - src/modules/auth/auth.controller.ts
@@ -221,9 +230,10 @@ Changed files against staging snapshot 248a01f
 
 Review handling
 The existing local worktree/branch was used. Unrelated navbar, typography and
-InteractiveWorkflowDashboard changes through staging 248a01f were retained; the
+InteractiveWorkflowDashboard changes through staging d4177c2 were retained; the
 security diff against that snapshot does not revert them. No live-secret update,
-production session mutation, push, PR merge, automatic merge or deployment occurred.
+production session mutation, PR merge, automatic merge or deployment occurred.
+Branch publication and head-specific CI status are recorded separately in the draft PR.
 Draft PR title/review order and next steps: docs/auth-draft-pr-plan.txt.
 
 Primary references
@@ -234,3 +244,28 @@ https://developers.cloudflare.com/workers/static-assets/routing/worker-script/
 https://developers.google.com/identity/protocols/oauth2/web-server
 https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
 https://github.com/advisories/GHSA-7589-6fvf-x4pw
+
+Documentation reconciliation and publication follow-up (23 November 2026)
+The review worktree was clean at entry. The unpublished branch was rebased onto
+fetched origin/release/staging-deployment d4177c2; unrelated theme/UI fixes are
+preserved. Security/tenancy/deployment, historical foundation/roadmap notes and README
+were reconciled with source. Legacy staging-harness labels now describe only the
+invalid-token and OAuth-start checks they actually perform; no live harness was run.
+
+Current local revalidation (separate from GitHub CI): 261 unit tests / 21 suites,
+90 PostgreSQL/Redis integration tests / 11 suites, and 12 real Chromium tests passed.
+Lint, typecheck, frontend build, API build, script syntax and git diff --check passed.
+Logs: .cache/revalidation-{unit,integration,browser,lint,typecheck,web-build,api-build}.log.
+All 13 existing migrations applied only to the isolated local test database.
+The audit still exits 1 for the existing three high Prisma/Effect findings; its
+current result is .cache/revalidation-audit.json. No dependency versions were changed
+in this follow-up. Hosted head-specific CI is recorded in the draft PR description
+and task result, never inferred from these local passes.
+
+Additional existing deployment limitations documented without runtime changes:
+DatabaseService warns instead of failing on unsafe runtime roles; detected cloud/
+pooler PostgreSQL and rediss connections disable certificate verification. The
+Render blueprint copies API DATABASE_URL into WORKER_DATABASE_URL. Separate least-
+privilege identities and transport verification require a separately reviewed fix
+and live acceptance. Current startup checks known GitHub placeholders, not all
+Google credential validity; both providers still require real consent verification.

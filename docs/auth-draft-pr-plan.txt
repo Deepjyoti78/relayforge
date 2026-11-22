@@ -1,4 +1,4 @@
-Draft PR plan (not created or pushed)
+Draft PR review plan
 
 Title: Harden cookie-based OAuth and reauthorize organization streams
 Base: release/staging-deployment
@@ -21,7 +21,7 @@ Review sequence:
 4. Review SSE 30-second authorization window and browser reconnect behavior.
 5. Review Playwright's test-only local provider/control server isolation and CI job.
 6. Review current diff against staging; unrelated navbar/typography changes through
-   248a01f were preserved. Refresh the base comparison if staging advances again.
+   d4177c2 were preserved. Refresh the base comparison if staging advances again.
 
 Evidence: docs/auth-security-review.txt lists commands, exact results and log paths.
 Release gates: docs/auth-release-checklist.txt lists environment names, exact provider
@@ -29,5 +29,6 @@ callbacks and manual consent/browser-policy checks. Existing dependency audit re
 red and should be fixed in a separate narrow dependency PR with generation/migration
 and runtime validation; do not approve a force downgrade to Prisma 6.
 
-After human review, push only the dedicated branch and open a DRAFT PR. Do not merge,
+Publication is authorized only for this dedicated branch and a DRAFT PR; current
+remote link and head-specific CI status belong in the PR description/task result. Do not merge,
 auto-merge, deploy or change live secrets as part of this plan.

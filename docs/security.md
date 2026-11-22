@@ -53,5 +53,11 @@ If an outbound webhook request automatically follows HTTP redirects (301, 302, 3
 ## 4. Multi-Tenant Row-Level Security (RLS)
 
 - PostgreSQL 17 Row-Level Security is active on all tenant-facing tables (`organizations`, `memberships`, `api_keys`, `endpoints`, `events`, `destinations`, `outbox_messages`, `delivery_attempts`).
-- Isolation is enforced inside PostgreSQL via `app.current_organization_id` session settings.
-- Bypassing application code cannot leak records across tenant boundaries because the PostgreSQL engine itself discards unauthorized rows at the storage layer.
+- Isolation is enforced inside PostgreSQL via transaction-local `app.current_org_id` and `app.current_user_id` settings.
+- Policies protect tenant rows under restricted, non-owner runtime roles. Superuser/BYPASSRLS credentials can bypass that boundary; startup currently only warns about unsafe roles. Verify deployed identities independently.
+
+## 5. Browser authentication and acceptance limits
+
+Google/GitHub OAuth uses PostgreSQL state and PKCE plus an HttpOnly browser-binding cookie. Sessions stay in HttpOnly cookies, with exact frontend-origin checks for redirects, CORS and cookie mutations. Valid bearer-session clients remain supported. See [tenancy and sessions](tenancy.md) for cookie defaults, fixed expiry, logout and bounded SSE reauthorization.
+
+This describes selected controls, not a complete production certification. The [review](auth-security-review.txt) and [release checklist](auth-release-checklist.txt) separate local tests, hosted CI and outstanding live validation. Default Cloudflare/Render hosts are cross-site; a same-site/custom-domain or same-origin proxy is needed for browsers blocking third-party cookies. Existing Prisma/Effect advisories, cloud TLS certificate verification and runtime role provisioning remain release concerns.

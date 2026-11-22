@@ -2,12 +2,10 @@
 /**
  * RelayForge Staging End-to-End Verification Harness
  *
- * Runs non-destructive synthetic acceptance tests against the staging environment:
- * 1. Healthcheck verification (Live & Ready)
- * 2. Ingestion & HMAC signature validation
- * 3. Idempotency deduplication
- * 4. Multi-tenant RLS isolation
- * 5. Direct session bypass prevention (cookie-only auth check)
+ * Limited synthetic checks: health, rejection of one invalid bearer session token,
+ * and an OAuth-start provider redirect/state. Starting OAuth writes a short-lived
+ * PostgreSQL state row. This does not test live consent, callback destination,
+ * cookie persistence, ingestion, PKCE exchange or tenant isolation.
  */
 
 const http = require('node:http');
@@ -65,24 +63,24 @@ async function runStagingVerification() {
     report.push({ test: 'API Readiness Probe (/health/ready)', status: 'FAILED', details: err.message });
   }
 
-  // Test 3: Direct session bypass prevention (ensures Bearer auth is rejected or requires valid cookie)
+  // Test 3: One invalid bearer token must not authenticate; valid bearer sessions remain supported.
   try {
     const unauth = await request(`${STAGING_API_URL}/v1/me`, {
       method: 'GET',
       headers: { 'Authorization': 'Bearer direct_test_token_bypass_attempt' }
     });
-    // In production/staging, invalid or direct bearer tokens MUST return 401 Unauthorized
+    // This invalid token must return 401; that does not establish a cookie-only policy.
     const passed = unauth.statusCode === 401;
     report.push({
-      test: 'Direct Session Bypass Prevention (Server-side)',
+      test: 'Invalid bearer-session rejection',
       status: passed ? 'PASSED' : 'FAILED',
       details: `HTTP ${unauth.statusCode} (expected 401 Unauthorized)`
     });
   } catch (err) {
-    report.push({ test: 'Direct Session Bypass Prevention (Server-side)', status: 'FAILED', details: err.message });
+    report.push({ test: 'Invalid bearer-session rejection', status: 'FAILED', details: err.message });
   }
 
-  // Test 4: Open Redirect Protection on OAuth start
+  // Test 4: OAuth start creates a provider redirect/state; final callback destination is not tested.
   try {
     const oauthRes = await request(`${STAGING_API_URL}/auth/github/start?redirect_uri=https://evil-attacker-site.com`, {
       method: 'GET',
@@ -92,12 +90,12 @@ async function runStagingVerification() {
     const stateParam = new URL(location).searchParams.get('state');
     const passed = oauthRes.statusCode === 302 && location.startsWith('https://github.com/login/oauth/authorize') && Boolean(stateParam);
     report.push({
-      test: 'OAuth PKCE State Generation & Redirect Protection',
+      test: 'OAuth start redirect and state generation',
       status: passed ? 'PASSED' : 'FAILED',
-      details: passed ? 'State nonce generated, external open redirect disallowed' : `Location: ${location}`
+      details: passed ? 'Provider authorization redirect and state present; callback destination not exercised' : `Location: ${location}`
     });
   } catch (err) {
-    report.push({ test: 'OAuth PKCE State Generation & Redirect Protection', status: 'FAILED', details: err.message });
+    report.push({ test: 'OAuth start redirect and state generation', status: 'FAILED', details: err.message });
   }
 
   console.log('\n================ STAGING VERIFICATION REPORT ================');
