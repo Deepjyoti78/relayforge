@@ -26,7 +26,9 @@ export async function createApiApplication(): Promise<NestExpressApplication> {
       ];
       if (
         allowed.some((a) => a && a.toLowerCase() === origin.toLowerCase()) ||
-        origin.endsWith('.onrender.com')
+        origin.endsWith('.onrender.com') ||
+        origin.endsWith('.workers.dev') ||
+        origin.endsWith('.pages.dev')
       ) {
         return callback(null, true);
       }
