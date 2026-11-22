@@ -7,7 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F2F2F5'><path d='M13 10V3L4 14h7v7l9-11h-7z'/></svg>" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
     <script>
       (function() {
         try {
@@ -31,6 +31,8 @@
       /* Base Default: Light Vercel */
       :root,
       [data-theme='vercel'] {
+        --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-mono: 'Geist Mono', monospace;
         --color-0: #FFFFFF;
         --color-1: #F8F9FA;
         --color-2: #F4F4F6;
@@ -63,6 +65,8 @@
       html.dark,
       [data-theme='vercel'].dark,
       html.dark [data-theme='vercel'] {
+        --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-mono: 'Geist Mono', monospace;
         --color-0: #000000;
         --color-1: #09090B;
         --color-2: #121214;
@@ -92,6 +96,8 @@
 
       /* Light Mode: Supabase (Emerald Tech) */
       [data-theme='supabase'] {
+        --font-sans: 'Outfit', 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-mono: 'Geist Mono', monospace;
         --color-0: #FFFFFF;
         --color-1: #F8FAFC;
         --color-2: #F1F5F9;
@@ -123,6 +129,8 @@
       [data-theme='supabase'].dark,
       html.dark[data-theme='supabase'],
       html.dark [data-theme='supabase'] {
+        --font-sans: 'Outfit', 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-mono: 'Geist Mono', monospace;
         --color-0: #0E1217;
         --color-1: #10141A;
         --color-2: #151A21;
@@ -152,6 +160,8 @@
 
       /* Light Mode: Claude (Warm Sand & Terracotta) */
       [data-theme='claude'] {
+        --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Geist', sans-serif;
+        --font-mono: 'Geist Mono', monospace;
         --color-0: #FFFFFF;
         --color-1: #FAF8F5;
         --color-2: #F3EFEA;
@@ -183,6 +193,8 @@
       [data-theme='claude'].dark,
       html.dark[data-theme='claude'],
       html.dark [data-theme='claude'] {
+        --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Geist', sans-serif;
+        --font-mono: 'Geist Mono', monospace;
         --color-0: #141210;
         --color-1: #171412;
         --color-2: #1C1916;
@@ -213,11 +225,12 @@
         box-sizing: border-box;
       }
       html, body, button, input, select, textarea, span, p, a, div, h1, h2, h3, h4, h5, h6, table, th, td {
-        font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Roboto Mono', monospace, -apple-system, sans-serif !important;
+        font-family: var(--font-sans) !important;
+        letter-spacing: -0.01em;
       }
       body {
         margin: 0;
-        font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Roboto Mono', monospace, -apple-system, sans-serif !important;
+        font-family: var(--font-sans) !important;
         background-color: var(--bg-main) !important;
         color: var(--text-primary) !important;
         min-height: 100vh;
@@ -225,8 +238,8 @@
         -moz-osx-font-smoothing: grayscale;
         transition: background-color 0.2s ease, color 0.2s ease;
       }
-      code, pre {
-        font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Roboto Mono', monospace !important;
+      code, pre, kbd, .font-mono, .rf-mono {
+        font-family: var(--font-mono) !important;
       }
       /* Custom scrollbar matching active theme palette */
       ::-webkit-scrollbar {
@@ -355,7 +368,10 @@
       }
 
       /* Destructive Actions: Solid Red background with pure white text */
-      .rf-btn-destructive {
+      .rf-btn-destructive,
+      button.rf-btn-destructive,
+      html.dark .rf-btn-destructive,
+      html.dark button.rf-btn-destructive {
         background-color: #DC2626 !important;
         color: #FFFFFF !important;
         border: none !important;
@@ -363,12 +379,113 @@
         cursor: pointer;
         transition: background-color 0.15s ease;
       }
-      .rf-btn-destructive:hover {
+      .rf-btn-destructive:hover,
+      html.dark .rf-btn-destructive:hover {
         background-color: #B91C1C !important;
         color: #FFFFFF !important;
       }
-      .rf-btn-destructive svg {
+      .rf-btn-destructive svg,
+      html.dark .rf-btn-destructive svg {
         stroke: #FFFFFF !important;
+      }
+
+      /* ========================================================= */
+      /* COMPLETE BLACK MODE HARDENING - ZERO WHITE CARDS          */
+      /* ========================================================= */
+      html.dark,
+      html.dark body {
+        background-color: var(--bg-main) !important;
+        color: var(--text-primary) !important;
+      }
+
+      /* Dark surfaces for all cards, panels, grids, modals */
+      html.dark .rf-nav-grid > div,
+      html.dark .rf-bottom-cards-grid > div,
+      html.dark .rf-stat-card,
+      html.dark .rf-table-responsive > div,
+      html.dark .rf-card-surface,
+      html.dark [style*="background-color: #FFFFFF"],
+      html.dark [style*="backgroundColor: #FFFFFF"],
+      html.dark [style*="background-color: #fff"],
+      html.dark [style*="backgroundColor: #fff"],
+      html.dark [style*="background-color: rgb(255, 255, 255)"],
+      html.dark [style*="background: #FFFFFF"],
+      html.dark [style*="background: #fff"],
+      html.dark [style*="background: rgb(255, 255, 255)"] {
+        background-color: var(--bg-card) !important;
+        border-color: var(--border-main) !important;
+        color: var(--text-primary) !important;
+      }
+
+      /* Sub-surfaces & inputs in dark mode */
+      html.dark input:not([type="checkbox"]):not([type="radio"]),
+      html.dark select,
+      html.dark textarea,
+      html.dark thead tr,
+      html.dark [style*="background-color: #F9FAFB"],
+      html.dark [style*="backgroundColor: #F9FAFB"],
+      html.dark [style*="background-color: #F4F4F6"],
+      html.dark [style*="backgroundColor: #F4F4F6"],
+      html.dark [style*="background-color: #F8F9FA"],
+      html.dark [style*="backgroundColor: #F8F9FA"] {
+        background-color: var(--bg-input) !important;
+        border-color: var(--border-main) !important;
+        color: var(--text-primary) !important;
+      }
+
+      /* Primary buttons in dark mode: white background with black text (Vercel style) */
+      html.dark button[style*="background-color: #09090B"]:not(.rf-btn-destructive),
+      html.dark button[style*="backgroundColor: #09090B"]:not(.rf-btn-destructive),
+      html.dark button[style*="background-color: rgb(9, 9, 11)"]:not(.rf-btn-destructive) {
+        background-color: var(--accent-primary) !important;
+        color: var(--accent-foreground) !important;
+      }
+
+      /* Secondary buttons in dark mode: card surface with white text */
+      html.dark button[style*="background-color: #FFFFFF"]:not(.rf-btn-destructive),
+      html.dark button[style*="backgroundColor: #FFFFFF"]:not(.rf-btn-destructive),
+      html.dark button[style*="background-color: rgb(255, 255, 255)"]:not(.rf-btn-destructive) {
+        background-color: var(--bg-card) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-main) !important;
+      }
+
+      /* Text color fixes in dark mode */
+      html.dark [style*="color: #09090B"],
+      html.dark [style*="color: rgb(9, 9, 11)"],
+      html.dark [style*="color: #000000"],
+      html.dark [style*="color: rgb(0, 0, 0)"] {
+        color: var(--text-primary) !important;
+      }
+
+      html.dark [style*="color: #71717A"],
+      html.dark [style*="color: rgb(113, 113, 122)"] {
+        color: var(--text-muted) !important;
+      }
+
+      html.dark [style*="color: #52525B"],
+      html.dark [style*="color: rgb(82, 82, 91)"] {
+        color: var(--text-secondary) !important;
+      }
+
+      /* Borders in dark mode */
+      html.dark [style*="border: 1px solid #E5E7EB"],
+      html.dark [style*="border: 1px solid rgb(229, 231, 235)"],
+      html.dark [style*="borderBottom: 1px solid #E5E7EB"],
+      html.dark [style*="border-bottom: 1px solid #E5E7EB"],
+      html.dark [style*="borderTop: 1px solid #E5E7EB"],
+      html.dark [style*="border-top: 1px solid #E5E7EB"] {
+        border-color: var(--border-main) !important;
+      }
+
+      /* Ensure Active Badge ALWAYS stays Green with warm ivory text */
+      .rf-card-badge,
+      .rf-card-badge-warm,
+      html.dark .rf-card-badge,
+      html.dark .rf-card-badge-warm {
+        background-color: #16A34A !important;
+        color: #F5F0E7 !important;
+        border: none !important;
       }
 
       /* Bottom Cards Grid in One Row - Tight gaps */
