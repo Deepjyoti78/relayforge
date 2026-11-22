@@ -22,12 +22,24 @@ export class RedisService implements OnModuleInit, OnApplicationShutdown {
     this.connection = new Redis(rawUrl, {
       lazyConnect: true,
       maxRetriesPerRequest: null,
+      enableReadyCheck: false,
       connectTimeout: 10000,
+      family: 4,
+      keepAlive: 10000,
+      autoResubscribe: true,
+      autoResendUnfulfilledCommands: true,
       ...(isTls ? { tls: { rejectUnauthorized: false, servername: hostname } } : {}),
-      retryStrategy: (attempt) => Math.min(attempt * 250, 2000),
+      retryStrategy: (attempt) => Math.min(attempt * 250, 3000),
     });
+
     this.connection.on('error', (error: Error) => {
-      this.logger.error({ event: 'redis_connection_error', error: safeError(error) });
+      this.logger.warn({ event: 'redis_connection_error', error: safeError(error) });
+    });
+    this.connection.on('close', () => {
+      this.logger.warn({ event: 'redis_connection_closed' });
+    });
+    this.connection.on('reconnecting', (delay: number) => {
+      this.logger.log({ event: 'redis_reconnecting', delayMs: delay });
     });
   }
 
@@ -48,15 +60,11 @@ export class RedisService implements OnModuleInit, OnApplicationShutdown {
         this.logger.log({ event: 'redis_connected' });
       }
     } catch (error) {
-      if (this.config.values.role === 'api') {
-        this.logger.warn({
-          event: 'redis_connection_advisory',
-          message: 'API started without Redis connection. Outbox queuing and events will use in-memory fallback.',
-        });
-        return;
-      }
-      this.connection.disconnect();
-      throw error;
+      this.logger.warn({
+        event: 'redis_connection_advisory',
+        message: `${this.config.values.role} started without active Redis connection. Outbox worker and HTTP health server remain active; operational Redis queue will retry in background.`,
+        error: safeError(error),
+      });
     }
   }
 
@@ -68,7 +76,11 @@ export class RedisService implements OnModuleInit, OnApplicationShutdown {
     } catch {
       // A lost Redis connection must not prevent process shutdown.
     } finally {
-      this.connection.disconnect();
+      try {
+        this.connection.disconnect();
+      } catch {
+        // ignore
+      }
     }
   }
 }

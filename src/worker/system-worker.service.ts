@@ -22,31 +22,41 @@ export class SystemWorkerService implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    this.worker = new Worker<HealthProbe, HealthResult>(SYSTEM_QUEUE, async (job) => {
-      const payload = healthProbeSchema.safeParse(job.data);
-      if (job.name !== HEALTH_JOB || !payload.success) {
-        throw new UnrecoverableError('Unsupported operational job');
+    try {
+      this.worker = new Worker<HealthProbe, HealthResult>(SYSTEM_QUEUE, async (job) => {
+        const payload = healthProbeSchema.safeParse(job.data);
+        if (job.name !== HEALTH_JOB || !payload.success) {
+          throw new UnrecoverableError('Unsupported operational job');
+        }
+        await this.database.ping();
+        return {
+          probeId: payload.data.probeId,
+          instanceId: this.heartbeat.instanceId,
+          version: this.config.values.version,
+        };
+      }, {
+        connection: this.redis.connection,
+        prefix: this.config.values.queuePrefix,
+        concurrency: this.config.values.workerConcurrency,
+        removeOnComplete: { age: 60, count: 100 },
+        removeOnFail: { age: 3600, count: 20 },
+      });
+      this.worker.on('error', (error: Error) => {
+        this.logger.warn({ event: 'worker_queue_error', error: safeError(error) });
+      });
+      this.worker.on('failed', (job, error: Error) => {
+        this.logger.warn({ event: 'operational_job_failed', jobId: job?.id, error: safeError(error) });
+      });
+      if (this.redis.connection.status === 'ready') {
+        await this.worker.waitUntilReady();
       }
-      await this.database.ping();
-      return {
-        probeId: payload.data.probeId,
-        instanceId: this.heartbeat.instanceId,
-        version: this.config.values.version,
-      };
-    }, {
-      connection: this.redis.connection,
-      prefix: this.config.values.queuePrefix,
-      concurrency: this.config.values.workerConcurrency,
-      removeOnComplete: { age: 60, count: 100 },
-      removeOnFail: { age: 3600, count: 20 },
-    });
-    this.worker.on('error', (error: Error) => {
-      this.logger.error({ event: 'worker_queue_error', error: safeError(error) });
-    });
-    this.worker.on('failed', (job, error: Error) => {
-      this.logger.warn({ event: 'operational_job_failed', jobId: job?.id, error: safeError(error) });
-    });
-    await this.worker.waitUntilReady();
+    } catch (error) {
+      this.logger.warn({
+        event: 'system_worker_queue_deferred',
+        message: 'System worker operational queue deferred awaiting Redis connection readiness.',
+        error: safeError(error),
+      });
+    }
   }
 
   async onModuleDestroy(): Promise<void> {

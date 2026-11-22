@@ -6,15 +6,7 @@ import { exitOnStartupFailure } from '../modules/observability/startup-error';
 import { WorkerModule } from './worker.module';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.createApplicationContext(WorkerModule, {
-    bufferLogs: true,
-    abortOnError: false,
-  });
-  app.useLogger(app.get(Logger));
-  app.flushLogs();
-  app.enableShutdownHooks(['SIGINT', 'SIGTERM']);
-
-  // Support cloud environments (e.g. Render free tier) requiring an HTTP health check port
+  // Support cloud environments (e.g. Render free tier) requiring an immediate HTTP health check port
   const workerHttpPort = process.env.WORKER_PORT || (process.env.NODE_ENV === 'production' ? process.env.PORT : undefined);
   if (workerHttpPort) {
     const port = parseInt(workerHttpPort, 10);
@@ -29,9 +21,18 @@ async function bootstrap(): Promise<void> {
     });
 
     server.listen(port, '0.0.0.0', () => {
-      app.get(Logger).log(`[Worker Health Server] Listening on port ${port} for cloud health checks`);
+      console.log(`[Worker Health Server] Listening on port ${port} for cloud health checks`);
     });
   }
+
+  const app = await NestFactory.createApplicationContext(WorkerModule, {
+    bufferLogs: true,
+    abortOnError: false,
+  });
+  app.useLogger(app.get(Logger));
+  app.flushLogs();
+  app.enableShutdownHooks(['SIGINT', 'SIGTERM']);
+  app.get(Logger).log('[Worker Bootstrap] Worker application context initialized successfully');
 }
 
 void bootstrap().catch((error: unknown) => exitOnStartupFailure('worker', error));
