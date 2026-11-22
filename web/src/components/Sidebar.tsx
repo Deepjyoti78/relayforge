@@ -197,7 +197,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           {!isCollapsedMode && (
             <div>
-              <div style={{ fontSize: '14px', fontWeight: 800, color: '#09090B', letterSpacing: '-0.02em', lineHeight: '1.2' }}>
+              <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.01em', lineHeight: '1.2' }}>
                 RELAYFORGE
               </div>
               <div style={{ fontSize: '11px', color: '#71717A', fontWeight: 500 }}>

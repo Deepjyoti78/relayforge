@@ -724,9 +724,9 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
         <div>
           <div style={{
             fontSize: '11px',
-            fontWeight: 700,
+            fontWeight: 500,
             letterSpacing: '0.08em',
-            color: '#A3A3A3',
+            color: 'var(--text-muted)',
             textTransform: 'uppercase',
             marginBottom: '6px',
           }}>
@@ -786,11 +786,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <h1 style={{
-                fontSize: '24px',
-                fontWeight: 800,
+                fontSize: '22px',
+                fontWeight: 600,
                 color: 'var(--text-primary)',
                 margin: 0,
-                letterSpacing: '-0.02em',
+                letterSpacing: '-0.015em',
               }}>
                 {organization.name}
               </h1>
@@ -1090,7 +1090,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 </svg>
               </div>
               <div>
-                <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)', lineHeight: '1.2' }}>
+                <div style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: '1.2' }}>
                   {members.length}
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px' }}>
@@ -1128,7 +1128,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)', lineHeight: '1.2' }}>
+              <div style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: '1.2' }}>
                 {Math.max(1, members.filter((m) => m.role === 'OWNER').length)}
               </div>
               <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500, marginTop: '2px' }}>
@@ -1167,7 +1167,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)', lineHeight: '1.2' }}>
+              <div style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: '1.2' }}>
                 {Math.max(1, members.length)}
               </div>
               <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500, marginTop: '2px' }}>
@@ -1205,7 +1205,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)', lineHeight: '1.2' }}>
+              <div style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: '1.2' }}>
                 0
               </div>
               <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500, marginTop: '2px' }}>
@@ -1233,11 +1233,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                   <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
-                <span className="rf-card-label" style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <span className="rf-card-label" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   TOTAL MEMBERS
                 </span>
               </div>
-              <div className="rf-card-value" style={{ fontSize: '34px', fontWeight: 800, lineHeight: '1.1' }}>
+              <div className="rf-card-value" style={{ fontSize: '30px', fontWeight: 600, lineHeight: '1.1' }}>
                 <AnimatedCounter value={members.length} duration={1200} />
               </div>
               <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1283,11 +1283,11 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               <svg className="rf-card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" strokeWidth="2.2" style={{ flexShrink: 0 }}>
                 <path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5-3 3 1.5 1.5L9 14l-5 5H2v-2l5-5 1.5 1.5 3-3-1.5-1.5 3.5-3.5 1.5 1.5L21 2z"></path>
               </svg>
-              <span className="rf-card-label" style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              <span className="rf-card-label" style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 ACTIVE API KEYS
               </span>
             </div>
-            <div className="rf-card-value" style={{ fontSize: '32px', fontWeight: 800, lineHeight: '1.1' }}>
+            <div className="rf-card-value" style={{ fontSize: '30px', fontWeight: 600, lineHeight: '1.1' }}>
               <AnimatedCounter value={activeKeyCount} duration={1200} />
             </div>
             <div className="rf-card-subtext" style={{ marginTop: '10px', fontSize: '11px', fontWeight: 500 }}>
@@ -1310,7 +1310,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 ENDPOINTS (M3)
               </span>
             </div>
-            <div className="rf-card-value" style={{ fontSize: '32px', fontWeight: 800, lineHeight: '1.1' }}>
+            <div className="rf-card-value" style={{ fontSize: '30px', fontWeight: 600, lineHeight: '1.1' }}>
               <AnimatedCounter value={endpoints.length} duration={1200} />
             </div>
             <div className="rf-card-subtext" style={{ marginTop: '10px', fontSize: '11px', fontWeight: 500 }}>
@@ -1332,7 +1332,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 TENANT ISOLATION
               </span>
             </div>
-            <div className="rf-card-value" style={{ fontSize: '24px', fontWeight: 800, lineHeight: '1.2' }}>
+            <div className="rf-card-value" style={{ fontSize: '24px', fontWeight: 600, lineHeight: '1.2' }}>
               Enforced
             </div>
             <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1763,8 +1763,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     borderBottom: '1px solid var(--border-main)',
                     color: 'var(--text-muted)',
                     fontSize: '11px',
-                    fontWeight: 700,
-                    letterSpacing: '0.06em',
+                    fontWeight: 500,
+                    letterSpacing: '0.04em',
                     textTransform: 'uppercase',
                     backgroundColor: 'var(--bg-input)',
                   }}>
@@ -1907,7 +1907,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                                 padding: '4px 12px',
                                 borderRadius: '999px',
                                 fontSize: '11px',
-                                fontWeight: 800,
+                                fontWeight: 600,
                                 backgroundColor: '#FEF3C7',
                                 color: '#92400E',
                                 border: '1px solid #FDE68A',
@@ -2328,8 +2328,8 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 borderBottom: '1px solid var(--border-main)',
                 color: 'var(--text-muted)',
                 fontSize: '11px',
-                fontWeight: 700,
-                letterSpacing: '0.05em',
+                fontWeight: 500,
+                letterSpacing: '0.04em',
                 textTransform: 'uppercase',
                 backgroundColor: 'var(--bg-input)',
               }}>
@@ -3116,7 +3116,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             marginBottom: '12px',
             marginTop: '4px',
           }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.01em' }}>
               Tenant Operations
             </h3>
             <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
@@ -3145,7 +3145,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                       <circle cx="9" cy="7" r="4"></circle>
                     </svg>
-                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-primary)' }}>Members Directory</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)' }}>Members Directory</span>
                   </div>
                   <span style={{ fontSize: '10.5px', padding: '1px 6px', borderRadius: '6px', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-main)', color: 'var(--text-muted)', fontWeight: 600 }}>
                     <AnimatedCounter value={members.length} duration={1200} /> enrolled
@@ -3194,7 +3194,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2">
                       <path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5-3 3 1.5 1.5L9 14l-5 5H2v-2l5-5 1.5 1.5 3-3-1.5-1.5 3.5-3.5 1.5 1.5L21 2z"></path>
                     </svg>
-                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-primary)' }}>API Keys & Credentials</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)' }}>API Keys & Credentials</span>
                   </div>
                   <span style={{ fontSize: '10.5px', padding: '1px 6px', borderRadius: '6px', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-main)', color: 'var(--text-muted)', fontWeight: 600 }}>
                     <AnimatedCounter value={activeKeyCount} duration={1200} /> active
@@ -3244,7 +3244,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                     </svg>
-                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-primary)' }}>Webhook Ingestion</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)' }}>Webhook Ingestion</span>
                   </div>
                   <span style={{ fontSize: '10.5px', padding: '1px 6px', borderRadius: '6px', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-main)', color: 'var(--text-muted)', fontWeight: 600 }}>
                     <AnimatedCounter value={endpoints.length} duration={1200} /> endpoints
@@ -3293,7 +3293,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2">
                       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
                     </svg>
-                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-primary)' }}>Deliveries & DLQ</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)' }}>Deliveries & DLQ</span>
                   </div>
                   <span style={{ fontSize: '10.5px', padding: '1px 6px', borderRadius: '6px', backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-main)', color: 'var(--text-muted)', fontWeight: 600 }}>
                     {deliveries.length} logs
@@ -3359,7 +3359,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                       </svg>
                     </div>
-                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
                       Sequential Workflow Engine (M4)
                     </span>
                   </div>
@@ -3438,7 +3438,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                       </svg>
                     </div>
-                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
                       PostgreSQL Row-Level Security Enforced
                     </span>
                   </div>
@@ -3505,7 +3505,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
               padding: '28px',
               boxShadow: 'var(--shadow-card)',
             }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: 'var(--text-primary)' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 600, margin: '0 0 6px', color: 'var(--text-primary)' }}>
                 Organization Parameters
               </h3>
               <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: '0 0 20px' }}>
@@ -3643,7 +3643,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             padding: '28px',
             boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
           }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: 'var(--text-primary)' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 600, margin: '0 0 6px', color: 'var(--text-primary)' }}>
               Register Organization Member
             </h3>
             <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: '0 0 20px' }}>
@@ -3783,7 +3783,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             padding: '28px',
             boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
           }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: 'var(--text-primary)' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 600, margin: '0 0 6px', color: 'var(--text-primary)' }}>
               Create Organization API Key
             </h3>
             <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: '0 0 20px' }}>
@@ -3908,7 +3908,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             padding: '28px',
             boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
           }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: 'var(--text-primary)' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 600, margin: '0 0 6px', color: 'var(--text-primary)' }}>
               Create Ingestion Endpoint
             </h3>
             <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: '0 0 20px' }}>
@@ -4035,7 +4035,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             padding: '28px',
             boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
           }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: 'var(--text-primary)' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 600, margin: '0 0 6px', color: 'var(--text-primary)' }}>
               Register Destination Target
             </h3>
             <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: '0 0 20px' }}>
@@ -4238,7 +4238,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
             boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 600, margin: 0, color: 'var(--text-primary)' }}>
                 Delivery Attempt Details
               </h3>
               <button
@@ -4421,7 +4421,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                   ⚡
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px', color: 'var(--text-primary)' }}>
+                  <h3 style={{ fontSize: '17px', fontWeight: 600, margin: '0 0 4px', color: 'var(--text-primary)' }}>
                     Inbound Webhook Simulator
                   </h3>
                   <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: 0 }}>
@@ -4818,7 +4818,7 @@ export const OrgManagement: React.FC<OrgManagementProps> = ({
                 </svg>
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: 'var(--text-primary)' }}>
+                <h3 style={{ fontSize: '17px', fontWeight: 600, margin: '0 0 6px', color: 'var(--text-primary)' }}>
                   {confirmModal.title}
                 </h3>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
