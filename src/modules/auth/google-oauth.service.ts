@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { isTrustedFrontendUrl } from './browser-security';
 import { generatePkcePair, generateState } from '../../common/crypto';
 import type { User } from '../../generated/prisma/client';
 import { RuntimeConfig } from '../config/config.module';
@@ -23,24 +24,6 @@ export class GoogleOAuthService {
     private readonly database: DatabaseService,
   ) {}
 
-  private isAllowedRedirectOrigin(urlStr: string): boolean {
-    try {
-      const parsed = new URL(urlStr);
-      const frontendOrigin = new URL(this.config.values.frontendUrl).origin;
-      return (
-        parsed.origin === frontendOrigin ||
-        parsed.hostname === 'localhost' ||
-        parsed.hostname === '127.0.0.1' ||
-        parsed.hostname.endsWith('.onrender.com') ||
-        parsed.hostname.endsWith('.workers.dev') ||
-        parsed.hostname.endsWith('.pages.dev') ||
-        parsed.hostname === 'relayforge-staging-web.onrender.com'
-      );
-    } catch {
-      return false;
-    }
-  }
-
   /**
    * Generates a Google OAuth 2.0 authorization URL with PKCE (S256) and a unique short-lived state.
    * Persists state, PKCE code verifier, and redirect URI in PostgreSQL.
@@ -50,7 +33,7 @@ export class GoogleOAuthService {
     const { verifier, challenge } = generatePkcePair();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minute expiry
 
-    const resolvedRedirectUri = redirectUri && this.isAllowedRedirectOrigin(redirectUri)
+    const resolvedRedirectUri = redirectUri && isTrustedFrontendUrl(redirectUri, this.config.values.frontendUrl)
       ? redirectUri
       : this.config.values.frontendUrl;
 
@@ -117,7 +100,8 @@ export class GoogleOAuthService {
 
     return {
       user,
-      redirectUri: storedState.redirectUri ?? this.config.values.frontendUrl,
+      redirectUri: storedState.redirectUri && isTrustedFrontendUrl(storedState.redirectUri, this.config.values.frontendUrl)
+        ? storedState.redirectUri : this.config.values.frontendUrl,
     };
   }
 

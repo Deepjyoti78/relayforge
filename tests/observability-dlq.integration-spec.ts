@@ -79,6 +79,7 @@ describe('Milestone 5: Observability, Destination Rate Limiting & DLQ Management
     const orgRes = await request(app.getHttpServer())
       .post('/v1/organizations')
       .set('Cookie', ownerCookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'M5 Observability Org' });
 
     const orgBody = orgRes.body as OrgCreateResponse;
@@ -88,6 +89,7 @@ describe('Milestone 5: Observability, Destination Rate Limiting & DLQ Management
     const epRes = await request(app.getHttpServer())
       .post(`/v1/organizations/${orgId}/endpoints`)
       .set('Cookie', ownerCookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'M5 Ingestion Endpoint' });
 
     const epBody = epRes.body as EndpointCreateResponse;
@@ -230,6 +232,7 @@ describe('Milestone 5: Observability, Destination Rate Limiting & DLQ Management
       const res = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgId}/dlq/bulk-replay`)
         .set('Cookie', ownerCookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .send({ outboxIds: deadLetterIds });
 
       const data = res.body as BulkReplayResponse;
@@ -276,7 +279,8 @@ describe('Milestone 5: Observability, Destination Rate Limiting & DLQ Management
 
       const res = await request(app.getHttpServer())
         .delete(`/v1/organizations/${orgId}/dlq/${purgeId}`)
-        .set('Cookie', ownerCookie);
+        .set('Cookie', ownerCookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin);
 
       const data = res.body as PurgeResponse;
       expect(res.status).toBe(200);

@@ -68,6 +68,7 @@ describe('Phase 6: Distributed Concurrency & Replay Hardening (Integration)', ()
     const resOrg = await request(app.getHttpServer())
       .post('/v1/organizations')
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'Concurrency Org' })
       .expect(201);
     orgA = { id: (resOrg.body as { id: string }).id };
@@ -76,6 +77,7 @@ describe('Phase 6: Distributed Concurrency & Replay Hardening (Integration)', ()
     const resDest = await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/destinations`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({
         name: 'Echo Destination',
         url: 'http://127.0.0.1:9999/webhook',
@@ -88,6 +90,7 @@ describe('Phase 6: Distributed Concurrency & Replay Hardening (Integration)', ()
     const resHangingDest = await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/destinations`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({
         name: 'Hanging Destination',
         url: hangingServerUrl,
@@ -247,6 +250,7 @@ describe('Phase 6: Distributed Concurrency & Replay Hardening (Integration)', ()
       const res = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/deliveries/${attempt.id}/replay`)
         .set('Cookie', userA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .expect(400);
 
       expect((res.body as { message: string }).message).toContain('Cannot replay a successfully dispatched delivery');
@@ -303,10 +307,12 @@ describe('Phase 6: Distributed Concurrency & Replay Hardening (Integration)', ()
       const [res1, res2] = await Promise.all([
         request(app.getHttpServer())
           .post(`/v1/organizations/${orgA.id}/deliveries/${attempt.id}/replay`)
-          .set('Cookie', userA.cookie),
+          .set('Cookie', userA.cookie)
+          .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin),
         request(app.getHttpServer())
           .post(`/v1/organizations/${orgA.id}/deliveries/${attempt.id}/replay`)
-          .set('Cookie', userA.cookie),
+          .set('Cookie', userA.cookie)
+          .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin),
       ]);
 
       const statuses = [res1.status, res2.status].sort();

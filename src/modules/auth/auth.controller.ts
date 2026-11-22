@@ -45,12 +45,10 @@ export class AuthController {
     @Query('state') state: string,
     @Res() res: Response,
     @Query('error') error?: string,
-    @Query('error_description') errorDescription?: string,
   ): Promise<void> {
     if (error) {
       const fallbackUrl = new URL(this.config.values.frontendUrl);
       fallbackUrl.searchParams.set('error', error);
-      if (errorDescription) fallbackUrl.searchParams.set('error_description', errorDescription);
       return res.redirect(302, fallbackUrl.toString());
     }
 
@@ -71,24 +69,14 @@ export class AuthController {
 
       res.setHeader('Set-Cookie', cookieHeader);
 
-      // Pass token in redirect URL for SPAs across subdomains (e.g. onrender.com)
-      let destination = redirectUri;
-      try {
-        const redirectUrl = new URL(redirectUri);
-        redirectUrl.searchParams.set('token', token);
-        destination = redirectUrl.toString();
-      } catch {
-        destination = redirectUri;
-      }
-
-      res.redirect(302, destination);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'GitHub authentication failed';
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('Referrer-Policy', 'no-referrer');
+      res.redirect(302, redirectUri);
+    } catch {
       let dest = this.config.values.frontendUrl;
       try {
         const fallbackUrl = new URL(dest);
         fallbackUrl.searchParams.set('error', 'github_auth_failed');
-        fallbackUrl.searchParams.set('error_description', msg);
         dest = fallbackUrl.toString();
       } catch {}
       res.redirect(302, dest);
@@ -107,12 +95,10 @@ export class AuthController {
     @Query('state') state: string,
     @Res() res: Response,
     @Query('error') error?: string,
-    @Query('error_description') errorDescription?: string,
   ): Promise<void> {
     if (error) {
       const fallbackUrl = new URL(this.config.values.frontendUrl);
       fallbackUrl.searchParams.set('error', error);
-      if (errorDescription) fallbackUrl.searchParams.set('error_description', errorDescription);
       return res.redirect(302, fallbackUrl.toString());
     }
 
@@ -133,24 +119,14 @@ export class AuthController {
 
       res.setHeader('Set-Cookie', cookieHeader);
 
-      // Pass token in redirect URL for SPAs across subdomains (e.g. onrender.com)
-      let destination = redirectUri;
-      try {
-        const redirectUrl = new URL(redirectUri);
-        redirectUrl.searchParams.set('token', token);
-        destination = redirectUrl.toString();
-      } catch {
-        destination = redirectUri;
-      }
-
-      res.redirect(302, destination);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Google authentication failed';
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('Referrer-Policy', 'no-referrer');
+      res.redirect(302, redirectUri);
+    } catch {
       let dest = this.config.values.frontendUrl;
       try {
         const fallbackUrl = new URL(dest);
         fallbackUrl.searchParams.set('error', 'google_auth_failed');
-        fallbackUrl.searchParams.set('error_description', msg);
         dest = fallbackUrl.toString();
       } catch {}
       res.redirect(302, dest);

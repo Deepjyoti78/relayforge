@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
+import { isTrustedFrontendOrigin } from '../modules/auth/browser-security';
 import { ApiModule } from './app.module';
 import { RuntimeConfig } from '../modules/config/config.module';
 
@@ -16,40 +17,7 @@ export async function createApiApplication(): Promise<NestExpressApplication> {
   const config = app.get(RuntimeConfig).values;
   app.enableCors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      const allowed = [
-        config.frontendUrl,
-        'https://relayforge-staging-web.onrender.com',
-        'http://localhost:5173',
-        'http://127.0.0.1:5173',
-        'http://localhost:3000',
-      ];
-      try {
-        const parsed = new URL(origin);
-        if (
-          allowed.some((a) => a && a.toLowerCase() === origin.toLowerCase()) ||
-          parsed.hostname.endsWith('.onrender.com') ||
-          parsed.hostname.endsWith('.workers.dev') ||
-          parsed.hostname.endsWith('.pages.dev') ||
-          parsed.hostname === 'localhost' ||
-          parsed.hostname === '127.0.0.1' ||
-          origin.endsWith('.onrender.com') ||
-          origin.endsWith('.workers.dev') ||
-          origin.endsWith('.pages.dev')
-        ) {
-          return callback(null, true);
-        }
-      } catch {
-        if (
-          allowed.some((a) => a && a.toLowerCase() === origin.toLowerCase()) ||
-          origin.endsWith('.onrender.com') ||
-          origin.endsWith('.workers.dev') ||
-          origin.endsWith('.pages.dev')
-        ) {
-          return callback(null, true);
-        }
-      }
-      return callback(null, false);
+      callback(null, !origin || isTrustedFrontendOrigin(origin, config.frontendUrl));
     },
     credentials: true,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],

@@ -1,0 +1,140 @@
+RelayForge authentication security review
+Date: 22 November 2026 (Asia/Calcutta)
+Repository: Deepjyoti78/relayforge
+Base: release/staging-deployment, 81de4a50b859838b0111fa3907efe5179a9e4174
+Review branch: codex/auth-security-review
+Local worktree: C:/Users/deepjyoti/Desktop/RelayForge/auth-security-review-worktree
+
+Scope and corrections
+- Both OAuth services now trust only the configured FRONTEND_URL origin,
+  including scheme and port. Redirect URLs with userinfo are rejected. Invalid
+  redirects fall back to FRONTEND_URL. Stored redirects are revalidated during
+  callback, covering states created before this patch.
+- Google and GitHub callbacks keep the session in an HttpOnly cookie. Session
+  tokens are no longer appended to redirect URLs. Successful callbacks set
+  Cache-Control: no-store and Referrer-Policy: no-referrer. Internal/provider
+  error descriptions are no longer reflected into redirect URLs.
+- Browser OAuth uses full-page navigation for both providers. It no longer
+  passes tokens through postMessage, BroadcastChannel, storage events, or URL
+  parameters. The frontend validates the cookie via /v1/me on every startup.
+  Legacy URL tokens are discarded and removed from history. Legacy persisted
+  session/popup tokens are removed. The existing development manual-token
+  facility uses memory only; it does not survive reload.
+- Credentialed CORS permits the exact configured frontend origin. Shared hosting
+  suffixes, unconditional loopback origins, malformed origins, and arbitrary
+  ports are no longer allowed. Nonbrowser requests without Origin still work.
+- Cookie-authenticated mutations require an exact trusted Origin or, only when
+  Origin is absent, a trusted Referer. Missing/null/untrusted origins fail closed.
+  Bearer-only clients remain supported. A bearer header cannot exempt a request
+  authenticated by a cookie from CSRF checks. The request Host is not trusted.
+- Both SSE aliases verify membership using the authenticated user and requested
+  organization inside tenant context before obtaining the stream. VIEWER members
+  remain authorized; nonmembers receive 403 and unauthenticated clients 401.
+- Existing integration fixtures send Origin for cookie-authenticated mutations.
+  Existing OAuth test mocks were typed so the complete lint check passes.
+
+Regression evidence, before implementation
+- OAuth redirects/callback token exposure and CSRF: 27 failing assertions,
+  23 passing; audit-auth-before.log.
+- SSE HTTP authorization: 4 failing assertions, 2 passing. Both routes returned
+  streams for authenticated nonmembers; audit-sse-before.log.
+- API bootstrap CORS and actual frontend storage module: 8 failing assertions,
+  7 passing; audit-browser-before.log.
+- The CORS and storage regressions were run against restored original versions
+  of those two files before applying their corrections. No real provider tokens
+  or production accounts were used.
+
+Validation
+- npm test: PASS, 239 tests across 18 suites (final log: audit-unit.log).
+- npm run test:integration: PASS, 82 tests across 9 suites; real local PostgreSQL
+  and Redis, restricted API/worker database roles (audit-integration.log).
+- npm run lint: PASS (audit-lint.log).
+- npm run typecheck: PASS (audit-typecheck.log).
+- npm --prefix web run build: PASS, including frontend TypeScript and Vite
+  production bundle (audit-web-build.log).
+- npm run build: PASS, Prisma generation and backend compilation
+  (audit-api-build.log).
+- git diff --check: PASS.
+- All 13 existing migrations applied to the isolated relayforge_test database.
+  No application schema migration was introduced by this patch.
+- Sandbox initially blocked DNS/local services. Tests and builds requiring
+  network/process access were rerun with reviewed permissions; final results
+  above use those runs. Logs are local ignored artifacts, not committed.
+- Nonfatal existing warnings: Vite entry bundle exceeds 500 kB minified; pg warns
+  about a query submitted while another query is executing. The final integration
+  run exited normally; an earlier run reported an open handle.
+
+Environment-dependent release checks still required
+- Live Google and GitHub consent, registered callback URLs, redirect back to the
+  configured frontend, /v1/me after navigation/reload, logout, and SSE should be
+  exercised in staging using authorized test accounts. Provider calls were
+  mocked in unit tests; live provider consent was not attempted.
+- Cross-site frontend/API hosting depends on third-party-cookie policy even with
+  SameSite=None; Secure and fetch/EventSource credentials enabled. In particular,
+  distinct hosting-provider domains can be cross-site. Browsers that block those
+  cookies may fail sign-in persistence. Validate supported browsers. A same-site
+  domain arrangement or same-origin API proxy is the preferred deployment remedy;
+  do not restore URL/localStorage session-token delivery as a workaround.
+- FRONTEND_URL must equal the actual frontend origin (a path is allowed in the
+  configured URL) and use HTTPS in production. Development frontend/API hosts
+  must align for Lax cookies; frontend fallback now preserves localhost versus
+  127.0.0.1. An explicit VITE_API_URL still takes precedence. No deployment
+  environment values or secrets were modified.
+- Frontend has no standalone lint/test script. Its module behavior is covered
+  through Jest's VM sandbox and its typecheck is included in the build; no
+  automated real-browser end-to-end flow was run.
+
+Remaining security risks / follow-up work
+- Previously exposed session tokens may already exist in copied URLs, external
+  logs, browser history, or other clients. Removing local storage does not revoke
+  server-side sessions. An authorized operational session revocation should be
+  considered separately; this audit did not revoke users' sessions.
+- OAuth state is single-use and expires after ten minutes, but is not bound to
+  the initiating browser with a separate cookie. Login-CSRF/session-swapping
+  protection remains incomplete and deserves a focused follow-up with provider-
+  specific browser-bound state. This patch does not claim to close that issue.
+- SSE membership/session authorization is checked at connection time. An already
+  open stream is not revalidated when membership is removed or a session is
+  revoked/expires. Immediate disconnect/revalidation needs follow-up.
+- Origin checks mitigate cookie CSRF, not same-origin XSS. General XSS auditing,
+  dependency vulnerabilities, OAuth account-linking policy, and infrastructure
+  configuration were outside this targeted patch.
+
+Changed files (plus this report)
+- src/api/create-api.ts
+- src/modules/auth/auth.controller.ts
+- src/modules/auth/auth.guard.ts
+- src/modules/auth/browser-security.ts
+- src/modules/auth/github-oauth.service.ts
+- src/modules/auth/google-oauth.service.ts
+- src/modules/observability/telemetry.controller.ts
+- tests/api-keys.integration-spec.ts
+- tests/auth-security.spec.ts
+- tests/browser-session-security.spec.ts
+- tests/concurrency-hardening.integration-spec.ts
+- tests/cors-security.spec.ts
+- tests/delivery.integration-spec.ts
+- tests/destinations.integration-spec.ts
+- tests/endpoints-ingestion.integration-spec.ts
+- tests/oauth-authentication.spec.ts
+- tests/observability-dlq.integration-spec.ts
+- tests/sse-security.spec.ts
+- tests/tenancy.integration-spec.ts
+- tests/workflow-execution.integration-spec.ts
+- web/src/App.tsx
+- web/src/api.ts
+- web/src/components/SignIn.tsx
+
+Review handling
+The shared checkout contained unrelated typography work which another process
+committed while the audit ran. Security edits were copied and hash-verified into
+this isolated worktree, then only the exact unchanged copies were removed from
+the shared checkout. The typography commit is the base of the review branch and
+is not included in the security diff. No main-branch push, remote push, PR merge,
+automatic merge, deployment, or deployment-secret update was performed.
+
+References
+OWASP CSRF Prevention Cheat Sheet (exact Origin/Referer checks and fail-closed
+behavior): https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
+MDN third-party cookies (browser policy and cross-site cookie limitations):
+https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Third-party_cookies

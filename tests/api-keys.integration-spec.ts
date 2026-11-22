@@ -83,6 +83,7 @@ describe('Milestone 3 — API Key Management & RLS Tenant Isolation (Integration
     const resA = await request(app.getHttpServer())
       .post('/v1/organizations')
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'Org A Ingestion' })
       .expect(201);
     orgA = resA.body as { id: string; name: string };
@@ -91,12 +92,14 @@ describe('Milestone 3 — API Key Management & RLS Tenant Isolation (Integration
     await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/members`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ email: userDev.email, role: 'DEVELOPER' })
       .expect(201);
 
     await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/members`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ email: userViewer.email, role: 'VIEWER' })
       .expect(201);
 
@@ -104,6 +107,7 @@ describe('Milestone 3 — API Key Management & RLS Tenant Isolation (Integration
     const resB = await request(app.getHttpServer())
       .post('/v1/organizations')
       .set('Cookie', userB.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'Org B Isolated' })
       .expect(201);
     orgB = resB.body as { id: string; name: string };
@@ -120,6 +124,7 @@ describe('Milestone 3 — API Key Management & RLS Tenant Isolation (Integration
     const res = await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/api-keys`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'Production Ingest Key', scopes: ['ingest'] })
       .expect(201);
 
@@ -168,6 +173,7 @@ describe('Milestone 3 — API Key Management & RLS Tenant Isolation (Integration
     const res = await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/api-keys`)
       .set('Cookie', userDev.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'Dev Team Key' })
       .expect(201);
 
@@ -180,6 +186,7 @@ describe('Milestone 3 — API Key Management & RLS Tenant Isolation (Integration
     await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/api-keys`)
       .set('Cookie', userViewer.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'Unauthorized Viewer Key' })
       .expect(403);
   });
@@ -195,6 +202,7 @@ describe('Milestone 3 — API Key Management & RLS Tenant Isolation (Integration
     await request(app.getHttpServer())
       .delete(`/v1/organizations/${orgA.id}/api-keys/${apiKeyRecordA.id}`)
       .set('Cookie', userB.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .expect(404);
   });
 
@@ -227,6 +235,7 @@ describe('Milestone 3 — API Key Management & RLS Tenant Isolation (Integration
     const res = await request(app.getHttpServer())
       .delete(`/v1/organizations/${orgA.id}/api-keys/${apiKeyRecordA.id}`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .expect(200);
 
     const body = res.body as { id: string; revokedAt: string | null };
