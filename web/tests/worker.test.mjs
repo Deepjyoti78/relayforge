@@ -1,12 +1,37 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
+import path from 'node:path';
 import {proxyRequest} from '../worker.js';
+import {assertRuntimeValues, assertGeneratedBindings, assertNoGeneratedRedirect} from '../../scripts/check-cloudflare-runtime.cjs';
 
 const env = {API_ORIGIN:'https://api.example.test', FRONTEND_URL:'https://app.example.test', ASSETS:{fetch:async () => new Response('SPA')}};
+const runtimeVars = {FRONTEND_URL:'https://relayforge.deepmuse.workers.dev', API_ORIGIN:'https://relayforge-staging-api.onrender.com'};
+test('configuration validator rejects omitted runtime vars and renamed Worker', () => {
+  const settings={name:'relayforge',assets:{binding:'ASSETS'},vars:runtimeVars};
+  assertRuntimeValues(settings);
+  assert.throws(()=>assertRuntimeValues({...settings,vars:{}}));
+  assert.throws(()=>assertRuntimeValues({...settings,name:'relayforge-staging'}));
+});
+test('effective binding validation requires complete exact literal values, not generic types or truncated URLs', () => {
+  assert.deepEqual(assertGeneratedBindings(`interface Env { FRONTEND_URL: ${JSON.stringify(runtimeVars.FRONTEND_URL)}; API_ORIGIN: ${JSON.stringify(runtimeVars.API_ORIGIN)}; }`),runtimeVars);
+  assert.throws(()=>assertGeneratedBindings('interface Env { FRONTEND_URL: string; API_ORIGIN: string; }'));
+  assert.throws(()=>assertGeneratedBindings(`interface Env { FRONTEND_URL: ${JSON.stringify(runtimeVars.FRONTEND_URL)}; API_ORIGIN: "https://relayforge-staging-api.onrend..."; }`));
+});
+test('generated deployment config in a parent directory cannot silently redirect publication', () => {
+  const fixture = path.resolve('config-fixture');
+  const redirect = path.join(fixture,'.wrangler','deploy','config.json');
+  assertNoGeneratedRedirect(path.join(fixture,'web'),()=>false);
+  assert.throws(()=>assertNoGeneratedRedirect(path.join(fixture,'web'),filename=>filename===redirect));
+});
 test('both Wrangler entry points wire the Worker and reserved routes before SPA fallback', async () => {
   for (const config of [new URL('../../wrangler.jsonc',import.meta.url),new URL('../wrangler.jsonc',import.meta.url)]) {
     const settings=JSON.parse(await readFile(config,'utf8'));
+    assert.equal(settings.name,'relayforge');
+    assert.deepEqual(settings.vars,{
+      FRONTEND_URL:'https://relayforge.deepmuse.workers.dev',
+      API_ORIGIN:'https://relayforge-staging-api.onrender.com',
+    });
     assert.equal(new URL(settings.main,config).pathname,new URL('../worker.js',import.meta.url).pathname);
     assert.equal(settings.assets.binding,'ASSETS');
     assert.equal(new URL(settings.assets.directory+'/',config).pathname,new URL('../dist/',import.meta.url).pathname);
