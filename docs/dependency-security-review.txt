@@ -47,6 +47,15 @@ Local results (distinct from GitHub Actions)
 - Full development audit: 26 existing moderate findings remain; out of scope.
 - Unit tests: 179 tests, 15 suites pass (baseline 178 tests, 14 suites).
 - PostgreSQL/Redis integration: 78 tests, 9 suites pass.
+- Post-rebase repeated ordinary integration runs on a reused test database
+  pass all 78 assertions but exit 1 during late worker/undici activity after
+  Jest teardown. The original Effect 3.20.0 independently reproduces this
+  failure on the same database (78 assertions pass, exit 1). The patched
+  --detectOpenHandles diagnostic run exits 0 with all 78 passing; no forced
+  exit or failure suppression was used. Worker shutdown clears timers but
+  does not await in-flight sweeps, consistent with the observed stack.
+  This pre-existing lifecycle issue needs separate follow-up; successful
+  assertions alone do not make the affected ordinary runs clean passes.
 - Typecheck, Prisma generation/validate, API/worker TypeScript build and
   frontend build pass. Frontend retains its existing >500 kB chunk warning.
 - Lint fails with the same 87 errors in tests/oauth-authentication.spec.ts
