@@ -234,6 +234,7 @@ model OutboxMessage {
   nextRetryAt    DateTime?    @map("next_retry_at") @db.Timestamptz(3)
   leaseExpiresAt DateTime?    @map("lease_expires_at") @db.Timestamptz(3)
   leaseToken     String?      @map("lease_token") @db.Uuid
+  deliveriesInitialized Boolean @default(false) @map("deliveries_initialized")
   replayedBy     String?      @map("replayed_by") @db.Uuid
   replayedAt     DateTime?    @map("replayed_at") @db.Timestamptz(3)
   workflowExecutionId String? @map("workflow_execution_id") @db.Uuid
@@ -244,13 +245,34 @@ model OutboxMessage {
   organization     Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   workflowExecution WorkflowExecution? @relation(fields: [workflowExecutionId], references: [id], onDelete: SetNull)
   deliveryAttempts DeliveryAttempt[]
+  destinationDeliveries DestinationDelivery[]
 
+  @@unique([id, organizationId])
   @@index([status, createdAt])
   @@index([status, nextRetryAt])
   @@index([leaseExpiresAt])
   @@index([organizationId])
   @@index([workflowExecutionId])
   @@map("outbox_messages")
+}
+
+// Durable fanout snapshot. Destination IDs survive destination deletion so
+// unfinished deliveries become explicit failures rather than disappearing.
+model DestinationDelivery {
+  outboxMessageId String @map("outbox_message_id") @db.Uuid
+  destinationId String @map("destination_id") @db.Uuid
+  organizationId String @map("org_id") @db.Uuid
+  status OutboxStatus @default(PENDING)
+  attemptCount Int @default(0) @map("attempt_count")
+  nextRetryAt DateTime? @map("next_retry_at") @db.Timestamptz(3)
+  activeLeaseToken String? @map("active_lease_token") @db.Uuid
+  lastError String? @map("last_error")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+  outbox OutboxMessage @relation(fields: [outboxMessageId, organizationId], references: [id, organizationId], onDelete: Cascade)
+
+  @@id([outboxMessageId, destinationId])
+  @@index([organizationId])
+  @@map("destination_deliveries")
 }
 
 // Milestone 3 Option 1: Destination Registry & SSRF Protection

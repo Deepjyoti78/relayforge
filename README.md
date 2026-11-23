@@ -2,7 +2,7 @@
 
 RelayForge is an enterprise-grade webhook delivery gateway and distributed sequential workflow orchestration platform.
 
-Engineered with a zero-trust security model and distributed-systems correctness, RelayForge ingests untrusted inbound webhooks with transactional durability, prevents outbound SSRF and DNS rebinding attacks via socket-level IP pinning, executes isolated sequential multi-step workflows, and guarantees at-least-once HTTP delivery with jittered exponential backoff and rate-limited dispatch.
+Engineered with a zero-trust security model and distributed-systems correctness, RelayForge ingests untrusted inbound webhooks with transactional durability, prevents outbound SSRF and DNS rebinding attacks via socket-level IP pinning, executes isolated sequential multi-step workflows, and provides durable, bounded at-least-once HTTP delivery attempts with jittered exponential backoff and rate-limited dispatch.
 
 ---
 
@@ -12,7 +12,7 @@ Engineered with a zero-trust security model and distributed-systems correctness,
 - **SSRF & DNS Rebinding Elimination:** Custom `undici` socket-level IP pinning verifies all resolved IPv4/IPv6 addresses, eliminates TOCTOU DNS rebinding vulnerabilities, rejects internal and cloud metadata IP ranges (`169.254.169.254`, `fd00:ec2::254`), and strictly disables automatic HTTP redirects (`redirect: 'manual'`).
 - **Distributed Sequential Workflow Engine:** Durable multi-step pipeline execution supporting Webhook Triggers → ALL/ANY Condition Groups → JSON Path Mapping & Transformations → Multiple Sequential HTTP Actions with checkpointed state.
 - **Tenant Isolation with PostgreSQL RLS:** Native PostgreSQL Row-Level Security (RLS) policies scoped by transaction-local `app.current_org_id` and `app.current_user_id` protect tenant tables under restricted runtime roles. Global identity/session tables are separate.
-- **At-Least-Once Delivery Semantics:** Distributed workers claim outbox batches using pessimistic row-level locking (`SELECT FOR UPDATE SKIP LOCKED`) and monotonic lease tokens with fenced crash recovery.
+- **At-Least-Once Delivery Semantics:** Workers claim coordinators just before processing, renew live leases, and persist independent destination retry outcomes with fenced crash recovery.
 - **Destination Rate Limiting & DLQ:** Atomic Redis sliding-window token bucket limits dispatch rates per destination with non-destructive outbox postpone. Advanced Dead Letter Queue (DLQ) console supports categorized filtering and bulk replay.
 - **Monochromatic Management Console:** High-contrast dark developer console with visual sequential workflow designer, real-time Server-Sent Events (SSE) telemetry, metrics dashboard, in-app modal confirmations, and a split-pane sign-in modal.
 

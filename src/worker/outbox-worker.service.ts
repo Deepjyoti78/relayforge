@@ -5,7 +5,7 @@ import { decryptSecret } from '../common/crypto';
 import { DatabaseService } from '../modules/database/database.service';
 import { DeliveryService } from '../modules/delivery/delivery.service';
 import { RateLimiterService } from '../modules/delivery/rate-limiter.service';
-import { evaluateRetry } from '../modules/delivery/retry-policy';
+import { calculateNextRetryDelay, evaluateRetry } from '../modules/delivery/retry-policy';
 import { RuntimeConfig } from '../modules/config/config.module';
 import { EventStreamService } from '../modules/observability/event-stream.service';
 import { safeError } from '../modules/observability/logging';
@@ -36,6 +36,7 @@ interface ActiveDestinationRow {
   rate_limit_per_second: number;
   timeout_ms: number;
   is_active: boolean;
+  attempt_count: number;
 }
 
 interface OrgEndpointSecretRow {
@@ -115,7 +116,7 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
   /**
    * Concurrently claims and dispatches pending transactional outbox messages.
    * Uses FOR UPDATE SKIP LOCKED with unique lease_token via claim_pending_outbox_messages
-   * to guarantee single-delivery ownership and optimistic concurrency control across workers.
+   * to fence database state ownership; remote HTTP receipt can remain ambiguous.
    */
   sweepPendingOutbox(): Promise<number> {
     return this.trackSweep(this.runPendingOutboxSweep());
@@ -127,20 +128,20 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
 
     let processedCount = 0;
     try {
-      const claimedMessages = await this.database.client.$queryRaw<ClaimedOutboxRow[]>`
-        SELECT id, event_id, org_id, channel, payload, status, attempt_count, created_at, event_type, max_retries, lease_token
-        FROM claim_pending_outbox_messages(25, 30)
-      `;
-
-      if (!claimedMessages || claimedMessages.length === 0) {
-        return 0;
-      }
-
-      processedCount = claimedMessages.length;
-      for (const msg of claimedMessages) {
-        // Unstarted messages retain their leases for normal stale recovery.
-        if (!this.isRunning) break;
-        await this.processOutboxMessage(msg);
+      const visited: string[] = [];
+      // Start each lease immediately before work, rather than aging 25 leases
+      // while earlier messages wait on sequential HTTP delivery.
+      for (let i = 0; i < 25 && this.isRunning; i += 1) {
+        const claimedMessages = await this.database.client.$queryRaw<ClaimedOutboxRow[]>`
+          SELECT * FROM claim_pending_outbox_messages(1, 30, ${visited}::uuid[])
+        `;
+        if (!claimedMessages?.length) break;
+        for (const msg of claimedMessages) {
+          if (!this.isRunning) break;
+          visited.push(msg.id);
+          processedCount += 1;
+          await this.withLeaseHeartbeat(msg);
+        }
       }
     } catch (err: unknown) {
       this.logger.error({
@@ -178,7 +179,43 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  private async processOutboxMessage(msg: ClaimedOutboxRow): Promise<void> {
+  private async renewLease(msg: ClaimedOutboxRow): Promise<boolean> {
+    const rows = await this.database.client.$queryRaw<{ renew_outbox_lease: boolean }[]>`
+      SELECT renew_outbox_lease(${msg.id}::uuid, ${msg.lease_token}::uuid, 30)
+    `;
+    return rows[0]?.renew_outbox_lease === true;
+  }
+
+  private async withLeaseHeartbeat(msg: ClaimedOutboxRow): Promise<void> {
+    const controller = new AbortController();
+    let pending: Promise<void> | undefined;
+    const renew = async () => {
+      try {
+        if (!await this.renewLease(msg)) controller.abort();
+      } catch (error: unknown) {
+        controller.abort();
+        this.logger.warn({ event: 'outbox_lease_renewal_failed', error: safeError(error), outboxId: msg.id });
+      }
+    };
+    await renew();
+    if (controller.signal.aborted || !this.isRunning) return;
+    const timer = setInterval(() => {
+      if (!pending) pending = renew().finally(() => { pending = undefined; });
+    }, 10000).unref();
+    try { await this.processOutboxMessage(msg, controller.signal); }
+    finally { clearInterval(timer); await pending; }
+  }
+
+  private async recordDestination(msg: ClaimedOutboxRow, destinationId: string,
+    status: 'PENDING' | 'DISPATCHED' | 'DEAD_LETTER', next: Date | null, error: string | null, refund = false): Promise<boolean> {
+    const rows = await this.database.client.$queryRaw<{ record_destination_result: boolean }[]>`
+      SELECT record_destination_result(${msg.id}::uuid, ${destinationId}::uuid, ${msg.lease_token}::uuid,
+        ${status}::outbox_status, ${next}::timestamptz, ${error}::text, ${refund}::boolean)
+    `;
+    return rows[0]?.record_destination_result === true;
+  }
+
+  private async processOutboxMessage(msg: ClaimedOutboxRow, signal: AbortSignal): Promise<void> {
     try {
       // If outbox message belongs to a workflow execution, delegate to WorkflowEngineService
       if (msg.channel === 'workflow' && this.workflowEngine) {
@@ -192,200 +229,56 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
         return;
       }
 
-      // 1. Fetch active destinations for this tenant
       const destinations = await this.database.client.$queryRaw<ActiveDestinationRow[]>`
-        SELECT id, org_id, name, url, http_method, headers, rate_limit_per_second, timeout_ms, is_active
-        FROM get_active_destinations_for_org(${msg.org_id}::uuid)
+        SELECT * FROM prepare_destination_deliveries(${msg.id}::uuid, ${msg.lease_token}::uuid)
       `;
-
-      const eventType = msg.event_type || 'webhook.event';
-
-      // If no active destinations exist, mark outbox dispatched and event completed
-      if (!destinations || destinations.length === 0) {
-        await this.database.client.$queryRaw<{ complete_outbox_dispatch: boolean }[]>`
-          SELECT complete_outbox_dispatch(${msg.id}::uuid, ${msg.event_id}::uuid, 'DISPATCHED', 'COMPLETED', ${msg.lease_token}::uuid)
-        `;
-        return;
-      }
-
-      // 1b. Fetch the org's endpoint signing secret for outbound HMAC signing.
-      //     Uses a SECURITY DEFINER function to bypass RLS (worker has no user context).
-      let orgSigningSecret: string | undefined;
-      try {
-        const secretRows = await this.database.client.$queryRaw<OrgEndpointSecretRow[]>`
-          SELECT endpoint_id, secret_ciphertext, secret_iv, secret_tag
-          FROM get_org_endpoint_signing_secret(${msg.org_id}::uuid)
-        `;
-        const secretRow = secretRows?.[0];
-        if (secretRow) {
-          orgSigningSecret = decryptSecret(
-            secretRow.secret_ciphertext,
-            secretRow.secret_iv,
-            secretRow.secret_tag,
-            this.getEncryptionKey(),
-          );
-        }
-      } catch (err: unknown) {
-        this.logger.warn({
-          event: 'outbox_signing_secret_fetch_failed',
-          outboxId: msg.id,
-          orgId: msg.org_id,
-          error: safeError(err),
-        });
-        // If we cannot decrypt the signing secret, abort delivery for this batch.
-        // This prevents unsigned deliveries from silently going out.
-        return;
-      }
-
-      if (!orgSigningSecret) {
-        this.logger.warn({
-          event: 'outbox_no_signing_secret',
-          outboxId: msg.id,
-          orgId: msg.org_id,
-          message: 'No active endpoint found for org; skipping delivery.',
-        });
-        return;
-      }
-
-      // 2. Check destination rate limits before delivery
+      const secrets = await this.database.client.$queryRaw<OrgEndpointSecretRow[]>`
+        SELECT * FROM get_event_endpoint_signing_secret(${msg.org_id}::uuid, ${msg.event_id}::uuid)
+      `;
+      const secret = secrets[0];
+      if (destinations.length && !secret) throw new Error('Originating endpoint signing secret unavailable');
+      const signingSecret = secret ? decryptSecret(secret.secret_ciphertext, secret.secret_iv, secret.secret_tag, this.getEncryptionKey()) : undefined;
       for (const dest of destinations) {
+        if (!this.isRunning) break;
+        if (signal.aborted || !await this.renewLease(msg)) return;
+        const started = await this.database.client.$queryRaw<{ begin_destination_delivery: number }[]>`
+          SELECT begin_destination_delivery(${msg.id}::uuid, ${dest.id}::uuid, ${msg.lease_token}::uuid)
+        `;
+        const attemptNumber = started[0]?.begin_destination_delivery ?? 0;
+        if (!attemptNumber) continue;
+        if (!dest.is_active) {
+          if (!await this.recordDestination(msg, dest.id, 'DEAD_LETTER', null, 'Destination deleted or deactivated')) return;
+          continue;
+        }
         if (dest.rate_limit_per_second > 0) {
-          const rateLimit = await this.rateLimiter.checkRateLimit(
-            dest.id,
-            dest.rate_limit_per_second,
-          );
-          if (!rateLimit.allowed) {
-            // Postpone delivery instead of burning customer retry quota
-            await this.database.client.$queryRaw<{ postpone_outbox_rate_limit: boolean }[]>`
-              SELECT postpone_outbox_rate_limit(${msg.id}::uuid, ${msg.lease_token}::uuid, ${rateLimit.retryAfterSeconds}::int)
-            `;
-            this.logger.warn({
-              event: 'delivery_rate_limit_postponed',
-              outboxId: msg.id,
-              destinationId: dest.id,
-              retryAfterSeconds: rateLimit.retryAfterSeconds,
-            });
-            return;
+          const limit = await this.rateLimiter.checkRateLimit(dest.id, dest.rate_limit_per_second);
+          if (!limit.allowed) {
+            if (!await this.recordDestination(msg, dest.id, 'PENDING', new Date(Date.now() + limit.retryAfterSeconds * 1000), 'Rate limited', true)) return;
+            continue;
           }
         }
-      }
-
-      // 3. Deliver to each destination target
-      let anySucceeded = false;
-      let lastStatusCode: number | null = null;
-      let lastErrorDescription: string | null = null;
-      let lastRetryAfterSeconds: number | null = null;
-
-      for (const dest of destinations) {
+        // A fresh fence immediately precedes egress; renewal failure aborts an
+        // in-flight request as ambiguous, rather than authorizing stale work.
+        if (signal.aborted || !await this.renewLease(msg)) return;
         const attempt = await this.deliveryService.deliverEventToDestination({
-          organizationId: msg.org_id,
-          eventId: msg.event_id,
-          destination: {
-            id: dest.id,
-            url: dest.url,
-            httpMethod: dest.http_method,
-            headers: dest.headers,
-            rateLimitPerSecond: dest.rate_limit_per_second,
-            timeoutMs: dest.timeout_ms,
-          },
-          payload: msg.payload,
-          eventType,
-          outboxMessageId: msg.id,
-          attemptNumber: msg.attempt_count,
-          signingSecret: orgSigningSecret,
+          organizationId: msg.org_id, eventId: msg.event_id, outboxMessageId: msg.id,
+          destination: { id: dest.id, url: dest.url, httpMethod: dest.http_method, headers: dest.headers,
+            rateLimitPerSecond: dest.rate_limit_per_second, timeoutMs: dest.timeout_ms },
+          payload: msg.payload, eventType: msg.event_type || 'webhook.event', attemptNumber, ...(signingSecret ? { signingSecret } : {}), signal,
         });
-
-        if (attempt.status === 'SUCCESS') {
-          anySucceeded = true;
-        } else {
-          lastStatusCode = attempt.statusCode;
-          lastErrorDescription = attempt.errorDescription;
-          if (attempt.retryAfterSeconds) {
-            lastRetryAfterSeconds = attempt.retryAfterSeconds;
-          }
-        }
+        const retry = evaluateRetry({ attemptCount: attemptNumber, maxRetries: msg.max_retries,
+          statusCode: attempt.statusCode, errorDescription: attempt.errorDescription,
+          ...(attempt.retryAfterSeconds ? { retryAfterMs: attempt.retryAfterSeconds * 1000 } : {}),
+        });
+        const status = attempt.status === 'SUCCESS' ? 'DISPATCHED' : retry.shouldRetry ? 'PENDING' : 'DEAD_LETTER';
+        if (!await this.recordDestination(msg, dest.id, status, status === 'PENDING' ? retry.nextRetryAt : null, attempt.errorDescription)) return;
       }
-
-      // 4. Update status or schedule retry / dead-letter with lease_token verification
-      if (anySucceeded) {
-        const res = await this.database.client.$queryRaw<{ complete_outbox_dispatch: boolean }[]>`
-          SELECT complete_outbox_dispatch(${msg.id}::uuid, ${msg.event_id}::uuid, 'DISPATCHED', 'COMPLETED', ${msg.lease_token}::uuid)
-        `;
-        const completed = res?.[0]?.complete_outbox_dispatch ?? false;
-        if (!completed) {
-          this.logger.warn({
-            event: 'stale_worker_complete_rejected',
-            outboxId: msg.id,
-            leaseToken: msg.lease_token,
-            message: 'Worker lease expired or was superseded before completion.',
-          });
-        }
-      } else {
-        const evalResult = evaluateRetry({
-          attemptCount: msg.attempt_count,
-          maxRetries: msg.max_retries ?? 5,
-          statusCode: lastStatusCode,
-          errorDescription: lastErrorDescription,
-          ...(lastRetryAfterSeconds ? { retryAfterMs: lastRetryAfterSeconds * 1000 } : {}),
-        });
-
-        if (evalResult.shouldRetry && evalResult.nextRetryAt) {
-          const res = await this.database.client.$queryRaw<{ schedule_outbox_retry: boolean }[]>`
-            SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, ${evalResult.nextRetryAt}::timestamptz, false, ${msg.lease_token}::uuid)
-          `;
-          const retried = res?.[0]?.schedule_outbox_retry ?? false;
-          if (!retried) {
-            this.logger.warn({
-              event: 'stale_worker_retry_rejected',
-              outboxId: msg.id,
-              leaseToken: msg.lease_token,
-            });
-          } else {
-            this.logger.log({
-              event: 'delivery_retry_scheduled',
-              outboxId: msg.id,
-              attemptCount: msg.attempt_count,
-              delayMs: evalResult.delayMs,
-              nextRetryAt: evalResult.nextRetryAt.toISOString(),
-            });
-          }
-        } else {
-          const res = await this.database.client.$queryRaw<{ schedule_outbox_retry: boolean }[]>`
-            SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, NOW(), true, ${msg.lease_token}::uuid)
-          `;
-          const deadLettered = res?.[0]?.schedule_outbox_retry ?? false;
-          if (!deadLettered) {
-            this.logger.warn({
-              event: 'stale_worker_deadletter_rejected',
-              outboxId: msg.id,
-              leaseToken: msg.lease_token,
-            });
-          } else {
-            this.logger.warn({
-              event: 'delivery_dead_lettered',
-              outboxId: msg.id,
-              attemptCount: msg.attempt_count,
-              reason: evalResult.reason,
-              statusCode: lastStatusCode,
-              error: lastErrorDescription,
-            });
-
-            // Publish DLQ real-time telemetry event
-            void this.eventStream.publishEvent({
-              type: 'dlq.routed',
-              organizationId: msg.org_id,
-              timestamp: new Date().toISOString(),
-              payload: {
-                outboxId: msg.id,
-                eventId: msg.event_id,
-                attemptCount: msg.attempt_count,
-                reason: evalResult.reason,
-                statusCode: lastStatusCode,
-                error: lastErrorDescription,
-              },
-            });
-          }
-        }
+      const result = await this.database.client.$queryRaw<{ finish_destination_batch: string | null }[]>`
+        SELECT finish_destination_batch(${msg.id}::uuid, ${msg.lease_token}::uuid)
+      `;
+      if (result[0]?.finish_destination_batch === 'DEAD_LETTER') {
+        await this.eventStream.publishEvent({ type: 'dlq.routed', organizationId: msg.org_id,
+          timestamp: new Date().toISOString(), payload: { outboxId: msg.id, eventId: msg.event_id } });
       }
     } catch (err: unknown) {
       this.logger.error({
@@ -393,6 +286,16 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
         outboxId: msg.id,
         error: safeError(err),
       });
+
+      if (msg.channel !== 'workflow') {
+        // Coordinator/configuration failures must not exhaust a destination's
+        // separate transport budget just because other targets woke this row.
+        const next = new Date(Date.now() + calculateNextRetryDelay(msg.attempt_count));
+        await this.database.client.$queryRaw`
+          SELECT schedule_outbox_retry(${msg.id}::uuid, ${msg.event_id}::uuid, ${next}::timestamptz, false, ${msg.lease_token}::uuid)
+        `;
+        return;
+      }
 
       const evalResult = evaluateRetry({
         attemptCount: msg.attempt_count,
