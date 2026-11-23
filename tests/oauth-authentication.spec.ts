@@ -2,19 +2,42 @@ import { BadRequestException } from '@nestjs/common';
 import { GoogleOAuthService } from '../src/modules/auth/google-oauth.service';
 import { GitHubOAuthService } from '../src/modules/auth/github-oauth.service';
 import { AuthController } from '../src/modules/auth/auth.controller';
-import { RuntimeConfig } from '../src/modules/config/config.module';
-import { DatabaseService } from '../src/modules/database/database.service';
-import { SessionService } from '../src/modules/auth/session.service';
-import { TenantContextService } from '../src/modules/database/tenant-context.service';
+import type { Response } from 'express';
+import type { AuthenticatedRequest } from '../src/modules/auth/auth.guard';
+import type { User } from '../src/generated/prisma/client';
+import type { RuntimeConfig } from '../src/modules/config/config.module';
+import type { DatabaseService } from '../src/modules/database/database.service';
+import type { SessionService } from '../src/modules/auth/session.service';
+import type { TenantContextService } from '../src/modules/database/tenant-context.service';
+
+function containing(value: unknown): unknown { return expect.objectContaining(value); }
+
+const mockQuery = () => jest.fn<Promise<unknown>, [unknown]>();
+function createMockDatabase() {
+  const client = {
+    $executeRaw: jest.fn<Promise<number>, [TemplateStringsArray, ...unknown[]]>().mockResolvedValue(1),
+    oAuthState: { create: mockQuery(), findUnique: mockQuery(), delete: mockQuery().mockResolvedValue({}) },
+    externalIdentity: { findUnique: mockQuery(), create: mockQuery(), update: mockQuery() },
+    user: { create: mockQuery(), update: mockQuery(), findFirst: mockQuery() },
+    organization: { create: mockQuery() }, membership: { create: mockQuery() },
+    $transaction: jest.fn<Promise<unknown>, [(tx: unknown) => Promise<unknown>]>(),
+  };
+  client.oAuthState.create.mockResolvedValue({ id: 'state-uuid-1' });
+  client.$transaction.mockImplementation((callback) => callback(client));
+  return { client };
+}
 
 describe('OAuth Authentication System (Google & GitHub)', () => {
   let googleOAuth: GoogleOAuthService;
   let gitHubOAuth: GitHubOAuthService;
   let authController: AuthController;
-  let mockDb: any;
+  let mockDb: ReturnType<typeof createMockDatabase>;
   let mockConfig: RuntimeConfig;
-  let mockSessionService: any;
-  let mockTenantContext: any;
+  let mockSessionService: {
+    createSession: jest.Mock<Promise<{ token: string; session: { expiresAt: Date } }>, []>;
+    revokeSession: jest.Mock<Promise<void>, []>;
+  };
+  let mockTenantContext: { runInUserContext: jest.Mock; runInTenantContext: jest.Mock };
 
   beforeEach(() => {
     mockConfig = {
@@ -29,42 +52,16 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
         sessionCookieName: 'rf_session',
         environment: 'development',
       },
-    } as any;
+    } as unknown as RuntimeConfig;
 
-    mockDb = {
-      client: {
-        oAuthState: {
-          create: jest.fn().mockResolvedValue({ id: 'state-uuid-1' }),
-          findUnique: jest.fn(),
-          delete: jest.fn().mockResolvedValue({}),
-        },
-        externalIdentity: {
-          findUnique: jest.fn(),
-          create: jest.fn(),
-          update: jest.fn(),
-        },
-        user: {
-          create: jest.fn(),
-          update: jest.fn(),
-          findFirst: jest.fn(),
-        },
-        organization: {
-          create: jest.fn(),
-        },
-        membership: {
-          create: jest.fn(),
-        },
-        $executeRaw: jest.fn().mockResolvedValue(1),
-        $transaction: jest.fn((callback) => callback(mockDb.client)),
-      },
-    };
+    mockDb = createMockDatabase();
 
     mockSessionService = {
-      createSession: jest.fn().mockResolvedValue({
+      createSession: jest.fn<Promise<{ token: string; session: { expiresAt: Date } }>, []>().mockResolvedValue({
         token: 'rf_test_session_token',
         session: { expiresAt: new Date(Date.now() + 86400000) },
       }),
-      revokeSession: jest.fn().mockResolvedValue(undefined),
+      revokeSession: jest.fn<Promise<void>, []>().mockResolvedValue(undefined),
     };
 
     mockTenantContext = {
@@ -72,14 +69,14 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
       runInTenantContext: jest.fn(),
     };
 
-    googleOAuth = new GoogleOAuthService(mockConfig, mockDb as DatabaseService);
-    gitHubOAuth = new GitHubOAuthService(mockConfig, mockDb as DatabaseService);
+    googleOAuth = new GoogleOAuthService(mockConfig, mockDb as unknown as DatabaseService);
+    gitHubOAuth = new GitHubOAuthService(mockConfig, mockDb as unknown as DatabaseService);
     authController = new AuthController(
       gitHubOAuth,
       googleOAuth,
-      mockSessionService as SessionService,
-      mockDb as DatabaseService,
-      mockTenantContext as TenantContextService,
+      mockSessionService as unknown as SessionService,
+      mockDb as unknown as DatabaseService,
+      mockTenantContext as unknown as TenantContextService,
       mockConfig,
     );
   });
@@ -98,8 +95,8 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
       expect(result.state).toBeDefined();
 
       expect(mockDb.client.oAuthState.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
+        containing({
+          data: containing({
             state: result.state,
             redirectUri: 'https://relayforge-staging-web.onrender.com',
           }),
@@ -141,7 +138,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
         displayName: 'Alex Rivera',
         email: 'alex@example.com',
         avatarUrl: 'https://example.com/photo.jpg',
-      } as any);
+      } as User);
 
       const res = await googleOAuth.handleCallback('valid-code', 'valid-state');
 
@@ -172,23 +169,23 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
       });
 
       expect(mockDb.client.user.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
+        containing({
+          data: containing({
             displayName: 'Jane Doe',
             email: 'jane@example.com',
           }),
         }),
       );
       expect(mockDb.client.organization.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
+        containing({
+          data: containing({
             createdBy: 'new-user-1',
           }),
         }),
       );
       expect(mockDb.client.membership.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
+        containing({
+          data: containing({
             userId: 'new-user-1',
             role: 'OWNER',
           }),
@@ -214,8 +211,8 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
 
       expect(mockDb.client.user.create).not.toHaveBeenCalled();
       expect(mockDb.client.externalIdentity.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
+        containing({
+          data: containing({
             userId: 'existing-user-99',
             provider: 'google',
             providerUserId: 'google-sub-7777',
@@ -271,16 +268,16 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
 
   describe('AuthController Logout and Session Revocation', () => {
     it('logout revokes the session in database and clears the session cookie', async () => {
-      const mockReq: any = {
+      const mockReq = {
         headers: { cookie: 'rf_session=active-token-to-revoke' },
         sessionToken: 'active-token-to-revoke',
       };
-      const mockRes: any = {
+      const mockRes = {
         setHeader: jest.fn(),
         json: jest.fn(),
       };
 
-      await authController.logout(mockReq, mockRes);
+      await authController.logout(mockReq as unknown as AuthenticatedRequest, mockRes as unknown as Response);
 
       expect(mockSessionService.revokeSession).toHaveBeenCalledWith('active-token-to-revoke');
       expect(mockRes.setHeader).toHaveBeenCalledWith(
@@ -293,11 +290,11 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
 
   describe('AuthController Endpoints', () => {
     it('googleStart redirects to Google authorization URL (302)', async () => {
-      const mockRes: any = {
+      const mockRes = {
         redirect: jest.fn(),
       };
 
-      await authController.googleStart('http://localhost:5173', mockRes);
+      await authController.googleStart('http://localhost:5173', mockRes as unknown as Response);
 
       expect(mockRes.redirect).toHaveBeenCalledWith(
         302,
@@ -323,14 +320,14 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
       jest.spyOn(googleOAuth, 'resolveUserFromGoogle').mockResolvedValue({
         id: 'user-uuid-2',
         displayName: 'Test User',
-      } as any);
+      } as User);
 
-      const mockRes: any = {
+      const mockRes = {
         setHeader: jest.fn(),
         redirect: jest.fn(),
       };
 
-      await authController.googleCallback('code-123', 'valid-state', mockRes);
+      await authController.googleCallback('code-123', 'valid-state', mockRes as unknown as Response);
 
       expect(mockRes.setHeader).toHaveBeenCalledWith(
         'Set-Cookie',
@@ -343,11 +340,11 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
     });
 
     it('githubStart redirects to GitHub authorization URL (302)', async () => {
-      const mockRes: any = {
+      const mockRes = {
         redirect: jest.fn(),
       };
 
-      await authController.githubStart('http://localhost:5173', mockRes);
+      await authController.githubStart('http://localhost:5173', mockRes as unknown as Response);
 
       expect(mockRes.redirect).toHaveBeenCalledWith(
         302,

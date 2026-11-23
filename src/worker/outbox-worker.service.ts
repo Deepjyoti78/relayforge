@@ -50,6 +50,7 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(OutboxWorkerService.name);
   private sweepTimer: NodeJS.Timeout | undefined;
   private staleRecoveryTimer: NodeJS.Timeout | undefined;
+  private readonly pendingSweeps = new Set<Promise<number>>();
   private isProcessing = false;
   private isRunning = true;
 
@@ -89,7 +90,7 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
     this.logger.log({ event: 'outbox_worker_started', pollIntervalMs: 1000 });
   }
 
-  onModuleDestroy(): void {
+  async onModuleDestroy(): Promise<void> {
     this.isRunning = false;
     if (this.sweepTimer) {
       clearInterval(this.sweepTimer);
@@ -99,6 +100,16 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
       clearInterval(this.staleRecoveryTimer);
       this.staleRecoveryTimer = undefined;
     }
+    // Nest closes database/Redis connections in onApplicationShutdown, after
+    // this hook. Finish active work before those resources or Jest disappear.
+    await Promise.all(this.pendingSweeps);
+  }
+
+  private trackSweep(task: Promise<number>): Promise<number> {
+    this.pendingSweeps.add(task);
+    const remove = () => { this.pendingSweeps.delete(task); };
+    void task.then(remove, remove);
+    return task;
   }
 
   /**
@@ -106,7 +117,11 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
    * Uses FOR UPDATE SKIP LOCKED with unique lease_token via claim_pending_outbox_messages
    * to guarantee single-delivery ownership and optimistic concurrency control across workers.
    */
-  async sweepPendingOutbox(): Promise<number> {
+  sweepPendingOutbox(): Promise<number> {
+    return this.trackSweep(this.runPendingOutboxSweep());
+  }
+
+  private async runPendingOutboxSweep(): Promise<number> {
     if (!this.isRunning || this.isProcessing) return 0;
     this.isProcessing = true;
 
@@ -123,6 +138,8 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
 
       processedCount = claimedMessages.length;
       for (const msg of claimedMessages) {
+        // Unstarted messages retain their leases for normal stale recovery.
+        if (!this.isRunning) break;
         await this.processOutboxMessage(msg);
       }
     } catch (err: unknown) {
@@ -140,7 +157,12 @@ export class OutboxWorkerService implements OnModuleInit, OnModuleDestroy {
   /**
    * Reclaims stale outbox message leases in case of worker crashes or ungraceful terminations.
    */
-  async sweepStaleLeases(): Promise<number> {
+  sweepStaleLeases(): Promise<number> {
+    if (!this.isRunning) return Promise.resolve(0);
+    return this.trackSweep(this.runStaleLeaseSweep());
+  }
+
+  private async runStaleLeaseSweep(): Promise<number> {
     try {
       const res = await this.database.client.$queryRaw<{ reclaim_stale_outbox_leases: number }[]>`
         SELECT reclaim_stale_outbox_leases()
