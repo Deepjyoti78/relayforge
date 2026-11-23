@@ -1,0 +1,94 @@
+Dependency security review — GHSA-7589-6fvf-x4pw
+Date: 2026-11-23
+
+Scope and cause
+Prisma CLI 7.10.1 depends on @prisma/config 7.10.1, which pins Effect
+3.20.0 exactly. @prisma/client also has an optional Prisma peer; the locked
+tree retains Prisma/config/Effect in a clean production-only install.
+Thus npm audit --omit=dev reports three high findings for one underlying
+advisory (Effect and its two affected ancestors). This is a dependency
+finding, not evidence of an exploitable webhook endpoint.
+
+The advisory affects Effect <=3.22.0. The 3.22.1 fix adds a linear matcher
+for all-string TemplateLiteral spans. Other schema forms can still use
+regular expressions; this change does not claim to eliminate every regex.
+Sources:
+https://github.com/advisories/GHSA-7589-6fvf-x4pw
+https://github.com/Effect-TS/effect/releases/tag/effect@3.22.1
+https://github.com/Effect-TS/effect/pull/6761
+
+Remediation and compatibility
+The version-scoped npm override @prisma/config@7.10.1 -> effect: 3.22.1
+replaces only node_modules/effect in the lockfile. Prisma, client, adapter,
+config and engines remain unchanged at their existing versions. Registry
+inspection found no newer stable Prisma 7 than 7.10.1; an 8.0 release
+candidate is not a suitable minimal security fix. No audit fix --force,
+Prisma 6 downgrade, audit suppression or unrelated dependency upgrade ran.
+Effect's fast-check and @standard-schema/spec dependency ranges are unchanged.
+
+This overrides an upstream exact pin across Effect minor versions. It is
+not automatically safe merely because the major version matches. Prisma
+configuration decoding, generation, migrations and application behavior
+were tested. Reassess/remove the override when Prisma ships a patched pin;
+a future Prisma/config version will require a fresh audit and validation.
+
+Regression and reproducibility
+tests/effect-security.spec.ts resolves Effect from Prisma config. Valid
+TemplateLiteral decoding must succeed and an adversarial 5,000-colon input
+must be rejected in a bounded child process. Before the fix it fails with
+ETIMEDOUT after five seconds; after the fix it passes without hanging Jest.
+Node 22.20.0 / npm 10.9.3 were used. npm install --package-lock-only
+--ignore-scripts --no-audit generated the lock change. A fresh npm ci
+--include=dev succeeded without changing the lockfile hash. A separate
+fresh npm ci --omit=dev succeeded and retained the patched Prisma chain.
+
+Local results (distinct from GitHub Actions)
+- Production audit: before 3 high / exit 1; after 0 vulnerabilities / exit 0.
+- Full development audit: 26 existing moderate findings remain; out of scope.
+- Unit tests: 179 tests, 15 suites pass (baseline 178 tests, 14 suites).
+- PostgreSQL/Redis integration: 78 tests, 9 suites pass.
+- Typecheck, Prisma generation/validate, API/worker TypeScript build and
+  frontend build pass. Frontend retains its existing >500 kB chunk warning.
+- Lint fails with the same 87 errors in tests/oauth-authentication.spec.ts
+  before and after. The new regression test has no lint errors. These
+  baseline errors are addressed by the separate authentication PR, not here.
+- All 13 migrations apply to a new isolated PostgreSQL test database;
+  second deploy is idempotent and migrate status reports up to date.
+- Read-only migrate diff exits 2 on BOTH original and patched Effect:
+  four updated_at default differences and an organizations.created_by
+  index difference already exist between migrations and schema. Normalized
+  output SHA256 is identical:
+  0617ed4a120ad16d03cbafe29b18b3145d6cadc149efe26b0f6bea753b3ebd5e.
+  No schema or migration changes were made to hide this pre-existing drift.
+- Restricted API/worker database roles, RLS, authentication/session handling,
+  ingestion/idempotency, delivery leasing/retries/DLQ, workflows and Redis
+  queues are covered by the passing integration suite.
+- Docker Desktop became unavailable during an initial run. Only after
+  recovery and successful fresh migration application were integration and
+  browser results accepted. This was an environment interruption.
+
+Authentication PR compatibility (separate disposable snapshot)
+Staging has no browser test script. To check compatibility with pending
+authentication PR #1, a git archive of its unchanged commit
+a9356aaf7cf8f9cfe8d7fd45ad702c4eb62a03df was tested with only this override,
+lock entry and regression test added. All 204 other tracked files matched
+the commit after newline normalization; the authentication branch was not
+edited. Snapshot lint/typecheck passed; 262 unit tests in 22 suites passed;
+12 Chromium authentication tests passed against the isolated test DB/Redis.
+The browser suite mocks provider consent/token/profile exchange only; real
+callbacks, cookies, Prisma sessions and authorization execute. It covers
+Google/GitHub, reload/persistence, logout/expiry/revocation, rejected origins,
+redirects, stolen state and SSE membership/session revocation. This is extra
+compatibility evidence, not a claim those tests exist on this PR's base.
+Live provider consent, configured OAuth credentials, Cloudflare/Render
+hosting and browser third-party-cookie policy remain manual release checks.
+
+CI and release constraints
+Baseline staging run https://github.com/Deepjyoti78/relayforge/actions/runs/45057698059
+failed npm audit --omit=dev --audit-level=moderate on this advisory, before
+lint/tests/build. The new PR's head-specific CI evidence is recorded in its
+description, separately from local results. Existing lint errors must not
+be suppressed to make this dependency PR appear green.
+No deployment, production migration, session rotation, secret change,
+authentication PR modification or merge is part of this change. Local
+database names end in _test and use separate local ports/containers.
