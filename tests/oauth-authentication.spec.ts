@@ -114,26 +114,26 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
       const exchange = jest.spyOn(service, 'exchangeCodeForToken').mockResolvedValue('provider-access-token');
       if (provider === 'google') {
         jest.spyOn(googleOAuth, 'fetchGoogleProfile').mockResolvedValue({ sub: 'google-user' });
-        jest.spyOn(googleOAuth, 'resolveUserFromGoogle').mockResolvedValue({ id: 'user-1' } as User);
+        jest.spyOn(googleOAuth, 'resolveUserFromGoogle').mockResolvedValue({ user: { id: 'user-1' } as User, isNewUser: false });
       } else {
         jest.spyOn(gitHubOAuth, 'fetchGitHubProfile').mockResolvedValue({ id: 123, login: 'github-user', email: 'user@example.com' });
-        jest.spyOn(gitHubOAuth, 'resolveUserFromGitHub').mockResolvedValue({ id: 'user-1' } as User);
+        jest.spyOn(gitHubOAuth, 'resolveUserFromGitHub').mockResolvedValue({ user: { id: 'user-1' } as User, isNewUser: false });
       }
       const result = await service.handleCallback('provider-code', 'old-state');
       expect(exchange).toHaveBeenCalledWith('provider-code', 'pkce-verifier');
       expect(mockDb.client.oAuthState.delete).toHaveBeenCalledWith({ where: { id: 'old-state' } });
-      expect(result).toEqual({ user: { id: 'user-1' }, redirectUri: mockConfig.values.frontendUrl });
+      expect(result).toEqual({ user: { id: 'user-1' }, isNewUser: false, redirectUri: mockConfig.values.frontendUrl });
     });
     it('sets a secure HttpOnly cookie without exposing the token in redirects', async () => {
       const service = provider === 'google' ? googleOAuth : gitHubOAuth;
       jest.spyOn(service, 'handleCallback').mockResolvedValue({
-        user: { id: 'user-1' } as User, redirectUri: mockConfig.values.frontendUrl,
+        user: { id: 'user-1' } as User, isNewUser: false, redirectUri: mockConfig.values.frontendUrl,
       });
       (mockConfig.values as { environment: string }).environment = 'production';
       const res = { setHeader: jest.fn(), append: jest.fn(), redirect: jest.fn() };
       if (provider === 'google') await authController.googleCallback('code', 'state', res as unknown as Response, { headers: { cookie: oauthStateCookie(mockConfig.values, provider, 'state') } } as unknown as Request);
       else await authController.githubCallback('code', 'state', res as unknown as Response, { headers: { cookie: oauthStateCookie(mockConfig.values, provider, 'state') } } as unknown as Request);
-      expect(res.redirect).toHaveBeenCalledWith(302, mockConfig.values.frontendUrl);
+      expect(res.redirect).toHaveBeenCalledWith(302, new URL('/dashboard', mockConfig.values.frontendUrl).toString());
       expect(res.append).toHaveBeenCalledWith('Set-Cookie', expect.stringContaining('HttpOnly'));
       expect(res.append).toHaveBeenCalledWith('Set-Cookie', expect.stringContaining('Secure'));
     });
@@ -191,12 +191,12 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
         email: 'alex@example.com',
         picture: 'https://example.com/photo.jpg',
       });
-      jest.spyOn(googleOAuth, 'resolveUserFromGoogle').mockResolvedValue({
+      jest.spyOn(googleOAuth, 'resolveUserFromGoogle').mockResolvedValue({ user: {
         id: 'user-uuid-1',
         displayName: 'Alex Rivera',
         email: 'alex@example.com',
         avatarUrl: 'https://example.com/photo.jpg',
-      } as User);
+      } as User, isNewUser: false });
 
       const res = await googleOAuth.handleCallback('valid-code', 'valid-state');
 
@@ -219,7 +219,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
       mockDb.client.organization.create.mockResolvedValue({ id: 'org-1', name: "Jane Doe's Workspace", slug: 'jane-doe-12345' });
       mockDb.client.membership.create.mockResolvedValue({ id: 'mem-1', role: 'OWNER' });
 
-      const user = await googleOAuth.resolveUserFromGoogle({
+      const { user, isNewUser } = await googleOAuth.resolveUserFromGoogle({
         sub: 'google-sub-5555',
         name: 'Jane Doe',
         email: 'jane@example.com',
@@ -250,6 +250,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
         }),
       );
       expect(user.id).toBe('new-user-1');
+      expect(isNewUser).toBe(true);
     });
 
     it('safely links Google identity to existing user when email is verified', async () => {
@@ -259,7 +260,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
       mockDb.client.externalIdentity.create.mockResolvedValue({ id: 'ident-2' });
       mockDb.client.user.update.mockResolvedValue({ ...existingUser, avatarUrl: 'https://photo.jpg' });
 
-      const user = await googleOAuth.resolveUserFromGoogle({
+      const { user, isNewUser } = await googleOAuth.resolveUserFromGoogle({
         sub: 'google-sub-7777',
         name: 'Jane Existing',
         email: 'jane@example.com',
@@ -278,6 +279,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
         }),
       );
       expect(user.id).toBe('existing-user-99');
+      expect(isNewUser).toBe(false);
     });
 
     it('does NOT link accounts if Google email is unverified', async () => {
@@ -306,7 +308,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
       // Simulate P2002 unique constraint violation on concurrent insert
       mockDb.client.$transaction.mockRejectedValue({ code: 'P2002', message: 'Unique constraint failed' });
 
-      const user = await googleOAuth.resolveUserFromGoogle({
+      const { user, isNewUser } = await googleOAuth.resolveUserFromGoogle({
         sub: 'google-sub-race',
         name: 'Racer',
         email: 'race@example.com',
@@ -314,6 +316,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
       });
 
       expect(user.id).toBe('race-winner-user');
+      expect(isNewUser).toBe(false);
     });
 
     it('fetches primary verified email for GitHub accounts with private email', async () => {
@@ -376,10 +379,10 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
         name: 'Test User',
         email: 'test@example.com',
       });
-      jest.spyOn(googleOAuth, 'resolveUserFromGoogle').mockResolvedValue({
+      jest.spyOn(googleOAuth, 'resolveUserFromGoogle').mockResolvedValue({ user: {
         id: 'user-uuid-2',
         displayName: 'Test User',
-      } as User);
+      } as User, isNewUser: false });
 
       const mockRes = {
         setHeader: jest.fn(), append: jest.fn(),
@@ -394,7 +397,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
       );
       expect(mockRes.redirect).toHaveBeenCalledWith(
         302,
-        'https://relayforge-staging-web.onrender.com',
+        'https://relayforge-staging-web.onrender.com/dashboard',
       );
     });
 

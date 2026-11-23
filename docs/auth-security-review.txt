@@ -8,6 +8,9 @@ The historical advisory failures below are superseded: the merged scoped Effect
 override is retained and the refreshed production audit passes with 0 findings.
 See the staging-integration follow-up at the end for current validation evidence.
 The actual source and diff were reviewed; the earlier report was not used as proof.
+Later staging-readiness work implements the configurable Worker proxy and robust
+frontend initialization/routing. See staging-auth-readiness.md for current evidence
+and live blockers; the proxy proposal/asset-only descriptions below are historical.
 
 Findings and implemented corrections
 1. The earlier exact-origin redirect/CORS/CSRF fixes are present in code and tested.

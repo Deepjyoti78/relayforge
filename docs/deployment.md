@@ -14,7 +14,8 @@ No deployment or live-secret changes were performed by this review.
   external Supabase/Upstash services; live accounts, regions, plans and network
   isolation have not been verified here. No current pricing claim is made.
 - Both [Wrangler configurations](../wrangler.jsonc) ([web](../web/wrangler.jsonc))
-  serve static SPA assets only. They contain no API proxy handler or run_worker_first.
+  wire static assets and the fixed-upstream [Worker](../web/worker.js), with reserved
+  auth/API/health routes before SPA fallback. Required public origins are configurable.
 - API starts with `npm run start:api`, worker with `npm run start:worker`. API probes
   are /health/live and /health/ready; the latter checks PostgreSQL. Redis connectivity
   and noeviction checks are currently advisory. PostgreSQL 17 and Redis 7.4 are used
@@ -41,12 +42,15 @@ Choose one reviewed topology:
 | Same-site custom domains | HTTPS app.relayforge.example and api.relayforge.example, replaced with owned names | FRONTEND_URL=frontend; VITE_API_URL=API; host-only API cookie; SESSION_COOKIE_SAME_SITE=lax; exact CORS |
 | Same-origin proxy | Frontend origin F serves SPA and proxies auth/API paths to Render | VITE_API_URL=/; FRONTEND_URL=F; both provider callbacks through F; SESSION_COOKIE_SAME_SITE=lax |
 
-For the proxy proposal, route /auth/*, /v1/* and /health/* before SPA fallback using a
-reviewed Worker handler, fixed API_ORIGIN, ASSETS binding and assets.run_worker_first.
+The implemented proxy routes /auth/*, /v1/* and /health/* before SPA fallback using a
+Worker handler, fixed API_ORIGIN, ASSETS binding and assets.run_worker_first.
 Preserve method/body/query, browser Origin/Referer, Cookie, individual Set-Cookie
 headers, status, Location and streaming response bodies. Use upstream redirect:
-manual, no auth caching/buffering, and no browser-selected upstream. This production
-proxy is not implemented or deployed by this PR; Playwright exercises a local Vite proxy.
+manual, no auth caching/buffering, and no browser-selected upstream. It is implemented
+and locally tested, not deployed. Playwright uses the actual handler via a local Node
+adapter. See [staging readiness](staging-auth-readiness.md) for exact configurable
+origins, console/cutover steps and observed live-start blockers. The current Render
+frontend is not assumed to host Cloudflare's Worker.
 
 ## Configuration and provider registration
 

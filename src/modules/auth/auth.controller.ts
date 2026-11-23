@@ -23,6 +23,7 @@ import { CurrentUser } from './current-user.decorator';
 import { GitHubOAuthService } from './github-oauth.service';
 import { GoogleOAuthService } from './google-oauth.service';
 import { SessionService } from './session.service';
+import { postOAuthDestination } from './browser-security';
 
 @Controller()
 export class AuthController {
@@ -62,7 +63,7 @@ export class AuthController {
         throw new Error('Provider authorization denied');
       }
 
-      const { user, redirectUri } = await this.gitHubOAuth.handleCallback(code, state);
+      const { user, redirectUri, isNewUser } = await this.gitHubOAuth.handleCallback(code, state);
       const { token, session } = await this.sessionService.createSession(user.id);
 
       // Calculate maxAge in seconds
@@ -77,7 +78,7 @@ export class AuthController {
 
       res.setHeader('Cache-Control', 'no-store');
       res.setHeader('Referrer-Policy', 'no-referrer');
-      res.redirect(302, redirectUri);
+      res.redirect(302, postOAuthDestination(redirectUri, this.config.values.frontendUrl, isNewUser));
     } catch {
       let dest = this.config.values.frontendUrl;
       try {
@@ -116,7 +117,7 @@ export class AuthController {
         throw new Error('Provider authorization denied');
       }
 
-      const { user, redirectUri } = await this.googleOAuth.handleCallback(code, state);
+      const { user, redirectUri, isNewUser } = await this.googleOAuth.handleCallback(code, state);
       const { token, session } = await this.sessionService.createSession(user.id);
 
       // Calculate maxAge in seconds
@@ -131,7 +132,7 @@ export class AuthController {
 
       res.setHeader('Cache-Control', 'no-store');
       res.setHeader('Referrer-Policy', 'no-referrer');
-      res.redirect(302, redirectUri);
+      res.redirect(302, postOAuthDestination(redirectUri, this.config.values.frontendUrl, isNewUser));
     } catch {
       let dest = this.config.values.frontendUrl;
       try {

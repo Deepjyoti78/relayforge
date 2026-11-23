@@ -44,7 +44,7 @@ describe('Browser-bound OAuth callbacks', () => {
       });
       provider.handleCallback.mockImplementation((_code: string, state: string) => {
         if (!states.delete(state)) return Promise.reject(new Error('Invalid state'));
-        return Promise.resolve({ user: { id: 'user-1' }, redirectUri: 'http://localhost:5173' });
+        return Promise.resolve({ user: { id: 'user-1' }, isNewUser: false, redirectUri: 'http://localhost:5173' });
       });
     }
   });
@@ -79,7 +79,7 @@ describe('Browser-bound OAuth callbacks', () => {
       const callback = () => request(app.getHttpServer() as Server).get('/auth/' + provider + '/callback')
         .set('Cookie', cookies?.join(';') ?? '').query({ code: 'code', state });
       const res = await callback().expect(302);
-      expect(res.headers.location).toBe('http://localhost:5173');
+      expect(res.headers.location).toBe('http://localhost:5173/dashboard');
       const setCookies = res.headers['set-cookie'] as unknown as string[];
       expect(setCookies.some((cookie) => cookie.includes('Max-Age=0'))).toBe(true);
       expect(setCookies.some((cookie) => cookie.includes('rf_session=session-secret'))).toBe(true);
