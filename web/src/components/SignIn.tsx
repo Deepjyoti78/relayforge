@@ -216,11 +216,16 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
   // Dynamic Navbar Scroll Listener (shows separation border and subtle blur on scroll)
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      const scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      setIsScrolled(scrollY > 8);
     };
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    document.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   return (
@@ -231,7 +236,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
-      overflowX: 'hidden',
+      overflowX: 'clip',
       fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       WebkitFontSmoothing: 'antialiased',
       MozOsxFontSmoothing: 'grayscale',
@@ -239,16 +244,16 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       {/* 1. TOP NAVBAR */}
       <header className="rf-landing-header" style={{
         width: '100%',
-        backgroundColor: isScrolled ? 'rgba(13, 12, 11, 0.85)' : '#0D0C0B',
-        borderBottom: isScrolled ? '1px solid rgba(235, 225, 208, 0.1)' : '1px solid transparent',
+        backgroundColor: isScrolled ? 'rgba(13, 12, 11, 0.90)' : '#0D0C0B',
+        borderBottom: isScrolled ? '1px solid rgba(255, 255, 255, 0.16)' : '1px solid transparent',
         position: 'sticky',
         top: 0,
-        zIndex: 50,
+        zIndex: 100,
         paddingTop: '12px',
         paddingBottom: '12px',
-        backdropFilter: isScrolled ? 'blur(16px)' : 'none',
-        WebkitBackdropFilter: isScrolled ? 'blur(16px)' : 'none',
-        boxShadow: isScrolled ? '0 4px 20px rgba(0, 0, 0, 0.45)' : 'none',
+        backdropFilter: isScrolled ? 'blur(20px)' : 'none',
+        WebkitBackdropFilter: isScrolled ? 'blur(20px)' : 'none',
+        boxShadow: isScrolled ? '0 10px 30px rgba(0, 0, 0, 0.65)' : 'none',
         transition: 'background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
       }}>
         <div className="rf-landing-container" style={{
@@ -263,38 +268,40 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           boxSizing: 'border-box',
           width: '100%',
         }}>
-          {/* Brand Logo & Name: RelayForge (Aligned with "Reliable" text corner) */}
+          {/* Brand Logo & Name: RelayForge (Thunder icon without square background) */}
           <div
             className="rf-header-brand"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '10px',
+              gap: '8px',
               cursor: 'pointer',
               userSelect: 'none',
               marginLeft: 0,
             }}
           >
-            <div
-              className="rf-brand-icon"
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="#F5F0E7"
               style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '8px',
-                backgroundColor: '#F5F0E7',
-                color: '#0D0C0B',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 2px 8px rgba(245, 240, 231, 0.16)',
                 flexShrink: 0,
+                filter: 'drop-shadow(0 0 8px rgba(245, 240, 231, 0.35))',
+                transition: 'transform 0.15s ease, filter 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.1)';
+                e.currentTarget.style.filter = 'drop-shadow(0 0 12px rgba(245, 240, 231, 0.6))';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.filter = 'drop-shadow(0 0 8px rgba(245, 240, 231, 0.35))';
               }}
             >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-              </svg>
-            </div>
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
             <span
               className="rf-brand-title"
               style={{
@@ -2421,7 +2428,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
         /* 1. Global Viewport Safety */
         html, body {
           max-width: 100vw;
-          overflow-x: hidden;
+          overflow-x: clip;
         }
 
         /* 2. Desktop Navigation & Interactions */

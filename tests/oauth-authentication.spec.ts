@@ -54,6 +54,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
         membership: {
           create: jest.fn(),
         },
+        $executeRaw: jest.fn().mockResolvedValue(1),
         $transaction: jest.fn((callback) => callback(mockDb.client)),
       },
     };
