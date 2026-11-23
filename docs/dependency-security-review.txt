@@ -58,9 +58,9 @@ Local results (distinct from GitHub Actions)
   assertions alone do not make the affected ordinary runs clean passes.
 - Typecheck, Prisma generation/validate, API/worker TypeScript build and
   frontend build pass. Frontend retains its existing >500 kB chunk warning.
-- Lint fails with the same 87 errors in tests/oauth-authentication.spec.ts
-  before and after. The new regression test has no lint errors. These
-  baseline errors are addressed by the separate authentication PR, not here.
+- Initial dependency-only review: lint failed with the same 87 errors in
+  tests/oauth-authentication.spec.ts before and after. The CI-unblock
+  follow-up below ports the relevant test typings and resolves all 87.
 - All 13 migrations apply to a new isolated PostgreSQL test database;
   second deploy is idempotent and migrate status reports up to date.
 - Read-only migrate diff exits 2 on BOTH original and patched Effect:
@@ -91,6 +91,29 @@ redirects, stolen state and SSE membership/session revocation. This is extra
 compatibility evidence, not a claim those tests exist on this PR's base.
 Live provider consent, configured OAuth credentials, Cloudflare/Render
 hosting and browser third-party-cookie policy remain manual release checks.
+
+CI-unblock follow-up (2026-11-23)
+Only OAuth test-mock typings were ported from authentication PR #1; no auth
+service/controller, cookie, redirect, CORS, CSRF, tenancy or SSE changes
+were imported. Existing test cases and behavioral assertions are preserved.
+The 87 diagnostics consisted of 4 consistent-type-imports, 11 explicit-any,
+6 unsafe-assignment, 1 unsafe-return, 21 unsafe-call, 37 unsafe-member-access
+and 7 unsafe-argument errors. Typed mock factories, explicit async mock
+signatures, typed fixture boundaries and a matcher returning unknown resolve
+these without changing ESLint rules or suppressing checks. Clean npm ci,
+production audit, lint, typecheck and 179 unit tests pass after this port.
+Exact subsequent build/integration/container and hosted CI results are
+recorded in PR #2, separately from the earlier dependency-only evidence.
+
+Merge coordination: a read-only three-way rehearsal of the OAuth test file
+finds seven overlapping hunks with PR #1 (imports, mock members and callback
+fixtures). Resolving those hunks to PR #1's version produces exactly its
+complete test file, preserving its additional security assertions and state
+cookie fixtures. When the branches are combined, retain PR #1's OAuth test
+file and this branch's Effect override/regression test, and rerun checks.
+Do not choose the older dependency-branch test file over the auth version.
+This is a reviewed resolution plan, not a claim the branches auto-merge
+without conflicts. The authentication branch itself remains unchanged.
 
 CI and release constraints
 Baseline staging run https://github.com/Deepjyoti78/relayforge/actions/runs/45057698059
