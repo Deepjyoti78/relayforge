@@ -464,4 +464,17 @@ describe('webhook delivery reliability with PostgreSQL and Redis', () => {
     expect(received.filter((r) => r.path === good.path)).toHaveLength(1);
     expect(received.filter((r) => r.path === bad.path)).toHaveLength(2);
   });
+
+  it('backfills a target budget from actual attempts, not a legacy coordinator ordinal', async () => {
+    const f = await fixture();
+    const dest = await f.addDestination((_body, res) => { res.statusCode = 500; res.end(); });
+    const event = await f.ingest({ legacy: true });
+    await app.get(DeliveryService).deliverEventToDestination({ organizationId: f.org, eventId: event.eventId,
+      outboxMessageId: event.outbox.id, destination: { id: dest.id, url: dest.url }, payload: { legacy: true },
+      eventType: 'reliability.test', attemptNumber: 4, signingSecret: f.endpoint.signingSecret });
+    await admin.query('UPDATE outbox_messages SET attempt_count=4 WHERE id=$1', [event.outbox.id]);
+    await worker().sweepPendingOutbox();
+    expect((await f.state(event.outbox.id)).status).toBe('PENDING');
+    expect((await f.targets(event.outbox.id))[0]!.attemptCount).toBe(2);
+  });
 });

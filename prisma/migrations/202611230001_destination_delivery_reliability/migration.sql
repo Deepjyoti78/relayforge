@@ -84,7 +84,7 @@ BEGIN
    INSERT INTO destination_deliveries(outbox_message_id,destination_id,org_id,status,attempt_count)
    SELECT o.id,d.id,o.org_id,
      CASE WHEN COALESCE(bool_or(a.status='SUCCESS'),false) THEN 'DISPATCHED'::outbox_status ELSE 'PENDING'::outbox_status END,
-     COALESCE(max(a.attempt_number) FILTER (WHERE o.replayed_at IS NULL OR a.created_at>=o.replayed_at),0)
+     (count(a.id) FILTER (WHERE o.replayed_at IS NULL OR a.created_at>=o.replayed_at))::int
    FROM destinations d LEFT JOIN delivery_attempts a ON a.outbox_message_id=o.id AND a.destination_id=d.id AND a.org_id=o.org_id
    WHERE d.org_id=o.org_id AND d.is_active GROUP BY d.id;
    UPDATE outbox_messages SET deliveries_initialized=true WHERE outbox_messages.id=o.id;
