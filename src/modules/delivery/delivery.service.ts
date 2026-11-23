@@ -174,7 +174,7 @@ export class DeliveryService {
             });
             return event?.endpoint;
           });
-          if (endpoint?.secretCiphertext && endpoint?.secretIv && endpoint?.secretTag) {
+          if (endpoint?.organizationId === params.organizationId && endpoint.secretCiphertext && endpoint.secretIv && endpoint.secretTag) {
             signingSecret = decryptSecret(
               endpoint.secretCiphertext,
               endpoint.secretIv,

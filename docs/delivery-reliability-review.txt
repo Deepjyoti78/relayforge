@@ -52,7 +52,9 @@ Implementation
   send. Replay resets unfinished targets only and retains successful targets.
 - Secret resolution joins event -> originating endpoint with matching org;
   both worker and DeliveryService fallback use it. The origin's current key
-  is used; no first-endpoint or unsigned fallback is introduced.
+  is used; no first-endpoint or unsigned fallback is introduced. A separate
+  failing-before unit test verifies that, if the SQL helper is unavailable,
+  a fallback endpoint from another org is rejected before signing or HTTP.
 - Sweeps still handle up to 25 coordinators, claiming one just before work.
   A third optional claim-function argument excludes already visited rows.
   Existing two-argument SQL callers retain default compatibility. Live
@@ -101,6 +103,12 @@ Migration / rollout plan — operator review required, not executed here
    historical state is deleted. Pending coordinators initialize lazily from
    active targets and existing attempt evidence. API and worker roles must
    be the existing separate runtime roles; no new secret/env variable is added.
+   Verify WORKER_DATABASE_URL actually logs in as relayforge_worker. The
+   existing render.yaml still copies the API DATABASE_URL into that setting;
+   that template must not be relied on for a least-privilege rollout. Supply
+   and validate the dedicated worker connection through the normal reviewed
+   hosting configuration process. This task changes no live credentials or
+   blueprint configuration and does not validate actual hosted DB roles.
    The composite unique index scans existing outbox rows and its ordinary
    index build can block writes. Measure this on a production-sized copy and
    schedule a maintenance/write-pause window; review a concurrent-index rollout
