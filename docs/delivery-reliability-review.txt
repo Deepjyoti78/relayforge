@@ -31,6 +31,10 @@ SIGKILL is the crash-under-test, never a way to force a passing process exit.
 A further focused reproduction showed coordinator claim count 100 plus an
 unreadable origin secret incorrectly caused DEAD_LETTER with zero target
 attempts. It expected PENDING and failed before the coordinator-backoff fix.
+A migration-review regression also caught legacy coordinator ordinals being
+mistaken for target attempt counts. One recorded failed request numbered 4
+must become target count 1, not 4. Snapshot backfill counts recorded requests
+in the current replay period and keeps known success across periods.
 
 Implementation
 - destination_deliveries persists the first-dispatch active target snapshot,
@@ -119,8 +123,9 @@ An old exhaustion fixture now creates four real failed target attempts before
 the fifth instead of changing only the coordinator counter. Existing manual
 worker integration fixtures now use the restricted worker DB role because
 new mutation helpers deliberately deny execution to the API role.
-The completed local suite passes 181 unit tests and 94 integration tests
-(including 16 new reliability scenarios). An additional bulk-replay regression
+The completed local suite before the final backfill case passed 181 unit tests
+and 94 integration tests. The latest full-suite counts (17 new reliability
+scenarios) are recorded in the draft PR. An additional bulk-replay regression
 failed before its compatibility correction: expected DISPATCHED after replay,
 received DEAD_LETTER because the old bulk endpoint left target state terminal.
 
