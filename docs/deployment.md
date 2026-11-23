@@ -91,11 +91,12 @@ npm run typecheck, npm --prefix web run build, npm run build, git diff --check.
 Integration/browser tests use a dedicated _test database and local Redis; browser
 consent/provider HTTP is mocked while cookies, callbacks, sessions and RLS are real.
 
-Hosted CI: the verify job audits dependencies before later gates. The existing
-Prisma/Effect advisory can fail that job and skip later steps. The independent
+Hosted CI: the verify job audits dependencies before later gates. Merged PR #2
+supplies the scoped Effect 3.22.1 override; the refreshed production audit passes.
+Keep the audit gate enabled and verify it on every release head. The independent
 browser-authentication job provides browser coverage separately. Record the actual
 head SHA, run URL, conclusion and skipped checks; never label local results as CI.
-No dependency fix or audit exception is part of this PR.
+This PR retains that merged fix without another dependency upgrade or audit exception.
 
 The legacy staging-e2e-verify.cjs harness checks health, one invalid bearer token and
 an OAuth-start redirect/state. It does not validate successful bearer rejection,

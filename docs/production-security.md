@@ -140,7 +140,7 @@ Automatic HTTP redirects (`301`, `302`, `303`, `307`, `308`) are explicitly disa
 
 ## Release limitations that remain open
 
-- The Prisma/Effect advisory still fails the vulnerability gate; this PR changes no existing dependency versions.
+- The Prisma/Effect advisory is resolved by merged PR #2's scoped Effect 3.22.1 override. Preserve the fix and require a passing production audit on the release head; no further dependency upgrade or exception is introduced here.
 - Live provider consent, exact callback registrations, production TLS and hosting cookie behavior remain manual acceptance checks.
 - DatabaseService disables certificate verification for detected cloud/pooler connections; RedisService disables it for rediss connections. Encryption alone is not certificate authentication. This existing behavior needs a separate transport-security fix and deployment verification.
 - render.yaml copies the API DATABASE_URL into WORKER_DATABASE_URL. Separate restricted identities must be provisioned and verified; staging-db-init.cjs can swallow failures and is not proof that roles/grants or runtime URLs are correct.
