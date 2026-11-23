@@ -76,6 +76,9 @@
   "overrides": {
     "@nestjs/platform-express": {
       "multer": "2.5.0"
+    },
+    "@prisma/config@7.10.1": {
+      "effect": "3.22.1"
     }
   }
 }

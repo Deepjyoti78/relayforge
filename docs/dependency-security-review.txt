@@ -1,0 +1,209 @@
+Dependency security review — GHSA-7589-6fvf-x4pw
+Date: 2026-11-23
+
+Scope and cause
+Prisma CLI 7.10.1 depends on @prisma/config 7.10.1, which pins Effect
+3.20.0 exactly. @prisma/client also has an optional Prisma peer; the locked
+tree retains Prisma/config/Effect in a clean production-only install.
+Thus npm audit --omit=dev reports three high findings for one underlying
+advisory (Effect and its two affected ancestors). This is a dependency
+finding, not evidence of an exploitable webhook endpoint.
+
+The advisory affects Effect <=3.22.0. The 3.22.1 fix adds a linear matcher
+for all-string TemplateLiteral spans. Other schema forms can still use
+regular expressions; this change does not claim to eliminate every regex.
+Sources:
+https://github.com/advisories/GHSA-7589-6fvf-x4pw
+https://github.com/Effect-TS/effect/releases/tag/effect@3.22.1
+https://github.com/Effect-TS/effect/pull/6761
+
+Remediation and compatibility
+The version-scoped npm override @prisma/config@7.10.1 -> effect: 3.22.1
+replaces only node_modules/effect in the lockfile. Prisma, client, adapter,
+config and engines remain unchanged at their existing versions. Registry
+inspection found no newer stable Prisma 7 than 7.10.1; an 8.0 release
+candidate is not a suitable minimal security fix. No audit fix --force,
+Prisma 6 downgrade, audit suppression or unrelated dependency upgrade ran.
+Effect's fast-check and @standard-schema/spec dependency ranges are unchanged.
+
+This overrides an upstream exact pin across Effect minor versions. It is
+not automatically safe merely because the major version matches. Prisma
+configuration decoding, generation, migrations and application behavior
+were tested. Reassess/remove the override when Prisma ships a patched pin;
+a future Prisma/config version will require a fresh audit and validation.
+
+Regression and reproducibility
+tests/effect-security.spec.ts resolves Effect from Prisma config. Valid
+TemplateLiteral decoding must succeed and an adversarial 5,000-colon input
+must be rejected in a bounded child process. Before the fix it fails with
+ETIMEDOUT after five seconds; after the fix it passes without hanging Jest.
+Node 22.20.0 / npm 10.9.3 were used. npm install --package-lock-only
+--ignore-scripts --no-audit generated the lock change. A fresh npm ci
+--include=dev succeeded without changing the lockfile hash. A separate
+fresh npm ci --omit=dev succeeded and retained the patched Prisma chain.
+
+Local results (distinct from GitHub Actions)
+- Production audit: before 3 high / exit 1; after 0 vulnerabilities / exit 0.
+- Full development audit: 26 existing moderate findings remain; out of scope.
+- Unit tests: 179 tests, 15 suites pass (baseline 178 tests, 14 suites).
+- PostgreSQL/Redis integration: 78 tests, 9 suites pass.
+- Post-rebase repeated ordinary integration runs on a reused test database
+  pass all 78 assertions but exit 1 during late worker/undici activity after
+  Jest teardown. The original Effect 3.20.0 independently reproduces this
+  failure on the same database (78 assertions pass, exit 1). The patched
+  --detectOpenHandles diagnostic run exits 0 with all 78 passing; no forced
+  exit or failure suppression was used. Worker shutdown clears timers but
+  does not await in-flight sweeps, consistent with the observed stack.
+  The CI-unblock follow-up below now addresses this lifecycle issue;
+  successful assertions alone did not make those earlier runs clean passes.
+- Typecheck, Prisma generation/validate, API/worker TypeScript build and
+  frontend build pass. Frontend retains its existing >500 kB chunk warning.
+- Initial dependency-only review: lint failed with the same 87 errors in
+  tests/oauth-authentication.spec.ts before and after. The CI-unblock
+  follow-up below ports the relevant test typings and resolves all 87.
+- All 13 migrations apply to a new isolated PostgreSQL test database;
+  second deploy is idempotent and migrate status reports up to date.
+- Read-only migrate diff exits 2 on BOTH original and patched Effect:
+  four updated_at default differences and an organizations.created_by
+  index difference already exist between migrations and schema. Normalized
+  output SHA256 is identical:
+  0617ed4a120ad16d03cbafe29b18b3145d6cadc149efe26b0f6bea753b3ebd5e.
+  No schema or migration changes were made to hide this pre-existing drift.
+- Restricted API/worker database roles, RLS, authentication/session handling,
+  ingestion/idempotency, delivery leasing/retries/DLQ, workflows and Redis
+  queues are covered by the passing integration suite.
+- Docker Desktop became unavailable during an initial run. Only after
+  recovery and successful fresh migration application were integration and
+  browser results accepted. This was an environment interruption.
+
+Authentication PR compatibility (separate disposable snapshot)
+Staging has no browser test script. To check compatibility with pending
+authentication PR #1, a git archive of its unchanged commit
+a9356aaf7cf8f9cfe8d7fd45ad702c4eb62a03df was tested with only this override,
+lock entry and regression test added. All 204 other tracked files matched
+the commit after newline normalization; the authentication branch was not
+edited. Snapshot lint/typecheck passed; 262 unit tests in 22 suites passed;
+12 Chromium authentication tests passed against the isolated test DB/Redis.
+The browser suite mocks provider consent/token/profile exchange only; real
+callbacks, cookies, Prisma sessions and authorization execute. It covers
+Google/GitHub, reload/persistence, logout/expiry/revocation, rejected origins,
+redirects, stolen state and SSE membership/session revocation. This is extra
+compatibility evidence, not a claim those tests exist on this PR's base.
+Live provider consent, configured OAuth credentials, Cloudflare/Render
+hosting and browser third-party-cookie policy remain manual release checks.
+
+CI-unblock follow-up (2026-11-23)
+Only OAuth test-mock typings were ported from authentication PR #1; no auth
+service/controller, cookie, redirect, CORS, CSRF, tenancy or SSE changes
+were imported. Existing test cases and behavioral assertions are preserved.
+The 87 diagnostics consisted of 4 consistent-type-imports, 11 explicit-any,
+6 unsafe-assignment, 1 unsafe-return, 21 unsafe-call, 37 unsafe-member-access
+and 7 unsafe-argument errors. Typed mock factories, explicit async mock
+signatures, typed fixture boundaries and a matcher returning unknown resolve
+these without changing ESLint rules or suppressing checks. Clean npm ci,
+production audit, lint, typecheck and 179 unit tests pass after this port.
+Exact subsequent build/integration/container and hosted CI results are
+recorded in PR #2, separately from the earlier dependency-only evidence.
+
+After the lint port, hosted PR run 45140393161 passed npm run check and
+migrations, then reproduced the worker teardown error: 78 assertions passed,
+but late delivery/persistence continued after Jest teardown and exited 1.
+The Docker build was therefore skipped. This was the next genuine blocker,
+not another lint/dependency failure.
+
+Two deterministic lifecycle regressions fail before the worker correction
+(shutdown resolves while dispatch or lease recovery is pending) and pass
+after it. OutboxWorkerService now tracks active dispatch/recovery sweeps,
+stops polling, and awaits active work in onModuleDestroy, before Nest invokes
+the database/Redis onApplicationShutdown hooks. It starts no further claimed
+messages after shutdown; unstarted leases remain available for normal stale
+recovery. No sleeps, forced process exits, test suppression or data deletion
+are used to hide unfinished work. The added runtime change is limited to
+the worker shutdown path; authentication implementations remain untouched.
+Platform termination grace periods must allow active deliveries to finish.
+
+Merge coordination: a read-only three-way rehearsal of the OAuth test file
+finds seven overlapping hunks with PR #1 (imports, mock members and callback
+fixtures). Resolving those hunks to PR #1's version produces exactly its
+complete test file, preserving its additional security assertions and state
+cookie fixtures. When the branches are combined, retain PR #1's OAuth test
+file and this branch's Effect override/regression test, and rerun checks.
+Do not choose the older dependency-branch test file over the auth version.
+This is a reviewed resolution plan, not a claim the branches auto-merge
+without conflicts. The authentication branch itself remains unchanged.
+
+CI and release constraints
+Baseline staging run https://github.com/Deepjyoti78/relayforge/actions/runs/45057698059
+failed npm audit --omit=dev --audit-level=moderate on this advisory, before
+lint/tests/build. The new PR's head-specific CI evidence is recorded in its
+description, separately from local results. Existing lint errors must not
+be suppressed to make this dependency PR appear green.
+No deployment, production migration, session rotation, secret change,
+authentication PR modification or merge is part of this change. Local
+database names end in _test and use separate local ports/containers.
+
+Controlled integration preparation (2026-11-23; supersedes older merge plan)
+
+PR #2's last passing PR run, 45141321993, tested merge b88ad475 against
+staging 8a778ad and dependency head 09889fd. Staging subsequently advanced to
+27e8c5b58039aa41c671a873ea37f69581ead920: both OAuth providers now initialize
+the transaction-local RLS user before externalIdentity.create, and SignIn
+contains newer navbar/brand changes. The older green run does not validate
+that newer staging commit.
+
+Integrate staging into the existing dependency branch with a local merge
+commit, preserving 09889fd ancestry. This avoids rewriting the pinned base
+of stacked delivery PR #3. No GitHub PR is merged by this operation.
+The only textual conflict is tests/oauth-authentication.spec.ts: staging
+added an untyped $executeRaw member to the old inline mock while this branch
+replaced that literal with createMockDatabase(). Keep the typed factory and
+add $executeRaw as jest.fn<Promise<number>,
+[TemplateStringsArray, ...unknown[]]>().mockResolvedValue(1). Retain all tests,
+typed fixtures and assertions. All other files merge automatically.
+The frontend and provider implementations must exactly match staging, with
+no PR #1 authentication implementation or PR #3 migration imported here.
+The Effect override/lock entry, worker drain and regressions remain unchanged
+from 09889fd. No dependency update or audit suppression is included.
+
+Authentication PR #1 remains unchanged at a9356aaf7cf8f9cfe8d7fd45ad702c4eb62a03df.
+Only AFTER #2 is approved and actually merged, fetch staging and refresh #1.
+Resolve the shared OAuth spec to #1's COMPLETE file, retaining all state-cookie
+fixtures and added security assertions rather than the older #2 spec. Keep
+#2's override, Effect regression and shutdown drain/tests. In each provider,
+retain staging's earliest RLS context initialization BEFORE identity creation;
+remove the redundant later bootstrap initialization if the merge adds both.
+Preserve PKCE/account linking, browser-bound state, strict redirects/CORS,
+cookie flags/clearing, CSRF, /v1/me persistence, SSE authorization/revalidation,
+all browser tests and the latest staging UI. Rerun the complete actual-branch
+suite, including Chromium, and inspect new HEAD-specific hosted CI before
+approval. Update the old advisory-blocked release notes after audit passes.
+No #1 branch or PR metadata is modified as part of preparing #2.
+
+Merge approval requires independent operator confirmation that Render
+Auto-Deploy is Off and Blueprint Auto Sync is disabled; also confirm no
+queued deployment or independent hook caller. No Render setting is changed
+here. render.yaml still runs role initialization/migrations during API build:
+the source tree alone cannot prove deployment is disabled. No merge, deploy,
+live migration, credential change or delivery migration change is authorized.
+
+Local revalidation on staging 27e8c5b plus the resolution above:
+- Clean npm ci and frontend npm ci PASS; both lockfiles remain unchanged.
+- Production audit PASS: 0 vulnerabilities. Prisma remains 7.10.1 and the
+  narrowly overridden Effect remains 3.22.1. No dependency remediation added.
+- npm run check PASS: lint/typecheck, 181 unit tests / 16 suites (34.656s),
+  Prisma generation and API/worker build. Explicit Prisma validate also PASS.
+- Fresh relayforge_controlled_merge_test on local PostgreSQL/Redis: all 13
+  migrations apply, 78 integration tests / 9 suites PASS (39.856s), exit 0.
+  Repeated migration deploy is idempotent; migrate status is current.
+- Read-only migrate diff exits 2 with only the same five baseline differences:
+  four updated_at defaults and organizations.created_by index. No schema fix.
+- Frontend production build and runtime Docker build PASS. Built-image smoke
+  PASS: live/ready, real BullMQ worker round trip and natural API/worker close.
+- Local API/worker roles lack superuser/BYPASSRLS/createdb/createrole. The
+  worker/undici teardown problem did not reproduce; no forced exits used.
+- git diff --check PASS. Nonfatal pg concurrency and Vite chunk-size warnings,
+  and 26 development-only moderate audit findings remain outside this PR.
+No browser script exists on #2; actual provider consent, deployed cookie
+policy and #1's complete browser suite remain part of the later auth gate.
+Fresh hosted evidence for this updated head is recorded separately in PR #2;
+these local results do not claim any GitHub job succeeded.

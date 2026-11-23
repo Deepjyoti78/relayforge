@@ -277,6 +277,12 @@ export class GitHubOAuthService {
           },
         });
 
+        // Set PostgreSQL session variable so Row-Level Security allows organization & membership creation
+        await tx.$executeRaw`
+          SELECT set_config('app.current_user_id', ${user.id}, true),
+                 set_config('app.current_org_id', '', true)
+        `;
+
         await tx.externalIdentity.create({
           data: {
             userId: user.id,
@@ -285,9 +291,6 @@ export class GitHubOAuthService {
             providerUsername: profile.login,
           },
         });
-
-        // Bootstrap under the new user's transaction-local RLS identity.
-        await tx.$executeRaw`SELECT set_config('app.current_user_id', ${user.id}, true), set_config('app.current_org_id', '', true)`;
 
         // Auto-provision initial workspace
         const orgName = `${user.displayName || profile.login || 'Personal'}'s Workspace`;

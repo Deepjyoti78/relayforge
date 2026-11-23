@@ -3,6 +3,10 @@ RelayForge authentication security review — independently verified follow-up
 Repository: Deepjyoti78/relayforge
 Review branch/worktree: codex/auth-security-review / auth-security-review-worktree
 Starting security commit: 0cfa2e0; staging comparison snapshot: d4177c2
+Current integration base: 67e8acca13d904bd2fd8272a35c2df200adcb5e7, merged PR #2.
+The historical advisory failures below are superseded: the merged scoped Effect
+override is retained and the refreshed production audit passes with 0 findings.
+See the staging-integration follow-up at the end for current validation evidence.
 The actual source and diff were reviewed; the earlier report was not used as proof.
 
 Findings and implemented corrections
@@ -25,7 +29,8 @@ Findings and implemented corrections
    services created a workspace without transaction-local app.current_user_id.
    Two real PostgreSQL tests reproduced error 42501/RLS (audit-provisioning-before.log).
    Both services now set the new user's RLS identity inside the existing provisioning
-   transaction, before creating the organization/OWNER membership. No RLS policy,
+   transaction, before external identity and organization/OWNER membership creation.
+   This retains staging's earlier initialization timing. No RLS policy,
    role privilege or database schema was weakened. Verified identity linking,
    returning identities and Google unverified-email non-linking are covered.
 4. Session cookies remain HttpOnly, host-only and Secure in production. Creation
@@ -137,7 +142,7 @@ execution. A fresh npm ci installs the committed Playwright dev dependency norma
 Tests requiring local sockets/DNS/browser subprocesses used reviewed tool permissions.
 Nonfatal warnings remain: Vite entry bundle >500 kB, and pg concurrent-query deprecation.
 
-CI vulnerability gate — existing dependency issue, not a new auth regression
+Historical pre-PR-#2 CI vulnerability gate — not a new auth regression
 Hosted run: https://github.com/Deepjyoti78/relayforge/actions/runs/45055019603
 Job: https://github.com/Deepjyoti78/relayforge/actions/runs/45055019603/job/137308202795
 Head: bbb5a57ed5ea860c1a7d4f5374f4aa9fe6066695 (before these follow-up changes).
@@ -155,7 +160,7 @@ new flaws. Lockfile additions are only @playwright/test, playwright and playwrig
 The advisory identifies effect 3.22.1 as patched. npm audit fix --force proposes a
 breaking Prisma downgrade to 6.12.0; it was NOT run. Recommend a separate narrowly
 reviewed Prisma-compatible patch/override after generation, migration and runtime
-validation. The audit remains a release blocker; no exception was added. A new
+validation. At that historical head the audit was a release blocker; no exception was added. A new
 independent browser-authentication CI job runs without depending on the failing
 verify job, and its head-specific status is recorded separately in the draft PR description.
 
@@ -252,13 +257,13 @@ preserved. Security/tenancy/deployment, historical foundation/roadmap notes and 
 were reconciled with source. Legacy staging-harness labels now describe only the
 invalid-token and OAuth-start checks they actually perform; no live harness was run.
 
-Current local revalidation (separate from GitHub CI): 261 unit tests / 21 suites,
+Historical local revalidation at d4177c2 (separate from GitHub CI): 261 unit tests / 21 suites,
 90 PostgreSQL/Redis integration tests / 11 suites, and 12 real Chromium tests passed.
 Lint, typecheck, frontend build, API build, script syntax and git diff --check passed.
 Logs: .cache/revalidation-{unit,integration,browser,lint,typecheck,web-build,api-build}.log.
 All 13 existing migrations applied only to the isolated local test database.
-The audit still exits 1 for the existing three high Prisma/Effect findings; its
-current result is .cache/revalidation-audit.json. No dependency versions were changed
+That historical audit exited 1 for the three high Prisma/Effect findings; its
+recorded result is .cache/revalidation-audit.json. No dependency versions were changed
 in this follow-up. Hosted head-specific CI is recorded in the draft PR description
 and task result, never inferred from these local passes.
 
@@ -269,3 +274,52 @@ Render blueprint copies API DATABASE_URL into WORKER_DATABASE_URL. Separate leas
 privilege identities and transport verification require a separately reviewed fix
 and live acceptance. Current startup checks known GitHub placeholders, not all
 Google credential validity; both providers still require real consent verification.
+
+Staging integration after PR #2 merged (23 November 2026)
+
+GitHub confirmed #2 merged at 67e8acca13d904bd2fd8272a35c2df200adcb5e7.
+That staging commit was merged locally into this existing auth branch, preserving
+history. The only textual conflict was tests/oauth-authentication.spec.ts; resolve
+to the COMPLETE a9356aa security file, not staging's shorter pre-security spec.
+Its Request/Response mocks, provider state cookies and every assertion are intact.
+All 14 critical cookie/session/CORS/SSE/browser/frontend/CI files exactly match
+a9356aa (hash evidence: .cache/staging-refresh-preservation.json). Each OAuth
+provider retains staging's earlier transaction-local RLS setup BEFORE identity
+creation; only the duplicate later bootstrap call from the auto-merge was removed.
+SignIn retains current staging navbar/typography alongside cookie-only sign-in.
+Worker drain/tests, Effect override/regression and all 13 migrations match staging.
+No delivery migration, PR #3 head or PR metadata was modified.
+
+Current LOCAL results (separate from fresh hosted CI in the PR description):
+- Clean root/frontend npm ci PASS; lockfiles unchanged by installation.
+- Production audit PASS, 0 vulnerabilities. Installed Prisma/config/client remain
+  7.10.1, Effect is the inherited scoped 3.22.1 override. No additional upgrade.
+- npm run check PASS: lint/typecheck, 264 units / 23 suites (39.928s), API/worker
+  build/generation. Explicit Prisma validate also PASS.
+- Fresh relayforge_auth_refresh_test: 13 migrations PASS; 90 PostgreSQL/Redis
+  integrations / 11 suites PASS (54.343s), normal exit. Repeat deploy/status PASS.
+- Complete Chromium suite PASS: 12 tests (1.9m), including Google/GitHub reload,
+  logout, stolen state, expiry/revocation, origin/redirect rejection and live SSE.
+  External provider consent/token/profile HTTP is mocked; real hosting/provider
+  acceptance is NOT claimed. Production cookie flags remain covered by unit tests.
+- Frontend and runtime Docker builds PASS; built-image live/ready, real BullMQ
+  queue round trip and natural API/worker shutdown PASS. git diff --check PASS.
+- Read-only migrate diff exits 2 with only the same five baseline differences:
+  four updated_at defaults and organizations.created_by index. No schema repair.
+Logs: .cache/staging-refresh-*.log and .cache/staging-refresh-results.json.
+
+Local setup failures were corrected without changing assertions: Docker initially
+was stopped; shared node_modules/generated junctions caused a native-file install
+lock and then 15 suites could not load the shared Prisma runtime. Preserved those
+junctions under .cache and installed/generated independently in this worktree;
+the complete final suite above passed. Restored only missing root dependency
+files from its unchanged lockfile and verified all production entry points and
+Prisma runtime resolve. No unrelated tracked worktree files changed. Existing
+26 dev-only moderate findings, pg concurrency and Vite chunk warnings remain.
+
+Live Google/GitHub app configuration/consent and deployed cookie persistence are
+still manual gates. Choose owned same-site HTTPS origins or implement/review the
+proposed same-origin proxy; asset-only Wrangler is insufficient. Verify exact
+callback variables, /v1/me/dashboard reload with third-party cookies blocked,
+dedicated database roles, transport certificate verification and hosting controls.
+No live credentials/settings, sessions, migrations or deployment were changed.

@@ -1,6 +1,10 @@
 RelayForge authentication release checklist | 23 November 2026
 No deployment or live-secret changes were made by this audit.
 
+[ ] Before merge approval, the operator independently confirms Render Auto-Deploy
+    Off, Blueprint Auto Sync disabled and no queued/hook-triggered deployment.
+    This review did not inspect/change live settings or authorize deployment.
+
 [ ] Choose and provision one HTTPS topology before release.
     A: Cloudflare frontend https://app.relayforge.example and Render API
        https://api.relayforge.example (replace with owned custom domains).
@@ -48,8 +52,9 @@ No deployment or live-secret changes were made by this audit.
     warns about unsafe roles. Health and bootstrap-script success are not proof.
 [ ] Resolve cloud database/Redis TLS certificate verification in a separate change;
     current cloud/pooler and rediss code disables verification. No live fix was made.
-[ ] Resolve the existing effect/Prisma vulnerability gate in a separate narrow PR.
-    Do not run npm audit fix --force: it proposes a breaking Prisma 6.12.0 downgrade.
+[ ] Re-run the production audit on the release head. Merged PR #2 supplies the
+    scoped @prisma/config@7.10.1 -> effect@3.22.1 override and regression test;
+    Prisma remains 7.10.1. Do not force an audit fix, downgrade or bypass the gate.
 [ ] Confirm unit, PostgreSQL/Redis integration, Chromium, lint, typecheck, frontend
     build, API build and git diff --check; verify new browser CI on a draft PR.
 [ ] Manually test LIVE Google and GitHub: new/returning users, verified-email linking,
