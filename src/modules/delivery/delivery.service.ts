@@ -46,6 +46,7 @@ export interface DeliverEventParams {
   outboxMessageId?: string;
   attemptNumber?: number;
   signingSecret?: string;
+  signal?: AbortSignal;
   workflowExecutionId?: string;
   stepExecutionId?: string;
   customDeliveryId?: string;
@@ -140,7 +141,7 @@ export class DeliveryService {
     const timestamp = Math.floor(Date.now() / 1000);
 
     // Resolve signing secret: use explicit secret if passed, otherwise securely
-    // resolve the organization's encrypted signing secret from the database.
+    // resolve the originating event endpoint's encrypted secret from the database.
     let signingSecret = params.signingSecret;
     if (!signingSecret) {
       try {
@@ -152,7 +153,7 @@ export class DeliveryService {
             secret_tag: string;
           }[]>`
             SELECT endpoint_id, secret_ciphertext, secret_iv, secret_tag
-            FROM get_org_endpoint_signing_secret(${params.organizationId}::uuid)
+            FROM get_event_endpoint_signing_secret(${params.organizationId}::uuid, ${params.eventId}::uuid)
           `;
         });
         const secretRow = secretRows?.[0];
@@ -168,10 +169,10 @@ export class DeliveryService {
         // Fallback to direct table query inside tenant context
         try {
           const endpoint = await this.tenantContext.runInTenantContext(params.organizationId, '', async (tx) => {
-            return tx.endpoint.findFirst({
-              where: { organizationId: params.organizationId, isActive: true },
-              orderBy: { createdAt: 'asc' },
+            const event = await tx.event.findFirst({
+              where: { id: params.eventId, organizationId: params.organizationId }, include: { endpoint: true },
             });
+            return event?.endpoint;
           });
           if (endpoint?.secretCiphertext && endpoint?.secretIv && endpoint?.secretTag) {
             signingSecret = decryptSecret(
@@ -264,7 +265,7 @@ export class DeliveryService {
         method: params.destination.httpMethod ?? 'POST',
         headers: requestHeaders,
         body: bodyStr,
-        signal: AbortSignal.timeout(timeoutMs),
+        signal: params.signal ? AbortSignal.any([params.signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs),
         redirect: 'manual',
       });
 
@@ -304,7 +305,7 @@ export class DeliveryService {
       }
     } catch (err: unknown) {
       const errObj = err as { name?: string; message?: string; code?: string } | null;
-      const isTimeout =
+      const isTimeout = params.signal?.aborted ||
         errObj?.name === 'TimeoutError' ||
         errObj?.name === 'AbortError' ||
         (typeof errObj?.message === 'string' && errObj.message.toLowerCase().includes('timeout'));
@@ -314,7 +315,9 @@ export class DeliveryService {
 
       if (isTimeout || isSocketReset) {
         status = 'UNKNOWN';
-        errorDescription = isTimeout
+        errorDescription = params.signal?.aborted
+          ? 'Worker lease lost during delivery (destination receipt ambiguous)'
+          : isTimeout
           ? `Delivery timed out after ${params.destination.timeoutMs ?? 10000}ms (destination receipt ambiguous)`
           : `Connection reset by destination peer during transport (${errObj?.message || 'ECONNRESET'})`;
       } else {

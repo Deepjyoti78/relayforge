@@ -91,7 +91,7 @@ flowchart TD
 | `ENCRYPTION_KEY` | AES-256 master encryption key (64 hex characters) | High-entropy key generated automatically by Render Blueprint |
 | `ALLOW_PRIVATE_DESTINATIONS`| SSRF bypass flag | `false` (Strictly enforced) |
 | `WORKER_CONCURRENCY` | Concurrent delivery tasks per worker process | `4` |
-| `WORKER_HEARTBEAT_MS` | Outbox lease heartbeat interval | `10000` |
+| `WORKER_HEARTBEAT_MS` | Worker liveness heartbeat (lease renewal is independently fixed at 10s) | `10000` |
 | `GITHUB_CLIENT_ID` | GitHub OAuth application client ID | Staging GitHub OAuth App Client ID |
 | `GITHUB_CLIENT_SECRET` | GitHub OAuth application secret | Staging GitHub OAuth App Client Secret |
 | `GITHUB_CALLBACK_URL` | Public OAuth redirect target | `https://relayforge-staging-api.onrender.com/auth/github/callback` |
