@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   addMember,
   deleteOrganization,
@@ -6,7 +6,6 @@ import {
   fetchMembers,
   fetchOrganization,
   fetchMe,
-  getCachedUser,
   logout,
   removeMember,
   setCachedMembers,
@@ -23,70 +22,84 @@ import { Sidebar } from './components/Sidebar.tsx';
 import { SignIn } from './components/SignIn.tsx';
 import { TopBar } from './components/TopBar.tsx';
 import type { MembershipRole, OrganizationDetails, OrganizationMember, UserProfile } from './types.ts';
+import { dashboardPath, readDashboardLocation } from './auth-navigation.ts';
+import type { DashboardTab } from './auth-navigation.ts';
 
 export const App: React.FC = () => {
+  const isLandingPreview = new URLSearchParams(window.location.search).get('view') === 'landing' || new URLSearchParams(window.location.search).has('landing');
+  const lookupGeneration = useRef(0);
+  const [authError, setAuthError] = useState<string | null>(null);
   // The server validates the HttpOnly session before rendering authenticated content.
   const [user, setUser] = useState<UserProfile | null>(null);
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
   const [activeOrg, setActiveOrg] = useState<OrganizationDetails | null>(null);
   const [members, setMembers] = useState<OrganizationMember[]>([]);
   const [isSyncing, setIsSyncing] = useState<boolean>(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'metrics' | 'dlq' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<DashboardTab>(() => readDashboardLocation().tab);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [createOrgModalOpen, setCreateOrgModalOpen] = useState(false);
-  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(() => window.location.pathname === '/onboarding');
   const [modalOrgName, setModalOrgName] = useState('');
   const [modalOrgSlug, setModalOrgSlug] = useState('');
   const [modalOrgLoading, setModalOrgLoading] = useState(false);
   const [modalOrgError, setModalOrgError] = useState<string | null>(null);
 
   const loadUser = async () => {
+    const generation = ++lookupGeneration.current;
+    setIsSyncing(true);
+    setAuthError(null);
     try {
       const data = await fetchMe();
+      if (generation !== lookupGeneration.current) return;
       if (data) {
         setUser(data);
         setCachedUser(data);
         if (data.organizations && data.organizations.length > 0) {
           setSelectedOrgId((prev) => {
-            const exists = data.organizations.some((o) => o.id === prev);
-            return exists ? prev : data.organizations[0]!.id;
+            const intended = readDashboardLocation().orgId ?? prev;
+            return data.organizations.some((o) => o.id === intended) ? intended : data.organizations[0]!.id;
           });
-        }
+        } else setSelectedOrgId(null);
       } else {
         // Token invalid, expired, or user not found
         setSessionToken(null);
         setUser(null);
         setCachedUser(null);
+        setSelectedOrgId(null);
         setActiveOrg(null);
         setCachedOrg(null);
         setMembers([]);
         setCachedMembers(null);
       }
-    } catch (err) {
-      console.warn('Authentication sync warning:', err);
-      if (!getCachedUser()) {
-        setUser(null);
-      }
+    } catch {
+      if (generation !== lookupGeneration.current) return;
+      // Unknown is not signed out. Never authorize an initial render from cache.
+      setAuthError('Unable to verify your session. Please retry.');
     } finally {
-      setIsSyncing(false);
+      if (generation === lookupGeneration.current) setIsSyncing(false);
     }
   };
 
   useEffect(() => {
     void loadUser();
+    return () => { lookupGeneration.current++; };
   }, []);
 
-  // Trigger professional onboarding for newly signed-in users or default orgs
   useEffect(() => {
-    if (user) {
-      const hasOnboarded = localStorage.getItem(`rf_onboarding_done_${user.id}`);
-      if (!hasOnboarded) {
-        setIsOnboardingOpen(true);
-      }
-    }
-  }, [user?.id]);
+    if (user && !isSyncing && !authError && !isLandingPreview && !isOnboardingOpen) window.history.replaceState({}, '', dashboardPath(activeTab, selectedOrgId));
+  }, [user, activeTab, selectedOrgId, isOnboardingOpen, isLandingPreview, isSyncing, authError]);
+
+  useEffect(() => {
+    const onNavigation = () => {
+      setActiveTab(readDashboardLocation().tab);
+      setIsOnboardingOpen(window.location.pathname === '/onboarding');
+      void loadUser();
+    };
+    window.addEventListener('popstate', onNavigation);
+    return () => window.removeEventListener('popstate', onNavigation);
+  }, []);
 
   const loadActiveOrg = async (orgId: string) => {
     try {
@@ -119,6 +132,11 @@ export const App: React.FC = () => {
       window.alert('Unable to sign out. Please try again.');
       return;
     }
+    lookupGeneration.current++;
+    window.history.replaceState({}, '', '/');
+    setAuthError(null);
+    setIsOnboardingOpen(false);
+    setActiveTab('dashboard');
     setUser(null);
     setSelectedOrgId(null);
     setActiveOrg(null);
@@ -191,7 +209,6 @@ export const App: React.FC = () => {
   }) => {
     if (!user) return;
     const newOrg = await createOrganization(orgData.name, orgData.slug);
-    localStorage.setItem(`rf_onboarding_done_${user.id}`, 'true');
     localStorage.setItem(`rf_workload_${newOrg.id}`, orgData.workloadType);
     localStorage.setItem(`rf_tier_${newOrg.id}`, orgData.architectureTier);
     localStorage.setItem(`rf_volume_${newOrg.id}`, orgData.estimatedVolume);
@@ -199,9 +216,9 @@ export const App: React.FC = () => {
     setSelectedOrgId(newOrg.id);
     await loadActiveOrg(newOrg.id);
     setIsOnboardingOpen(false);
+    setActiveTab('dashboard');
+    window.history.replaceState({}, '', dashboardPath('dashboard', newOrg.id));
   };
-
-  const isLandingPreview = typeof window !== 'undefined' && (new URLSearchParams(window.location.search).get('view') === 'landing' || new URLSearchParams(window.location.search).has('landing'));
 
   if (isSyncing && !user) {
     return (
@@ -231,13 +248,19 @@ export const App: React.FC = () => {
     );
   }
 
+  if (authError && !user) {
+    return <main style={{minHeight:'100vh', display:'grid', placeContent:'center', gap:16, padding:24}}>
+      <p role="alert">{authError}</p>
+      <button type="button" disabled={isSyncing} onClick={() => { void loadUser(); }}>Retry</button>
+    </main>;
+  }
+
   if (!user || isLandingPreview) {
     return (
       <SignIn
         onTokenSignIn={async (token) => {
           setSessionToken(token);
           setIsSyncing(true);
-          setIsOnboardingOpen(true);
           await loadUser();
         }}
       />
@@ -252,6 +275,7 @@ export const App: React.FC = () => {
       color: '#FFFFFF',
       position: 'relative',
     }}>
+      {authError && <div role="alert" style={{position:"fixed",top:0,left:0,right:0,zIndex:10000,padding:12,background:"var(--bg-card)",color:"var(--text-primary)",textAlign:"center"}}>{authError} <button type="button" disabled={isSyncing} onClick={() => { void loadUser(); }}>Retry</button></div>}
       {/* Top subtle indeterminate progress bar during background revalidation (never blocks the user) */}
       {isSyncing && (
         <div style={{
@@ -328,7 +352,7 @@ export const App: React.FC = () => {
           onOpenProfile={() => setProfileModalOpen(true)}
         />
 
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: 'var(--bg-main)', minWidth: 0, width: '100%', transition: 'background-color 0.2s ease' }}>
+        <main data-active-tab={activeTab} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: 'var(--bg-main)', minWidth: 0, width: '100%', transition: 'background-color 0.2s ease' }}>
           {activeOrg ? (
             <OrgManagement
               organization={activeOrg}
@@ -576,8 +600,8 @@ export const App: React.FC = () => {
           userEmail={user.email}
           onComplete={handleOnboardingComplete}
           onSkip={() => {
-            localStorage.setItem(`rf_onboarding_done_${user.id}`, 'true');
             setIsOnboardingOpen(false);
+            window.history.replaceState({}, '', dashboardPath(activeTab, selectedOrgId));
           }}
         />
       )}

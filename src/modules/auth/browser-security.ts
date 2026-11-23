@@ -13,3 +13,16 @@ export function isTrustedFrontendUrl(value: string, frontendUrl: string): boolea
 export function isTrustedFrontendOrigin(value: string, frontendUrl: string): boolean {
   return isTrustedFrontendUrl(value, frontendUrl) && new URL(value).origin === value;
 }
+
+export function postOAuthDestination(redirectUri: string, frontendUrl: string, isNewUser: boolean): string {
+  const destination = new URL(isTrustedFrontendUrl(redirectUri, frontendUrl) ? redirectUri : frontendUrl);
+  if (isNewUser) {
+    destination.pathname = '/onboarding';
+    destination.search = '';
+  } else if (destination.pathname === '/' || destination.pathname === '/onboarding') {
+    destination.pathname = '/dashboard';
+  }
+  for (const parameter of ['view', 'landing', 'error', 'token', 'session_token', 'access_token', 'id_token', 'code', 'state']) destination.searchParams.delete(parameter);
+  destination.hash = '';
+  return destination.toString();
+}

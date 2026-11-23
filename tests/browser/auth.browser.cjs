@@ -7,7 +7,7 @@ test.beforeEach(async ({ context }) => {
 
 async function signIn(page, provider, redirect = base) {
   await page.goto(`/auth/${provider}/start?redirect_uri=${encodeURIComponent(redirect)}`);
-  await expect(page).toHaveURL(base + '/');
+  await expect(page).toHaveURL(/\/(dashboard|onboarding)(\?|$)/);
   await expect.poll(() => page.evaluate(async () => (await fetch('/v1/me', { credentials: 'include' })).status)).toBe(200);
 }
 async function me(page) {
@@ -71,7 +71,7 @@ test('same-site but untrusted origin cannot log out a cookie-authenticated user'
   await signIn(page, 'google');
   await page.goto('http://localhost:3311');
   const result = await page.evaluate(async () => {
-    try { await fetch('http://localhost:3310/v1/auth/logout', { method: 'POST', credentials: 'include' }); return 'readable'; }
+    try { await fetch('http://localhost:5175/v1/auth/logout', { method: 'POST', credentials: 'include' }); return 'readable'; }
     catch { return 'CORS blocked'; }
   });
   expect(result).toBe('CORS blocked');

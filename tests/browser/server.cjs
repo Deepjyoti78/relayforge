@@ -3,6 +3,7 @@ if (process.env.NODE_ENV !== 'test') throw new Error('Browser auth fixtures requ
 require('../load-integration-env.cjs'); // Refuses databases not ending in _test.
 require('ts-node/register');
 const { createServer } = require('node:http');
+const { Readable } = require('node:stream');
 const { randomUUID, randomInt } = require('node:crypto');
 const { createApiApplication } = require('../../src/api/create-api');
 const { GoogleOAuthService } = require('../../src/modules/auth/google-oauth.service');
@@ -15,7 +16,7 @@ const { hashToken } = require('../../src/common/crypto');
 
 (async () => {
   const app = await createApiApplication();
-  const run = randomUUID();
+  let run = randomUUID();
   // Only external provider HTTP calls are mocked. PKCE/state persistence,
   // provisioning, account linking, session hashing, guards and RLS are real.
   const exchange = async (code, verifier) => {
@@ -28,12 +29,16 @@ const { hashToken } = require('../../src/common/crypto');
     email: 'browser-google-' + run + '@example.test', email_verified: true });
   const github = app.get(GitHubOAuthService);
   github.exchangeCodeForToken = exchange;
-  const githubId = randomInt(1, 2000000000);
+  let githubId = randomInt(1, 2000000000);
   github.fetchGitHubProfile = async () => ({ id: githubId, login: 'browser-' + run, name: 'Browser GitHub User', email: null });
   github.fetchGitHubPrimaryEmail = async () => 'browser-github-' + run + '@example.test';
   const attacker = createServer(async (req, res) => {
     try {
       const url = new URL(req.url, 'http://localhost:3311');
+      if (req.method === 'POST' && url.pathname === '/__test/identity' && req.headers['x-test-control'] === 'rotate') {
+        run = randomUUID(); githubId = randomInt(1, 2000000000);
+        res.writeHead(204); return res.end();
+      }
       if (req.method === 'GET' && url.pathname.startsWith('/mock-provider/')) {
         const callback = new URL(url.searchParams.get('redirect_uri'));
         callback.searchParams.set('state', url.searchParams.get('state'));
@@ -69,8 +74,40 @@ const { hashToken } = require('../../src/common/crypto');
       return { state: original.state, url: 'http://localhost:3311/mock-provider/' + provider + url.search };
     };
   }
+  // Execute the production Worker handler in a local Node HTTP adapter. Only
+  // the configured HTTPS upstream transport is mapped to the loopback API.
+  // This tests the real proxy/cookie/redirect/SSE contract, not Cloudflare TLS.
+  const { proxyRequest } = await import('../../web/worker.js');
+  const frontend = process.env.FRONTEND_URL;
+  const gateway = createServer(async (req, res) => {
+    const controller = new AbortController();
+    res.on('close', () => controller.abort());
+    try {
+      const request = new Request(new URL(req.url, frontend), {
+        method:req.method, headers:req.headers, signal:controller.signal,
+        ...(!['GET','HEAD'].includes(req.method) ? {body:Readable.toWeb(req), duplex:'half'} : {}),
+      });
+      const response = await proxyRequest(request, {API_ORIGIN:'https://api.proxy.test', FRONTEND_URL:frontend,
+        ASSETS:{fetch:async()=>new Response('Not an asset server',{status:404})}}, (outbound, options) => {
+          const upstream = new URL(outbound.url);
+          if (upstream.origin !== 'https://api.proxy.test') throw new Error('Unexpected upstream');
+          upstream.protocol='http:'; upstream.hostname='127.0.0.1'; upstream.port='3310';
+          return fetch(new Request(upstream, outbound), options);
+        });
+      const headers = Object.fromEntries([...response.headers].filter(([key])=>key !== 'set-cookie'));
+      const cookies = response.headers.getSetCookie();
+      if (cookies.length) headers['set-cookie']=cookies;
+      res.writeHead(response.status, headers);
+      if (response.body) Readable.fromWeb(response.body).on('error',()=>res.destroy()).pipe(res);
+      else res.end();
+    } catch { if (!res.headersSent) res.writeHead(503); res.end(); }
+  });
   await new Promise(resolve => attacker.listen(3311, '127.0.0.1', resolve));
+  await new Promise(resolve => gateway.listen(3312, '127.0.0.1', resolve));
   await app.listen(3310, '127.0.0.1');
-  const close = async () => { attacker.close(); await app.close(); process.exit(0); };
+  const close = async () => {
+    for (const server of [attacker, gateway]) { server.close(); server.closeAllConnections(); }
+    await app.close();
+  };
   process.on('SIGTERM', close); process.on('SIGINT', close);
 })().catch(error => { console.error(error); process.exit(1); });

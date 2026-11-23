@@ -119,9 +119,9 @@ export function getApiBaseUrl(): string {
     if (host === 'localhost' || host === '127.0.0.1') {
       return `http://${host}:3100`;
     }
-    return 'https://relayforge-staging-api.onrender.com';
+    return '';
   }
-  return 'https://relayforge-staging-api.onrender.com';
+  return '';
 }
 
 export function warmupApi(): void {
@@ -148,7 +148,8 @@ if (typeof window !== 'undefined') {
 
 export function getAuthStartUrl(provider: 'github' | 'google'): string {
   const apiBase = getApiBaseUrl();
-  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const location = typeof window !== 'undefined' ? new URL(window.location.href) : null;
+  const origin = location ? location.origin + (location.pathname === '/dashboard' || location.pathname.startsWith('/dashboard/') ? location.pathname + location.search : '/dashboard') : '';
   const base = apiBase ? apiBase.replace(/\/+$/, '') : '';
   return `${base}/auth/${provider}/start?redirect_uri=${encodeURIComponent(origin)}`;
 }
@@ -197,18 +198,12 @@ async function apiFetch(input: RequestInfo | URL, init?: RequestInit): Promise<R
 }
 
 export async function fetchMe(): Promise<UserProfile | null> {
-  try {
-    const res = await apiFetch('/v1/me');
-    if (res.status === 401) return null;
-    const contentType = res.headers.get('content-type');
-    if (!res.ok || !contentType?.includes('application/json')) {
-      return null;
-    }
-    return (await res.json()) as UserProfile;
-  } catch (err) {
-    console.warn('Silent fetchMe background error:', err);
-    return null;
-  }
+  const res = await apiFetch('/v1/me');
+  if (res.status === 401) return null;
+  if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) throw new Error('Session service is unavailable');
+  const user = await res.json() as UserProfile;
+  if (!user || typeof user.id !== 'string' || !Array.isArray(user.organizations)) throw new Error('Invalid session response');
+  return user;
 }
 
 export async function logout(): Promise<void> {

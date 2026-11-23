@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { isTrustedFrontendUrl } from './browser-security';
 import { generatePkcePair, generateState } from '../../common/crypto';
-import type { User } from '../../generated/prisma/client';
+import type { OAuthUserResolution } from './oauth-user';
 import { RuntimeConfig } from '../config/config.module';
 import { DatabaseService } from '../database/database.service';
 
@@ -70,7 +70,7 @@ export class GitHubOAuthService {
    * Atomically consumes the state record, exchanges the code and PKCE verifier for an access token,
    * fetches the GitHub profile, and resolves or registers the User.
    */
-  async handleCallback(code: string, state: string): Promise<{ user: User; redirectUri: string }> {
+  async handleCallback(code: string, state: string): Promise<OAuthUserResolution & { redirectUri: string }> {
     if (!code || !state) {
       throw new BadRequestException('Missing code or state parameter');
     }
@@ -98,10 +98,11 @@ export class GitHubOAuthService {
     const email = profile.email ?? (await this.fetchGitHubPrimaryEmail(accessToken));
 
     // Resolve or create user anchored on stable GitHub numeric user ID (converted to string)
-    const user = await this.resolveUserFromGitHub(profile, email);
+    const { user, isNewUser } = await this.resolveUserFromGitHub(profile, email);
 
     return {
       user,
+      isNewUser,
       redirectUri: storedState.redirectUri && isTrustedFrontendUrl(storedState.redirectUri, this.config.values.frontendUrl)
         ? storedState.redirectUri : this.config.values.frontendUrl,
     };
@@ -188,7 +189,7 @@ export class GitHubOAuthService {
    * Resolves or registers a User anchored to GitHub's stable provider user ID.
    * If the identity exists, updates profile details. If new, provisions a new User and ExternalIdentity.
    */
-  async resolveUserFromGitHub(profile: GitHubUserProfile, email: string | null): Promise<User> {
+  async resolveUserFromGitHub(profile: GitHubUserProfile, email: string | null): Promise<OAuthUserResolution> {
     const providerUserId = profile.id.toString();
 
     // Search for existing external identity
@@ -220,7 +221,7 @@ export class GitHubOAuthService {
         });
       }
 
-      return updatedUser;
+      return { user: updatedUser, isNewUser: false };
     }
 
     // Safe account linking: If verified email matches an existing user, link to that account
@@ -240,13 +241,14 @@ export class GitHubOAuthService {
             },
           });
 
-          return await this.database.client.user.update({
+          const linkedUser = await this.database.client.user.update({
             where: { id: existingUserByEmail.id },
             data: {
               avatarUrl: existingUserByEmail.avatarUrl ?? profile.avatar_url ?? null,
               displayName: existingUserByEmail.displayName ?? profile.name ?? profile.login,
             },
           });
+          return { user: linkedUser, isNewUser: false };
         } catch (err: unknown) {
           // If concurrent request created the identity first, return existing user
           if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: string }).code === 'P2002') {
@@ -259,7 +261,7 @@ export class GitHubOAuthService {
               },
               include: { user: true },
             });
-            if (recheck?.user) return recheck.user;
+            if (recheck?.user) return { user: recheck.user, isNewUser: false };
           }
           throw err;
         }
@@ -268,7 +270,7 @@ export class GitHubOAuthService {
 
     // New user registration with automatic workspace provisioning
     try {
-      return await this.database.client.$transaction(async (tx) => {
+      const registeredUser = await this.database.client.$transaction(async (tx) => {
         const user = await tx.user.create({
           data: {
             displayName: profile.name ?? profile.login,
@@ -319,6 +321,7 @@ export class GitHubOAuthService {
 
         return user;
       });
+      return { user: registeredUser, isNewUser: true };
     } catch (err: unknown) {
       // Handle concurrent first-time registration race condition
       if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: string }).code === 'P2002') {
@@ -331,7 +334,7 @@ export class GitHubOAuthService {
           },
           include: { user: true },
         });
-        if (recheck?.user) return recheck.user;
+        if (recheck?.user) return { user: recheck.user, isNewUser: false };
       }
       throw err;
     }

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { isTrustedFrontendUrl } from './browser-security';
 import { generatePkcePair, generateState } from '../../common/crypto';
-import type { User } from '../../generated/prisma/client';
+import type { OAuthUserResolution } from './oauth-user';
 import { RuntimeConfig } from '../config/config.module';
 import { DatabaseService } from '../database/database.service';
 
@@ -69,7 +69,7 @@ export class GoogleOAuthService {
    * Atomically consumes the state record, exchanges the code and PKCE verifier for an access token,
    * fetches the Google user profile, and resolves or registers the User.
    */
-  async handleCallback(code: string, state: string): Promise<{ user: User; redirectUri: string }> {
+  async handleCallback(code: string, state: string): Promise<OAuthUserResolution & { redirectUri: string }> {
     if (!code || !state) {
       throw new BadRequestException('Missing code or state parameter');
     }
@@ -96,10 +96,11 @@ export class GoogleOAuthService {
     const profile = await this.fetchGoogleProfile(accessToken);
 
     // Resolve or create user anchored on Google's stable numeric subject ID (sub)
-    const user = await this.resolveUserFromGoogle(profile);
+    const { user, isNewUser } = await this.resolveUserFromGoogle(profile);
 
     return {
       user,
+      isNewUser,
       redirectUri: storedState.redirectUri && isTrustedFrontendUrl(storedState.redirectUri, this.config.values.frontendUrl)
         ? storedState.redirectUri : this.config.values.frontendUrl,
     };
@@ -164,7 +165,7 @@ export class GoogleOAuthService {
    * If the identity exists, updates profile details. If new, provisions a new User,
    * ExternalIdentity, and initial personal organization with OWNER membership.
    */
-  async resolveUserFromGoogle(profile: GoogleUserProfile): Promise<User> {
+  async resolveUserFromGoogle(profile: GoogleUserProfile): Promise<OAuthUserResolution> {
     const providerUserId = profile.sub;
 
     // Search for existing external identity
@@ -189,7 +190,7 @@ export class GoogleOAuthService {
         },
       });
 
-      return updatedUser;
+      return { user: updatedUser, isNewUser: false };
     }
 
     // Safe account linking: Only link to an existing user if Google verified the email
@@ -211,13 +212,14 @@ export class GoogleOAuthService {
           });
 
           // Refresh avatar/displayName if missing on existing account
-          return await this.database.client.user.update({
+          const linkedUser = await this.database.client.user.update({
             where: { id: existingUserByEmail.id },
             data: {
               avatarUrl: existingUserByEmail.avatarUrl ?? profile.picture ?? null,
               displayName: existingUserByEmail.displayName ?? profile.name ?? null,
             },
           });
+          return { user: linkedUser, isNewUser: false };
         } catch (err: unknown) {
           // If concurrent request created the identity first, return existing user
           if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: string }).code === 'P2002') {
@@ -230,7 +232,7 @@ export class GoogleOAuthService {
               },
               include: { user: true },
             });
-            if (recheck?.user) return recheck.user;
+            if (recheck?.user) return { user: recheck.user, isNewUser: false };
           }
           throw err;
         }
@@ -239,7 +241,7 @@ export class GoogleOAuthService {
 
     // New user registration with automatic workspace provisioning
     try {
-      return await this.database.client.$transaction(async (tx) => {
+      const registeredUser = await this.database.client.$transaction(async (tx) => {
         const user = await tx.user.create({
           data: {
             displayName: profile.name ?? profile.email?.split('@')[0] ?? 'Google User',
@@ -290,6 +292,7 @@ export class GoogleOAuthService {
 
         return user;
       });
+      return { user: registeredUser, isNewUser: true };
     } catch (err: unknown) {
       // Handle concurrent first-time registration race condition
       if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: string }).code === 'P2002') {
@@ -302,7 +305,7 @@ export class GoogleOAuthService {
           },
           include: { user: true },
         });
-        if (recheck?.user) return recheck.user;
+        if (recheck?.user) return { user: recheck.user, isNewUser: false };
       }
       throw err;
     }

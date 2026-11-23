@@ -10,8 +10,9 @@ No deployment or live-secret changes were made by this audit.
        https://api.relayforge.example (replace with owned custom domains).
     B: Same-origin proxy at F, the exact active HTTPS frontend origin. Route
        /auth/*, /v1/* and /health/* to a fixed Render API origin before SPA fallback.
-       The current Wrangler files are asset-only; this proxy is a proposal,
-       not an implemented/deployed production handler. See the review for details.
+       The Wrangler files now wire web/worker.js and ASSETS/run_worker_first.
+       It is implemented/tested, NOT deployed. See staging-auth-readiness.md for
+       the unknown final Cloudflare origin and exact operator-only cutover steps.
 
 [ ] Configure API runtime variables through the approved deployment process.
     NODE_ENV=production
@@ -32,7 +33,7 @@ No deployment or live-secret changes were made by this audit.
 
 [ ] Set frontend BUILD variable VITE_API_URL=https://api.relayforge.example [A],
     or VITE_API_URL=/ [B], then rebuild. None of these names contain secret values.
-    For B only, a proposed proxy needs fixed nonsecret API_ORIGIN and ASSETS binding;
+    For B only, the proxy needs explicit nonsecret FRONTEND_URL=F, API_ORIGIN and ASSETS binding;
     assets.run_worker_first must cover the three route patterns. Preserve method,
     body, query, browser Origin/Referer, Cookie, separate Set-Cookie headers,
     Location, status and SSE streaming. Use redirect: manual and no auth caching.
