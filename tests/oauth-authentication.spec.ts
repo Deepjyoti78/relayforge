@@ -15,6 +15,7 @@ function containing(value: unknown): unknown { return expect.objectContaining(va
 const mockQuery = () => jest.fn<Promise<unknown>, [unknown]>();
 function createMockDatabase() {
   const client = {
+    $executeRaw: jest.fn<Promise<number>, [TemplateStringsArray, ...unknown[]]>().mockResolvedValue(1),
     oAuthState: { create: mockQuery(), findUnique: mockQuery(), delete: mockQuery().mockResolvedValue({}) },
     externalIdentity: { findUnique: mockQuery(), create: mockQuery(), update: mockQuery() },
     user: { create: mockQuery(), update: mockQuery(), findFirst: mockQuery() },

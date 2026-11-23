@@ -141,3 +141,69 @@ be suppressed to make this dependency PR appear green.
 No deployment, production migration, session rotation, secret change,
 authentication PR modification or merge is part of this change. Local
 database names end in _test and use separate local ports/containers.
+
+Controlled integration preparation (2026-11-23; supersedes older merge plan)
+
+PR #2's last passing PR run, 45141321993, tested merge b88ad475 against
+staging 8a778ad and dependency head 09889fd. Staging subsequently advanced to
+27e8c5b58039aa41c671a873ea37f69581ead920: both OAuth providers now initialize
+the transaction-local RLS user before externalIdentity.create, and SignIn
+contains newer navbar/brand changes. The older green run does not validate
+that newer staging commit.
+
+Integrate staging into the existing dependency branch with a local merge
+commit, preserving 09889fd ancestry. This avoids rewriting the pinned base
+of stacked delivery PR #3. No GitHub PR is merged by this operation.
+The only textual conflict is tests/oauth-authentication.spec.ts: staging
+added an untyped $executeRaw member to the old inline mock while this branch
+replaced that literal with createMockDatabase(). Keep the typed factory and
+add $executeRaw as jest.fn<Promise<number>,
+[TemplateStringsArray, ...unknown[]]>().mockResolvedValue(1). Retain all tests,
+typed fixtures and assertions. All other files merge automatically.
+The frontend and provider implementations must exactly match staging, with
+no PR #1 authentication implementation or PR #3 migration imported here.
+The Effect override/lock entry, worker drain and regressions remain unchanged
+from 09889fd. No dependency update or audit suppression is included.
+
+Authentication PR #1 remains unchanged at a9356aaf7cf8f9cfe8d7fd45ad702c4eb62a03df.
+Only AFTER #2 is approved and actually merged, fetch staging and refresh #1.
+Resolve the shared OAuth spec to #1's COMPLETE file, retaining all state-cookie
+fixtures and added security assertions rather than the older #2 spec. Keep
+#2's override, Effect regression and shutdown drain/tests. In each provider,
+retain staging's earliest RLS context initialization BEFORE identity creation;
+remove the redundant later bootstrap initialization if the merge adds both.
+Preserve PKCE/account linking, browser-bound state, strict redirects/CORS,
+cookie flags/clearing, CSRF, /v1/me persistence, SSE authorization/revalidation,
+all browser tests and the latest staging UI. Rerun the complete actual-branch
+suite, including Chromium, and inspect new HEAD-specific hosted CI before
+approval. Update the old advisory-blocked release notes after audit passes.
+No #1 branch or PR metadata is modified as part of preparing #2.
+
+Merge approval requires independent operator confirmation that Render
+Auto-Deploy is Off and Blueprint Auto Sync is disabled; also confirm no
+queued deployment or independent hook caller. No Render setting is changed
+here. render.yaml still runs role initialization/migrations during API build:
+the source tree alone cannot prove deployment is disabled. No merge, deploy,
+live migration, credential change or delivery migration change is authorized.
+
+Local revalidation on staging 27e8c5b plus the resolution above:
+- Clean npm ci and frontend npm ci PASS; both lockfiles remain unchanged.
+- Production audit PASS: 0 vulnerabilities. Prisma remains 7.10.1 and the
+  narrowly overridden Effect remains 3.22.1. No dependency remediation added.
+- npm run check PASS: lint/typecheck, 181 unit tests / 16 suites (34.656s),
+  Prisma generation and API/worker build. Explicit Prisma validate also PASS.
+- Fresh relayforge_controlled_merge_test on local PostgreSQL/Redis: all 13
+  migrations apply, 78 integration tests / 9 suites PASS (39.856s), exit 0.
+  Repeated migration deploy is idempotent; migrate status is current.
+- Read-only migrate diff exits 2 with only the same five baseline differences:
+  four updated_at defaults and organizations.created_by index. No schema fix.
+- Frontend production build and runtime Docker build PASS. Built-image smoke
+  PASS: live/ready, real BullMQ worker round trip and natural API/worker close.
+- Local API/worker roles lack superuser/BYPASSRLS/createdb/createrole. The
+  worker/undici teardown problem did not reproduce; no forced exits used.
+- git diff --check PASS. Nonfatal pg concurrency and Vite chunk-size warnings,
+  and 26 development-only moderate audit findings remain outside this PR.
+No browser script exists on #2; actual provider consent, deployed cookie
+policy and #1's complete browser suite remain part of the later auth gate.
+Fresh hosted evidence for this updated head is recorded separately in PR #2;
+these local results do not claim any GitHub job succeeded.
