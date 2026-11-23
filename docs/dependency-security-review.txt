@@ -54,8 +54,8 @@ Local results (distinct from GitHub Actions)
   --detectOpenHandles diagnostic run exits 0 with all 78 passing; no forced
   exit or failure suppression was used. Worker shutdown clears timers but
   does not await in-flight sweeps, consistent with the observed stack.
-  This pre-existing lifecycle issue needs separate follow-up; successful
-  assertions alone do not make the affected ordinary runs clean passes.
+  The CI-unblock follow-up below now addresses this lifecycle issue;
+  successful assertions alone did not make those earlier runs clean passes.
 - Typecheck, Prisma generation/validate, API/worker TypeScript build and
   frontend build pass. Frontend retains its existing >500 kB chunk warning.
 - Initial dependency-only review: lint failed with the same 87 errors in
@@ -104,6 +104,23 @@ these without changing ESLint rules or suppressing checks. Clean npm ci,
 production audit, lint, typecheck and 179 unit tests pass after this port.
 Exact subsequent build/integration/container and hosted CI results are
 recorded in PR #2, separately from the earlier dependency-only evidence.
+
+After the lint port, hosted PR run 45140393161 passed npm run check and
+migrations, then reproduced the worker teardown error: 78 assertions passed,
+but late delivery/persistence continued after Jest teardown and exited 1.
+The Docker build was therefore skipped. This was the next genuine blocker,
+not another lint/dependency failure.
+
+Two deterministic lifecycle regressions fail before the worker correction
+(shutdown resolves while dispatch or lease recovery is pending) and pass
+after it. OutboxWorkerService now tracks active dispatch/recovery sweeps,
+stops polling, and awaits active work in onModuleDestroy, before Nest invokes
+the database/Redis onApplicationShutdown hooks. It starts no further claimed
+messages after shutdown; unstarted leases remain available for normal stale
+recovery. No sleeps, forced process exits, test suppression or data deletion
+are used to hide unfinished work. The added runtime change is limited to
+the worker shutdown path; authentication implementations remain untouched.
+Platform termination grace periods must allow active deliveries to finish.
 
 Merge coordination: a read-only three-way rehearsal of the OAuth test file
 finds seven overlapping hunks with PR #1 (imports, mock members and callback
