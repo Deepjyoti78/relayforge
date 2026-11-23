@@ -259,10 +259,11 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          position: 'relative',
           boxSizing: 'border-box',
           width: '100%',
         }}>
-          {/* Brand Logo & Name: RelayForge (Shifted rightward for balanced indentation) */}
+          {/* Brand Logo & Name: RelayForge (Aligned with "Reliable" text corner) */}
           <div
             className="rf-header-brand"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -272,7 +273,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               gap: '10px',
               cursor: 'pointer',
               userSelect: 'none',
-              marginLeft: 'clamp(12px, 2.2vw, 36px)',
+              marginLeft: 0,
             }}
           >
             <div
@@ -308,18 +309,19 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             </span>
           </div>
 
-          {/* Right-aligned Navigation Links (Product, Solutions, Models, Docs, Pricing, Contact, Resources) */}
+          {/* Centered Navigation Links (Product, Solutions, Models, Docs) */}
           <nav className="rf-landing-nav-center" style={{
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
             display: 'flex',
             alignItems: 'center',
-            gap: '26px',
+            gap: '32px',
             fontSize: '13.5px',
             fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
             fontWeight: 450,
             letterSpacing: '-0.01em',
             color: '#A1A1AA',
-            marginLeft: 'auto',
-            marginRight: '32px',
           }}>
             <button
               onClick={() => {
@@ -401,63 +403,6 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             >
               Docs
             </a>
-            <button
-              onClick={() => { setAuthMode('signup'); setModalOpen(true); }}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#A1A1AA',
-                fontSize: '13.5px',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-                fontWeight: 450,
-                letterSpacing: '-0.01em',
-                cursor: 'pointer',
-                padding: '6px 0',
-                transition: 'color 0.15s ease',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
-            >
-              Pricing
-            </button>
-            <button
-              onClick={() => { setAuthMode('signup'); setModalOpen(true); }}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#A1A1AA',
-                fontSize: '13.5px',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-                fontWeight: 450,
-                letterSpacing: '-0.01em',
-                cursor: 'pointer',
-                padding: '6px 0',
-                transition: 'color 0.15s ease',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
-            >
-              Contact
-            </button>
-            <button
-              onClick={() => { setAuthMode('signup'); setModalOpen(true); }}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#A1A1AA',
-                fontSize: '13.5px',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-                fontWeight: 450,
-                letterSpacing: '-0.01em',
-                cursor: 'pointer',
-                padding: '6px 0',
-                transition: 'color 0.15s ease',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#A1A1AA'; }}
-            >
-              Resources
-            </button>
           </nav>
 
           {/* Right Action Button: Book a demo */}
@@ -465,7 +410,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             display: 'flex',
             alignItems: 'center',
             gap: '14px',
-            marginRight: 'clamp(12px, 2.2vw, 36px)',
+            marginRight: 0,
           }}>
             <button
               id="open-signin-button"
@@ -475,25 +420,28 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#18181B',
-                border: '1px solid rgba(255, 255, 255, 0.16)',
-                borderRadius: '8px',
-                color: '#FFFFFF',
+                backgroundColor: '#F5F0E7',
+                border: 'none',
+                borderRadius: '999px',
+                color: '#0D0C0B',
                 fontSize: '13px',
                 fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-                fontWeight: 500,
-                padding: '7px 18px',
+                fontWeight: 600,
+                padding: '8px 20px',
                 cursor: 'pointer',
-                transition: 'all 0.15s ease',
+                boxShadow: '0 2px 14px rgba(245, 240, 231, 0.16)',
+                transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                 whiteSpace: 'nowrap',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#27272A';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.28)';
+                e.currentTarget.style.backgroundColor = '#FFFFFF';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(245, 240, 231, 0.28)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#18181B';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.16)';
+                e.currentTarget.style.backgroundColor = '#F5F0E7';
+                e.currentTarget.style.transform = 'translateY(0px)';
+                e.currentTarget.style.boxShadow = '0 2px 14px rgba(245, 240, 231, 0.16)';
               }}
             >
               Book a demo
@@ -580,24 +528,6 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               >
                 Docs
               </a>
-              <button
-                onClick={() => { setMobileMenuOpen(false); setModalOpen(true); }}
-                style={{ background: 'none', border: 'none', color: '#FFFFFF', textAlign: 'left', padding: '10px 4px', fontSize: '15px', fontWeight: 500, cursor: 'pointer' }}
-              >
-                Pricing
-              </button>
-              <button
-                onClick={() => { setMobileMenuOpen(false); setModalOpen(true); }}
-                style={{ background: 'none', border: 'none', color: '#FFFFFF', textAlign: 'left', padding: '10px 4px', fontSize: '15px', fontWeight: 500, cursor: 'pointer' }}
-              >
-                Contact
-              </button>
-              <button
-                onClick={() => { setMobileMenuOpen(false); setModalOpen(true); }}
-                style={{ background: 'none', border: 'none', color: '#FFFFFF', textAlign: 'left', padding: '10px 4px', fontSize: '15px', fontWeight: 500, cursor: 'pointer' }}
-              >
-                Resources
-              </button>
             </div>
             <div style={{ height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.1)', margin: '4px 0' }} />
             <div>
@@ -605,14 +535,15 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 onClick={() => { setMobileMenuOpen(false); setAuthMode('signup'); setModalOpen(true); }}
                 style={{
                   width: '100%',
-                  padding: '11px 16px',
-                  borderRadius: '8px',
-                  backgroundColor: '#18181B',
-                  border: '1px solid rgba(255, 255, 255, 0.16)',
-                  color: '#FFFFFF',
+                  padding: '11px 18px',
+                  borderRadius: '999px',
+                  backgroundColor: '#F5F0E7',
+                  border: 'none',
+                  color: '#0D0C0B',
                   fontSize: '13.5px',
-                  fontWeight: 500,
+                  fontWeight: 600,
                   cursor: 'pointer',
+                  boxShadow: '0 2px 14px rgba(245, 240, 231, 0.16)',
                   fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
                 }}
               >
