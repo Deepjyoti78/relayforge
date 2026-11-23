@@ -65,6 +65,7 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
     const resA = await request(app.getHttpServer())
       .post('/v1/organizations')
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'Acme Corp Org A', slug: `acme-dest-a-${randomUUID().slice(0, 8)}` })
       .expect(201);
     orgA = resA.body as { id: string; name: string };
@@ -73,6 +74,7 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
     const resB = await request(app.getHttpServer())
       .post('/v1/organizations')
       .set('Cookie', userB.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'Beta Corp Org B', slug: `beta-dest-b-${randomUUID().slice(0, 8)}` })
       .expect(201);
     orgB = resB.body as { id: string; name: string };
@@ -81,6 +83,7 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
     await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/members`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ email: userDevA.email, role: 'DEVELOPER' })
       .expect(201);
 
@@ -88,6 +91,7 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
     await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/members`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ email: userViewerA.email, role: 'VIEWER' })
       .expect(201);
   });
@@ -101,6 +105,7 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
       const res = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/destinations`)
         .set('Cookie', userA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .send({
           name: 'Malicious Loopback Target',
           url: 'http://127.0.0.1:8080/internal-admin',
@@ -114,6 +119,7 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
       const res = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/destinations`)
         .set('Cookie', userA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .send({
           name: 'Malicious Private Network Target',
           url: 'http://192.168.1.100:3000/keys',
@@ -127,6 +133,7 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
       const res = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/destinations`)
         .set('Cookie', userA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .send({
           name: 'Cloud Metadata Exploit',
           url: 'http://169.254.169.254/latest/meta-data/',
@@ -140,6 +147,7 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
       const res = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/destinations`)
         .set('Cookie', userA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .send({
           name: 'File Exfiltration',
           url: 'file:///etc/passwd',
@@ -153,6 +161,7 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
       const res = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/destinations`)
         .set('Cookie', userA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .send({
           name: 'Production Stripe Webhook Target',
           url: 'https://httpbin.org/post',
@@ -177,6 +186,7 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
       const res = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/destinations`)
         .set('Cookie', userDevA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .send({
           name: 'Developer Created Target',
           url: 'https://httpbin.org/anything',
@@ -191,6 +201,7 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
       await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/destinations`)
         .set('Cookie', userViewerA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .send({
           name: 'Viewer Target',
           url: 'https://httpbin.org/post',
@@ -206,6 +217,7 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
       const res = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/destinations`)
         .set('Cookie', userA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .send({
           name: 'Org A Dedicated Target',
           url: 'https://httpbin.org/post',
@@ -245,12 +257,14 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
       await request(app.getHttpServer())
         .patch(`/v1/organizations/${orgA.id}/destinations/${destinationAId}`)
         .set('Cookie', userB.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .send({ name: 'Tampered by Org B' })
         .expect(404);
 
       await request(app.getHttpServer())
         .delete(`/v1/organizations/${orgA.id}/destinations/${destinationAId}`)
         .set('Cookie', userB.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .expect(404);
     });
 
@@ -258,6 +272,7 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
       const updateRes = await request(app.getHttpServer())
         .patch(`/v1/organizations/${orgA.id}/destinations/${destinationAId}`)
         .set('Cookie', userA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .send({
           name: 'Updated Org A Target',
           rateLimitPerSecond: 250,
@@ -275,6 +290,7 @@ describe('Milestone 3 Option 1: Destination Registry & SSRF Protection (Integrat
       await request(app.getHttpServer())
         .delete(`/v1/organizations/${orgA.id}/destinations/${destinationAId}`)
         .set('Cookie', userA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .expect(200);
 
       // Verify it is gone

@@ -1,4 +1,7 @@
-# Why this foundation exists
+# Foundation milestone notes
+
+This is historical milestone context. For current authentication, tenancy and release
+limits, use [tenancy](tenancy.md), [deployment](deployment.md) and the [release checklist](auth-release-checklist.txt).
 
 The first milestone answers a small question: can the API, database, queue, and
 worker run independently, connect with the right privileges, and fail visibly?
@@ -16,9 +19,10 @@ It does not yet claim that webhook events are accepted or delivered.
 `/health/live` does not query dependencies. A database outage should make the API
 unready, not cause a liveness probe to repeatedly restart a healthy Node process.
 
-Redis is deliberately absent from API initialization. Later, accepting an event
-will require a PostgreSQL transaction with an outbox record, not a successful
-immediate Redis write. Hard admission quotas will bound the backlog during outages.
+The original foundation kept Redis out of API readiness. The current API attempts
+Redis for observability, but connection and noeviction failures are advisory.
+PostgreSQL remains the readiness dependency and durable outbox record. A successful
+API probe does not prove Redis or worker delivery is healthy.
 
 ## Follow one worker probe
 
@@ -43,19 +47,21 @@ retention will be added with operational maintenance.
 - `relayforge_api` can read operational worker state.
 - `relayforge_worker` can register and update worker state.
 
-The application refuses to start with superuser, role-creation, database-creation,
-or RLS-bypass privileges. The runtime accounts do not own the tables. Future
+The intended runtime accounts do not own tenant tables or have superuser, role-
+creation, database-creation or RLS-bypass privileges. Current startup warns about
+unsafe roles instead of refusing them; operators must verify actual deployed grants. Future
 migrations must include reviewed grants for new tables; they must not grant
 blanket ownership to a runtime account.
 
-This does not yet implement tenant isolation. Organization tables, composite
-foreign keys, authorized tenant context, and RLS policies form the next milestone.
+Tenant isolation was implemented after this foundation milestone. Organization
+tables, composite foreign keys, transaction-local user/organization context and RLS
+now exist; see [the current tenancy model](tenancy.md).
 
 ## Why persistent Redis with noeviction?
 
 Redis cache configurations commonly remove keys to free memory. Removing arbitrary
-queue keys can corrupt queue behavior. Worker startup verifies the noeviction
-policy. The development service also enables append-only persistence.
+queue keys can corrupt queue behavior. Redis initialization inspects noeviction and warns when it differs; it does not
+enforce that policy. The development service also enables append-only persistence.
 
 Queue persistence still does not make Redis the durable record of accepted
 events. PostgreSQL checkpoints and reconciliation will provide that guarantee.

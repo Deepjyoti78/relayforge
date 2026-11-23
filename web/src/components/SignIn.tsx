@@ -8,13 +8,14 @@ interface SignInProps {
 }
 
 export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(() => new URLSearchParams(window.location.search).has('error'));
   const [authMode, setAuthMode] = useState<'signup' | 'login'>('signup');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [authError, setAuthError] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<string | null>(() =>
+    new URLSearchParams(window.location.search).has('error') ? 'Sign-in failed or was cancelled. Please try again.' : null);
   const [overviewModalOpen, setOverviewModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [manualToken, setManualToken] = useState('');
@@ -49,128 +50,23 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
     setAuthError('Please sign in using "Continue with Google" or "Continue with GitHub". Direct password login is restricted in this staging environment.');
   };
 
-  const openOAuthPopup = (provider: 'google' | 'github') => {
+  const startOAuth = (provider: 'google' | 'github') => {
     setIsLoading(true);
     setAuthError(null);
     const authUrl = getAuthStartUrl(provider);
 
-    // Standard centered OAuth popup coordinates
-    const width = 500;
-    const height = 620;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2.5;
-
-    let popup: Window | null = null;
-    try {
-      popup = window.open(
-        authUrl,
-        'RelayForgeOAuthPopup',
-        `width=${width},height=${height},left=${left},top=${top},status=no,toolbar=no,menubar=no,location=yes,resizable=yes`
-      );
-    } catch {
-      popup = null;
-    }
-
-    // If popup was blocked by browser or failed, fall back to direct full-page redirect
-    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-      window.location.href = authUrl;
-      return;
-    }
-
-    popup.focus();
-
-    const timer = setInterval(() => {
-      if (!popup || popup.closed) {
-        clearInterval(timer);
-        setIsLoading(false);
-      }
-    }, 800);
+    window.location.assign(authUrl);
   };
 
   const handleGoogleSignIn = () => {
     if (isLoading) return;
-    openOAuthPopup('google');
+    startOAuth('google');
   };
 
   const handleGitHubSignIn = () => {
     if (isLoading) return;
-    openOAuthPopup('github');
+    startOAuth('github');
   };
-
-  // Multi-channel OAuth completion listener (BroadcastChannel, storage event, postMessage)
-  useEffect(() => {
-    const onAuthSuccess = (token: string, email?: string) => {
-      setIsLoading(false);
-      setModalOpen(false);
-      setSessionToken(token);
-      if (onTokenSignIn) {
-        onTokenSignIn(token, email);
-      } else {
-        window.location.reload();
-      }
-    };
-
-    // 1. Modern BroadcastChannel (works seamlessly across tabs and popups even if opener is severed)
-    let channel: BroadcastChannel | null = null;
-    try {
-      channel = new BroadcastChannel('rf_oauth_channel');
-      channel.onmessage = (event) => {
-        if (event.data?.type === 'rf_oauth_success' && typeof event.data.token === 'string') {
-          onAuthSuccess(event.data.token, event.data.email);
-        } else if (event.data?.type === 'rf_oauth_error' && typeof event.data.error === 'string') {
-          setIsLoading(false);
-          setAuthError(event.data.error);
-        }
-      };
-    } catch {
-      // BroadcastChannel not available in older browser engines
-    }
-
-    // 2. Storage event listener (fires when popup updates localStorage on same origin)
-    const handleStorage = (event: StorageEvent) => {
-      if (event.key === 'rf_oauth_token' && event.newValue) {
-        const token = event.newValue;
-        try { localStorage.removeItem('rf_oauth_token'); } catch {}
-        onAuthSuccess(token);
-      } else if (event.key === 'rf_oauth_error' && event.newValue) {
-        const error = event.newValue;
-        try { localStorage.removeItem('rf_oauth_error'); } catch {}
-        setIsLoading(false);
-        setAuthError(error);
-      }
-    };
-    window.addEventListener('storage', handleStorage);
-
-    // 3. postMessage listener (for direct window.opener communication)
-    const handleMessage = (event: MessageEvent) => {
-      const origin = event.origin || '';
-      const isAllowedOrigin =
-        origin === window.location.origin ||
-        origin.includes('localhost') ||
-        origin.includes('127.0.0.1') ||
-        origin.endsWith('.onrender.com') ||
-        origin.endsWith('.workers.dev') ||
-        origin.endsWith('.pages.dev');
-
-      if (!isAllowedOrigin) return;
-
-      if (typeof event.data === 'object' && event.data !== null) {
-        if (event.data.type === 'rf_oauth_success' && typeof event.data.token === 'string') {
-          onAuthSuccess(event.data.token, event.data.email);
-        } else if (event.data.type === 'rf_oauth_error' && typeof event.data.error === 'string') {
-          setIsLoading(false);
-          setAuthError(event.data.error);
-        }
-      }
-    };
-    window.addEventListener('message', handleMessage);
-
-    return () => {
-      try { channel?.close(); } catch {}
-      window.removeEventListener('storage', handleStorage);
-      window.removeEventListener('message', handleMessage);
-    };
-  }, [onTokenSignIn]);
 
   // Keyboard shortcut (Escape to close modals)
   useEffect(() => {

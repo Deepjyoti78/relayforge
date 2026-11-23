@@ -6,10 +6,7 @@ import {
   fetchMembers,
   fetchOrganization,
   fetchMe,
-  getCachedMembers,
-  getCachedOrg,
   getCachedUser,
-  getSessionToken,
   logout,
   removeMember,
   setCachedMembers,
@@ -28,111 +25,12 @@ import { TopBar } from './components/TopBar.tsx';
 import type { MembershipRole, OrganizationDetails, OrganizationMember, UserProfile } from './types.ts';
 
 export const App: React.FC = () => {
-  // Robust detection of whether the current window is an OAuth popup (via opener, window name, or dimensions)
-  const isPopup = typeof window !== 'undefined' && (
-    Boolean(window.opener && window.opener !== window) ||
-    window.name === 'RelayForgeOAuthPopup' ||
-    window.name === 'GoogleSignInPopup' ||
-    window.name === 'GitHubSignInPopup' ||
-    (window.outerWidth <= 650 && window.outerHeight <= 750)
-  );
-
-  // Check token synchronously on first render
-  let initialUrlToken: string | null = null;
-  if (typeof window !== 'undefined') {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      initialUrlToken = params.get('token');
-      const oauthError = params.get('error_description') || params.get('error');
-
-      if (initialUrlToken) {
-        setSessionToken(initialUrlToken);
-        params.delete('token');
-        const remainingQuery = params.toString();
-        const cleanUrl = window.location.pathname + (remainingQuery ? `?${remainingQuery}` : '') + window.location.hash;
-        window.history.replaceState({}, '', cleanUrl);
-
-        // If inside an OAuth popup, broadcast via all channels and close window immediately
-        if (isPopup) {
-          // 1. BroadcastChannel
-          try {
-            const bc = new BroadcastChannel('rf_oauth_channel');
-            bc.postMessage({ type: 'rf_oauth_success', token: initialUrlToken });
-            bc.close();
-          } catch {}
-
-          // 2. localStorage storage event (cross-window on same origin)
-          try {
-            localStorage.setItem('rf_oauth_token', initialUrlToken);
-            localStorage.setItem('rf_oauth_time', Date.now().toString());
-          } catch {}
-
-          // 3. postMessage (if window.opener is still active)
-          if (window.opener && window.opener !== window) {
-            try {
-              window.opener.postMessage({ type: 'rf_oauth_success', token: initialUrlToken }, '*');
-            } catch {}
-          }
-
-          // 4. Close the popup window
-          setTimeout(() => {
-            try { window.close(); } catch {}
-          }, 80);
-        }
-      } else if (oauthError) {
-        params.delete('error');
-        params.delete('error_description');
-        const remainingQuery = params.toString();
-        const cleanUrl = window.location.pathname + (remainingQuery ? `?${remainingQuery}` : '') + window.location.hash;
-        window.history.replaceState({}, '', cleanUrl);
-
-        if (isPopup) {
-          try {
-            const bc = new BroadcastChannel('rf_oauth_channel');
-            bc.postMessage({ type: 'rf_oauth_error', error: oauthError });
-            bc.close();
-          } catch {}
-
-          try {
-            localStorage.setItem('rf_oauth_error', oauthError);
-          } catch {}
-
-          if (window.opener && window.opener !== window) {
-            try {
-              window.opener.postMessage({ type: 'rf_oauth_error', error: oauthError }, '*');
-            } catch {}
-          }
-
-          setTimeout(() => {
-            try { window.close(); } catch {}
-          }, 80);
-        }
-      }
-    } catch {
-      // Ignore URL parsing errors
-    }
-  }
-
-  const tokenPresent = !!getSessionToken() || !!initialUrlToken;
-  const cachedUser = getCachedUser();
-  const cachedOrg = getCachedOrg();
-  const cachedMembers = getCachedMembers();
-
-  // If token is present and we have a cached user from a previous session, use it during revalidation.
-  // If no token is present, user is strictly unauthenticated (guest).
-  const immediateUser: UserProfile | null = tokenPresent ? cachedUser : null;
-  const initialActiveOrg: OrganizationDetails | null = tokenPresent ? cachedOrg : null;
-  const initialMembers: OrganizationMember[] = tokenPresent && cachedMembers ? cachedMembers : [];
-
-  const [user, setUser] = useState<UserProfile | null>(immediateUser);
-  const [selectedOrgId, setSelectedOrgId] = useState<string | null>(
-    () => initialActiveOrg?.id ?? null
-  );
-  const [activeOrg, setActiveOrg] = useState<OrganizationDetails | null>(
-    () => initialActiveOrg
-  );
-  const [members, setMembers] = useState<OrganizationMember[]>(initialMembers);
-  const [isSyncing, setIsSyncing] = useState<boolean>(tokenPresent);
+  // The server validates the HttpOnly session before rendering authenticated content.
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
+  const [activeOrg, setActiveOrg] = useState<OrganizationDetails | null>(null);
+  const [members, setMembers] = useState<OrganizationMember[]>([]);
+  const [isSyncing, setIsSyncing] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'members' | 'api-keys' | 'endpoints' | 'destinations' | 'deliveries' | 'workflows' | 'metrics' | 'dlq' | 'settings'>('dashboard');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -177,9 +75,7 @@ export const App: React.FC = () => {
   };
 
   useEffect(() => {
-    if (tokenPresent) {
-      void loadUser();
-    }
+    void loadUser();
   }, []);
 
   // Trigger professional onboarding for newly signed-in users or default orgs
@@ -191,61 +87,6 @@ export const App: React.FC = () => {
       }
     }
   }, [user?.id]);
-
-  // Multi-channel OAuth completion listener (BroadcastChannel, storage event, postMessage)
-  useEffect(() => {
-    const handleAuthSuccess = (token: string) => {
-      setSessionToken(token);
-      setIsSyncing(true);
-      setIsOnboardingOpen(true);
-      void loadUser();
-    };
-
-    // 1. BroadcastChannel
-    let channel: BroadcastChannel | null = null;
-    try {
-      channel = new BroadcastChannel('rf_oauth_channel');
-      channel.onmessage = (event) => {
-        if (event.data?.type === 'rf_oauth_success' && event.data.token) {
-          handleAuthSuccess(event.data.token);
-        }
-      };
-    } catch {}
-
-    // 2. Storage event listener (triggers across tabs/windows on same origin)
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === 'rf_oauth_token' && e.newValue) {
-        handleAuthSuccess(e.newValue);
-        try { localStorage.removeItem('rf_oauth_token'); } catch {}
-      }
-    };
-    window.addEventListener('storage', handleStorage);
-
-    // 3. postMessage listener
-    const handleOAuthMessage = (event: MessageEvent) => {
-      const origin = event.origin || '';
-      const isAllowedOrigin =
-        origin === window.location.origin ||
-        origin.includes('localhost') ||
-        origin.includes('127.0.0.1') ||
-        origin.endsWith('.onrender.com') ||
-        origin.endsWith('.workers.dev') ||
-        origin.endsWith('.pages.dev');
-
-      if (!isAllowedOrigin) return;
-
-      if (event.data && event.data.type === 'rf_oauth_success' && event.data.token) {
-        handleAuthSuccess(event.data.token);
-      }
-    };
-    window.addEventListener('message', handleOAuthMessage);
-
-    return () => {
-      try { channel?.close(); } catch {}
-      window.removeEventListener('storage', handleStorage);
-      window.removeEventListener('message', handleOAuthMessage);
-    };
-  }, []);
 
   const loadActiveOrg = async (orgId: string) => {
     try {
@@ -272,7 +113,12 @@ export const App: React.FC = () => {
   }, [selectedOrgId]);
 
   const handleLogout = async () => {
-    await logout();
+    try {
+      await logout();
+    } catch {
+      window.alert('Unable to sign out. Please try again.');
+      return;
+    }
     setUser(null);
     setSelectedOrgId(null);
     setActiveOrg(null);
@@ -355,38 +201,9 @@ export const App: React.FC = () => {
     setIsOnboardingOpen(false);
   };
 
-  // Prevent full app / dashboard / onboarding modal rendering inside an OAuth popup window
-  if (isPopup) {
-    return (
-      <div style={{
-        display: 'flex',
-        minHeight: '100vh',
-        backgroundColor: '#000000',
-        color: '#FFFFFF',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: 'monospace',
-        fontSize: '12px',
-        letterSpacing: '0.05em',
-      }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
-          <div style={{
-            width: '26px',
-            height: '26px',
-            border: '2px solid rgba(255, 255, 255, 0.2)',
-            borderTopColor: '#FFFFFF',
-            borderRadius: '50%',
-            animation: 'spin 0.8s linear infinite',
-          }} />
-          <span style={{ color: '#D4D4D8' }}>AUTHENTICATED — CLOSING POPUP...</span>
-        </div>
-      </div>
-    );
-  }
-
   const isLandingPreview = typeof window !== 'undefined' && (new URLSearchParams(window.location.search).get('view') === 'landing' || new URLSearchParams(window.location.search).has('landing'));
 
-  if (tokenPresent && isSyncing && !user) {
+  if (isSyncing && !user) {
     return (
       <div style={{
         display: 'flex',

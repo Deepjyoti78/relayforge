@@ -5,10 +5,12 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import { parseCookies } from '../../common/cookies';
 import type { Session, User } from '../../generated/prisma/client';
 import { RuntimeConfig } from '../config/config.module';
+import { isTrustedFrontendOrigin, isTrustedFrontendUrl } from './browser-security';
+import { clearSessionCookie } from './auth-cookies';
 import { SessionService } from './session.service';
 
 export interface AuthenticatedRequest extends Request {
@@ -38,11 +40,16 @@ export class AuthGuard implements CanActivate {
 
     const auth = await this.sessionService.validateSession(token);
     if (!auth) {
+      if (cookies[cookieName]) {
+        const response = context.switchToHttp().getResponse<Response>();
+        response.setHeader('Set-Cookie', clearSessionCookie(this.config.values));
+        response.setHeader('Cache-Control', 'no-store');
+      }
       throw new UnauthorizedException('Invalid or expired session');
     }
 
     // CSRF defense-in-depth on state-changing requests
-    this.verifyCsrfProtection(request);
+    if (cookies[cookieName]) this.verifyCsrfProtection(request);
 
     request.user = auth.user;
     request.session = auth.session;
@@ -64,41 +71,17 @@ export class AuthGuard implements CanActivate {
     if (!mutatingMethods.includes(request.method)) return;
 
     const origin = request.headers.origin;
-    if (!origin) {
-      // If no origin header, check sec-fetch-site or standard header
-      const secFetchSite = request.headers['sec-fetch-site'];
-      if (secFetchSite && secFetchSite === 'cross-site') {
-        throw new ForbiddenException('Cross-site requests forbidden');
+    const frontend = this.config.values.frontendUrl;
+    if (origin) {
+      if (!isTrustedFrontendOrigin(origin, frontend)) {
+        throw new ForbiddenException('CSRF origin mismatch');
       }
       return;
     }
-
-    let originUrl: URL;
-    try {
-      originUrl = new URL(origin);
-    } catch {
-      throw new ForbiddenException('Invalid request origin');
-    }
-
-    const host = request.headers.host;
-    let frontendOrigin = '';
-    try {
-      frontendOrigin = new URL(this.config.values.frontendUrl).origin;
-    } catch {
-      // ignore invalid frontendUrl in config
-    }
-
-    // Allow matching host, configured frontend origin, local dev, or onrender / cloudflare staging subdomains
-    const isAllowed = originUrl.host === host
-      || (frontendOrigin ? originUrl.origin === frontendOrigin : false)
-      || originUrl.hostname === '127.0.0.1'
-      || originUrl.hostname === 'localhost'
-      || originUrl.hostname.endsWith('.onrender.com')
-      || originUrl.hostname.endsWith('.workers.dev')
-      || originUrl.hostname.endsWith('.pages.dev');
-
-    if (!isAllowed) {
-      throw new ForbiddenException('CSRF origin mismatch');
+    // Older browsers may omit Origin; require a trusted Referer in that case.
+    const referer = request.headers.referer;
+    if (!referer || !isTrustedFrontendUrl(referer, frontend)) {
+      throw new ForbiddenException('CSRF origin required');
     }
   }
 }

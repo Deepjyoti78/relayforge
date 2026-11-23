@@ -1,14 +1,16 @@
 import { BadRequestException } from '@nestjs/common';
 import { GoogleOAuthService } from '../src/modules/auth/google-oauth.service';
 import { GitHubOAuthService } from '../src/modules/auth/github-oauth.service';
+import { oauthStateCookie } from '../src/modules/auth/auth-cookies';
 import { AuthController } from '../src/modules/auth/auth.controller';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import type { AuthenticatedRequest } from '../src/modules/auth/auth.guard';
 import type { User } from '../src/generated/prisma/client';
 import type { RuntimeConfig } from '../src/modules/config/config.module';
 import type { DatabaseService } from '../src/modules/database/database.service';
 import type { SessionService } from '../src/modules/auth/session.service';
 import type { TenantContextService } from '../src/modules/database/tenant-context.service';
+
 
 function containing(value: unknown): unknown { return expect.objectContaining(value); }
 
@@ -48,7 +50,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
         githubClientId: 'github-client-test-id',
         githubClientSecret: 'github-client-test-secret',
         githubCallbackUrl: 'http://127.0.0.1:3100/auth/github/callback',
-        frontendUrl: 'http://localhost:5173',
+        frontendUrl: 'https://relayforge-staging-web.onrender.com',
         sessionCookieName: 'rf_session',
         environment: 'development',
       },
@@ -79,6 +81,62 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
       mockTenantContext as unknown as TenantContextService,
       mockConfig,
     );
+  });
+
+  describe.each(['google', 'github'] as const)('%s redirect security', (provider) => {
+    it.each([
+      'https://attacker.onrender.com', 'https://attacker.workers.dev',
+      'https://attacker.pages.dev', 'http://localhost:9999', 'http://127.0.0.1:5173',
+      'http://relayforge-staging-web.onrender.com',
+      'https://user:password@relayforge-staging-web.onrender.com/path',
+      'javascript:alert(1)', '//attacker.example',
+    ])('falls back safely for %s', async (redirect) => {
+      const service = provider === 'google' ? googleOAuth : gitHubOAuth;
+      await service.createAuthorizationUrl(redirect);
+      expect(mockDb.client.oAuthState.create).toHaveBeenCalledWith(containing({
+        data: containing({ redirectUri: mockConfig.values.frontendUrl }),
+      }));
+    });
+    it('preserves a path on the exact configured frontend origin', async () => {
+      const service = provider === 'google' ? googleOAuth : gitHubOAuth;
+      const redirect = mockConfig.values.frontendUrl + '/dashboard?tab=events';
+      await service.createAuthorizationUrl(redirect);
+      expect(mockDb.client.oAuthState.create).toHaveBeenCalledWith(containing({
+        data: containing({ redirectUri: redirect }),
+      }));
+    });
+    it('preserves PKCE exchange and revalidates redirects from older stored states', async () => {
+      mockDb.client.oAuthState.findUnique.mockResolvedValue({
+        id: 'old-state', codeVerifier: 'pkce-verifier',
+        redirectUri: 'https://attacker.onrender.com', expiresAt: new Date(Date.now() + 60000),
+      });
+      const service = provider === 'google' ? googleOAuth : gitHubOAuth;
+      const exchange = jest.spyOn(service, 'exchangeCodeForToken').mockResolvedValue('provider-access-token');
+      if (provider === 'google') {
+        jest.spyOn(googleOAuth, 'fetchGoogleProfile').mockResolvedValue({ sub: 'google-user' });
+        jest.spyOn(googleOAuth, 'resolveUserFromGoogle').mockResolvedValue({ id: 'user-1' } as User);
+      } else {
+        jest.spyOn(gitHubOAuth, 'fetchGitHubProfile').mockResolvedValue({ id: 123, login: 'github-user', email: 'user@example.com' });
+        jest.spyOn(gitHubOAuth, 'resolveUserFromGitHub').mockResolvedValue({ id: 'user-1' } as User);
+      }
+      const result = await service.handleCallback('provider-code', 'old-state');
+      expect(exchange).toHaveBeenCalledWith('provider-code', 'pkce-verifier');
+      expect(mockDb.client.oAuthState.delete).toHaveBeenCalledWith({ where: { id: 'old-state' } });
+      expect(result).toEqual({ user: { id: 'user-1' }, redirectUri: mockConfig.values.frontendUrl });
+    });
+    it('sets a secure HttpOnly cookie without exposing the token in redirects', async () => {
+      const service = provider === 'google' ? googleOAuth : gitHubOAuth;
+      jest.spyOn(service, 'handleCallback').mockResolvedValue({
+        user: { id: 'user-1' } as User, redirectUri: mockConfig.values.frontendUrl,
+      });
+      (mockConfig.values as { environment: string }).environment = 'production';
+      const res = { setHeader: jest.fn(), append: jest.fn(), redirect: jest.fn() };
+      if (provider === 'google') await authController.googleCallback('code', 'state', res as unknown as Response, { headers: { cookie: oauthStateCookie(mockConfig.values, provider, 'state') } } as unknown as Request);
+      else await authController.githubCallback('code', 'state', res as unknown as Response, { headers: { cookie: oauthStateCookie(mockConfig.values, provider, 'state') } } as unknown as Request);
+      expect(res.redirect).toHaveBeenCalledWith(302, mockConfig.values.frontendUrl);
+      expect(res.append).toHaveBeenCalledWith('Set-Cookie', expect.stringContaining('HttpOnly'));
+      expect(res.append).toHaveBeenCalledWith('Set-Cookie', expect.stringContaining('Secure'));
+    });
   });
 
   describe('Google OAuth Service', () => {
@@ -146,7 +204,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
         where: { id: 'state-id-1' },
       });
       expect(res.user.displayName).toBe('Alex Rivera');
-      expect(res.redirectUri).toBe('http://localhost:5173');
+      expect(res.redirectUri).toBe(mockConfig.values.frontendUrl);
     });
   });
 
@@ -273,7 +331,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
         sessionToken: 'active-token-to-revoke',
       };
       const mockRes = {
-        setHeader: jest.fn(),
+        setHeader: jest.fn(), append: jest.fn(),
         json: jest.fn(),
       };
 
@@ -291,6 +349,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
   describe('AuthController Endpoints', () => {
     it('googleStart redirects to Google authorization URL (302)', async () => {
       const mockRes = {
+        setHeader: jest.fn(),
         redirect: jest.fn(),
       };
 
@@ -302,7 +361,7 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
       );
     });
 
-    it('googleCallback sets session cookie and redirects with token in URL', async () => {
+    it('googleCallback sets an HttpOnly cookie without exposing the session in the redirect', async () => {
       mockDb.client.oAuthState.findUnique.mockResolvedValue({
         id: 'state-id-1',
         state: 'valid-state',
@@ -323,24 +382,25 @@ describe('OAuth Authentication System (Google & GitHub)', () => {
       } as User);
 
       const mockRes = {
-        setHeader: jest.fn(),
+        setHeader: jest.fn(), append: jest.fn(),
         redirect: jest.fn(),
       };
 
-      await authController.googleCallback('code-123', 'valid-state', mockRes as unknown as Response);
+      await authController.googleCallback('code-123', 'valid-state', mockRes as unknown as Response, { headers: { cookie: oauthStateCookie(mockConfig.values, 'google', 'valid-state') } } as unknown as Request);
 
-      expect(mockRes.setHeader).toHaveBeenCalledWith(
+      expect(mockRes.append).toHaveBeenCalledWith(
         'Set-Cookie',
         expect.stringContaining('rf_session='),
       );
       expect(mockRes.redirect).toHaveBeenCalledWith(
         302,
-        'https://relayforge-staging-web.onrender.com/?token=rf_test_session_token',
+        'https://relayforge-staging-web.onrender.com',
       );
     });
 
     it('githubStart redirects to GitHub authorization URL (302)', async () => {
       const mockRes = {
+        setHeader: jest.fn(),
         redirect: jest.fn(),
       };
 

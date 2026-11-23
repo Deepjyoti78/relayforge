@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  Header,
   HttpStatus,
   Post,
   Query,
@@ -9,12 +10,13 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { parseCookies, serializeCookie } from '../../common/cookies';
 import type { User } from '../../generated/prisma/client';
 import { RuntimeConfig } from '../config/config.module';
 import { DatabaseService } from '../database/database.service';
 import { TenantContextService } from '../database/tenant-context.service';
+import { clearSessionCookie, oauthStateCookie, sessionCookieOptions, verifyOAuthBrowserState } from './auth-cookies';
 import { AuthGuard } from './auth.guard';
 import type { AuthenticatedRequest } from './auth.guard';
 import { CurrentUser } from './current-user.decorator';
@@ -34,61 +36,53 @@ export class AuthController {
   ) {}
 
   @Get('auth/github/start')
+  @Header('Cache-Control', 'no-store')
+  @Header('Referrer-Policy', 'no-referrer')
   async githubStart(@Query('redirect_uri') redirectUri: string | undefined, @Res() res: Response): Promise<void> {
-    const { url } = await this.gitHubOAuth.createAuthorizationUrl(redirectUri);
+    const { url, state } = await this.gitHubOAuth.createAuthorizationUrl(redirectUri);
+    res.setHeader('Set-Cookie', oauthStateCookie(this.config.values, 'github', state));
     res.redirect(302, url);
   }
 
   @Get('auth/github/callback')
+  @Header('Cache-Control', 'no-store')
+  @Header('Referrer-Policy', 'no-referrer')
   async githubCallback(
     @Query('code') code: string,
     @Query('state') state: string,
     @Res() res: Response,
+    @Req() req: Request,
     @Query('error') error?: string,
-    @Query('error_description') errorDescription?: string,
   ): Promise<void> {
-    if (error) {
-      const fallbackUrl = new URL(this.config.values.frontendUrl);
-      fallbackUrl.searchParams.set('error', error);
-      if (errorDescription) fallbackUrl.searchParams.set('error_description', errorDescription);
-      return res.redirect(302, fallbackUrl.toString());
-    }
-
     try {
+      verifyOAuthBrowserState(this.config.values, 'github', state, req.headers.cookie);
+      res.setHeader('Set-Cookie', oauthStateCookie(this.config.values, 'github', null));
+      if (error) {
+        await this.database.client.oAuthState.deleteMany({ where: { state } });
+        throw new Error('Provider authorization denied');
+      }
+
       const { user, redirectUri } = await this.gitHubOAuth.handleCallback(code, state);
       const { token, session } = await this.sessionService.createSession(user.id);
 
       // Calculate maxAge in seconds
       const maxAge = Math.floor((session.expiresAt.getTime() - Date.now()) / 1000);
       const cookieHeader = serializeCookie(this.config.values.sessionCookieName, token, {
-        httpOnly: true,
-        secure: this.config.values.environment === 'production',
-        sameSite: this.config.values.environment === 'production' ? 'None' : 'Lax',
-        path: '/',
+        ...sessionCookieOptions(this.config.values),
         maxAge,
         expires: session.expiresAt,
       });
 
-      res.setHeader('Set-Cookie', cookieHeader);
+      res.append('Set-Cookie', cookieHeader);
 
-      // Pass token in redirect URL for SPAs across subdomains (e.g. onrender.com)
-      let destination = redirectUri;
-      try {
-        const redirectUrl = new URL(redirectUri);
-        redirectUrl.searchParams.set('token', token);
-        destination = redirectUrl.toString();
-      } catch {
-        destination = redirectUri;
-      }
-
-      res.redirect(302, destination);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'GitHub authentication failed';
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('Referrer-Policy', 'no-referrer');
+      res.redirect(302, redirectUri);
+    } catch {
       let dest = this.config.values.frontendUrl;
       try {
         const fallbackUrl = new URL(dest);
         fallbackUrl.searchParams.set('error', 'github_auth_failed');
-        fallbackUrl.searchParams.set('error_description', msg);
         dest = fallbackUrl.toString();
       } catch {}
       res.redirect(302, dest);
@@ -96,61 +90,53 @@ export class AuthController {
   }
 
   @Get('auth/google/start')
+  @Header('Cache-Control', 'no-store')
+  @Header('Referrer-Policy', 'no-referrer')
   async googleStart(@Query('redirect_uri') redirectUri: string | undefined, @Res() res: Response): Promise<void> {
-    const { url } = await this.googleOAuth.createAuthorizationUrl(redirectUri);
+    const { url, state } = await this.googleOAuth.createAuthorizationUrl(redirectUri);
+    res.setHeader('Set-Cookie', oauthStateCookie(this.config.values, 'google', state));
     res.redirect(302, url);
   }
 
   @Get('auth/google/callback')
+  @Header('Cache-Control', 'no-store')
+  @Header('Referrer-Policy', 'no-referrer')
   async googleCallback(
     @Query('code') code: string,
     @Query('state') state: string,
     @Res() res: Response,
+    @Req() req: Request,
     @Query('error') error?: string,
-    @Query('error_description') errorDescription?: string,
   ): Promise<void> {
-    if (error) {
-      const fallbackUrl = new URL(this.config.values.frontendUrl);
-      fallbackUrl.searchParams.set('error', error);
-      if (errorDescription) fallbackUrl.searchParams.set('error_description', errorDescription);
-      return res.redirect(302, fallbackUrl.toString());
-    }
-
     try {
+      verifyOAuthBrowserState(this.config.values, 'google', state, req.headers.cookie);
+      res.setHeader('Set-Cookie', oauthStateCookie(this.config.values, 'google', null));
+      if (error) {
+        await this.database.client.oAuthState.deleteMany({ where: { state } });
+        throw new Error('Provider authorization denied');
+      }
+
       const { user, redirectUri } = await this.googleOAuth.handleCallback(code, state);
       const { token, session } = await this.sessionService.createSession(user.id);
 
       // Calculate maxAge in seconds
       const maxAge = Math.floor((session.expiresAt.getTime() - Date.now()) / 1000);
       const cookieHeader = serializeCookie(this.config.values.sessionCookieName, token, {
-        httpOnly: true,
-        secure: this.config.values.environment === 'production',
-        sameSite: this.config.values.environment === 'production' ? 'None' : 'Lax',
-        path: '/',
+        ...sessionCookieOptions(this.config.values),
         maxAge,
         expires: session.expiresAt,
       });
 
-      res.setHeader('Set-Cookie', cookieHeader);
+      res.append('Set-Cookie', cookieHeader);
 
-      // Pass token in redirect URL for SPAs across subdomains (e.g. onrender.com)
-      let destination = redirectUri;
-      try {
-        const redirectUrl = new URL(redirectUri);
-        redirectUrl.searchParams.set('token', token);
-        destination = redirectUrl.toString();
-      } catch {
-        destination = redirectUri;
-      }
-
-      res.redirect(302, destination);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Google authentication failed';
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('Referrer-Policy', 'no-referrer');
+      res.redirect(302, redirectUri);
+    } catch {
       let dest = this.config.values.frontendUrl;
       try {
         const fallbackUrl = new URL(dest);
         fallbackUrl.searchParams.set('error', 'google_auth_failed');
-        fallbackUrl.searchParams.set('error_description', msg);
         dest = fallbackUrl.toString();
       } catch {}
       res.redirect(302, dest);
@@ -158,6 +144,7 @@ export class AuthController {
   }
 
   @Post('v1/auth/logout')
+  @Header('Cache-Control', 'no-store')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   async logout(@Req() req: AuthenticatedRequest, @Res() res: Response): Promise<void> {
@@ -168,20 +155,12 @@ export class AuthController {
       await this.sessionService.revokeSession(token);
     }
 
-    const clearCookie = serializeCookie(this.config.values.sessionCookieName, '', {
-      httpOnly: true,
-      secure: this.config.values.environment === 'production',
-      sameSite: 'Lax',
-      path: '/',
-      maxAge: 0,
-      expires: new Date(0),
-    });
-
-    res.setHeader('Set-Cookie', clearCookie);
+    res.setHeader('Set-Cookie', clearSessionCookie(this.config.values));
     res.json({ success: true });
   }
 
   @Get('v1/me')
+  @Header('Cache-Control', 'no-store')
   @UseGuards(AuthGuard)
   async me(@CurrentUser() user: User) {
     // Retrieve memberships for this user within user context so RLS permits access

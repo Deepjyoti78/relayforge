@@ -54,12 +54,13 @@ const baseSchema = z.object({
   QUEUE_PREFIX: z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/).default('relayforge'),
   GITHUB_CLIENT_ID: z.string().default(DEFAULT_INSECURE_GITHUB_CLIENT_ID),
   GITHUB_CLIENT_SECRET: z.string().default(DEFAULT_INSECURE_GITHUB_CLIENT_SECRET),
-  GITHUB_CALLBACK_URL: z.string().url().default('http://127.0.0.1:3100/auth/github/callback'),
+  GITHUB_CALLBACK_URL: z.string().url().default('http://localhost:3100/auth/github/callback'),
   GOOGLE_CLIENT_ID: z.string().default(DEFAULT_INSECURE_GOOGLE_CLIENT_ID),
   GOOGLE_CLIENT_SECRET: z.string().default(DEFAULT_INSECURE_GOOGLE_CLIENT_SECRET),
-  GOOGLE_CALLBACK_URL: z.string().url().default('http://127.0.0.1:3100/auth/google/callback'),
+  GOOGLE_CALLBACK_URL: z.string().url().default('http://localhost:3100/auth/google/callback'),
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
-  SESSION_COOKIE_NAME: z.string().default('rf_session'),
+  SESSION_COOKIE_NAME: z.string().regex(/^[A-Za-z0-9_-]{1,80}$/).default('rf_session'),
+  SESSION_COOKIE_SAME_SITE: z.enum(['lax', 'none']).optional(),
   ENCRYPTION_KEY: z.string().default(DEFAULT_INSECURE_ENCRYPTION_KEY),
   ALLOW_PRIVATE_DESTINATIONS: z.preprocess(
     (val) => val === 'true' || val === true || val === '1' || val === 1,
@@ -76,6 +77,9 @@ export function parseEnvironment(role: ProcessRole, input: NodeJS.ProcessEnv) {
     ? baseSchema.extend({ DATABASE_URL: databaseUrl, REDIS_URL: redisUrl.optional() })
     : baseSchema.extend({ WORKER_DATABASE_URL: databaseUrl, REDIS_URL: redisUrl })
   ).superRefine((data, ctx) => {
+    if (data.SESSION_COOKIE_SAME_SITE === 'none' && data.NODE_ENV !== 'production') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['SESSION_COOKIE_SAME_SITE'], message: 'SameSite=None requires production Secure cookies' });
+    }
     if (data.NODE_ENV === 'production') {
       if (data.ENCRYPTION_KEY === DEFAULT_INSECURE_ENCRYPTION_KEY || data.ENCRYPTION_KEY.length < 32) {
         ctx.addIssue({
@@ -141,6 +145,8 @@ export function parseEnvironment(role: ProcessRole, input: NodeJS.ProcessEnv) {
     googleCallbackUrl: values.GOOGLE_CALLBACK_URL,
     frontendUrl: values.FRONTEND_URL,
     sessionCookieName: values.SESSION_COOKIE_NAME,
+    sessionCookieSameSite: values.SESSION_COOKIE_SAME_SITE === 'lax' ? 'Lax' as const
+      : values.SESSION_COOKIE_SAME_SITE === 'none' ? 'None' as const : values.NODE_ENV === 'production' ? 'None' as const : 'Lax' as const,
     encryptionKey: createHash('sha256').update(values.ENCRYPTION_KEY).digest(),
     allowPrivateDestinations: Boolean(values.ALLOW_PRIVATE_DESTINATIONS),
   });

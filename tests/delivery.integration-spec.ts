@@ -119,6 +119,7 @@ describe('Milestone 3 Option 2: Durable HTTP Delivery Pipeline & Outbox Dispatch
     const resOrgA = await request(app.getHttpServer())
       .post('/v1/organizations')
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'Delivery Corp A' })
       .expect(201);
     orgA = { id: (resOrgA.body as { id: string }).id, name: 'Delivery Corp A' };
@@ -127,6 +128,7 @@ describe('Milestone 3 Option 2: Durable HTTP Delivery Pipeline & Outbox Dispatch
     const resOrgB = await request(app.getHttpServer())
       .post('/v1/organizations')
       .set('Cookie', userB.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'Delivery Corp B' })
       .expect(201);
     orgB = { id: (resOrgB.body as { id: string }).id, name: 'Delivery Corp B' };
@@ -142,6 +144,7 @@ describe('Milestone 3 Option 2: Durable HTTP Delivery Pipeline & Outbox Dispatch
     const resDestA = await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/destinations`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({
         name: 'Local Webhook Target',
         url: testServerUrl,
@@ -168,6 +171,7 @@ describe('Milestone 3 Option 2: Durable HTTP Delivery Pipeline & Outbox Dispatch
       const res = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/destinations/${destinationA.id}/test`)
         .set('Cookie', userA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .expect(200);
 
       const attempt = res.body as {
@@ -327,6 +331,7 @@ describe('Milestone 3 Option 2: Durable HTTP Delivery Pipeline & Outbox Dispatch
       const resDest = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/destinations`)
         .set('Cookie', userA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .send({
           name: 'Failing Destination Target',
           url: failUrl,
@@ -386,6 +391,7 @@ describe('Milestone 3 Option 2: Durable HTTP Delivery Pipeline & Outbox Dispatch
       const replayRes = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/deliveries/${attempts[0]!.id}/replay`)
         .set('Cookie', userA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .expect(200);
 
       expect((replayRes.body as { success: boolean }).success).toBe(true);
@@ -411,6 +417,7 @@ describe('Milestone 3 Option 2: Durable HTTP Delivery Pipeline & Outbox Dispatch
       const inFlightReplayRes = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/deliveries/${attempts[0]!.id}/replay`)
         .set('Cookie', userA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .expect(400);
 
       expect((inFlightReplayRes.body as { message: string }).message).toContain('currently in-flight');

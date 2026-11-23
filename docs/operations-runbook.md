@@ -98,7 +98,15 @@ WHERE status = 'DELIVERED'
   AND completed_at < NOW() - INTERVAL '30 days';
 ```
 
-### 3.2 Key Rotation Protocol (AES-256-GCM)
-1. Add new key to key ring configuration.
-2. Existing secrets remain decryptable with their corresponding version tag.
-3. Trigger re-encryption background script to migrate old ciphertexts to the new master key.
+### 3.2 Secret and session operations require a separate plan
+
+Current encrypted records use one ENCRYPTION_KEY, ciphertext, IV and authentication
+tag. No versioned key ring or automated re-encryption script is implemented. Do not
+change the key without an authorized migration/recovery plan; existing ciphertext
+may become unreadable. This review performs no live key or session rotation.
+
+For authentication incidents, distinguish cookie removal from server-side session
+revocation. Previously leaked tokens remain valid until expiry/revocation. Live SSE
+connections can retain access for up to their remaining 30-second lifetime, then
+reconnect rechecks session and membership. Network/5xx logout failure is not successful
+revocation. See [session behavior](tenancy.md) and the [release gates](auth-release-checklist.txt).

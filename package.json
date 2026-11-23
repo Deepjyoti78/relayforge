@@ -33,7 +33,8 @@
     "check": "npm run lint && npm run typecheck && npm test && npm run build",
     "db:backup": "node scripts/backup-db.cjs",
     "db:restore": "node scripts/restore-db.cjs",
-    "healthcheck:worker": "node -r ts-node/register src/worker/healthcheck.ts"
+    "healthcheck:worker": "node -r ts-node/register src/worker/healthcheck.ts",
+    "test:browser": "playwright test --config playwright.config.cjs"
   },
   "dependencies": {
     "@nestjs/common": "11.2.8",
@@ -56,6 +57,7 @@
   },
   "devDependencies": {
     "@nestjs/testing": "11.2.8",
+    "@playwright/test": "1.65.1",
     "@types/express": "5.0.6",
     "@types/jest": "30.0.0",
     "@types/node": "22.20.5",

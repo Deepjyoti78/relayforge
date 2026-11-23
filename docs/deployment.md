@@ -1,176 +1,109 @@
-# RelayForge Production Deployment Architecture & Hosting Guide
+# Deployment configuration and authentication acceptance
 
-## 1. Hosting Platform Evaluation for Solo Developers
+This is a source/configuration guide, not evidence of a live deployment. Consult the
+[release checklist](auth-release-checklist.txt) before approving a release and the
+[security review](auth-security-review.txt) for separately recorded local and CI results.
+No deployment or live-secret changes were performed by this review.
 
-RelayForge consists of:
-1. **API Service:** Stateless HTTP server (NestJS) handling webhooks, tenant management, and workflows.
-2. **Worker Service:** Stateful/polling background daemon processing outbox queues, HTTP deliveries, and workflows.
-3. **Database:** PostgreSQL 16+ with Row-Level Security (RLS) support.
-4. **Cache & Queues:** Redis 7+ for token-bucket rate limiting and BullMQ/pubsub.
-5. **Frontend Web Console:** Static React SPA with Vite.
+## What the repository actually declares
 
-Below is an objective evaluation of hosting options tailored for an independent engineer or small engineering team:
+- [render.yaml](../render.yaml) declares three services: API and worker as Node
+  `type: web` services, plus a static frontend. The worker exposes /health. It does
+  not declare a dedicated `type: worker`, managed PostgreSQL/Redis, or a private VPC.
+- PostgreSQL and Redis are supplied through environment variables. Comments mention
+  external Supabase/Upstash services; live accounts, regions, plans and network
+  isolation have not been verified here. No current pricing claim is made.
+- Both [Wrangler configurations](../wrangler.jsonc) ([web](../web/wrangler.jsonc))
+  serve static SPA assets only. They contain no API proxy handler or run_worker_first.
+- API starts with `npm run start:api`, worker with `npm run start:worker`. API probes
+  are /health/live and /health/ready; the latter checks PostgreSQL. Redis connectivity
+  and noeviction checks are currently advisory. PostgreSQL 17 and Redis 7.4 are used
+  by the isolated integration containers; this is not a live-version assertion.
 
-| Criteria | Render.com (Selected for Staging) | Railway.app | AWS ECS Fargate + RDS |
-| :--- | :--- | :--- | :--- |
-| **Complexity** | Low — Native support for Web Services + Background Workers | Low — Unified project canvas, multi-service deployments | High — Requires VPC, Subnets, IAM, ALB, Task Definitions |
-| **Setup Time** | < 1 hour | < 1 hour | 1–2 days (Terraform/CloudFormation) |
-| **Zero-Downtime Deploy** | Native rolling deployments with health check gating | Native rolling restarts | Managed rolling deployments via target groups |
-| **Background Worker** | Dedicated "Background Worker" service type | Standard service running custom command | Separate ECS Task Definition |
-| **Managed DB & Redis** | Native Managed Postgres + Redis with private networking | Native Redis & PostgreSQL plugins | Amazon RDS PostgreSQL + Amazon ElastiCache |
-| **Estimated Monthly Cost** | \$31–\$35 / month (Staging tier) | \$25–\$45 / month | \$120–\$250 / month |
+## Browser-cookie topology is a release decision
 
-### Selection Justification: Render.com
-Render is selected for the RelayForge staging environment due to:
-- Dedicated, persistent `type: worker` processes that run indefinitely without HTTP ingress timeouts.
-- Isolated private network addresses (`*.internal`) ensuring PostgreSQL and Redis are strictly inaccessible to the public internet.
-- Automatic SSL/TLS termination on custom and onrender.com subdomains.
-- Declarative Infrastructure-as-Code via [`render.yaml`](../render.yaml).
+The blueprint's frontend and API use different onrender.com hostnames. The
+[Public Suffix List](https://publicsuffix.org/list/public_suffix_list.dat) includes
+onrender.com, workers.dev and pages.dev. The two Render hosts are therefore different
+sites; a Cloudflare-default frontend to the Render API is cross-site too.
 
----
+Top-level OAuth callback navigation can set an API cookie, yet subsequent frontend
+fetch/EventSource requests to that API are third-party contexts. SameSite=None;
+Secure plus credentials can work only where browser policy permits them. Lax omits
+cookies on cross-site fetches, and CORS cannot override third-party-cookie blocking.
+Do not share Domain=onrender.com or restore URL/localStorage token delivery.
+See [MDN's cookie guidance](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Third-party_cookies).
 
-## 2. Infrastructure Topology
+Choose one reviewed topology:
 
-```mermaid
-flowchart TD
-    Internet([Public Internet / Webhook Senders]) --> Cloudflare[Cloudflare CDN & DDoS Shield]
-    Cloudflare -->|HTTPS / REST| ApiService[RelayForge API Service\nNode.js NestJS]
-    Cloudflare -->|HTTPS / Static Assets| StaticWeb[RelayForge Web Console\nVite React SPA]
+| Topology | Public frontend/API | Required configuration |
+| --- | --- | --- |
+| Same-site custom domains | HTTPS app.relayforge.example and api.relayforge.example, replaced with owned names | FRONTEND_URL=frontend; VITE_API_URL=API; host-only API cookie; SESSION_COOKIE_SAME_SITE=lax; exact CORS |
+| Same-origin proxy | Frontend origin F serves SPA and proxies auth/API paths to Render | VITE_API_URL=/; FRONTEND_URL=F; both provider callbacks through F; SESSION_COOKIE_SAME_SITE=lax |
 
-    subgraph Private VPC [Isolated Private Network]
-        ApiService -->|SQL / RLS Enforced| Postgres[(PostgreSQL 16\nPrimary Database)]
-        ApiService -->|Publish Telemetry & Limit| RedisCluster[(Redis 7.4\nSliding Window Limits & PubSub)]
+For the proxy proposal, route /auth/*, /v1/* and /health/* before SPA fallback using a
+reviewed Worker handler, fixed API_ORIGIN, ASSETS binding and assets.run_worker_first.
+Preserve method/body/query, browser Origin/Referer, Cookie, individual Set-Cookie
+headers, status, Location and streaming response bodies. Use upstream redirect:
+manual, no auth caching/buffering, and no browser-selected upstream. This production
+proxy is not implemented or deployed by this PR; Playwright exercises a local Vite proxy.
 
-        WorkerService[RelayForge Worker Service\nOutbox Leaser & Delivery Pipeline]
-        WorkerService -->|SELECT FOR UPDATE SKIP LOCKED| Postgres
-        WorkerService -->|Token Bucket Rate Limiting| RedisCluster
-    end
+## Configuration and provider registration
 
-    WorkerService -->|SSRF-Validated & Socket Pinned HTTPS| ExternalDestinations[Customer Webhook Destinations]
-```
+API runtime names: NODE_ENV, FRONTEND_URL, SESSION_COOKIE_NAME,
+SESSION_COOKIE_SAME_SITE, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_CALLBACK_URL,
+GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL, DATABASE_URL, REDIS_URL,
+ENCRYPTION_KEY, HOST and PORT. Worker and migration identities use WORKER_DATABASE_URL
+and MIGRATION_DATABASE_URL separately. VITE_API_URL is a frontend BUILD variable;
+never put provider/database secrets in VITE_*.
 
----
+The [release checklist](auth-release-checklist.txt) gives exact public callback URLs,
+provider settings and the custom-domain/proxy variable matrix. Google authorized
+redirect URIs must match GOOGLE_CALLBACK_URL. GitHub's callback must match
+GITHUB_CALLBACK_URL, with wildcard matching disabled. Both must belong to the same
+provider app/environment as the configured client ID/secret. Live consent tests are
+still required for Google and GitHub; mocked provider tests are not a substitute.
 
-## 3. Container Deployment Specifications
+Omitted SESSION_COOKIE_SAME_SITE preserves production None for compatibility; explicit
+none requires NODE_ENV=production/Secure. Prefer lax only after choosing a same-site
+or same-origin layout. Local defaults consistently use localhost for frontend and
+callbacks; existing .env files must be checked rather than assumed to have changed.
 
-### 3.1 RelayForge API Service
-- **Command:** `npm run start:api` (or `node dist/api/main.js`)
-- **Port:** `3100` (internally mapped)
-- **Liveness Probe:** `GET /health/live` (Interval: 10s, Timeout: 2s)
-- **Readiness Probe:** `GET /health/ready` (Interval: 10s, Timeout: 3s)
-- **Scale:** 1 to N stateless instances behind load balancer.
-- **Resources:** Minimum 0.5 CPU, 512 MB RAM (Recommended: 1.0 CPU, 1024 MB RAM).
+## Existing infrastructure security gaps
 
-### 3.2 RelayForge Worker Daemon
-- **Command:** `npm run start:worker` (or `node dist/worker/main.js`)
-- **Healthcheck Probe:** `npm run healthcheck:worker` (checks DB lease heartbeats)
-- **Scale:** 1 to 4 worker instances (Worker concurrency handles parallel deliveries per instance).
-- **Resources:** Minimum 0.5 CPU, 512 MB RAM (Recommended: 1.0 CPU, 1024 MB RAM).
+The blueprint currently copies API DATABASE_URL into worker WORKER_DATABASE_URL.
+It also runs role initialization/migrations during API build and does not declare a
+separate migration URL. Provision distinct restricted API/worker roles and a separate
+migration identity through the approved process before release. The initialization
+script can swallow role/connection errors and exits successfully; it does not prove
+credentials, grants or RLS are correct. Runtime startup warns about unsafe roles
+rather than failing closed. A successful health probe does not validate role isolation.
 
-### 3.3 Database (PostgreSQL 16+)
-- Minimum connection limit: 50.
-- Pool settings: `DATABASE_POOL_SIZE=10`.
-- Extensions: `uuid-ossp` or native `gen_random_uuid()`.
-- Storage: 10 GB SSD with auto-grow enabled.
+Current PostgreSQL cloud/pooler and Redis TLS code disables certificate verification.
+This is an existing transport-security gap, not fixed here. Verify certificates and
+connections in a separate focused change. Do not treat an encrypted URL as proof of
+server authentication. No secret rotation or live provisioning was attempted.
 
-### 3.4 Redis (Redis 7+)
-- Connection mode: `rediss://` or private VPC host.
-- Eviction policy: `noeviction` (prevents dropping rate limit or outbox state).
-- Memory: 256 MB minimum.
+## Validation and deployment gates
 
----
+Local: npm test, npm run test:integration, npm run test:browser, npm run lint,
+npm run typecheck, npm --prefix web run build, npm run build, git diff --check.
+Integration/browser tests use a dedicated _test database and local Redis; browser
+consent/provider HTTP is mocked while cookies, callbacks, sessions and RLS are real.
 
-## 4. Production & Staging Environment Mapping
+Hosted CI: the verify job audits dependencies before later gates. Merged PR #2
+supplies the scoped Effect 3.22.1 override; the refreshed production audit passes.
+Keep the audit gate enabled and verify it on every release head. The independent
+browser-authentication job provides browser coverage separately. Record the actual
+head SHA, run URL, conclusion and skipped checks; never label local results as CI.
+This PR retains that merged fix without another dependency upgrade or audit exception.
 
-| Variable | Description | Example Staging Value |
-| :--- | :--- | :--- |
-| `NODE_ENV` | Application environment mode | `production` |
-| `DATABASE_URL` | API database connection URL (least-privilege `relayforge_api`) | `postgresql://relayforge_api:...@relayforge-staging-db.internal:5432/relayforge_staging` |
-| `WORKER_DATABASE_URL` | Worker database connection URL (`relayforge_worker`) | `postgresql://relayforge_worker:...@relayforge-staging-db.internal:5432/relayforge_staging` |
-| `REDIS_URL` | Redis cluster URL | `redis://relayforge-staging-redis.internal:6379/0` |
-| `ENCRYPTION_KEY` | AES-256 master encryption key (64 hex characters) | High-entropy key generated automatically by Render Blueprint |
-| `ALLOW_PRIVATE_DESTINATIONS`| SSRF bypass flag | `false` (Strictly enforced) |
-| `WORKER_CONCURRENCY` | Concurrent delivery tasks per worker process | `4` |
-| `WORKER_HEARTBEAT_MS` | Outbox lease heartbeat interval | `10000` |
-| `GITHUB_CLIENT_ID` | GitHub OAuth application client ID | Staging GitHub OAuth App Client ID |
-| `GITHUB_CLIENT_SECRET` | GitHub OAuth application secret | Staging GitHub OAuth App Client Secret |
-| `GITHUB_CALLBACK_URL` | Public OAuth redirect target | `https://relayforge-staging-api.onrender.com/auth/github/callback` |
-| `FRONTEND_URL` | Management console base origin | `https://relayforge-staging-web.onrender.com` |
+The legacy staging-e2e-verify.cjs harness checks health, one invalid bearer token and
+an OAuth-start redirect/state. It does not validate successful bearer rejection,
+callback destination, PKCE exchange, live consent, ingestion or RLS isolation. Its
+historical PASSED text is not deployment acceptance. This review did not run it live.
 
----
-
-## 5. Zero-Downtime Deployment & Migration Protocol
-
-1. **Pre-Deployment:**
-   - Provision runtime least-privilege roles (`scripts/staging-db-init.cjs`).
-   - Execute database migrations via GitHub Actions or deployment hook:
-     ```bash
-     npx prisma migrate deploy
-     ```
-2. **Worker Deployment:**
-   - Deploy new Worker instances.
-   - Older workers finish active delivery leases and terminate gracefully via `SIGTERM`.
-3. **API Deployment:**
-   - Deploy new API instances behind load balancer.
-   - Traffic switches only after `/health/ready` returns HTTP 200.
-
----
-
-## 6. Staging Deployment Execution Guide (Step-by-Step)
-
-### Step 1: Push Repository to GitHub
-Ensure branch `release/staging-deployment` is pushed to GitHub:
-```bash
-git push -u origin release/staging-deployment
-```
-
-### Step 2: Register GitHub OAuth App (Staging)
-1. Go to **GitHub Settings → Developer settings → OAuth Apps → New OAuth App**.
-2. Fill in:
-   - **Application name:** `RelayForge Staging`
-   - **Homepage URL:** `https://relayforge-staging-web.onrender.com`
-   - **Authorization callback URL:** `https://relayforge-staging-api.onrender.com/auth/github/callback`
-3. Click **Register application** and generate a new **Client Secret**.
-4. Note your `Client ID` and `Client Secret`.
-
-### Step 3: Deploy via Render Blueprint
-1. Log in to [Render.com](https://dashboard.render.com).
-2. Click **New + → Blueprint**.
-3. Select the `RelayForge` repository and branch `release/staging-deployment`.
-4. Render will parse [`render.yaml`](../render.yaml) and prompt for:
-   - `GITHUB_CLIENT_ID`: Paste your GitHub App Client ID.
-   - `GITHUB_CLIENT_SECRET`: Paste your GitHub App Client Secret.
-5. Click **Apply Blueprint**. Render automatically provisions all 5 services.
-
-### Step 4: Run Staging Role Init & Migrations
-From the Render dashboard shell on `relayforge-staging-api` (or locally connected to staging DB):
-```bash
-node scripts/staging-db-init.cjs
-npx prisma migrate deploy
-```
-
-### Step 5: Execute Automated Verification
-```bash
-STAGING_API_URL=https://relayforge-staging-api.onrender.com node scripts/staging-e2e-verify.cjs
-```
-
-
----
-
-## 6. Live Staging Acceptance Status
-
-| Component | Target URL | Status | Health Verdict |
-| :--- | :--- | :--- | :--- |
-| **API Web Service** | `https://relayforge-staging-api.onrender.com` | **Live** | HTTP 200 (`/health/ready`, Postgres OK) |
-| **Web Console SPA** | `https://relayforge-staging-web.onrender.com` | **Live** | HTTP 200 (Static CDN) |
-| **Worker Service** | `https://relayforge-staging-worker.onrender.com` | **Provisioned** | Free HTTP Web Service |
-| **Cloud PostgreSQL** | Supabase Session Pooler (`ap-northeast-2`) | **Live** | 12 Migrations Applied |
-| **Cloud Redis** | Upstash TLS Redis (`us-west-2`) | **Live** | TLS `rediss://` Compatible |
-
-**Automated Synthetic Verification Run:**
-```
-[PASSED] API Liveness Probe (/health/live) - {"status":"ok","service":"relayforge-api","version":"1.0.0-staging"}
-[PASSED] API Readiness Probe (/health/ready) - {"status":"ok","checks":{"postgres":"ok"}}
-[PASSED] Direct Session Bypass Prevention (Server-side) - HTTP 401 (expected 401 Unauthorized)
-[PASSED] OAuth PKCE State Generation & Redirect Protection - State nonce generated, external open redirect disallowed
-```
+Live health, migration status, runtime identities, provider consent and browser policy
+are pending authorized acceptance. Earlier unversioned tables claiming live services,
+12 applied migrations or complete cookie-only auth have been removed. Follow the
+release checklist and review the draft PR; do not auto-merge or deploy from this guide.

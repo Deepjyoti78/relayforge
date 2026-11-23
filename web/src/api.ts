@@ -94,24 +94,19 @@ export function clearAppCache(): void {
   }
 }
 
+// Manual development sessions live only in memory. OAuth sessions use HttpOnly cookies.
+let manualSessionToken: string | null = null;
+try {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem('rf_oauth_token');
+} catch { /* Storage may be unavailable. */ }
+
 export function getSessionToken(): string | null {
-  try {
-    return localStorage.getItem(TOKEN_KEY);
-  } catch {
-    return null;
-  }
+  return manualSessionToken;
 }
 
 export function setSessionToken(token: string | null): void {
-  try {
-    if (token) {
-      localStorage.setItem(TOKEN_KEY, token);
-    } else {
-      localStorage.removeItem(TOKEN_KEY);
-    }
-  } catch {
-    // Ignore localStorage errors
-  }
+  manualSessionToken = token;
 }
 
 export function getApiBaseUrl(): string {
@@ -122,7 +117,7 @@ export function getApiBaseUrl(): string {
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
     if (host === 'localhost' || host === '127.0.0.1') {
-      return 'http://127.0.0.1:3100';
+      return `http://${host}:3100`;
     }
     return 'https://relayforge-staging-api.onrender.com';
   }
@@ -142,6 +137,12 @@ export function warmupApi(): void {
 
 // Automatically trigger background warmup when module loads
 if (typeof window !== 'undefined') {
+  // Discard credentials from legacy links; never adopt them as a session.
+  const url = new URL(window.location.href);
+  if (url.searchParams.has('token')) {
+    url.searchParams.delete('token');
+    window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+  }
   warmupApi();
 }
 
@@ -211,14 +212,11 @@ export async function fetchMe(): Promise<UserProfile | null> {
 }
 
 export async function logout(): Promise<void> {
-  try {
-    await apiFetch('/v1/auth/logout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
-  } catch {
-    // Ignore network error on logout
-  }
+  const res = await apiFetch('/v1/auth/logout', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+  });
+  // A rejected expired/revoked cookie is cleared by the backend AuthGuard.
+  if (!res.ok && res.status !== 401) throw new Error('Unable to sign out. Please try again.');
   setSessionToken(null);
   clearAppCache();
 }

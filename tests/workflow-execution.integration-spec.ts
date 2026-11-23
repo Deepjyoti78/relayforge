@@ -127,6 +127,7 @@ describe('Sequential Workflow Execution Engine (Integration)', () => {
     const resOrgA = await request(app.getHttpServer())
       .post('/v1/organizations')
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'Workflow Corp A' })
       .expect(201);
     orgA = { id: (resOrgA.body as { id: string }).id, name: 'Workflow Corp A' };
@@ -135,6 +136,7 @@ describe('Sequential Workflow Execution Engine (Integration)', () => {
     const resOrgB = await request(app.getHttpServer())
       .post('/v1/organizations')
       .set('Cookie', userB.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'Workflow Corp B' })
       .expect(201);
     expect((resOrgB.body as { id: string }).id).toBeDefined();
@@ -150,6 +152,7 @@ describe('Sequential Workflow Execution Engine (Integration)', () => {
     const resDest1 = await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/destinations`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({
         name: 'Action 1 Target (CRM)',
         url: `${testServerUrl}/action-1`,
@@ -161,6 +164,7 @@ describe('Sequential Workflow Execution Engine (Integration)', () => {
     const resDest2 = await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/destinations`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({
         name: 'Action 2 Target (Notification)',
         url: `${testServerUrl}/action-2`,
@@ -216,6 +220,7 @@ describe('Sequential Workflow Execution Engine (Integration)', () => {
     const resCreate = await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/workflows`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({
         name: 'Enterprise Payment Flow',
         description: 'Conditions -> Transform -> CRM & Notification',
@@ -231,6 +236,7 @@ describe('Sequential Workflow Execution Engine (Integration)', () => {
     const resPublish = await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/workflows/${wf.id}/publish`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ definition })
       .expect(201);
 
@@ -396,6 +402,7 @@ describe('Sequential Workflow Execution Engine (Integration)', () => {
     await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/executions/${failedExecId}/resume`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .expect(200);
 
     // Wait a brief moment for background execution to complete

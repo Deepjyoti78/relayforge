@@ -9,6 +9,9 @@ describe('process configuration boundaries', () => {
     const config = parseEnvironment('api', apiEnvironment);
     expect(config.databaseUrl).toBe(apiEnvironment.DATABASE_URL);
     expect(config.redisUrl).toBeUndefined();
+    // Host-only state/session cookies must survive the development round-trip.
+    expect(new URL(config.githubCallbackUrl).hostname).toBe(new URL(config.frontendUrl).hostname);
+    expect(new URL(config.googleCallbackUrl).hostname).toBe(new URL(config.frontendUrl).hostname);
   });
 
   it('does not silently give the worker the API database identity', () => {
@@ -17,6 +20,9 @@ describe('process configuration boundaries', () => {
 
   it.each([
     { PORT: 'not-a-port' },
+    { SESSION_COOKIE_SAME_SITE: 'none' },
+    { SESSION_COOKIE_SAME_SITE: 'invalid' },
+    { SESSION_COOKIE_NAME: 'name; injected=value' },
     { PORT: '65536' },
     { DATABASE_POOL_SIZE: '0' },
     { DATABASE_TIMEOUT_MS: '0' },
@@ -61,6 +67,8 @@ describe('process configuration boundaries', () => {
       GITHUB_CLIENT_SECRET: 'gh_secret_abcdef1234567890abcdef',
     });
     expect(prodConfig.environment).toBe('production');
+    expect(prodConfig.sessionCookieSameSite).toBe('None');
+    expect(parseEnvironment('api', { ...apiEnvironment, SESSION_COOKIE_SAME_SITE: 'lax' }).sessionCookieSameSite).toBe('Lax');
 
     // Fails if ALLOW_PRIVATE_DESTINATIONS is set to true in production
     expect(() => parseEnvironment('api', {

@@ -99,6 +99,7 @@ describe('Milestone 3 Phase 2 & 3: Endpoints, Signed Ingestion & Transactional O
     const resA = await request(app.getHttpServer())
       .post('/v1/organizations')
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'Org A Ingestion' })
       .expect(201);
     orgA = resA.body as { id: string; name: string };
@@ -107,12 +108,14 @@ describe('Milestone 3 Phase 2 & 3: Endpoints, Signed Ingestion & Transactional O
     await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/members`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ email: userDev.email, role: 'DEVELOPER' })
       .expect(201);
 
     await request(app.getHttpServer())
       .post(`/v1/organizations/${orgA.id}/members`)
       .set('Cookie', userA.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ email: userViewer.email, role: 'VIEWER' })
       .expect(201);
 
@@ -120,6 +123,7 @@ describe('Milestone 3 Phase 2 & 3: Endpoints, Signed Ingestion & Transactional O
     const resB = await request(app.getHttpServer())
       .post('/v1/organizations')
       .set('Cookie', userB.cookie)
+      .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
       .send({ name: 'Org B Ingestion' })
       .expect(201);
     orgB = resB.body as { id: string; name: string };
@@ -135,6 +139,7 @@ describe('Milestone 3 Phase 2 & 3: Endpoints, Signed Ingestion & Transactional O
       const res = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/endpoints`)
         .set('Cookie', userDev.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .send({ name: 'Stripe Webhooks', slug: 'stripe-webhooks' })
         .expect(201);
 
@@ -158,6 +163,7 @@ describe('Milestone 3 Phase 2 & 3: Endpoints, Signed Ingestion & Transactional O
       await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/endpoints`)
         .set('Cookie', userViewer.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .send({ name: 'Unauthorized Endpoint' })
         .expect(403);
     });
@@ -191,6 +197,7 @@ describe('Milestone 3 Phase 2 & 3: Endpoints, Signed Ingestion & Transactional O
       await request(app.getHttpServer())
         .delete(`/v1/organizations/${orgA.id}/endpoints/${endpointA.id}`)
         .set('Cookie', userB.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .expect(404);
     });
 
@@ -198,6 +205,7 @@ describe('Milestone 3 Phase 2 & 3: Endpoints, Signed Ingestion & Transactional O
       const res = await request(app.getHttpServer())
         .post(`/v1/organizations/${orgA.id}/endpoints/${endpointA.id}/rotate-secret`)
         .set('Cookie', userA.cookie)
+        .set('Origin', new URL(process.env.FRONTEND_URL ?? 'http://localhost:5173').origin)
         .expect(201);
 
       const body = res.body as EndpointResponse;
