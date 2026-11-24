@@ -34,6 +34,7 @@ export interface DlqRecord {
   destinationUrl?: string | null | undefined;
   replayedAt?: Date | null | undefined;
   payloadSummary?: unknown;
+  destinationFailures?: { destinationId: string; attemptCount: number; lastError: string | null }[];
 }
 
 @Injectable()
@@ -86,6 +87,7 @@ export class DlqService {
         tx.outboxMessage.findMany({
           where: whereClause,
           include: {
+            destinationDeliveries: { where: { status: 'DEAD_LETTER' }, orderBy: { updatedAt: 'desc' } },
             deliveryAttempts: {
               orderBy: { createdAt: 'desc' },
               take: 1,
@@ -102,26 +104,33 @@ export class DlqService {
         }),
       ]);
 
-      const records: DlqRecord[] = outboxRows.map((msg) => {
-        const lastAttempt = msg.deliveryAttempts[0];
-        return {
+      const records: DlqRecord[] = [];
+      for (const msg of outboxRows) {
+        const failure = filters.destinationId ? msg.destinationDeliveries.find((d) => d.destinationId === filters.destinationId) : msg.destinationDeliveries[0];
+        if (filters.destinationId && msg.destinationDeliveries.length && !failure) continue;
+        const lastAttempt = failure ? await tx.deliveryAttempt.findFirst({
+          where: { outboxMessageId: msg.id, destinationId: failure.destinationId, status: { not: 'SUCCESS' } },
+          orderBy: { createdAt: 'desc' }, include: { destination: { select: { id: true, name: true, url: true } } },
+        }) : msg.deliveryAttempts[0];
+        records.push({
           id: msg.id,
           eventId: msg.eventId,
           channel: msg.channel,
-          attemptCount: msg.attemptCount,
+          attemptCount: failure?.attemptCount ?? msg.attemptCount,
           maxRetries: msg.maxRetries,
           status: msg.status,
           createdAt: msg.createdAt,
           lastAttemptAt: lastAttempt?.createdAt ?? null,
           lastStatusCode: lastAttempt?.statusCode ?? null,
-          lastErrorDescription: lastAttempt?.errorDescription ?? null,
-          destinationId: lastAttempt?.destination?.id ?? null,
+          lastErrorDescription: failure?.lastError ?? lastAttempt?.errorDescription ?? null,
+          destinationId: failure?.destinationId ?? lastAttempt?.destination?.id ?? null,
           destinationName: lastAttempt?.destination?.name ?? null,
           destinationUrl: lastAttempt?.destination?.url ?? null,
           replayedAt: msg.replayedAt,
           payloadSummary: msg.payload,
-        };
-      });
+          destinationFailures: msg.destinationDeliveries.map((d) => ({ destinationId: d.destinationId, attemptCount: d.attemptCount, lastError: d.lastError })),
+        });
+      }
 
       // Filter by category in-memory if requested
       let filtered = records;
@@ -183,49 +192,21 @@ export class DlqService {
         throw new ForbiddenException('Only Owners and Developers can replay DLQ deliveries');
       }
 
-      // Query candidate rows with FOR UPDATE SKIP LOCKED
-      const candidates = await tx.outboxMessage.findMany({
-        where: {
-          id: { in: outboxIds },
-          organizationId,
-          status: { in: ['FAILED', 'DEAD_LETTER'] },
-        },
-      });
-
-      const now = new Date();
+      const requested = [...new Set(outboxIds)];
+      // Lock and recheck eligibility in PostgreSQL; two bulk calls cannot both
+      // reset a coordinator or race a live worker between a read and update.
+      const candidates = await tx.$queryRaw<{ id: string }[]>`
+        SELECT id FROM outbox_messages WHERE id=ANY(${requested}::uuid[]) AND org_id=${organizationId}::uuid
+          AND status IN ('FAILED','DEAD_LETTER') AND (lease_expires_at IS NULL OR lease_expires_at<=clock_timestamp())
+        ORDER BY id FOR UPDATE SKIP LOCKED
+      `;
       const replayedIds: string[] = [];
-      const skippedIds: string[] = [];
-
       for (const msg of candidates) {
-        // If lease is currently active on an in-flight worker, do not replay!
-        if (msg.leaseExpiresAt && msg.leaseExpiresAt > now) {
-          skippedIds.push(msg.id);
-          continue;
-        }
-
-        await tx.outboxMessage.update({
-          where: { id: msg.id },
-          data: {
-            status: 'PENDING',
-            attemptCount: 0,
-            nextRetryAt: now,
-            leaseToken: null,
-            leaseExpiresAt: null,
-            replayedAt: now,
-            replayedBy: userId,
-          },
-        });
-
+        await tx.$queryRaw`SELECT * FROM replay_outbox_message(${msg.id}::uuid,${userId}::uuid)`;
         replayedIds.push(msg.id);
       }
-
-      // Record remaining requested IDs that were not found as skipped
-      const candidateSet = new Set(candidates.map((c) => c.id));
-      for (const id of outboxIds) {
-        if (!candidateSet.has(id)) {
-          skippedIds.push(id);
-        }
-      }
+      const replayed = new Set(replayedIds);
+      const skippedIds = requested.filter((id) => !replayed.has(id));
 
       this.logger.log({
         event: 'dlq_bulk_replay_executed',
