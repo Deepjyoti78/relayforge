@@ -28,6 +28,7 @@ function deferred() {
 }
 
 describe('webhook delivery reliability with PostgreSQL and Redis', () => {
+  const trustedOrigin = process.env.FRONTEND_URL ?? 'http://localhost:5173';
   let app: NestExpressApplication;
   let db: DatabaseService;
   let workerDb: DatabaseService;
@@ -89,7 +90,7 @@ describe('webhook delivery reliability with PostgreSQL and Redis', () => {
     const user = await db.client.user.create({ data: { email: `${randomUUID()}@reliability.test`, displayName: 'Delivery tester' } });
     const token = randomUUID();
     await db.client.session.create({ data: { userId: user.id, tokenHash: hashToken(token), expiresAt: new Date(Date.now() + 3600000) } });
-    const response = await request(app.getHttpServer()).post('/v1/organizations').set('Cookie', `rf_session=${token}`)
+    const response = await request(app.getHttpServer()).post('/v1/organizations').set('Cookie', `rf_session=${token}`).set('Origin', trustedOrigin)
       .send({ name: 'Reliability fixtures' }).expect(201);
     const org = (response.body as { id: string }).id;
     orgs.push(org);
@@ -113,7 +114,7 @@ describe('webhook delivery reliability with PostgreSQL and Redis', () => {
     };
     const state = (id: string) => tenant.runInTenantContext(org, user.id, (tx) => tx.outboxMessage.findUniqueOrThrow({ where: { id } }));
     const targets = (id: string) => tenant.runInTenantContext(org, user.id, (tx) => tx.destinationDelivery.findMany({ where: { outboxMessageId: id }, orderBy: { destinationId: 'asc' } }));
-    return { org, user, endpoint, addDestination, ingest, state, targets };
+    return { org, user, token, endpoint, addDestination, ingest, state, targets };
   }
 
   async function due(id: string) {
@@ -128,6 +129,47 @@ describe('webhook delivery reliability with PostgreSQL and Redis', () => {
       SELECT * FROM claim_pending_outbox_messages(1,30,${excluded}::uuid[])
     `;
   }
+
+  it('accepts a signed synthetic event through HTTP provisioning and rejects foreign-tenant management access', async () => {
+    const f = await fixture();
+    const foreign = await fixture();
+    const cookie = `rf_session=${f.token}`;
+    const base = `/v1/organizations/${f.org}`;
+    const key = await request(app.getHttpServer()).post(`${base}/api-keys`).set('Cookie', cookie).set('Origin', trustedOrigin)
+      .send({ name: 'Synthetic acceptance only', scopes: ['ingest'] }).expect(201);
+    expect((key.body as { apiKey: string }).apiKey).toMatch(/^rf_live_/);
+    const endpointResponse = await request(app.getHttpServer()).post(`${base}/endpoints`).set('Cookie', cookie).set('Origin', trustedOrigin)
+      .send({ name: 'HTTP acceptance origin' }).expect(201);
+    const source = endpointResponse.body as { endpoint: { id: string }; signingSecret: string };
+    const path = `/${randomUUID()}`;
+    routes.set(path, (_body, res) => { res.end('synthetic accepted'); });
+    const destination = await request(app.getHttpServer()).post(`${base}/destinations`).set('Cookie', cookie).set('Origin', trustedOrigin)
+      .send({ name: 'Owned loopback receiver', url: origin + path, rateLimitPerSecond: 50, timeoutMs: 1000 }).expect(201);
+    const payload = JSON.stringify({ synthetic: true, runId: randomUUID() });
+    const ingestPath = `/v1/ingest/${source.endpoint.id}`;
+    await request(app.getHttpServer()).post(ingestPath).set('Content-Type', 'application/json')
+      .set('x-relayforge-signature', 'sha256=invalid').send(payload).expect(401);
+    const idempotency = randomUUID();
+    const send = () => request(app.getHttpServer()).post(ingestPath).set('Content-Type', 'application/json')
+      .set('x-relayforge-signature', signWebhookPayload(payload, source.signingSecret))
+      .set('x-idempotency-key', idempotency).send(payload);
+    const accepted = await send().expect(202);
+    await send().expect(200);
+    await worker().sweepPendingOutbox();
+    expect(received.filter((r) => r.path === path)).toHaveLength(1);
+    const sent = received.find((r) => r.path === path)!;
+    expect(sent.headers['x-relayforge-signature']).toBe(signWebhookPayload(sent.body, source.signingSecret, Number(sent.headers['x-relayforge-timestamp'])));
+    const attempts = await request(app.getHttpServer()).get(`${base}/deliveries?eventId=${(accepted.body as { eventId: string }).eventId}`)
+      .set('Cookie', cookie).set('Origin', trustedOrigin).expect(200);
+    expect(JSON.stringify(attempts.body)).toContain('SUCCESS');
+    const foreignCookie = `rf_session=${foreign.token}`;
+    await request(app.getHttpServer()).get(`${base}/deliveries`).set('Cookie', foreignCookie).set('Origin', trustedOrigin).expect(404);
+    await request(app.getHttpServer()).post(`${base}/api-keys`).set('Cookie', foreignCookie).set('Origin', trustedOrigin)
+      .send({ name: 'Denied' }).expect(404);
+    await request(app.getHttpServer()).get(`${base}/destinations/${(destination.body as { id: string }).id}`)
+      .set('Cookie', foreignCookie).set('Origin', trustedOrigin).expect(404);
+    await request(app.getHttpServer()).get(`${base}/dlq`).set('Cookie', foreignCookie).set('Origin', trustedOrigin).expect(403);
+  });
 
   it('keeps a mixed 200/500 event pending and retries only the failed destination', async () => {
     const f = await fixture();

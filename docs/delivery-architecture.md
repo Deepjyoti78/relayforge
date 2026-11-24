@@ -55,3 +55,7 @@ The HMAC covers `${timestamp}.${body}` and is sent as `t=<timestamp>,v1=<digest>
 The destination-state table has forced RLS and organization/member-scoped API reads. The API cannot directly mutate target outcomes. Worker mutation helpers require a live coordinator lease, have fixed search paths and revoke PUBLIC execution. A composite foreign key binds each state row to its coordinator's organization. Destination IDs intentionally remain as tombstones after destination deletion.
 
 See [the migration and reliability review](delivery-reliability-review.txt) before rollout. Old and new fanout workers must not overlap. Historically completed mixed-outcome events are not automatically reopened or redelivered.
+
+Use the [controlled staging checklist](delivery-staging-checklist.md) for dedicated
+role checks, backup/restore, index-lock planning, historical recovery and synthetic
+acceptance. Repository configuration and local tests do not verify hosted roles.

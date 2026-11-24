@@ -1,5 +1,16 @@
 Webhook delivery reliability review — 2026-11-23
 
+Integration update — 2026-11-24
+The following stack/validation record describes the original PR #3 work.
+GitHub now records that PR merged into codex/dependency-security-fix, not staging.
+The delivery-only commits have been cherry-picked onto staging 826bd83 in the
+isolated codex/webhook-delivery-staging branch; no security/dependency commits
+were replayed. README/deployment conflicts retain staging's auth/tenancy guide.
+See delivery-staging-checklist.md for the current operator gates, acceptance
+scenarios, migration/restore restrictions and replacement-draft-PR requirement.
+Current combined-code results are recorded separately from the historical counts
+below. No deployment or live credential/role validation is implied.
+
 Stack and review boundary
 This branch starts at PR #2 head 09889fdd86701866abea1cd70ccc3afb0812873c.
 Its draft PR targets codex/dependency-security-fix, not staging. PR #1's
