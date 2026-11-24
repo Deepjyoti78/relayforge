@@ -108,6 +108,19 @@ describe('Milestone 3 Option 2: DeliveryService Unit Tests', () => {
       global.fetch = originalFetch;
     });
 
+    it('rejects a cross-organization fallback secret when the SQL helper is unavailable', async () => {
+      const encrypted = encryptSecret('another-organizations-secret', mockConfig.values.encryptionKey);
+      mockTenantContext.runInTenantContext.mockRejectedValueOnce(new Error('Helper unavailable'))
+        .mockResolvedValueOnce({ organizationId: 'another-org', secretCiphertext: encrypted.ciphertext,
+          secretIv: encrypted.iv, secretTag: encrypted.tag });
+      const fetchMock = jest.fn().mockResolvedValue(new Response('ok', { status: 200 }));
+      global.fetch = fetchMock;
+      const attempt = await deliveryService.deliverEventToDestination({ organizationId: orgId, eventId,
+        destination: { id: destId, url: 'http://127.0.0.1:9999/webhook' }, payload: { protected: true }, eventType: 'test' });
+      expect(attempt.status).toBe('FAILED');
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
     it('successfully delivers webhook and records SUCCESS delivery attempt', async () => {
       let capturedHeaders: Record<string, string> | undefined;
       let capturedBody: string | undefined;

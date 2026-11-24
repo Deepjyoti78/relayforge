@@ -6,6 +6,8 @@ import request from 'supertest';
 import { createApiApplication } from '../src/api/create-api';
 import { serializeCookie } from '../src/common/cookies';
 import { generateToken, hashToken, signWebhookPayload } from '../src/common/crypto';
+import { RuntimeConfig } from '../src/modules/config/config.module';
+import { parseEnvironment } from '../src/modules/config/environment';
 import { DatabaseService } from '../src/modules/database/database.service';
 import { TenantContextService } from '../src/modules/database/tenant-context.service';
 import { DeliveryService } from '../src/modules/delivery/delivery.service';
@@ -25,6 +27,7 @@ interface ReceivedRequest {
 describe('Milestone 3 Option 2: Durable HTTP Delivery Pipeline & Outbox Dispatcher (Integration)', () => {
   let app: NestExpressApplication;
   let database: DatabaseService;
+  let workerDatabase: DatabaseService;
   let tenantContext: TenantContextService;
   let deliveryService: DeliveryService;
   let endpointService: EndpointService;
@@ -85,8 +88,10 @@ describe('Milestone 3 Option 2: Durable HTTP Delivery Pipeline & Outbox Dispatch
     deliveryService = app.get(DeliveryService);
     endpointService = app.get(EndpointService);
     ingestionService = app.get(IngestionService);
+    workerDatabase = new DatabaseService(new RuntimeConfig(parseEnvironment('worker', process.env)));
+    await workerDatabase.onModuleInit();
     outboxWorker = new OutboxWorkerService(
-      database,
+      workerDatabase,
       deliveryService,
       app.get(RateLimiterService),
       app.get(EventStreamService),
@@ -156,6 +161,8 @@ describe('Milestone 3 Option 2: Durable HTTP Delivery Pipeline & Outbox Dispatch
   });
 
   afterAll(async () => {
+    await outboxWorker?.onModuleDestroy();
+    await workerDatabase?.onApplicationShutdown();
     await app.close();
     await new Promise<void>((resolve) => {
       testServer.close(() => resolve());
@@ -440,16 +447,15 @@ describe('Milestone 3 Option 2: Durable HTTP Delivery Pipeline & Outbox Dispatch
         payload,
       );
 
-      // Simulate 4 prior failed attempts
-      await tenantContext.runInTenantContext(orgA.id, userA.id, async (tx) => {
-        await tx.outboxMessage.updateMany({
-          where: { eventId: ingestRes.eventId },
-          data: {
-            attemptCount: 4,
-            nextRetryAt: new Date(Date.now() - 1000), // Ready to run
-          },
-        });
-      });
+      // Seed real per-destination attempt evidence, not only the coordinator's
+      // claim count: each target now owns its independent retry budget.
+      const pending = await tenantContext.runInTenantContext(orgA.id, userA.id, (tx) =>
+        tx.outboxMessage.findFirstOrThrow({ where: { eventId: ingestRes.eventId } }));
+      for (let attemptNumber = 1; attemptNumber <= 4; attemptNumber += 1) {
+        await deliveryService.deliverEventToDestination({ organizationId: orgA.id, eventId: ingestRes.eventId,
+          outboxMessageId: pending.id, destination: { id: failDestination.id, url: failDestination.url },
+          payload, eventType: 'invoice.failed', attemptNumber, signingSecret: failEndpoint.signingSecret });
+      }
 
       // Sweep will attempt 5th time (attempt_count becomes 5 >= maxRetries) and fail
       await outboxWorker.sweepPendingOutbox();

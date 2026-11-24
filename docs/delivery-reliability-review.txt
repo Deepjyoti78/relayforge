@@ -1,0 +1,169 @@
+Webhook delivery reliability review — 2026-11-23
+
+Integration update — 2026-11-24
+The following stack/validation record describes the original PR #3 work.
+GitHub now records that PR merged into codex/dependency-security-fix, not staging.
+The delivery-only commits have been cherry-picked onto staging 826bd83 in the
+isolated codex/webhook-delivery-staging branch; no security/dependency commits
+were replayed. README/deployment conflicts retain staging's auth/tenancy guide.
+See delivery-staging-checklist.md for the current operator gates, acceptance
+scenarios, migration/restore restrictions and replacement-draft-PR requirement.
+Current combined-code results are recorded separately from the historical counts
+below. No deployment or live credential/role validation is implied.
+
+Stack and review boundary
+This branch starts at PR #2 head 09889fdd86701866abea1cd70ccc3afb0812873c.
+Its draft PR targets codex/dependency-security-fix, not staging. PR #1's
+authentication implementation is excluded; PR #2's Effect override, lint
+corrections and graceful sweep-drain remain intact. No deployment, live
+credential change, production query/write or PR merge is authorized here.
+
+Actual failing-before evidence
+Commit 2152c9a365cade4c6c50a1481e4f5eefcca5aa72 contains the three original
+schema-independent PostgreSQL/Redis integration reproductions. On the
+unchanged PR #2 implementation and its 13 migrations, this command exited 1:
+  npm run test:integration -- --runTestsByPath tests/delivery-reliability.integration-spec.ts
+Three tests failed (14.286 seconds):
+1. Mixed recipient HTTP 200 and HTTP 500: expected coordinator PENDING,
+   received DISPATCHED. anySucceeded dropped the failed recipient's retry.
+2. Event ingested at a second endpoint: expected HMAC using its secret,
+   received an HMAC using the organization's first endpoint's secret.
+3. While the first HTTP call was gated, PostgreSQL advanced an unstarted
+   queued row's lease into the past. A competing worker delivered it, then
+   the first worker also sent it: expected one request, received two with
+   the same delivery ID and distinct attempt IDs. This uses a real SQL
+   deadline change, not mocked SQL/Redis or a fake application clock.
+
+The expanded suite adds destination-only retry/replay, retry exhaustion,
+target deletion, Redis throttling, read/write RLS, duplicate starts/claims,
+stale tokens, real heartbeat renewal, slow/timeout/partial shutdown, a
+SIGKILLed child worker, and committed-success recovery. The intentional
+SIGKILL is the crash-under-test, never a way to force a passing process exit.
+A further focused reproduction showed coordinator claim count 100 plus an
+unreadable origin secret incorrectly caused DEAD_LETTER with zero target
+attempts. It expected PENDING and failed before the coordinator-backoff fix.
+A migration-review regression also caught legacy coordinator ordinals being
+mistaken for target attempt counts. One recorded failed request numbered 4
+must become target count 1, not 4. Snapshot backfill counts recorded requests
+in the current replay period and keeps known success across periods.
+
+Implementation
+- destination_deliveries persists the first-dispatch active target snapshot,
+  per-target status, reserved attempt count, next retry, active token and
+  last error. Its composite primary key prevents duplicate fanout. Its
+  composite FK binds the coordinator and organization. Destination IDs
+  deliberately survive target deletion as tombstones; deleted targets
+  become explicit dead letters instead of disappearing from completion.
+- A parent is completed only when all snapshot targets succeeded. Pending
+  targets keep it pending at their earliest due time. Once all targets are
+  terminal, any dead target fails the event and routes its parent to DLQ.
+- Each HTTP reservation is durable before egress. Target results check the
+  current, unexpired parent token. A committed SUCCESS attempt is reconciled
+  after a crash before the coordinator update, avoiding another known-success
+  send. Replay resets unfinished targets only and retains successful targets.
+- Secret resolution joins event -> originating endpoint with matching org;
+  both worker and DeliveryService fallback use it. The origin's current key
+  is used; no first-endpoint or unsigned fallback is introduced. A separate
+  failing-before unit test verifies that, if the SQL helper is unavailable,
+  a fallback endpoint from another org is rejected before signing or HTTP.
+- Sweeps still handle up to 25 coordinators, claiming one just before work.
+  A third optional claim-function argument excludes already visited rows.
+  Existing two-argument SQL callers retain default compatibility. Live
+  30-second leases renew every 10 seconds and immediately before egress.
+  Lost/expired tokens cannot be renewed; renewal failure cancels active HTTP
+  and stops new targets. Token fences do not claim to undo remote effects.
+- Shutdown stops new claims/targets, drains dispatch, recovery and renewal,
+  and persists partial progress before Nest closes PostgreSQL/Redis.
+- Target transport budgets remain bounded; coordinator infrastructure/secret
+  failures retry with capped backoff without consuming another target's
+  transport budget. Operators must repair persistent configuration failures.
+- Bulk DLQ replay now uses row locks and the same replay helper as single
+  replay; concurrent calls requeue a coordinator only once. The helper also
+  accepts the bulk API's historical FAILED terminal spelling. DLQ records
+  identify failed target state rather than a successful sibling's latest
+  attempt, and expose all remaining failed destination IDs/counters/errors.
+
+Isolation and test configuration
+Tests use restricted API/worker roles and a separate tmpfs PostgreSQL/Redis
+project on loopback ports 55435/56382, database relayforge_reliability_test.
+Only fixture data in that disposable database is changed. The test-only
+ALLOW_PRIVATE_DESTINATIONS flag permits loopback HTTP recipients; production
+still rejects it. No production env file or OAuth credentials are used.
+New target-state reads require org membership under forced RLS; API writes
+are denied. Mutation helpers are worker-only, fixed-search-path functions
+with PUBLIC execution revoked. Origin-secret API lookup requires matching
+tenant context. Existing end-user replay authorization is retained.
+
+Migration / rollout plan — operator review required, not executed here
+1. After PR #2 is approved and merged, fetch staging and rebase this branch;
+   resolve only related conflicts, preserve the security/shutdown changes,
+   rerun all validation, then retarget the draft PR. Do not retarget solely
+   because a branch name exists. PR #1 remains a separate review/integration.
+2. Back up and inspect destination/event/outbox consistency and historical
+   mixed-outcome DISPATCHED events. This migration does not reopen completed
+   history or automatically resend payloads that may already have succeeded.
+   Any historical repair needs a separately reviewed, scoped operator plan.
+3. Quiesce and drain old outbox workers before applying migration
+   202611230001_destination_delivery_reliability and starting new workers.
+   Ingestion can queue while workers are paused, subject to the migration's
+   write-lock window below. Do not overlap old fanout workers with
+   initialized destination state: they do not understand success preservation.
+4. The additive migration introduces one table, a coordinator initialization
+   flag and composite unique key, lease/origin/state helpers, and a replay
+   wrapper retaining the existing locked/attributed replay behavior. No
+   historical state is deleted. Pending coordinators initialize lazily from
+   active targets and existing attempt evidence. API and worker roles must
+   be the existing separate runtime roles; no new secret/env variable is added.
+   Verify WORKER_DATABASE_URL actually logs in as relayforge_worker. The
+   existing render.yaml still copies the API DATABASE_URL into that setting;
+   that template must not be relied on for a least-privilege rollout. Supply
+   and validate the dedicated worker connection through the normal reviewed
+   hosting configuration process. This task changes no live credentials or
+   blueprint configuration and does not validate actual hosted DB roles.
+   The composite unique index scans existing outbox rows and its ordinary
+   index build can block writes. Measure this on a production-sized copy and
+   schedule a maintenance/write-pause window; review a concurrent-index rollout
+   separately if that window is unacceptable. Do not assume zero downtime.
+5. Generate the Prisma 7 client and apply with prisma migrate deploy. Verify
+   migration status, API/worker health and representative 200/500 fanout,
+   signing, target-only replay, fencing, queue recovery and graceful stop.
+   Allow enough termination grace for current HTTP/database work.
+6. Code-only rollback to old fanout logic after initialization is unsafe.
+   Pause workers, preserve the new state, and prefer a reviewed forward fix.
+   Never drop/reset the production database or clear target successes as a
+   rollback shortcut. No rollback or deployment is performed by this task.
+
+Validation record
+All original three regressions pass with the corrections. Exact latest-head
+unit/integration counts, clean installation/audit, migration idempotency and
+status, schema diff, lint/typecheck, API/frontend/Docker builds, runtime smoke
+and hosted CI results are recorded separately in the draft PR description.
+An old exhaustion fixture now creates four real failed target attempts before
+the fifth instead of changing only the coordinator counter. Existing manual
+worker integration fixtures now use the restricted worker DB role because
+new mutation helpers deliberately deny execution to the API role.
+The completed local suite before the final backfill case passed 181 unit tests
+and 94 integration tests. The latest full-suite counts (17 new reliability
+scenarios) are recorded in the draft PR. An additional bulk-replay regression
+failed before its compatibility correction: expected DISPATCHED after replay,
+received DEAD_LETTER because the old bulk endpoint left target state terminal.
+
+Guarantees and remaining limits
+See delivery-architecture.md for the public contract. Delivery is bounded,
+at-least-once attempt semantics, not an unconditional receipt or exactly-once
+side-effect guarantee. A receipt followed by process death before durable
+acknowledgement can be resent with the same logical ID; receivers must use
+atomic, durable deduplication. HTTP cannot participate in the database commit.
+Loss of database connectivity, event-loop stalls, partitions and forced
+termination can still produce ambiguous receipt. A crash before egress can
+consume a reserved attempt. Secret rotation uses the origin's current key.
+Target membership snapshots at first dispatch; later additions are excluded,
+while retries use current target config. Deletion/retention policies still
+apply; deleting an endpoint cascades its event/outbox data as before.
+Existing workflow step-side-effect semantics, Redis limiter fail-open behavior,
+the five-minute Retry-After cap and existing replay restrictions are retained.
+Historical invalid coordinator rows require operator audit; new normal fanout
+failures use DEAD_LETTER. Persistent infrastructure/key
+problems can remain pending until repaired; monitor coordinator retries/DLQ.
+The pre-existing four updated_at default differences and organizations
+created_by index/schema drift must remain visible; this is not a drift repair.

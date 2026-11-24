@@ -15,6 +15,7 @@ function fixture(claimed: unknown[], recovery = Promise.resolve()) {
   const query = jest.fn<Promise<unknown>, [TemplateStringsArray, ...unknown[]]>()
     .mockImplementation(async (sql) => {
       if (sql.join('').includes('claim_pending_outbox_messages')) return claimed;
+      if (sql.join('').includes('renew_outbox_lease')) return [{ renew_outbox_lease: true }];
       await recovery;
       return [{ reclaim_stale_outbox_leases: 0 }];
     });

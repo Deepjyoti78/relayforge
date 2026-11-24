@@ -6,6 +6,8 @@ import request from 'supertest';
 import { createApiApplication } from '../src/api/create-api';
 import { serializeCookie } from '../src/common/cookies';
 import { generateToken, hashToken } from '../src/common/crypto';
+import { RuntimeConfig } from '../src/modules/config/config.module';
+import { parseEnvironment } from '../src/modules/config/environment';
 import { DatabaseService } from '../src/modules/database/database.service';
 import { DeliveryService } from '../src/modules/delivery/delivery.service';
 import { RateLimiterService } from '../src/modules/delivery/rate-limiter.service';
@@ -19,6 +21,7 @@ import { OutboxWorkerService } from '../src/worker/outbox-worker.service';
 describe('Sequential Workflow Execution Engine (Integration)', () => {
   let app: NestExpressApplication;
   let database: DatabaseService;
+  let workerDatabase: DatabaseService;
   let workflowEngine: WorkflowEngineService;
   let ingestionService: IngestionService;
   let endpointService: EndpointService;
@@ -92,8 +95,10 @@ describe('Sequential Workflow Execution Engine (Integration)', () => {
     endpointService = app.get(EndpointService);
     ingestionService = app.get(IngestionService);
     workflowEngine = app.get(WorkflowEngineService);
+    workerDatabase = new DatabaseService(new RuntimeConfig(parseEnvironment('worker', process.env)));
+    await workerDatabase.onModuleInit();
     outboxWorker = new OutboxWorkerService(
-      database,
+      workerDatabase,
       deliveryService,
       app.get(RateLimiterService),
       app.get(EventStreamService),
@@ -175,6 +180,8 @@ describe('Sequential Workflow Execution Engine (Integration)', () => {
   });
 
   afterAll(async () => {
+    await outboxWorker?.onModuleDestroy();
+    await workerDatabase?.onApplicationShutdown();
     if (testServer) {
       await new Promise<void>((resolve) => testServer.close(() => resolve()));
     }
