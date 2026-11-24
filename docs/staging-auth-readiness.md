@@ -2,13 +2,15 @@
 
 Prepared 23 November 2026 from staging `93c3840`: authentication PR #1 and dependency PR #2 are merged. This branch prepares code and configuration; it does not deploy, change provider registrations or live settings, or run live migrations. Delivery PR #3 is excluded.
 
+Updated 24 November: the existing Worker is `relayforge` at `https://relayforge.deepmuse.workers.dev`. Both Wrangler configurations now declare its confirmed public runtime variables. See [runtime configuration and controlled commands](cloudflare-runtime-config.md); observations below are historical 23 November evidence, not a claim about today's deployment.
+
 ## Current deployment evidence and limits
 
 The operator confirmed these current URLs:
 
 - Render frontend: `https://relayforge-staging-web.onrender.com`
 - Render API: `https://relayforge-staging-api.onrender.com`
-- A final Cloudflare frontend/custom domain has **not** been configured. The Render frontend is **not** assumed to host the new Worker.
+- Cloudflare frontend is now confirmed as `https://relayforge.deepmuse.workers.dev`, existing Worker `relayforge`. The Render frontend is **not** the proxy host.
 
 Public HTTP probes returned 200 for the frontend and API `/health/live`. Normal OAuth-start requests returned the following without following provider login. These requests create only ordinary short-lived OAuth state; no provider login, account or session was created. State/cookie values were not recorded.
 
@@ -78,24 +80,21 @@ Use F as a canonical HTTPS origin, without a path/query/fragment. A is currently
 
 Keep `DATABASE_URL`, `REDIS_URL`, `ENCRYPTION_KEY`, `HOST`, `PORT`, and separate `WORKER_DATABASE_URL`/`MIGRATION_DATABASE_URL` identities unchanged through the approved operations process. No secret or migration connection belongs in the Worker or frontend. There is no new CORS wildcard, cookie-domain setting or token bridge.
 
-Wrangler intentionally contains no guessed public origin/upstream values. Pass the two **nonsecret** Worker variables explicitly in the approved deployment command/configuration. Do not assume Render environment variables are available to Cloudflare or that frontend build variables update at runtime. Preview hosts must not be added with wildcard trust.
+Both Wrangler files now contain the confirmed **nonsecret** Worker runtime variables. They do not need build-variable or CLI `--var` substitution. Do not assume Render environment variables are available to Cloudflare or that frontend build variables update at runtime. Preview hosts must not be added with wildcard trust.
 
 ## Operator-only deployment and console steps — not performed here
 
 1. Independently confirm Render Auto-Deploy Off, Blueprint Auto Sync disabled, no queued deployment or hook caller, and controlled Cloudflare production/preview build triggers before merge approval. Merging source is not release authorization.
-2. Choose a stable F in the intended Cloudflare account, confirm domain authorization/DNS/TLS, and choose a dedicated staging Worker name. Do not overwrite an unrelated Worker named `relayforge`. An owned verified custom domain is preferable for final provider branding. A workers.dev trial origin still requires provider-console/policy acceptance; no final hostname is assumed here.
+2. Verify authorization/TLS and the account owning the confirmed F, `https://relayforge.deepmuse.workers.dev`, and existing Worker `relayforge`. Do not rename it or create `relayforge-staging`. Provider-console/domain-policy acceptance still needs manual verification.
 3. Inspect the intended staging OAuth app/client IDs in both consoles and compare their allowed callbacks with the matrix. Keep existing secrets. The observed Render callback URLs are not the new F callbacks and are not proof of console registration.
 4. **Google Auth Platform/Cloud Console:** use a Web application client; register the exact `F/auth/google/callback` Authorized redirect URI (scheme/host/port/path, no extra trailing slash). Set F as an Authorized JavaScript origin if that setting is used (origin only; this implementation uses server-side code exchange). Verify authorized domains/branding/consent audience and staging test users. Ensure homepage/privacy/terms and domain verification satisfy the app's publishing status. [Google web-server flow](https://developers.google.com/identity/protocols/oauth2/web-server), [domain policies](https://developers.google.com/identity/protocols/oauth2/policies).
 5. **GitHub Developer settings → OAuth Apps:** select the intended staging app; Homepage URL is F, authorization callback is exactly `F/auth/github/callback`. Confirm the client ID matches the API setting. Do not rely on wildcard/platform-domain matching. Coordinate the old/new callback cutover or separately approve a dedicated staging app; do not silently change credentials. [GitHub registration](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app).
 6. In a separately approved release, roll out the merged API security/readiness code and the API public values in the matrix. Verify browser-binding cookies/no-store on starts and state verification on callbacks. **The current API build command runs role initialization/migrations.** Review/replace that with an approved compile-only auth rollout; do not invoke it blindly. This branch changes no schema and does not run or authorize live migrations. Verify dedicated runtime roles and existing cloud PostgreSQL/Redis certificate-verification gaps separately.
-7. Build the frontend for same origin. Validate the Worker bundle without uploading. Only after code, DNS/TLS, public configuration and console changes are approved, publish the dedicated Worker and attach the approved F. Source commands below are instructions, not operations performed by this task.
+7. Build the frontend for same origin. Validate the Worker bundle without uploading. Only after code, public configuration and console changes are approved, publish the existing `relayforge` Worker at the confirmed F. Source commands below are instructions, not operations performed by this task.
 
-Example PowerShell commands from the repository root; replace F and verify the account/Worker name before the **approved publish** step:
+Example PowerShell commands from the repository root; verify the account owns the existing Worker before the **approved publish** step. Compare Builds settings with the [current runtime guide](cloudflare-runtime-config.md).
 
 ```powershell
-$frontendOrigin = 'https://REPLACE_WITH_FINAL_CLOUDFLARE_FRONTEND'
-$apiOrigin = 'https://relayforge-staging-api.onrender.com'
-$workerName = 'relayforge-staging' # confirm dedicated staging ownership
 $env:VITE_API_URL = '/'
 $env:WRANGLER_SEND_METRICS = 'false'
 npm ci --include=dev
@@ -103,10 +102,10 @@ npm --prefix web ci --include=dev
 npm --prefix web run build
 
 # Local bundle/config validation only; this is the mode used by this review/CI.
-npm exec --yes --package=wrangler@4.166.0 -- wrangler deploy --dry-run --config wrangler.jsonc --outdir .cache/worker-bundle
+npm run check:cloudflare
 
 # OPERATOR ONLY, AFTER SEPARATE RELEASE APPROVAL. Not run by this task:
-npm exec --yes --package=wrangler@4.166.0 -- wrangler deploy --config wrangler.jsonc --name $workerName --var "FRONTEND_URL:$frontendOrigin" --var "API_ORIGIN:$apiOrigin"
+npm exec --yes --package=wrangler@4.166.0 -- wrangler deploy --config wrangler.jsonc
 ```
 
 Use the same public variables/account/name when configuring a reviewed Cloudflare build integration later. Neither CI nor this task publishes a Worker. The pinned CLI is an ephemeral build tool; project lockfiles/dependency versions are unchanged. [Asset routing/bindings](https://developers.cloudflare.com/workers/static-assets/binding/), [manual redirects](https://developers.cloudflare.com/workers/runtime-apis/request/), [multiple cookies](https://developers.cloudflare.com/workers/runtime-apis/headers/).

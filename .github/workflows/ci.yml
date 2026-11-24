@@ -31,8 +31,8 @@ jobs:
       - run: npm audit --omit=dev --audit-level=moderate
       - run: npm run check
       - run: npm run build:web
-      - name: Bundle Cloudflare Worker without deployment
-        run: WRANGLER_SEND_METRICS=false npm exec --yes --package=wrangler@4.166.0 -- wrangler deploy --dry-run --outdir .cache/worker-bundle --config wrangler.jsonc
+      - name: Validate both Cloudflare deployment configurations without upload
+        run: npm run check:cloudflare
       - run: docker compose -f compose.test.yaml up -d --wait
       - run: npm run db:migrate
       - run: npm run test:integration

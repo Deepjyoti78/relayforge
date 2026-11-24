@@ -3,6 +3,10 @@
   "name": "relayforge",
   "compatibility_date": "2026-11-19",
   "main": "./worker.js",
+  "vars": {
+    "FRONTEND_URL": "https://relayforge.deepmuse.workers.dev",
+    "API_ORIGIN": "https://relayforge-staging-api.onrender.com"
+  },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
