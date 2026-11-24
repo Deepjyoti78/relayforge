@@ -6,9 +6,10 @@ merged into its old dependency branch as `0f939d0`, not staging. The isolated
 commits (`2152c9a`, `d18e103`, `3d49d13`, `91f280f`). A merged PR cannot be
 retargeted; this work needs a replacement draft against staging, linked to #3.
 No merge, deployment, live database query/migration or secret change is performed.
-The operator approved a replacement draft but then instructed this branch to stay
-local because Cloudflare/Render publishing controls for it are unverified. No push,
-replacement PR or hosted CI run is authorized until that hold is lifted.
+The operator initially held publication while Cloudflare/Render trigger safety was
+unverified. On 24 November the operator confirmed those controls are safe for
+`codex/webhook-delivery-staging` and authorized its push, replacement draft PR and
+hosted CI. This authorization does not permit merge, deployment or live migration.
 
 ## Conflict resolution and preserved implementation
 
@@ -256,7 +257,8 @@ disposable Compose project. No hosted database/receiver was contacted. Existing
 26 development-only moderate advisories and pg concurrent-query deprecation
 warnings remain; no dependency upgrade or unrelated drift repair was attempted.
 
-Hosted GitHub CI remains **not run** under the operator's explicit local-only
-instruction. Historical PR #3 CI does not validate this combined staging code.
+Hosted GitHub CI was **not run during local preparation** under the publication
+hold. Fresh hosted results for the published head are recorded separately in the
+replacement PR; historical PR #3 CI does not validate this combined staging code.
 Real hosted role/Redis/backup validation, receiver acceptance and release approval
 remain operator gates, even though staging Google/GitHub sign-in is reported working.
