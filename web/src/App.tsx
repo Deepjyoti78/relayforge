@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import {
   addMember,
   deleteOrganization,
@@ -15,8 +15,8 @@ import {
   updateMemberRole,
   updateOrganization,
 } from './api.ts';
+import { SessionLoading } from './components/SessionLoading.tsx';
 import { OrganizationOnboardingModal } from './components/OrganizationOnboardingModal.tsx';
-import { OrgManagement } from './components/OrgManagement.tsx';
 import { ProfileModal } from './components/ProfileModal.tsx';
 import { Sidebar } from './components/Sidebar.tsx';
 import { SignIn } from './components/SignIn.tsx';
@@ -24,6 +24,8 @@ import { TopBar } from './components/TopBar.tsx';
 import type { MembershipRole, OrganizationDetails, OrganizationMember, UserProfile } from './types.ts';
 import { dashboardPath, readDashboardLocation } from './auth-navigation.ts';
 import type { DashboardTab } from './auth-navigation.ts';
+
+const OrgManagement = lazy(() => import('./components/OrgManagement.tsx').then(module => ({ default: module.OrgManagement })));
 
 export const App: React.FC = () => {
   const isLandingPreview = new URLSearchParams(window.location.search).get('view') === 'landing' || new URLSearchParams(window.location.search).has('landing');
@@ -220,44 +222,19 @@ export const App: React.FC = () => {
     window.history.replaceState({}, '', dashboardPath('dashboard', newOrg.id));
   };
 
-  if (isSyncing && !user) {
-    return (
-      <div style={{
-        display: 'flex',
-        minHeight: '100vh',
-        backgroundColor: '#000000',
-        color: '#FFFFFF',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: 'monospace',
-        fontSize: '13px',
-        letterSpacing: '0.05em',
-      }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-          <div style={{
-            width: '26px',
-            height: '26px',
-            border: '2px solid rgba(255, 255, 255, 0.12)',
-            borderTopColor: '#FFFFFF',
-            borderRadius: '50%',
-            animation: 'spin 0.8s linear infinite',
-          }} />
-          <span style={{ color: '#A1A1AA' }}>AUTHENTICATING RELAYFORGE SESSION...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (authError && !user) {
-    return <main style={{minHeight:'100vh', display:'grid', placeContent:'center', gap:16, padding:24}}>
-      <p role="alert">{authError}</p>
-      <button type="button" disabled={isSyncing} onClick={() => { void loadUser(); }}>Retry</button>
-    </main>;
+  // Public content can render while the API wakes up. Protected routes still
+  // require a verified HttpOnly session before rendering any account data.
+  const isPublicLanding = window.location.pathname === '/' || isLandingPreview;
+  if (!user && !isPublicLanding && (isSyncing || authError)) {
+    return <SessionLoading error={authError} onRetry={() => { void loadUser(); }} />;
   }
 
   if (!user || isLandingPreview) {
     return (
       <SignIn
+        sessionPending={isSyncing}
+        sessionError={authError}
+        onRetrySession={() => { void loadUser(); }}
         onTokenSignIn={async (token) => {
           setSessionToken(token);
           setIsSyncing(true);
@@ -354,6 +331,7 @@ export const App: React.FC = () => {
 
         <main data-active-tab={activeTab} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: 'var(--bg-main)', minWidth: 0, width: '100%', transition: 'background-color 0.2s ease' }}>
           {activeOrg ? (
+            <Suspense fallback={<p role="status" style={{ padding: 24, color: 'var(--text-secondary)' }}>Loading your dashboard…</p>}>
             <OrgManagement
               organization={activeOrg}
               members={members}
@@ -366,6 +344,7 @@ export const App: React.FC = () => {
               onRemoveMember={handleRemoveMember}
               onDeleteOrg={handleDeleteOrg}
             />
+            </Suspense>
           ) : (
             <div style={{
               flex: 1,

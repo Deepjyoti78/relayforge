@@ -4,10 +4,13 @@ import { InteractiveWorkflowDashboard } from './InteractiveWorkflowDashboard.tsx
 import { AnimatedCounter } from './AnimatedCounter.tsx';
 
 interface SignInProps {
+  sessionPending?: boolean;
+  sessionError?: string | null;
+  onRetrySession?: () => void;
   onTokenSignIn?: (token: string, email?: string) => void;
 }
 
-export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
+export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn, sessionPending, sessionError, onRetrySession }) => {
   const [modalOpen, setModalOpen] = useState(() => new URLSearchParams(window.location.search).has('error'));
   const [authMode, setAuthMode] = useState<'signup' | 'login'>('signup');
   const [email, setEmail] = useState('');
@@ -125,7 +128,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
   }, []);
 
   return (
-    <div style={{
+    <div className="rf-landing" style={{
       minHeight: '100vh',
       backgroundColor: '#0D0C0B',
       color: '#F5F0E7',
@@ -133,10 +136,14 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
       flexDirection: 'column',
       position: 'relative',
       overflowX: 'clip',
-      fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
       WebkitFontSmoothing: 'antialiased',
       MozOsxFontSmoothing: 'grayscale',
     }}>
+      {sessionError && <div className="rf-landing-session-notice" role="alert">
+        We couldn’t verify your session. You can still explore RelayForge.
+        <button type="button" disabled={sessionPending} onClick={onRetrySession}>{sessionPending ? 'Checking…' : 'Retry session'}</button>
+      </div>}
       {/* 1. TOP NAVBAR */}
       <header className="rf-landing-header" style={{
         width: '100%',
@@ -205,7 +212,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 fontWeight: 650,
                 letterSpacing: '-0.015em',
                 color: '#F5F0E7',
-                fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               }}
             >
               RelayForge
@@ -221,7 +228,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             alignItems: 'center',
             gap: '32px',
             fontSize: '13.5px',
-            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             fontWeight: 450,
             letterSpacing: '-0.01em',
             color: '#A1A1AA',
@@ -237,7 +244,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 border: 'none',
                 color: '#A1A1AA',
                 fontSize: '13.5px',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 450,
                 letterSpacing: '-0.01em',
                 cursor: 'pointer',
@@ -256,7 +263,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 border: 'none',
                 color: '#A1A1AA',
                 fontSize: '13.5px',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 450,
                 letterSpacing: '-0.01em',
                 cursor: 'pointer',
@@ -275,7 +282,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 border: 'none',
                 color: '#A1A1AA',
                 fontSize: '13.5px',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 450,
                 letterSpacing: '-0.01em',
                 cursor: 'pointer',
@@ -295,7 +302,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 color: '#A1A1AA',
                 textDecoration: 'none',
                 fontSize: '13.5px',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 450,
                 letterSpacing: '-0.01em',
                 padding: '6px 0',
@@ -328,7 +335,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 borderRadius: '999px',
                 color: '#0D0C0B',
                 fontSize: '13px',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 600,
                 padding: '8px 20px',
                 cursor: 'pointer',
@@ -401,7 +408,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             gap: '16px',
             zIndex: 49,
             boxShadow: '0 20px 48px rgba(0, 0, 0, 0.95)',
-            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button
@@ -447,7 +454,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   fontWeight: 600,
                   cursor: 'pointer',
                   boxShadow: '0 2px 14px rgba(245, 240, 231, 0.16)',
-                  fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 }}
               >
                 Book a demo
@@ -496,7 +503,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 color: '#E9D8B9',
                 marginBottom: '16px',
                 letterSpacing: '0.02em',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               }}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E9D8B9" strokeWidth="2.5">
                   <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
@@ -505,34 +512,34 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               </div>
 
               {/* Dominant Heading in Exactly Two Lines (Fixed Position) */}
-              <h1 className="rf-hero-headline rf-scroll-reveal rf-stagger-2" style={{
-                fontSize: 'clamp(26px, 3vw, 42px)',
+              <h1 className="rf-hero-headline" style={{
+                fontSize: 'clamp(36px, 3.6vw, 56px)',
                 fontWeight: 700,
                 lineHeight: 1.18,
                 letterSpacing: '-0.025em',
                 color: '#F5F0E7',
-                margin: '0 0 clamp(74px, 9.6vh, 105px)',
-                fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+                margin: '0 0 28px',
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               }}>
                 <span className="rf-headline-line-1" style={{ display: 'block' }}>Reliable Webhooks &amp;</span>
                 <span className="rf-headline-line-2" style={{ display: 'block' }}>Sequential Workflows</span>
               </h1>
 
               {/* Supporting Description (Moved further below heading) */}
-              <p className="rf-hero-desc rf-scroll-reveal rf-stagger-3" style={{
-                fontSize: 'clamp(13px, 1.1vw, 15px)',
+              <p className="rf-hero-desc" style={{
+                fontSize: 'clamp(16px, 1.2vw, 18px)',
                 color: '#B5AEA3',
                 maxWidth: '520px',
                 lineHeight: 1.6,
                 letterSpacing: '-0.01em',
-                margin: '0 0 clamp(48px, 6.5vh, 64px)',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                margin: '0 0 32px',
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               }}>
                 Ingest high-throughput events, execute durable multi-step pipelines, and guarantee at-least-once delivery with jittered exponential retries.
               </p>
 
               {/* Two Action Buttons (Moved further downward) */}
-              <div className="rf-hero-buttons rf-scroll-reveal rf-stagger-4" style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+              <div className="rf-hero-buttons" style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
                 {/* Primary Warm Ivory Button: Get Started → */}
                 <button
                   id="hero-signin-btn"
@@ -551,7 +558,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     cursor: 'pointer',
                     boxShadow: '0 4px 20px rgba(245, 240, 231, 0.16)',
                     transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#FFFFFF';
@@ -587,7 +594,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     fontWeight: 600,
                     cursor: 'pointer',
                     transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'rgba(235, 225, 208, 0.08)';
@@ -649,7 +656,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               textAlign: 'center',
               letterSpacing: '0.04em',
               padding: '0 8px',
-              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             }}>
               Trusted By Engineering Teams Building Reliable Systems
             </span>
@@ -665,7 +672,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             gap: '24px',
             width: '100%',
             color: '#B5AEA3',
-            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             letterSpacing: '-0.01em',
           }}>
             {/* Vercel */}
@@ -778,7 +785,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             letterSpacing: '0.08em',
             color: '#B5AEA3',
             marginBottom: '16px',
-            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           }}>
             Event Processing Platform
           </div>
@@ -790,7 +797,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             letterSpacing: '-0.025em',
             color: '#F5F0E7',
             margin: '0 0 18px',
-            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           }}>
             <span className="rf-go-from-line-1 rf-scroll-reveal rf-stagger-2" style={{ display: 'block' }}>Go From &ldquo;Raw Events&rdquo; To</span>
             <span className="rf-go-from-line-2 rf-scroll-reveal rf-stagger-3" style={{ display: 'block' }}>&ldquo;Reliable Workflows&rdquo;</span>
@@ -803,7 +810,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             maxWidth: '620px',
             margin: '0 auto 28px',
             letterSpacing: '-0.01em',
-            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           }}>
             Ingest, process, and deliver events at scale with durable workflows, retries, and guaranteed delivery.
           </p>
@@ -825,7 +832,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 cursor: 'pointer',
                 boxShadow: '0 4px 20px rgba(245, 240, 231, 0.16)',
                 transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = '#FFFFFF';
@@ -873,7 +880,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 color: '#F5F0E7',
                 margin: '0 0 20px',
                 letterSpacing: '-0.01em',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               }}>
                 The Usual Approach
               </h3>
@@ -913,7 +920,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       <polyline points="14 2 14 8 20 8" />
                     </svg>
                   </div>
-                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>Event</span>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>Event</span>
                 </div>
 
                 <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
@@ -936,7 +943,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       <polyline points="8 6 2 12 8 18" />
                     </svg>
                   </div>
-                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, whiteSpace: 'nowrap', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>Custom Code</span>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, whiteSpace: 'nowrap', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>Custom Code</span>
                 </div>
 
                 <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
@@ -960,7 +967,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
                     </svg>
                   </div>
-                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>Queues</span>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>Queues</span>
                 </div>
 
                 <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
@@ -982,7 +989,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
                     </svg>
                   </div>
-                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, whiteSpace: 'nowrap', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>Manual Retry</span>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, whiteSpace: 'nowrap', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>Manual Retry</span>
                 </div>
               </div>
 
@@ -998,7 +1005,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     <div style={{ color: '#E06C55', fontSize: '13px', lineHeight: '20px', fontWeight: 700, flexShrink: 0 }}>
                       ✕
                     </div>
-                    <span style={{ fontSize: '13px', color: '#B5AEA3', lineHeight: '20px', letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                    <span style={{ fontSize: '13px', color: '#B5AEA3', lineHeight: '20px', letterSpacing: '-0.01em', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
                       {text}
                     </span>
                   </div>
@@ -1027,7 +1034,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 color: '#F5F0E7',
                 margin: '0 0 20px',
                 letterSpacing: '-0.01em',
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               }}>
                 With RelayForge
               </h3>
@@ -1067,7 +1074,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       <polyline points="14 2 14 8 20 8" />
                     </svg>
                   </div>
-                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>Event</span>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>Event</span>
                 </div>
 
                 <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
@@ -1090,7 +1097,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                     </svg>
                   </div>
-                  <span style={{ fontSize: '11px', color: '#F5F0E7', fontWeight: 700, letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>RelayForge</span>
+                  <span style={{ fontSize: '11px', color: '#F5F0E7', fontWeight: 700, letterSpacing: '-0.01em', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>RelayForge</span>
                 </div>
 
                 <span style={{ color: 'rgba(235, 225, 208, 0.28)', fontSize: '13px', flexShrink: 0 }}>→</span>
@@ -1114,7 +1121,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                       <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
                     </svg>
                   </div>
-                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, whiteSpace: 'nowrap', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>Your System</span>
+                  <span style={{ fontSize: '11px', color: '#858078', fontWeight: 600, whiteSpace: 'nowrap', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>Your System</span>
                 </div>
               </div>
 
@@ -1130,7 +1137,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     <div style={{ color: '#84CC16', fontSize: '14px', lineHeight: '20px', fontWeight: 700, flexShrink: 0 }}>
                       ✓
                     </div>
-                    <span style={{ fontSize: '13px', color: '#F5F0E7', fontWeight: 500, lineHeight: '20px', letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                    <span style={{ fontSize: '13px', color: '#F5F0E7', fontWeight: 500, lineHeight: '20px', letterSpacing: '-0.01em', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
                       {text}
                     </span>
                   </div>
@@ -1148,7 +1155,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             letterSpacing: '-0.02em',
             color: '#F5F0E7',
             margin: '0 0 12px',
-            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           }}>
             Better Insights. Bigger Impact.
           </h2>
@@ -1160,7 +1167,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             maxWidth: '580px',
             margin: '0 auto 36px',
             letterSpacing: '-0.01em',
-            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           }}>
             RelayForge gives you the reliability and visibility to turn events into measurable business outcomes.
           </p>
@@ -1216,10 +1223,10 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 height: '118px',
                 boxSizing: 'border-box',
               }}>
-                <div style={{ fontSize: '26px', fontWeight: 700, color: '#F5F0E7', lineHeight: 1, fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                <div style={{ fontSize: '26px', fontWeight: 700, color: '#F5F0E7', lineHeight: 1, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
                   {metric.renderValue()}
                 </div>
-                <div style={{ fontSize: '12px', color: '#858078', fontWeight: 500, lineHeight: 1.4, fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                <div style={{ fontSize: '12px', color: '#858078', fontWeight: 500, lineHeight: 1.4, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
                   {metric.label}
                 </div>
               </div>
@@ -1251,7 +1258,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               letterSpacing: '0.08em',
               color: '#858078',
               marginBottom: '14px',
-              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             }}>
               See It In Action
             </div>
@@ -1263,7 +1270,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               letterSpacing: '-0.02em',
               color: '#F5F0E7',
               margin: '0 0 18px',
-              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             }}>
               See RelayForge<br />
               In Action
@@ -1276,7 +1283,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               maxWidth: '430px',
               margin: '0 0 32px',
               letterSpacing: '-0.01em',
-              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             }}>
               Explore a live demo to see how events flow through workflows, retries, and delivery with full visibility.
             </p>
@@ -1298,7 +1305,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                   cursor: 'pointer',
                   boxShadow: '0 2px 10px rgba(0, 0, 0, 0.25)',
                   transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                  fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#FFFFFF';
@@ -1431,21 +1438,21 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                   </svg>
                 </div>
-                <span style={{ fontSize: '15px', fontWeight: 700, letterSpacing: '-0.01em', color: '#F5F0E7', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+                <span style={{ fontSize: '15px', fontWeight: 700, letterSpacing: '-0.01em', color: '#F5F0E7', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
                   RelayForge
                 </span>
               </div>
-              <p style={{ fontSize: '13px', color: '#858078', lineHeight: 1.55, marginTop: '14px', maxWidth: '300px', letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+              <p style={{ fontSize: '13px', color: '#858078', lineHeight: 1.55, marginTop: '14px', maxWidth: '300px', letterSpacing: '-0.01em', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
                 A durable event processing platform for reliable, scalable systems.
               </p>
             </div>
 
             {/* Product Column */}
             <div>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px', letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px', letterSpacing: '-0.01em', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
                 Product
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
                 <a href="#rf-metrics-section" style={{ color: '#858078', textDecoration: 'none', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Features</a>
                 <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Integrations</a>
                 <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Changelog</a>
@@ -1454,10 +1461,10 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
             {/* Solutions Column */}
             <div>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px', letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px', letterSpacing: '-0.01em', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
                 Solutions
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
                 <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Order Processing</a>
                 <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Notifications</a>
                 <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Data Sync</a>
@@ -1466,10 +1473,10 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
             {/* Resources Column */}
             <div>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px', letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px', letterSpacing: '-0.01em', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
                 Resources
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
                 <a href="https://github.com" target="_blank" rel="noreferrer" style={{ color: '#858078', textDecoration: 'none', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Docs</a>
                 <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Guides</a>
                 <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>API Reference</a>
@@ -1478,10 +1485,10 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
             {/* Company Column */}
             <div>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px', letterSpacing: '-0.01em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#F5F0E7', marginBottom: '14px', letterSpacing: '-0.01em', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
                 Company
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
                 <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>About</a>
                 <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Pricing</a>
                 <a onClick={() => setModalOpen(true)} role="button" style={{ color: '#858078', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.color = '#F5F0E7'} onMouseLeave={e => e.currentTarget.style.color = '#858078'}>Contact</a>
@@ -1500,7 +1507,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             gap: '16px',
             fontSize: '12px',
             color: '#666159',
-            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             letterSpacing: '-0.01em',
           }}>
             <div>
@@ -1633,7 +1640,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             }}>
               {/* Clean Title Case Headline */}
               <h2 style={{
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontSize: '22px',
                 fontWeight: 700,
                 letterSpacing: '-0.02em',
@@ -1763,7 +1770,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 <div style={{ marginBottom: '14px' }}>
                   <label style={{
                     display: 'block',
-                    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                     fontSize: '12px',
                     fontWeight: 500,
                     color: '#a1a1aa',
@@ -1805,7 +1812,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                 <div style={{ marginBottom: '16px' }}>
                   <label style={{
                     display: 'block',
-                    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                     fontSize: '12px',
                     fontWeight: 500,
                     color: '#a1a1aa',
@@ -1909,7 +1916,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
                     fontSize: '13px',
                     fontWeight: 600,
                     letterSpacing: '-0.01em',
-                    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                     cursor: isLoading ? 'not-allowed' : 'pointer',
                     boxShadow: '0 4px 18px rgba(245, 238, 227, 0.15)',
                     transition: 'all 0.15s ease',
@@ -2128,13 +2135,13 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
               letterSpacing: '0.04em',
               color: '#E9D8B9',
               marginBottom: '12px',
-              fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#E9D8B9' }}></span>
               System Architecture Walkthrough
             </div>
 
-            <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#F5F0E7', margin: '0 0 10px', letterSpacing: '-0.02em', fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+            <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#F5F0E7', margin: '0 0 10px', letterSpacing: '-0.02em', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
               RelayForge in 90 Seconds
             </h3>
 
@@ -2188,6 +2195,17 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
 
       {/* Responsive Styles for Landing Page */}
       <style>{`
+        .rf-landing { --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        .rf-landing .rf-headline-line-2 {
+          font-family: Georgia, 'Times New Roman', serif !important;
+          font-weight: 400;
+          letter-spacing: -0.03em;
+        }
+        .rf-hero-headline { text-wrap: balance; }
+        .rf-landing-session-notice { position: relative; z-index: 101; padding: 12px 24px; background: #27231e; color: #f5f0e7; font-size: 14px; text-align: center; line-height: 1.5; }
+        .rf-landing-session-notice button { margin-left: 16px; font: inherit; color: inherit; background: transparent; border: 0; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; padding: 4px; }
+        .rf-landing-session-notice button:disabled { opacity: .6; cursor: wait; }
+
         @keyframes fadeIn {
           from { opacity: 0; transform: scale(0.98); }
           to { opacity: 1; transform: scale(1); }
@@ -2445,7 +2463,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn }) => {
             display: block !important;
           }
           .rf-hero-headline {
-            font-size: clamp(22px, 6vw, 30px) !important;
+            font-size: clamp(30px, 7vw, 42px) !important;
             line-height: 1.2 !important;
             margin-bottom: 24px !important;
           }

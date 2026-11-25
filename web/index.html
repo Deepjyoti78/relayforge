@@ -7,7 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F2F2F5'><path d='M13 10V3L4 14h7v7l9-11h-7z'/></svg>" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <script>
       (function() {
         try {
@@ -988,15 +988,15 @@
   </head>
   <body>
     <div id="root" style="position: relative; z-index: 1;">
-      <div style="min-height: 100vh; background-color: #F8F9FA; color: #09090B; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace;">
+      <div style="min-height: 100svh; background-color: #0D0C0B; color: #F5F0E7; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace;">
         <div style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
-          <div className="rf-loader-icon" class="rf-loader-icon" style="width: 44px; height: 44px; border-radius: 12px; background-color: #09090B; color: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);">
+          <div class="rf-loader-icon" aria-hidden="true" style="width: 44px; height: 44px; border-radius: 12px; background-color: #09090B; color: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
             </svg>
           </div>
-          <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #71717A; text-transform: uppercase;">
-            RELAYFORGE
+          <div role="status" aria-label="Loading RelayForge" style="font-size: 16px; font-weight: 700; letter-spacing: -0.02em; color: #B5AEA3;">
+            RelayForge
           </div>
         </div>
       </div>
