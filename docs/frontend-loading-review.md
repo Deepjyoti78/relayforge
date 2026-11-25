@@ -27,8 +27,8 @@ for reveal animations. Existing dashboard fonts load asynchronously, while its
 theme remains intact. Dashboard management code loads only when needed.
 
 A native React/CSS delivery ticker sits below the hero. It shows six explicit
-sample states, a duplicated aria-hidden track, pause/resume and hover/focus pause.
-Reduced-motion users receive a static wrapped list. It imports no third-party
+sample states, a duplicated aria-hidden track and hover/focus pause. The manual
+pause/resume button was removed at the user's request. Reduced-motion users receive a static wrapped list. It imports no third-party
 ticker script and claims no live customer metrics. The trust/technology-logo
 section has been removed in full at the user's request.
 

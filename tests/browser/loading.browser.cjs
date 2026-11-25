@@ -120,7 +120,7 @@ test('hero stays exactly two lines without clipped text across mobile and deskto
   await page.screenshot({ path: '.cache/landing-two-line-desktop.png' });
 });
 
-test('delivery ticker is labeled as a sample and can be paused and resumed', async ({ page }) => {
+test('delivery ticker is labeled as a sample and pauses on hover', async ({ page }) => {
   await page.route('**/v1/me', route => route.fulfill({ status: 401, json: {} }));
   await page.goto('/');
   const ticker = page.getByRole('region', { name: 'Webhook delivery preview' });
@@ -130,10 +130,9 @@ test('delivery ticker is labeled as a sample and can be paused and resumed', asy
   await expect(page.getByText('Trusted By Engineering Teams Building Reliable Systems', { exact: true })).toHaveCount(0);
   await expect(page.locator('.rf-trusted-section')).toHaveCount(0);
   await expect(ticker.getByRole('listitem')).toHaveCount(6);
-  await ticker.getByRole('button', { name: 'Pause delivery preview' }).click();
-  await expect(ticker.getByRole('button', { name: 'Resume delivery preview' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(ticker.getByRole('button', { name: 'Pause delivery preview' })).toHaveCount(0);
+  await ticker.hover();
   expect(await ticker.locator('.rf-ticker-track').evaluate(el => getComputedStyle(el).animationPlayState)).toBe('paused');
-  await ticker.getByRole('button', { name: 'Resume delivery preview' }).click();
   await page.mouse.move(0, 0);
   await page.locator('h1').click();
   expect(await ticker.locator('.rf-ticker-track').evaluate(el => getComputedStyle(el).animationPlayState)).toBe('running');

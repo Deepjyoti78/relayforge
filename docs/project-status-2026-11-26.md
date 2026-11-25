@@ -88,7 +88,7 @@ Redis branch. OAuth HTTP providers are mocked in automated browser tests.
   light sans computed styles and exactly two full headline lines at 320, 390,
   768, 1280 and 1860 pixels. API responses are synthetic.
 - Final follow-up after ticker/trust-strip edits: 9 Chromium cases passed in
-  32.7 seconds, including sample labeling, pause/resume, static reduced-motion
+  32.7 seconds, including sample labeling, ticker hover pause (manual pause button removed per user request), static reduced-motion
   layout and removed-section absence. Final frontend build passed: entry
   408.44 kB / 104.98 kB gzip. The scoped UI detector returned no findings.
 - Current frontend TypeScript/Vite build passed: entry 411.56 kB / 105.00 kB gzip,
