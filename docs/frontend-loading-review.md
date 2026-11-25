@@ -1,7 +1,9 @@
 # Landing and session loading refinement
 
 Local review branch: `codex/landing-loading-polish`, based on staging `d5552a7`.
-No deployment or remote publication performed. Redis/infrastructure work is separate.
+The initial UI commit `5c2e8e3` was subsequently pushed at the user's request;
+its hosted CI passed. Follow-up UI work remains local only. No deployment was
+performed. Redis/infrastructure work is separate.
 
 ## Behavior
 
@@ -16,11 +18,19 @@ status, a slow-response message after four seconds, reduced-motion support and
 an error recovery view. The initial HTML fallback now matches the dark surface.
 No artificial minimum loading duration was added.
 
-The landing page uses Helvetica Neue/Helvetica/Arial for sans-serif roles and
-Georgia/Times New Roman for the second hero line. Helvetica Neue is used where
-installed; no proprietary font is downloaded. Hero text/actions no longer wait
+The latest reference supersedes the original serif pairing: the landing page
+uses Helvetica Neue/Helvetica/Arial, regular-weight headings and a muted second
+hero line. Helvetica Neue is used where installed; no proprietary font is
+downloaded. The hero reads “Every event.” / “Delivered reliably.” and remains
+two lines at the five tested viewport widths. Hero text/actions no longer wait
 for reveal animations. Existing dashboard fonts load asynchronously, while its
 theme remains intact. Dashboard management code loads only when needed.
+
+A native React/CSS delivery ticker sits below the hero. It shows six explicit
+sample states, a duplicated aria-hidden track, pause/resume and hover/focus pause.
+Reduced-motion users receive a static wrapped list. It imports no third-party
+ticker script and claims no live customer metrics. The trust/technology-logo
+section has been removed in full at the user's request.
 
 ## Local verification — 26 November 2026
 
@@ -56,3 +66,9 @@ The backend's 20-second deadline and infrastructure behavior are unchanged.
 Local visual evidence is under `.cache/landing-desktop.png`,
 `.cache/landing-mobile.png`, `.cache/session-loading-desktop.png`,
 `.cache/session-error-mobile.png` and `.cache/landing-login.png`.
+
+Follow-up final checks: 9 Chromium tests passed in 32.7 seconds, including ticker
+pause/resume, static reduced-motion mobile layout, two complete heading lines at
+five viewport widths and absence of the removed trust section. Frontend build
+passed (entry 408.44 kB / 104.98 kB gzip). Scoped UI detector returned no findings.
+These local follow-ups have not been pushed or covered by fresh hosted CI.

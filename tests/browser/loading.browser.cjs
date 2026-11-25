@@ -16,7 +16,7 @@ test('landing content and login are usable before the session request completes'
   });
   try {
     await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Reliable Webhooks');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Every event.');
     await expect(page.locator('#hero-signin-btn')).toBeVisible();
     expect(finished).toBe(false);
     await page.locator('#hero-signin-btn').click();
@@ -52,7 +52,7 @@ test('protected route keeps account data hidden during slow session verification
   await expect(page.locator('[data-active-tab]')).toHaveCount(0);
   await expect(page.getByRole('status')).toContainText('longer than usual', { timeout: 6000 });
   await page.screenshot({ path: '.cache/session-loading-desktop.png' });
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Reliable Webhooks', { timeout: 6000 });
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Every event.', { timeout: 6000 });
 });
 
 test('session outage is retryable and preserves the protected route', async ({ page }) => {
@@ -71,13 +71,20 @@ test('session outage is retryable and preserves the protected route', async ({ p
   await expect(page.locator('[data-active-tab]')).toHaveCount(0);
 });
 
-test('landing remains available when the API fails and typography uses the requested pairing', async ({ page }) => {
+test('landing remains available when the API fails and uses the new light sans typography', async ({ page }) => {
   await page.route('**/v1/me', route => route.fulfill({ status: 502, json: {} }));
   await page.goto('/');
   await expect(page.getByRole('alert')).toContainText('still explore');
   await expect(page.locator('#hero-signin-btn')).toBeVisible();
   expect(await page.locator('h1').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Helvetica Neue');
-  expect(await page.locator('.rf-headline-line-2').evaluate(el => getComputedStyle(el).fontFamily)).toContain('Georgia');
+  const secondLine = await page.locator('.rf-headline-line-2').evaluate(el => {
+    const style = getComputedStyle(el);
+    return { family: style.fontFamily, weight: style.fontWeight, color: style.color };
+  });
+  expect(secondLine.family).toContain('Helvetica Neue');
+  expect(secondLine.weight).toBe('400');
+  expect(secondLine.color).toBe('rgb(170, 165, 158)');
+  expect(await page.locator('h1').evaluate(el => getComputedStyle(el).fontWeight)).toBe('400');
 });
 
 test('mobile landing has no horizontal overflow and reduced-motion loading is static', async ({ page }) => {
@@ -93,4 +100,56 @@ test('mobile landing has no horizontal overflow and reduced-motion loading is st
   await expect(page.getByRole('alert')).toBeVisible();
   expect(await page.locator('.rf-session-relay span').first().evaluate(el => getComputedStyle(el).animationName)).toBe('none');
   await page.screenshot({ path: '.cache/session-error-mobile.png' });
+});
+
+test('hero stays exactly two lines without clipped text across mobile and desktop', async ({ page }) => {
+  await page.route('**/v1/me', route => route.fulfill({ status: 401, json: {} }));
+  await page.goto('/');
+  for (const width of [320, 390, 768, 1280, 1860]) {
+    await page.setViewportSize({ width, height: 940 });
+    const lines = await page.locator('.rf-hero-headline > span').evaluateAll(spans => spans.map(span => {
+      const range = document.createRange();
+      range.selectNodeContents(span);
+      const rects = [...range.getClientRects()];
+      const heading = span.parentElement.getBoundingClientRect();
+      return { text: span.textContent, count: rects.length, fits: rects.every(rect => rect.right <= heading.right + 1 && rect.right <= innerWidth) };
+    }));
+    expect(lines.map(line => line.text)).toEqual(['Every event.', 'Delivered reliably.']);
+    expect(lines.every(line => line.count === 1 && line.fits), `two complete lines at ${width}px`).toBe(true);
+  }
+  await page.screenshot({ path: '.cache/landing-two-line-desktop.png' });
+});
+
+test('delivery ticker is labeled as a sample and can be paused and resumed', async ({ page }) => {
+  await page.route('**/v1/me', route => route.fulfill({ status: 401, json: {} }));
+  await page.goto('/');
+  const ticker = page.getByRole('region', { name: 'Webhook delivery preview' });
+  await ticker.scrollIntoViewIfNeeded();
+  await expect(ticker).toContainText('Illustrative stream');
+  await expect(ticker).toContainText('No customer data');
+  await expect(page.getByText('Trusted By Engineering Teams Building Reliable Systems', { exact: true })).toHaveCount(0);
+  await expect(page.locator('.rf-trusted-section')).toHaveCount(0);
+  await expect(ticker.getByRole('listitem')).toHaveCount(6);
+  await ticker.getByRole('button', { name: 'Pause delivery preview' }).click();
+  await expect(ticker.getByRole('button', { name: 'Resume delivery preview' })).toHaveAttribute('aria-pressed', 'true');
+  expect(await ticker.locator('.rf-ticker-track').evaluate(el => getComputedStyle(el).animationPlayState)).toBe('paused');
+  await ticker.getByRole('button', { name: 'Resume delivery preview' }).click();
+  await page.mouse.move(0, 0);
+  await page.locator('h1').click();
+  expect(await ticker.locator('.rf-ticker-track').evaluate(el => getComputedStyle(el).animationPlayState)).toBe('running');
+  await page.screenshot({ path: '.cache/landing-ticker-desktop.png', fullPage: true });
+});
+
+test('reduced-motion ticker is static and all sample events remain readable on mobile', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: 320, height: 844 });
+  await page.route('**/v1/me', route => route.fulfill({ status: 401, json: {} }));
+  await page.goto('/');
+  const ticker = page.getByRole('region', { name: 'Webhook delivery preview' });
+  await ticker.scrollIntoViewIfNeeded();
+  expect(await ticker.locator('.rf-ticker-track').evaluate(el => getComputedStyle(el).animationName)).toBe('none');
+  await expect(ticker.getByRole('listitem')).toHaveCount(6);
+  await expect(ticker.getByRole('button')).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: '.cache/landing-ticker-mobile.png', fullPage: true });
 });

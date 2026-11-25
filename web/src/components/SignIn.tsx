@@ -2,6 +2,7 @@ import { getAuthStartUrl, setSessionToken } from '../api.ts';
 import React, { useState, useEffect } from 'react';
 import { InteractiveWorkflowDashboard } from './InteractiveWorkflowDashboard.tsx';
 import { AnimatedCounter } from './AnimatedCounter.tsx';
+import { DeliveryTicker } from './DeliveryTicker.tsx';
 
 interface SignInProps {
   sessionPending?: boolean;
@@ -514,15 +515,15 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn, sessionPending, s
               {/* Dominant Heading in Exactly Two Lines (Fixed Position) */}
               <h1 className="rf-hero-headline" style={{
                 fontSize: 'clamp(36px, 3.6vw, 56px)',
-                fontWeight: 700,
-                lineHeight: 1.18,
+                fontWeight: 400,
+                lineHeight: 1.08,
                 letterSpacing: '-0.025em',
                 color: '#F5F0E7',
                 margin: '0 0 28px',
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               }}>
-                <span className="rf-headline-line-1" style={{ display: 'block' }}>Reliable Webhooks &amp;</span>
-                <span className="rf-headline-line-2" style={{ display: 'block' }}>Sequential Workflows</span>
+                <span className="rf-headline-line-1" style={{ display: 'block' }}>Every event.</span>
+                <span className="rf-headline-line-2" style={{ display: 'block' }}>Delivered reliably.</span>
               </h1>
 
               {/* Supporting Description (Moved further below heading) */}
@@ -631,142 +632,8 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn, sessionPending, s
           </div>
         </section>
 
-        {/* 3. TRUSTED TECHNOLOGY SECTION (Shifted downward toward bottom of first fold) */}
-        <section className="rf-trusted-section" style={{
-          width: '100%',
-          maxWidth: '1400px',
-          margin: '0 auto',
-          padding: 'clamp(32px, 4.5vh, 56px) clamp(20px, 4vw, 52px) clamp(36px, 5vh, 60px)',
-          boxSizing: 'border-box',
-        }}>
-          {/* Horizontal Divider Line with Centered Label */}
-          <div className="rf-scroll-reveal" style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '24px',
-            marginBottom: '32px',
-            width: '100%',
-          }}>
-            <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(235, 225, 208, 0.12)' }} />
-            <span style={{
-              fontSize: '12px',
-              color: '#858078',
-              fontWeight: 600,
-              textAlign: 'center',
-              letterSpacing: '0.04em',
-              padding: '0 8px',
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            }}>
-              Trusted By Engineering Teams Building Reliable Systems
-            </span>
-            <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(235, 225, 208, 0.12)' }} />
-          </div>
+        <DeliveryTicker />
 
-          {/* 6 Logos Row: Vercel, Render, PostgreSQL, Redis, Docker, Kubernetes */}
-          <div className="rf-landing-logos" style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '24px',
-            width: '100%',
-            color: '#B5AEA3',
-            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            letterSpacing: '-0.01em',
-          }}>
-            {/* Vercel */}
-            <div
-              className="rf-scroll-reveal rf-stagger-1"
-              style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="12 2 22 20 2 20"></polygon>
-              </svg>
-              <span>Vercel</span>
-            </div>
-
-            {/* Render */}
-            <div
-              className="rf-scroll-reveal rf-stagger-2"
-              style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 4h7v7H3z M14 4h7v7h-7z M3 13h7v7H3z"></path>
-              </svg>
-              <span>Render</span>
-            </div>
-
-            {/* PostgreSQL */}
-            <div
-              className="rf-scroll-reveal rf-stagger-3"
-              style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
-                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
-                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
-              </svg>
-              <span>PostgreSQL</span>
-            </div>
-
-            {/* Redis */}
-            <div
-              className="rf-scroll-reveal rf-stagger-4"
-              style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                <polyline points="2 17 12 22 22 17"></polyline>
-                <polyline points="2 12 12 17 22 12"></polyline>
-              </svg>
-              <span>Redis</span>
-            </div>
-
-            {/* Docker */}
-            <div
-              className="rf-scroll-reveal rf-stagger-5"
-              style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="4" y="9" width="3" height="3"></rect>
-                <rect x="8" y="9" width="3" height="3"></rect>
-                <rect x="12" y="9" width="3" height="3"></rect>
-                <rect x="8" y="5" width="3" height="3"></rect>
-                <path d="M2 13c0 4 4 6 10 6s10-2 10-6c-2 0-3-1-4-1s-3 1-4 1H2z"></path>
-              </svg>
-              <span>Docker</span>
-            </div>
-
-            {/* Kubernetes */}
-            <div
-              className="rf-scroll-reveal rf-stagger-6"
-              style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#B5AEA3', transition: 'color 0.15s ease', cursor: 'default' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#F5F0E7'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#B5AEA3'; }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="9"></circle>
-                <circle cx="12" cy="12" r="3"></circle>
-                <line x1="12" y1="3" x2="12" y2="9"></line>
-                <line x1="12" y1="15" x2="12" y2="21"></line>
-                <line x1="3" y1="12" x2="9" y2="12"></line>
-                <line x1="15" y1="12" x2="21" y2="12"></line>
-              </svg>
-              <span>Kubernetes</span>
-            </div>
-          </div>
-        </section>
       </div>
 
       {/* 4. MAIN COMPARISON SECTION: RAW EVENTS TO RELIABLE WORKFLOWS */}
@@ -2196,12 +2063,20 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn, sessionPending, s
       {/* Responsive Styles for Landing Page */}
       <style>{`
         .rf-landing { --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-        .rf-landing .rf-headline-line-2 {
-          font-family: Georgia, 'Times New Roman', serif !important;
-          font-weight: 400;
-          letter-spacing: -0.03em;
+        .rf-landing h1, .rf-landing h2 {
+          font-weight: 400 !important;
+          letter-spacing: -0.035em;
         }
-        .rf-hero-headline { text-wrap: balance; }
+        .rf-landing h3 { font-weight: 500 !important; }
+        .rf-landing .rf-headline-line-2 {
+          font-family: var(--font-sans) !important;
+          font-weight: 400;
+          color: #aaa59e;
+          letter-spacing: -0.035em;
+        }
+        .rf-landing .rf-go-from-line-2 { color: #aaa59e; }
+        .rf-hero-headline { text-wrap: initial; }
+        .rf-hero-headline > span { white-space: nowrap; }
         .rf-landing-session-notice { position: relative; z-index: 101; padding: 12px 24px; background: #27231e; color: #f5f0e7; font-size: 14px; text-align: center; line-height: 1.5; }
         .rf-landing-session-notice button { margin-left: 16px; font: inherit; color: inherit; background: transparent; border: 0; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; padding: 4px; }
         .rf-landing-session-notice button:disabled { opacity: .6; cursor: wait; }
@@ -2469,7 +2344,7 @@ export const SignIn: React.FC<SignInProps> = ({ onTokenSignIn, sessionPending, s
           }
           .rf-headline-line-1, .rf-headline-line-2 {
             display: block !important;
-            white-space: normal !important;
+            white-space: nowrap !important;
           }
           .rf-hero-desc {
             font-size: 15px !important;
