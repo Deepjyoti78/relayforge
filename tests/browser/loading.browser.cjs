@@ -50,6 +50,19 @@ test('protected route keeps account data hidden during slow session verification
   await page.goto('/dashboard?tab=deliveries');
   await expect(page.getByRole('heading', { name: 'Opening your workspace.' })).toBeVisible();
   await expect(page.locator('[data-active-tab]')).toHaveCount(0);
+  const butterfly = page.locator('.rf-session-butterfly');
+  const firstFrame = await butterfly.evaluate(el => el.toDataURL());
+  await expect.poll(() => butterfly.evaluate(el => el.toDataURL())).not.toBe(firstFrame);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: 393, height: 852 });
+  await page.waitForTimeout(100);
+  const stillFrame = await butterfly.evaluate(el => el.toDataURL());
+  await page.waitForTimeout(150);
+  expect(await butterfly.evaluate(el => el.toDataURL())).toBe(stillFrame);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: '.cache/session-loading-mobile.png' });
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   await expect(page.getByRole('status')).toContainText('longer than usual', { timeout: 6000 });
   await page.screenshot({ path: '.cache/session-loading-desktop.png' });
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Every event.', { timeout: 6000 });
@@ -98,7 +111,12 @@ test('mobile landing has no horizontal overflow and reduced-motion loading is st
   await page.route('**/v1/me', route => route.fulfill({ status: 503, json: {} }));
   await page.goto('/dashboard');
   await expect(page.getByRole('alert')).toBeVisible();
-  expect(await page.locator('.rf-session-relay span').first().evaluate(el => getComputedStyle(el).animationName)).toBe('none');
+  const butterfly = page.locator('.rf-session-butterfly');
+  await expect(butterfly).toBeVisible();
+  const still = await butterfly.evaluate(el => el.toDataURL());
+  await page.waitForTimeout(150);
+  expect(await butterfly.evaluate(el => el.toDataURL())).toBe(still);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: '.cache/session-error-mobile.png' });
 });
 
