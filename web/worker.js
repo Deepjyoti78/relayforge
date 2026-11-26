@@ -14,6 +14,13 @@ function configuredOrigin(value, allowLocal = false) {
 export async function proxyRequest(request, env, fetchUpstream = fetch) {
   const incoming = new URL(request.url);
   if (!apiPath(incoming.pathname)) return env.ASSETS.fetch(request);
+  // Branch previews render public UI only; never share deployed sessions/data.
+  if (env.PREVIEW_ONLY === 'true') {
+    if (incoming.pathname === '/v1/me' && request.method === 'GET') {
+      return Response.json({message:'UI preview: no authenticated session'}, {status:401, headers:{'Cache-Control':'no-store'}});
+    }
+    return unavailable('Sign-in and API access are disabled in this UI preview. Use https://relayforge.deepmuse.workers.dev.');
+  }
   let upstreamOrigin, frontendOrigin;
   try {
     upstreamOrigin = configuredOrigin(env.API_ORIGIN);

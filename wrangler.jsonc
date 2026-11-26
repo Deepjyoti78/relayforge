@@ -7,6 +7,13 @@
     "FRONTEND_URL": "https://relayforge.deepmuse.workers.dev",
     "API_ORIGIN": "https://relayforge-staging-api.onrender.com"
   },
+  "previews": {
+    "vars": {
+      "FRONTEND_URL": "https://preview.invalid",
+      "API_ORIGIN": "https://preview-api.invalid",
+      "PREVIEW_ONLY": "true"
+    }
+  },
   "assets": {
     "directory": "./web/dist",
     "binding": "ASSETS",

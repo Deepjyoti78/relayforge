@@ -1,0 +1,29 @@
+.rf-session-screen {
+  --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  min-height: 100svh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background: #0d0c0b;
+  color: #f5f0e7;
+  padding: clamp(24px, 5vw, 64px);
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.rf-session-brand { color: inherit; text-decoration: none; font-size: 20px; font-weight: 700; letter-spacing: -.03em; align-self: flex-start; }
+.rf-session-brand span { margin-left: 8px; color: #b5aea3; }
+.rf-session-content { margin: auto; width: min(100%, 520px); padding: 64px 0; text-align: center; }
+.rf-session-content h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 400; font-family: Georgia, 'Times New Roman', serif !important; letter-spacing: -.03em; line-height: 1.15; margin: 32px 0 16px; text-wrap: balance; }
+.rf-session-content p { color: #b5aea3; font-size: 16px; line-height: 1.65; max-width: 38ch; margin: auto; text-wrap: pretty; }
+.rf-session-relay { display: flex; align-items: center; justify-content: center; gap: 10px; height: 32px; }
+.rf-session-relay span { width: 10px; height: 10px; background: #e9d8b9; border-radius: 3px; animation: rf-relay-pulse 1.5s ease-in-out infinite; }
+.rf-session-relay span:nth-child(2) { animation-delay: .18s; }
+.rf-session-relay span:nth-child(3) { animation-delay: .36s; }
+.rf-session-relay-paused span { animation: none; opacity: .4; }
+.rf-session-actions { margin-top: 28px; display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; }
+.rf-session-actions button { font: inherit; font-weight: 600; background: #f5f0e7; color: #0d0c0b; padding: 12px 20px; border: 0; border-radius: 8px; cursor: pointer; }
+.rf-session-actions a { color: #f5f0e7; text-underline-offset: 5px; }
+.rf-session-actions button:hover { background: #e9d8b9; }
+.rf-session-screen :focus-visible { outline: 2px solid #e9d8b9; outline-offset: 5px; }
+.rf-session-footnote { color: #b5aea3; text-align: center; font-size: 13px; margin: 0; }
+@keyframes rf-relay-pulse { 0%, 70%, 100% { opacity: .3; transform: translateY(0); } 35% { opacity: 1; transform: translateY(-6px); } }
+@media (prefers-reduced-motion: reduce) { .rf-session-relay span { animation: none; opacity: .7; } }

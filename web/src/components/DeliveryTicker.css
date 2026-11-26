@@ -1,0 +1,38 @@
+.rf-delivery-ticker {
+  width: min(100%, 1400px);
+  align-self: center;
+  box-sizing: border-box;
+  padding: 16px clamp(20px, 4vw, 52px) 32px;
+  color: #f5f0e7;
+}
+.rf-ticker-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; font-size: 14px; }
+.rf-ticker-heading > div { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rf-ticker-indicator { width: 6px; height: 6px; border-radius: 50%; background: #e9d8b9; }
+.rf-ticker-demo { font-size: 12px; color: #aaa59e; margin-left: 4px; }
+.rf-ticker-heading button { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; padding: 8px 10px; background: transparent; border: 1px solid #49443d; border-radius: 6px; color: #c9c2b7; font: inherit; font-size: 12px; cursor: pointer; }
+.rf-ticker-heading button:hover { background: #211e19; color: #f5f0e7; }
+.rf-ticker-heading button:focus-visible { outline: 2px solid #e9d8b9; outline-offset: 4px; }
+.rf-ticker-window { border-top: 1px dashed #49443d; border-bottom: 1px dashed #49443d; overflow: hidden; }
+.rf-ticker-track { display: flex; width: max-content; animation: rf-delivery-tape 48s linear infinite; }
+.rf-ticker-events { display: flex; flex-shrink: 0; list-style: none; padding: 0; margin: 0; }
+.rf-ticker-events li { display: flex; align-items: center; gap: 16px; padding: 22px 28px; white-space: nowrap; border-right: 1px solid #302b25; }
+.rf-delivery-ticker .rf-ticker-events span, .rf-delivery-ticker .rf-ticker-caption span { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace !important; font-size: 13px; letter-spacing: 0; }
+.rf-ticker-event { color: #ddd6cb; }
+.rf-ticker-success { color: #a9c98b; }
+.rf-ticker-retry { color: #e6bc74; }
+.rf-ticker-neutral { color: #b5aea3; }
+.rf-ticker-caption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; padding-top: 12px; color: #aaa59e; }
+.rf-delivery-ticker .rf-ticker-caption span { font-size: 11px; line-height: 1.5; }
+.rf-ticker-paused .rf-ticker-track, .rf-delivery-ticker:hover .rf-ticker-track, .rf-delivery-ticker:focus-within .rf-ticker-track { animation-play-state: paused; }
+@keyframes rf-delivery-tape { to { transform: translateX(-50%); } }
+@media (max-width: 600px) {
+  .rf-ticker-demo { width: 100%; margin-left: 16px; }
+  .rf-ticker-events li { padding: 18px 20px; gap: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rf-ticker-track { animation: none; width: 100%; }
+  .rf-ticker-events { width: 100%; flex-wrap: wrap; }
+  .rf-ticker-events li { flex-wrap: wrap; white-space: normal; padding: 12px; border-right: 0; }
+  .rf-ticker-events[aria-hidden='true'] { display: none; }
+  .rf-ticker-heading button { display: none; }
+}
