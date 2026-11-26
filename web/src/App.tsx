@@ -16,6 +16,7 @@ import {
   updateOrganization,
 } from './api.ts';
 import { SessionLoading } from './components/SessionLoading.tsx';
+import './DashboardTheme.css';
 import { OrganizationOnboardingModal } from './components/OrganizationOnboardingModal.tsx';
 import { ProfileModal } from './components/ProfileModal.tsx';
 import { Sidebar } from './components/Sidebar.tsx';

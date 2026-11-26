@@ -1,0 +1,54 @@
+/* All dark dashboard presets share the landing page's brand foundation.
+   Light presets retain their existing palettes. */
+html.dark[data-theme] {
+  --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --color-0: #0d0c0b;
+  --color-1: #141311;
+  --color-2: #1a1917;
+  --color-3: #aaa59e;
+  --color-4: #b5aea3;
+  --color-5: #e9d8b9;
+  --color-6: #f5f0e7;
+  --bg-main: #0d0c0b;
+  --bg-card: #141311;
+  --bg-sidebar: #0d0c0b;
+  --bg-topbar: #0d0c0b;
+  --bg-input: #1a1917;
+  --bg-hover: #27231e;
+  --border-main: #35312b;
+  --border-subtle: #27231e;
+  --text-primary: #f5f0e7;
+  --text-secondary: #b5aea3;
+  --text-muted: #aaa59e;
+  --accent-primary: #f5f0e7;
+  --accent-foreground: #0d0c0b;
+  --badge-bg: #27231e;
+  --badge-text: #e9d8b9;
+  --shadow-card: 0 2px 8px rgb(0 0 0 / 12%);
+  --scrollbar-thumb: #35312b;
+  --scrollbar-thumb-hover: #575047;
+  color-scheme: dark;
+}
+
+/* Scope typography to the authenticated shell, including its dialogs. */
+html.dark .rf-app-enter {
+  background-color: var(--bg-main) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .rf-app-enter :is(h1, h2, .rf-h1, .rf-h2) {
+  font-weight: 400 !important;
+  letter-spacing: -.035em;
+  line-height: 1.2;
+}
+
+html.dark .rf-app-enter :is(h3, h4, h5, h6, .rf-h3) {
+  font-weight: 500 !important;
+  letter-spacing: -.015em;
+}
+
+html.dark .rf-app-enter .rf-card-value {
+  font-weight: 400 !important;
+  letter-spacing: -.035em;
+}
