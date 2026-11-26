@@ -35,13 +35,14 @@ No live setting, branch publication or deployment was changed by this task.
 2. In Cloudflare select the existing **relayforge** Worker → Settings → Builds.
    Set Root directory to `web` to avoid automatically installing the backend's
    715 packages for a frontend build. Set:
-   - Build: `npm ci --include=dev && npm run build:cloudflare`
+   - Build: `npm run build:cloudflare`
    - Preview command: `npx --yes wrangler@4.168.0 preview --config wrangler.jsonc`
    - Production deploy command: `npx --yes wrangler@4.168.0 deploy --config wrangler.jsonc`
    These deploy commands are instructions for an approved release, not commands
    executed by this task. Node 22.23.5/npm 10.9.2 in the supplied log are compatible.
 3. If deliberately keeping repository root `/`, instead use build
-   `npm --prefix web ci --include=dev && npm run build:cloudflare`. Cloudflare may
+   `npm run build:cloudflare`. The wrapper installs frontend dependencies itself;
+   Cloudflare may
    still automatically install backend dependencies in that root. The two deploy
    commands stay the same; the matching Wrangler entry point is selected explicitly.
 4. Check production branch selection. Deploying a branch Preview does not update
@@ -68,3 +69,16 @@ passed; built preview passed desktop/mobile Chromium checks with zero upstream A
 calls; both Wrangler configs passed no-upload dry-run/effective-binding checks;
 git diff --check passed. No backend/DB suite was rerun for these eight frontend
 configuration/gateway/documentation files. No dependency versions or lockfiles changed.
+
+The subsequent 26 November log exposed another root-directory issue: installing
+root dependencies does not install web dependencies. The wrapper now always runs
+`npm --prefix web ci --include=dev` before compiling. Frontend build uses `vite`
+directly, so missing tooling fails clearly instead of npx downloading Vite 8.
+Use only `npm run build:cloudflare` as the Build command from either root to avoid
+an extra root reinstall. Root directory `web` is still the cheaper choice.
+
+Follow-up validation: a fresh isolated checkout fixture with no backend or frontend
+node_modules installed built successfully through the wrapper: 69 frontend packages,
+zero frontend audit findings, locked Vite 6.4.5. All 17 build/proxy/preview tests
+passed, including install-before-build and failure propagation. No dependency
+versions or lockfiles changed. Hosted success must be checked on the new commit.
